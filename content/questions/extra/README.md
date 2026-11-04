@@ -1,13 +1,14 @@
 # Zusatzfragen (Fragen aus gesondert gekennzeichneten Quellen)
 
-Dateien in diesem Verzeichnis sind **Zusatzfragen**. Sie werden bei `lpic3ctl content-sync` zwar importiert, bleiben für Lernende aber unsichtbar, bis ein Betreuer die Quelle unter *Verwaltung › Zusatzfragen* für eine Lerngruppe freischaltet. Jede Frage trägt in der Oberfläche die Kennzeichnung „Zusatzfrage“ mit Quelle und Rechtestatus.
+Dateien in diesem Verzeichnis sind **externe Zusatzquellen**. Sie werden bei `lpic3ctl content-sync` zwar importiert, bleiben aber unveröffentlicht, bis ein Betreuer sie unter *Verwaltung › Freigaben* für eine Lerngruppe oder ein Administrator sie systemweit freigibt. Jede Frage trägt in der Oberfläche die Kennzeichnung „Zusatzfrage“ mit Quelle und Rechtestatus.
 
 Pflichtfelder im Dateikopf:
 
 | Feld | Bedeutung |
 |------|-----------|
-| `"supplementary": true` | kennzeichnet die Datei als Zusatzquelle |
+| `"supplementary": true` | kennzeichnet die mitgelieferte Datei als externe Quelle (unveröffentlicht) |
 | `"source"` | Quellenbezeichnung, wie sie Betreuer und Lernende sehen, z. B. `ExamTopics 04.11.2026` |
+| `"exam_version"` | Prüfungsgeneration, z. B. `3.0` |
 | `"rights"` | `cleared` (Lizenz bekannt), `unknown`, `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt) |
 | `"license"` | kurzer Hinweistext (max. 255 Zeichen) |
 

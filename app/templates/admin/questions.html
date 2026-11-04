@@ -11,14 +11,14 @@
 </form>
 <p class="muted">{{ questions | length }} Fragen (maximal 300 angezeigt)</p>
 <table class="table">
-  <thead><tr><th>ID</th><th>Ziel</th><th>Frage</th><th>Typ</th><th>Sichtbar</th><th>Status</th><th></th></tr></thead>
+  <thead><tr><th>ID</th><th>Ziel</th><th>Frage</th><th>Typ</th><th>Freigabe</th><th>Status</th><th></th></tr></thead>
   <tbody>
   {% for q in questions %}
   <tr class="{% if not q.is_active %}row-dim{% endif %}">
     <td>{{ q.external_id }}{% if q.supplementary %} <span class="tag tag-warn">Zusatz</span>{% endif %}</td>
     <td>{{ q.objective.code if q.objective else '–' }}</td>
     <td><a href="/question/{{ q.id }}">{{ q.text_en[:120] }}{% if q.text_en | length > 120 %}…{% endif %}</a></td>
-    <td>{{ q.kind }}</td><td>{{ q.visibility }}</td><td>{% if q.is_active %}aktiv{% else %}inaktiv{% endif %}</td>
+    <td>{{ q.kind }}</td><td>{% if q.visibility == 'public' %}freigegeben{% else %}gruppenweise / unveröffentlicht{% endif %}</td><td>{% if q.is_active %}aktiv{% else %}inaktiv{% endif %}</td>
     <td>{% if user.is_admin or q.created_by == user.id %}<form method="post" action="/admin/questions/{{ q.id }}/toggle" class="inline"><button class="btn btn-small" type="submit">{% if q.is_active %}Deaktivieren{% else %}Aktivieren{% endif %}</button></form>{% endif %}</td>
   </tr>
   {% endfor %}

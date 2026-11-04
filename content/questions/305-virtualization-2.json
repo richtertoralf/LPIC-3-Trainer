@@ -2,289 +2,858 @@
   "schema_version": 1,
   "kind": "questions",
   "module": "305",
+  "source": "LPIC-3 Trainer Projekt",
+  "exam_version": "3.0",
+  "rights": "cleared",
   "license": "CC BY-SA 4.0",
   "author": "LPIC-3 Trainer Projekt",
-  "visibility": "public",
   "questions": [
-    {"id": "305-351.1-04", "objective": "351.1", "type": "single", "difficulty": 2,
-     "question": "What distinguishes a type 1 hypervisor from a type 2 hypervisor?",
-     "question_de": "Was unterscheidet einen Typ-1-Hypervisor von einem Typ-2-Hypervisor?",
-     "choices": [
-       {"text": "A type 1 hypervisor runs directly on the hardware, a type 2 hypervisor runs as an application on a host operating system.", "text_de": "Ein Typ-1-Hypervisor läuft direkt auf der Hardware, ein Typ-2-Hypervisor als Anwendung auf einem Host-Betriebssystem.", "correct": true},
-       {"text": "A type 1 hypervisor supports only Linux guests.", "text_de": "Ein Typ-1-Hypervisor unterstützt nur Linux-Gäste."},
-       {"text": "A type 2 hypervisor does not need CPU virtualization extensions.", "text_de": "Ein Typ-2-Hypervisor braucht keine CPU-Virtualisierungserweiterungen."},
-       {"text": "Type 2 hypervisors are always paravirtualized.", "text_de": "Typ-2-Hypervisoren sind immer paravirtualisiert."}],
-     "explanation_de": "Xen und ESXi sind Typ 1 (bare metal), VirtualBox ist Typ 2. KVM nimmt eine Zwischenstellung ein: der Linux-Kernel wird selbst zum Hypervisor. Beide Typen nutzen heute VT-x/AMD-V.",
-     "terms": [{"term": "distinguish", "de": "unterscheiden"}]},
-    {"id": "305-351.1-05", "objective": "351.1", "type": "single", "difficulty": 2,
-     "question": "A VM is paused with virsh suspend. What happens to its state?",
-     "question_de": "Eine VM wird mit virsh suspend pausiert. Was geschieht mit ihrem Zustand?",
-     "choices": [
-       {"text": "The vCPUs stop, memory stays allocated on the host and the VM continues exactly where it stopped after resume.", "text_de": "Die vCPUs halten an, der Speicher bleibt auf dem Host belegt, nach resume läuft die VM genau dort weiter.", "correct": true},
-       {"text": "The memory is written to disk and freed on the host.", "text_de": "Der Speicher wird auf die Platte geschrieben und auf dem Host freigegeben."},
-       {"text": "The guest operating system performs an orderly shutdown.", "text_de": "Das Gastbetriebssystem fährt geordnet herunter."},
-       {"text": "A disk snapshot is created automatically.", "text_de": "Ein Platten-Snapshot wird automatisch erzeugt."}],
-     "explanation_de": "suspend/resume pausieren nur die Ausführung. virsh save schreibt den Speicher in eine Datei und beendet die VM (managedsave ebenso), shutdown fährt den Gast per ACPI herunter, Snapshots sind getrennte Operationen.",
-     "terms": []},
-    {"id": "305-351.1-06", "objective": "351.1", "type": "single", "difficulty": 2,
-     "question": "Which open source platform combines KVM virtualization and LXC containers in a web-managed cluster and is often used in small data centers?",
-     "question_de": "Welche Open-Source-Plattform kombiniert KVM-Virtualisierung und LXC-Container in einem webverwalteten Cluster und wird oft in kleinen Rechenzentren eingesetzt?",
-     "choices": [
-       {"text": "Proxmox VE", "text_de": "Proxmox VE", "correct": true},
-       {"text": "Open vSwitch", "text_de": "Open vSwitch"},
-       {"text": "systemd-machined", "text_de": "systemd-machined"},
-       {"text": "Packer", "text_de": "Packer"}],
-     "explanation_de": "Proxmox VE basiert auf Debian, nutzt KVM/QEMU und LXC, bietet Cluster, HA und Ceph-Integration. oVirt ist die Alternative auf KVM-Basis. Open vSwitch ist ein virtueller Switch, systemd-machined verwaltet lokale Container und VMs, Packer baut Images.",
-     "terms": []},
-    {"id": "305-351.2-03", "objective": "351.2", "type": "single", "difficulty": 2,
-     "question": "Which xl.cfg setting defines a paravirtualized Xen guest that boots a kernel provided by the Dom0?",
-     "question_de": "Welche xl.cfg-Einstellung definiert einen paravirtualisierten Xen-Gast, der einen vom Dom0 bereitgestellten Kernel bootet?",
-     "choices": [
-       {"text": "type = \"pv\" together with kernel = \"/boot/vmlinuz-guest\"", "text_de": "type = \"pv\" zusammen mit kernel = \"/boot/vmlinuz-guest\"", "correct": true},
-       {"text": "type = \"hvm\" together with boot = \"c\"", "text_de": "type = \"hvm\" zusammen mit boot = \"c\""},
-       {"text": "builder = \"qemu\"", "text_de": "builder = \"qemu\""},
-       {"text": "bootloader = \"grub\" together with type = \"hvm\"", "text_de": "bootloader = \"grub\" zusammen mit type = \"hvm\""}],
-     "explanation_de": "PV-Gäste erhalten Kernel und initrd aus dem Dom0 (kernel=, ramdisk=) oder über bootloader = \"pygrub\" aus dem Gast-Image. HVM-Gäste booten über ihr eigenes BIOS/UEFI von der virtuellen Platte (boot=\"c\").",
-     "terms": []},
-    {"id": "305-351.3-04", "objective": "351.3", "type": "single", "difficulty": 2,
-     "question": "Which QEMU monitor command creates a snapshot of the running VM including memory inside a qcow2 image?",
-     "question_de": "Welcher QEMU-Monitor-Befehl erzeugt einen Snapshot der laufenden VM einschließlich Speicher in einem qcow2-Image?",
-     "choices": [
-       {"text": "savevm snap1", "text_de": "savevm snap1", "correct": true},
-       {"text": "snapshot_blkdev drive0 snap1", "text_de": "snapshot_blkdev drive0 snap1"},
-       {"text": "migrate exec:cat>snap1", "text_de": "migrate exec:cat>snap1"},
-       {"text": "info snapshots", "text_de": "info snapshots"}],
-     "explanation_de": "savevm speichert einen internen Snapshot mit VM-Zustand, loadvm lädt ihn, delvm löscht ihn, info snapshots listet sie. snapshot_blkdev erzeugt einen externen Disk-Snapshot ohne Speicher, migrate exec speichert den Zustand in eine Datei.",
-     "terms": []},
-    {"id": "305-351.3-05", "objective": "351.3", "type": "single", "difficulty": 2,
-     "question": "What is the role of the QEMU guest agent?",
-     "question_de": "Welche Rolle hat der QEMU Guest Agent?",
-     "choices": [
-       {"text": "It runs inside the guest and lets the host execute actions such as freezing file systems, reading IP addresses or setting the time.", "text_de": "Er läuft im Gast und erlaubt dem Host Aktionen wie das Einfrieren von Dateisystemen, Abfragen von IP-Adressen oder Setzen der Uhrzeit.", "correct": true},
-       {"text": "It replaces the VirtIO drivers.", "text_de": "Er ersetzt die VirtIO-Treiber."},
-       {"text": "It provides the graphical console via SPICE.", "text_de": "Er stellt die grafische Konsole über SPICE bereit."},
-       {"text": "It emulates the CPU for guests without KVM.", "text_de": "Er emuliert die CPU für Gäste ohne KVM."}],
-     "explanation_de": "qemu-guest-agent kommuniziert über einen virtio-serial-Kanal (org.qemu.guest_agent.0). virsh domfsfreeze, domifaddr --source agent oder konsistente Snapshots (--quiesce) nutzen ihn.",
-     "terms": []},
-    {"id": "305-351.4-06", "objective": "351.4", "type": "single", "difficulty": 2,
-     "question": "Which virsh command shows the libvirt virtual networks and which file defines the default network?",
-     "question_de": "Welcher virsh-Befehl zeigt die virtuellen libvirt-Netze, und welche Datei definiert das Netz default?",
-     "choices": [
-       {"text": "virsh net-list --all; /etc/libvirt/qemu/networks/default.xml", "text_de": "virsh net-list --all; /etc/libvirt/qemu/networks/default.xml", "correct": true},
-       {"text": "virsh iface-list; /etc/network/interfaces", "text_de": "virsh iface-list; /etc/network/interfaces"},
-       {"text": "virsh domiflist; /etc/libvirt/libvirtd.conf", "text_de": "virsh domiflist; /etc/libvirt/libvirtd.conf"},
-       {"text": "virsh net-dumpxml; /etc/dnsmasq.conf", "text_de": "virsh net-dumpxml; /etc/dnsmasq.conf"}],
-     "explanation_de": "Virtuelle Netze werden mit net-list, net-start, net-autostart, net-edit und net-dumpxml verwaltet; ihre XML-Definitionen liegen unter /etc/libvirt/qemu/networks/. Das Netz default ist ein NAT-Netz mit virbr0, für das libvirt eine eigene dnsmasq-Instanz startet.",
-     "terms": []},
-    {"id": "305-351.4-07", "objective": "351.4", "type": "single", "difficulty": 2,
-     "question": "Which virsh command attaches an additional disk image to the running domain vm1 and keeps it in the persistent configuration?",
-     "question_de": "Welcher virsh-Befehl hängt ein zusätzliches Disk-Image an die laufende Domäne vm1 an und behält es in der dauerhaften Konfiguration?",
-     "choices": [
-       {"text": "virsh attach-disk vm1 /var/lib/libvirt/images/data.qcow2 vdb --driver qemu --subdriver qcow2 --persistent", "text_de": "virsh attach-disk vm1 /var/lib/libvirt/images/data.qcow2 vdb --driver qemu --subdriver qcow2 --persistent", "correct": true},
-       {"text": "virsh vol-attach vm1 data.qcow2", "text_de": "virsh vol-attach vm1 data.qcow2"},
-       {"text": "virsh blockresize vm1 vdb data.qcow2", "text_de": "virsh blockresize vm1 vdb data.qcow2"},
-       {"text": "qemu-img attach data.qcow2 vm1", "text_de": "qemu-img attach data.qcow2 vm1"}],
-     "explanation_de": "attach-disk fügt ein Gerät hinzu; --live wirkt auf die laufende, --config auf die gespeicherte Definition, --persistent auf beides. detach-disk entfernt es. blockresize ändert die Größe eines angeschlossenen Blockgeräts.",
-     "terms": []},
-    {"id": "305-351.4-08", "objective": "351.4", "type": "single", "difficulty": 2,
-     "question": "Which URI connects virsh to the system libvirt daemon on the remote host kvm2 via SSH?",
-     "question_de": "Welche URI verbindet virsh über SSH mit dem System-libvirt-Daemon auf dem entfernten Host kvm2?",
-     "choices": [
-       {"text": "qemu+ssh://root@kvm2/system", "text_de": "qemu+ssh://root@kvm2/system", "correct": true},
-       {"text": "qemu:///session@kvm2", "text_de": "qemu:///session@kvm2"},
-       {"text": "ssh://kvm2/libvirt", "text_de": "ssh://kvm2/libvirt"},
-       {"text": "xen+tcp://kvm2/system", "text_de": "xen+tcp://kvm2/system"}],
-     "explanation_de": "Die URI besteht aus Treiber, Transport, Host und Pfad: /system ist der privilegierte Daemon, /session der Benutzerdaemon. qemu:///system ist die lokale Standardverbindung. tcp und tls sind weitere Transporte, xen der Treiber für Xen-Hosts.",
-     "terms": []},
-    {"id": "305-351.4-09", "objective": "351.4", "type": "single", "difficulty": 2,
-     "question": "Which virsh command shows CPU time, memory usage and block I/O statistics of the domain vm1 for resource analysis?",
-     "question_de": "Welcher virsh-Befehl zeigt zur Ressourcenanalyse CPU-Zeit, Speichernutzung und Block-I/O-Statistiken der Domäne vm1?",
-     "choices": [
-       {"text": "virsh domstats vm1", "text_de": "virsh domstats vm1", "correct": true},
-       {"text": "virsh dominfo vm1", "text_de": "virsh dominfo vm1"},
-       {"text": "virsh dumpxml vm1", "text_de": "virsh dumpxml vm1"},
-       {"text": "virsh capabilities", "text_de": "virsh capabilities"}],
-     "explanation_de": "domstats liefert alle Statistikgruppen (--cpu-total, --balloon, --block, --interface). dominfo zeigt nur Basisdaten wie vCPUs und maximalen Speicher. Einzelwerte liefern auch domblkstat, domifstat und dommemstat; virt-top fasst alles live zusammen.",
-     "terms": []},
-    {"id": "305-351.5-03", "objective": "351.5", "type": "single", "difficulty": 2,
-     "question": "Which command increases the size of the qcow2 image disk.qcow2 by 10 GB, and what has to be done afterwards inside the guest?",
-     "question_de": "Welcher Befehl vergrößert das qcow2-Image disk.qcow2 um 10 GB, und was ist danach im Gast zu tun?",
-     "choices": [
-       {"text": "qemu-img resize disk.qcow2 +10G; afterwards grow partition and file system inside the guest (or use virt-resize)", "text_de": "qemu-img resize disk.qcow2 +10G; danach Partition und Dateisystem im Gast vergrößern (oder virt-resize nutzen)", "correct": true},
-       {"text": "qemu-img convert -O qcow2 -s +10G disk.qcow2; nothing else", "text_de": "qemu-img convert -O qcow2 -s +10G disk.qcow2; nichts weiter"},
-       {"text": "virt-sparsify --grow 10G disk.qcow2; reboot the guest", "text_de": "virt-sparsify --grow 10G disk.qcow2; Gast neu starten"},
-       {"text": "truncate -s +10G disk.qcow2; run fsck", "text_de": "truncate -s +10G disk.qcow2; fsck ausführen"}],
-     "explanation_de": "qemu-img resize ändert nur die virtuelle Plattengröße. Partitionstabelle und Dateisystem müssen anschließend angepasst werden (growpart, resize2fs, xfs_growfs) oder man nutzt virt-resize --expand auf eine Kopie. truncate würde das qcow2-Format beschädigen.",
-     "terms": []},
-    {"id": "305-352.1-04", "objective": "352.1", "type": "single", "difficulty": 2,
-     "question": "Which Linux kernel feature filters the system calls a container process may invoke?",
-     "question_de": "Welche Linux-Kernelfunktion filtert die Systemaufrufe, die ein Containerprozess verwenden darf?",
-     "choices": [
-       {"text": "seccomp", "text_de": "seccomp", "correct": true},
-       {"text": "cgroups", "text_de": "cgroups"},
-       {"text": "overlayfs", "text_de": "overlayfs"},
-       {"text": "netfilter", "text_de": "netfilter"}],
-     "explanation_de": "seccomp-BPF-Profile erlauben oder verbieten einzelne Syscalls; Docker liefert ein Standardprofil mit. cgroups begrenzen Ressourcen, overlayfs stellt die Image-Schichten bereit, netfilter filtert Netzwerkpakete.",
-     "terms": []},
-    {"id": "305-352.1-05", "objective": "352.1", "type": "single", "difficulty": 2,
-     "question": "What is the difference between a system container and an application container?",
-     "question_de": "Was ist der Unterschied zwischen einem Systemcontainer und einem Anwendungscontainer?",
-     "choices": [
-       {"text": "A system container runs a full init system with several services like a lightweight VM; an application container runs a single process.", "text_de": "Ein Systemcontainer betreibt ein vollständiges Init-System mit mehreren Diensten wie eine leichte VM; ein Anwendungscontainer führt einen einzelnen Prozess aus.", "correct": true},
-       {"text": "System containers need a hypervisor, application containers do not.", "text_de": "Systemcontainer brauchen einen Hypervisor, Anwendungscontainer nicht."},
-       {"text": "Application containers share no kernel with the host.", "text_de": "Anwendungscontainer teilen keinen Kernel mit dem Host."},
-       {"text": "There is no difference.", "text_de": "Es gibt keinen Unterschied."}],
-     "explanation_de": "LXC/LXD und systemd-nspawn sind typische Systemcontainer, Docker und podman stehen für Anwendungscontainer. Beide teilen den Host-Kernel und nutzen Namespaces und cgroups.",
-     "terms": [{"term": "lightweight", "de": "leichtgewichtig"}]},
-    {"id": "305-352.1-06", "objective": "352.1", "type": "single", "difficulty": 2,
-     "question": "Which command starts a shell in new user and PID namespaces so that the shell appears to run as root without real privileges?",
-     "question_de": "Welcher Befehl startet eine Shell in neuen User- und PID-Namensräumen, so dass die Shell scheinbar als root läuft, ohne echte Rechte zu haben?",
-     "choices": [
-       {"text": "unshare --user --map-root-user --pid --fork /bin/bash", "text_de": "unshare --user --map-root-user --pid --fork /bin/bash", "correct": true},
-       {"text": "nsenter --user --root /bin/bash", "text_de": "nsenter --user --root /bin/bash"},
-       {"text": "capsh --user=root -- /bin/bash", "text_de": "capsh --user=root -- /bin/bash"},
-       {"text": "sudo -u root unshare /bin/bash", "text_de": "sudo -u root unshare /bin/bash"}],
-     "explanation_de": "Ein User-Namespace bildet die eigene UID auf 0 ab (--map-root-user). Das ist die Grundlage rootloser Container (podman, unprivilegiertes LXC). nsenter tritt nur in bestehende Namensräume ein.",
-     "terms": [{"term": "appear", "de": "erscheinen, scheinbar sein"}]},
-    {"id": "305-352.1-07", "objective": "352.1", "type": "single", "difficulty": 2,
-     "question": "Which tool copies container images between registries and inspects them without a running daemon?",
-     "question_de": "Welches Werkzeug kopiert Container-Images zwischen Registries und untersucht sie ohne laufenden Daemon?",
-     "choices": [
-       {"text": "skopeo", "text_de": "skopeo", "correct": true},
-       {"text": "buildah", "text_de": "buildah"},
-       {"text": "runc", "text_de": "runc"},
-       {"text": "containerd", "text_de": "containerd"}],
-     "explanation_de": "skopeo copy, inspect und delete arbeiten direkt mit Registries und Image-Speichern. buildah baut Images, podman führt sie aus, runc ist die Low-Level-Laufzeit, containerd der Daemon hinter Docker und Kubernetes.",
-     "terms": []},
-    {"id": "305-352.2-03", "objective": "352.2", "type": "single", "difficulty": 2,
-     "question": "Which command lists the images available in the public LXD image server and which one copies one into the local store?",
-     "question_de": "Welcher Befehl listet die Images des öffentlichen LXD-Image-Servers, und welcher kopiert eines in den lokalen Speicher?",
-     "choices": [
-       {"text": "lxc image list images:; lxc image copy images:debian/12 local: --alias debian12", "text_de": "lxc image list images:; lxc image copy images:debian/12 local: --alias debian12", "correct": true},
-       {"text": "lxc list images; lxc pull debian/12", "text_de": "lxc list images; lxc pull debian/12"},
-       {"text": "lxd images; lxd fetch debian/12", "text_de": "lxd images; lxd fetch debian/12"},
-       {"text": "lxc remote list; lxc remote add debian/12", "text_de": "lxc remote list; lxc remote add debian/12"}],
-     "explanation_de": "Remotes wie images: oder ubuntu: werden mit lxc remote list angezeigt. lxc image list, copy, import, export und delete verwalten Images; lxc list zeigt Container.",
-     "terms": []},
-    {"id": "305-352.2-04", "objective": "352.2", "type": "single", "difficulty": 2,
-     "question": "Which command runs an interactive shell inside the running LXD container web?",
-     "question_de": "Welcher Befehl startet eine interaktive Shell im laufenden LXD-Container web?",
-     "choices": [
-       {"text": "lxc exec web -- /bin/bash", "text_de": "lxc exec web -- /bin/bash", "correct": true},
-       {"text": "lxc attach web", "text_de": "lxc attach web"},
-       {"text": "lxc console web --shell", "text_de": "lxc console web --shell"},
-       {"text": "lxc-attach -n web", "text_de": "lxc-attach -n web"}],
-     "explanation_de": "lxc exec führt Befehle im Container aus; lxc console verbindet mit der seriellen Konsole (Login nötig). lxc-attach gehört zu den klassischen LXC-Werkzeugen ohne LXD.",
-     "terms": []},
-    {"id": "305-352.2-05", "objective": "352.2", "type": "single", "difficulty": 2,
-     "question": "Which LXD command publishes a stopped container as a reusable image?",
-     "question_de": "Welcher LXD-Befehl veröffentlicht einen gestoppten Container als wiederverwendbares Image?",
-     "choices": [
-       {"text": "lxc publish web --alias web-base", "text_de": "lxc publish web --alias web-base", "correct": true},
-       {"text": "lxc snapshot web web-base", "text_de": "lxc snapshot web web-base"},
-       {"text": "lxc image import web", "text_de": "lxc image import web"},
-       {"text": "lxc copy web web-base", "text_de": "lxc copy web web-base"}],
-     "explanation_de": "publish erzeugt aus einem Container oder Snapshot ein Image mit Alias. snapshot legt einen Snapshot an, copy klont einen Container, image import liest Image-Dateien ein.",
-     "terms": [{"term": "reusable", "de": "wiederverwendbar"}]},
-    {"id": "305-352.2-06", "objective": "352.2", "type": "single", "difficulty": 2,
-     "question": "What is an LXD profile?",
-     "question_de": "Was ist ein LXD-Profil?",
-     "choices": [
-       {"text": "A reusable set of configuration keys and devices (e.g. network, root disk) that can be applied to many containers.", "text_de": "Ein wiederverwendbarer Satz von Konfigurationsschlüsseln und Geräten (z. B. Netzwerk, Root-Platte), der auf viele Container angewendet werden kann.", "correct": true},
-       {"text": "A performance report of a container.", "text_de": "Ein Leistungsbericht eines Containers."},
-       {"text": "The seccomp policy of LXD.", "text_de": "Die seccomp-Richtlinie von LXD."},
-       {"text": "A backup of the container file system.", "text_de": "Eine Sicherung des Container-Dateisystems."}],
-     "explanation_de": "Das Profil default enthält Netzwerkkarte und Root-Disk. Mit lxc profile create, edit und lxc profile add <container> <profil> werden Einstellungen zentral gepflegt; Container-eigene Werte überschreiben Profilwerte.",
-     "terms": []},
-    {"id": "305-352.3-05", "objective": "352.3", "type": "single", "difficulty": 2,
-     "question": "Which Dockerfile instruction copies files into the image and can additionally extract local tar archives and fetch URLs?",
-     "question_de": "Welche Dockerfile-Anweisung kopiert Dateien ins Image und kann zusätzlich lokale tar-Archive entpacken und URLs laden?",
-     "choices": [
-       {"text": "ADD", "text_de": "ADD", "correct": true},
-       {"text": "COPY", "text_de": "COPY"},
-       {"text": "VOLUME", "text_de": "VOLUME"},
-       {"text": "WORKDIR", "text_de": "WORKDIR"}],
-     "explanation_de": "ADD hat die Zusatzfunktionen, COPY kopiert nur und wird deshalb für einfache Kopien empfohlen. VOLUME deklariert Einhängepunkte, WORKDIR setzt das Arbeitsverzeichnis.",
-     "terms": [{"term": "extract", "de": "entpacken"}]},
-    {"id": "305-352.3-06", "objective": "352.3", "type": "single", "difficulty": 2,
-     "question": "Which command creates a user-defined bridge network and which option connects a new container to it?",
-     "question_de": "Welcher Befehl erzeugt ein benutzerdefiniertes Bridge-Netz, und welche Option verbindet einen neuen Container damit?",
-     "choices": [
-       {"text": "docker network create appnet; docker run --network appnet ...", "text_de": "docker network create appnet; docker run --network appnet ...", "correct": true},
-       {"text": "docker bridge add appnet; docker run --bridge appnet ...", "text_de": "docker bridge add appnet; docker run --bridge appnet ..."},
-       {"text": "brctl addbr appnet; docker run --net-bridge appnet ...", "text_de": "brctl addbr appnet; docker run --net-bridge appnet ..."},
-       {"text": "docker network create --driver host appnet; docker run -p appnet ...", "text_de": "docker network create --driver host appnet; docker run -p appnet ..."}],
-     "explanation_de": "Benutzerdefinierte Bridge-Netze bieten eingebaute DNS-Auflösung der Containernamen und Isolation. docker network connect verbindet laufende Container nachträglich. Der Treiber host nutzt den Host-Netzwerkstack ohne eigenes Netz.",
-     "terms": []},
-    {"id": "305-352.3-07", "objective": "352.3", "type": "single", "difficulty": 2,
-     "question": "Which file configures the Docker daemon, for example its logging driver or storage driver?",
-     "question_de": "Welche Datei konfiguriert den Docker-Daemon, zum Beispiel Logging- oder Speichertreiber?",
-     "choices": [
-       {"text": "/etc/docker/daemon.json", "text_de": "/etc/docker/daemon.json", "correct": true},
-       {"text": "/var/lib/docker/config.json", "text_de": "/var/lib/docker/config.json"},
-       {"text": "~/.docker/config.json", "text_de": "~/.docker/config.json"},
-       {"text": "/etc/default/dockerd.conf", "text_de": "/etc/default/dockerd.conf"}],
-     "explanation_de": "daemon.json enthält z. B. \"log-driver\": \"journald\", \"storage-driver\": \"overlay2\" oder \"insecure-registries\". ~/.docker/config.json ist die Client-Konfiguration mit Registry-Logins, /var/lib/docker speichert Images und Container.",
-     "terms": []},
-    {"id": "305-352.3-08", "objective": "352.3", "type": "single", "difficulty": 2,
-     "question": "Which command removes all stopped containers, unused networks, dangling images and build cache?",
-     "question_de": "Welcher Befehl entfernt alle gestoppten Container, ungenutzten Netze, verwaisten Images und den Build-Cache?",
-     "choices": [
-       {"text": "docker system prune", "text_de": "docker system prune", "correct": true},
-       {"text": "docker rm -a", "text_de": "docker rm -a"},
-       {"text": "docker image clean --all", "text_de": "docker image clean --all"},
-       {"text": "docker volume rm --unused", "text_de": "docker volume rm --unused"}],
-     "explanation_de": "docker system prune räumt auf; mit -a auch alle nicht genutzten Images, mit --volumes auch Volumes. Einzelne Bereiche: container prune, image prune, network prune, volume prune.",
-     "terms": [{"term": "dangling", "de": "verwaist, ohne Referenz"}]},
-    {"id": "305-352.3-09", "objective": "352.3", "type": "single", "difficulty": 2,
-     "question": "Which Dockerfile practice reduces the image size and the number of layers for a package installation?",
-     "question_de": "Welche Dockerfile-Praxis verringert bei einer Paketinstallation die Imagegröße und die Zahl der Schichten?",
-     "choices": [
-       {"text": "Combine update, install and cache cleanup in one RUN instruction with &&", "text_de": "Update, Installation und Cache-Bereinigung in einer RUN-Anweisung mit && zusammenfassen", "correct": true},
-       {"text": "Use one RUN instruction per command for readability", "text_de": "Je Befehl eine eigene RUN-Anweisung für bessere Lesbarkeit"},
-       {"text": "Run the cleanup in CMD", "text_de": "Die Bereinigung in CMD ausführen"},
-       {"text": "Declare a VOLUME for /var/cache/apt", "text_de": "Ein VOLUME für /var/cache/apt deklarieren"}],
-     "explanation_de": "Jede RUN-Anweisung erzeugt eine Schicht. Dateien, die in einer späteren Schicht gelöscht werden, bleiben in der früheren erhalten. Deshalb apt-get update && apt-get install -y ... && rm -rf /var/lib/apt/lists/* in einem Schritt; Multi-Stage-Builds helfen zusätzlich.",
-     "terms": []},
-    {"id": "305-352.4-03", "objective": "352.4", "type": "single", "difficulty": 2,
-     "question": "Which command initializes a Docker Swarm on the current node and which command deploys a stack from a Compose file?",
-     "question_de": "Welcher Befehl initialisiert einen Docker Swarm auf dem aktuellen Knoten, und welcher rollt einen Stack aus einer Compose-Datei aus?",
-     "choices": [
-       {"text": "docker swarm init; docker stack deploy -c docker-compose.yml app", "text_de": "docker swarm init; docker stack deploy -c docker-compose.yml app", "correct": true},
-       {"text": "docker cluster create; docker compose deploy app", "text_de": "docker cluster create; docker compose deploy app"},
-       {"text": "docker swarm join --manager; docker service up app", "text_de": "docker swarm join --manager; docker service up app"},
-       {"text": "kubeadm init; kubectl apply -f docker-compose.yml", "text_de": "kubeadm init; kubectl apply -f docker-compose.yml"}],
-     "explanation_de": "swarm init macht den Knoten zum Manager und gibt den Join-Token für Worker aus. Dienste werden als Services oder Stacks verwaltet (docker service ls, docker stack ps). kubeadm und kubectl gehören zu Kubernetes.",
-     "terms": []},
-    {"id": "305-353.2-02", "objective": "353.2", "type": "single", "difficulty": 2,
-     "question": "In which order does Packer process the parts of a template during a build?",
-     "question_de": "In welcher Reihenfolge verarbeitet Packer die Teile eines Templates während eines Builds?",
-     "choices": [
-       {"text": "Builder creates the machine, provisioners configure it, post-processors handle the resulting artifact.", "text_de": "Der Builder erzeugt die Maschine, Provisioner konfigurieren sie, Post-Processors verarbeiten das entstandene Artefakt.", "correct": true},
-       {"text": "Post-processors run first to prepare the source image.", "text_de": "Post-Processors laufen zuerst, um das Quell-Image vorzubereiten."},
-       {"text": "Provisioners create the machine, builders upload it.", "text_de": "Provisioner erzeugen die Maschine, Builder laden sie hoch."},
-       {"text": "All parts run in parallel.", "text_de": "Alle Teile laufen parallel."}],
-     "explanation_de": "packer build startet die Builder (parallel, wenn mehrere), in jeder Maschine laufen die Provisioner nacheinander, danach Post-Processors wie compress, manifest oder vagrant. packer validate prüft das Template vorher.",
-     "terms": [{"term": "artifact", "de": "Artefakt, Build-Ergebnis"}]},
-    {"id": "305-353.3-03", "objective": "353.3", "type": "single", "difficulty": 2,
-     "question": "Which datasource lets you test cloud-init locally by providing meta-data and user-data on an attached ISO image?",
-     "question_de": "Welche Datenquelle erlaubt es, cloud-init lokal zu testen, indem meta-data und user-data auf einem angehängten ISO-Image bereitgestellt werden?",
-     "choices": [
-       {"text": "NoCloud (config drive), e.g. created with cloud-localds", "text_de": "NoCloud (Config Drive), z. B. erzeugt mit cloud-localds", "correct": true},
-       {"text": "EC2 metadata service at 169.254.169.254", "text_de": "EC2-Metadatendienst unter 169.254.169.254"},
-       {"text": "OpenStack Nova API", "text_de": "OpenStack-Nova-API"},
-       {"text": "Vagrant shared folders", "text_de": "Vagrant Shared Folders"}],
-     "explanation_de": "Die NoCloud-Datenquelle liest ein Medium mit dem Label cidata, das meta-data und user-data enthält. cloud-localds seed.iso user-data erzeugt es. Der Metadatendienst steht nur in Clouds zur Verfügung.",
-     "terms": []},
-    {"id": "305-353.4-03", "objective": "353.4", "type": "single", "difficulty": 2,
-     "question": "Which Vagrantfile snippet defines two machines web and db in one environment?",
-     "question_de": "Welcher Vagrantfile-Ausschnitt definiert zwei Maschinen web und db in einer Umgebung?",
-     "choices": [
-       {"text": "config.vm.define \"web\" do |web| ... end\nconfig.vm.define \"db\" do |db| ... end", "text_de": "config.vm.define \"web\" do |web| ... end\nconfig.vm.define \"db\" do |db| ... end", "correct": true},
-       {"text": "config.vm.box = [\"web\", \"db\"]", "text_de": "config.vm.box = [\"web\", \"db\"]"},
-       {"text": "config.vm.multi = 2", "text_de": "config.vm.multi = 2"},
-       {"text": "config.vm.provision \"machines\", names: [\"web\", \"db\"]", "text_de": "config.vm.provision \"machines\", names: [\"web\", \"db\"]"}],
-     "explanation_de": "Multi-Machine-Setups nutzen config.vm.define je Maschine mit eigener Box, Netzwerk und Provisionierung. vagrant up web startet nur eine davon, vagrant status zeigt alle.",
-     "terms": []}
+    {
+      "id": "305-351.1-04",
+      "objective": "351.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "What distinguishes a type 1 hypervisor from a type 2 hypervisor?",
+      "question_de": "Was unterscheidet einen Typ-1-Hypervisor von einem Typ-2-Hypervisor?",
+      "choices": [
+        {
+          "text": "A type 1 hypervisor runs directly on the hardware, a type 2 hypervisor runs as an application on a host operating system.",
+          "text_de": "Ein Typ-1-Hypervisor läuft direkt auf der Hardware, ein Typ-2-Hypervisor als Anwendung auf einem Host-Betriebssystem.",
+          "correct": true
+        },
+        {
+          "text": "A type 1 hypervisor supports only Linux guests.",
+          "text_de": "Ein Typ-1-Hypervisor unterstützt nur Linux-Gäste."
+        },
+        {
+          "text": "A type 2 hypervisor does not need CPU virtualization extensions.",
+          "text_de": "Ein Typ-2-Hypervisor braucht keine CPU-Virtualisierungserweiterungen."
+        },
+        {
+          "text": "Type 2 hypervisors are always paravirtualized.",
+          "text_de": "Typ-2-Hypervisoren sind immer paravirtualisiert."
+        }
+      ],
+      "explanation_de": "Xen und ESXi sind Typ 1 (bare metal), VirtualBox ist Typ 2. KVM nimmt eine Zwischenstellung ein: der Linux-Kernel wird selbst zum Hypervisor. Beide Typen nutzen heute VT-x/AMD-V.",
+      "terms": [
+        {
+          "term": "distinguish",
+          "de": "unterscheiden"
+        }
+      ]
+    },
+    {
+      "id": "305-351.1-05",
+      "objective": "351.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "A VM is paused with virsh suspend. What happens to its state?",
+      "question_de": "Eine VM wird mit virsh suspend pausiert. Was geschieht mit ihrem Zustand?",
+      "choices": [
+        {
+          "text": "The vCPUs stop, memory stays allocated on the host and the VM continues exactly where it stopped after resume.",
+          "text_de": "Die vCPUs halten an, der Speicher bleibt auf dem Host belegt, nach resume läuft die VM genau dort weiter.",
+          "correct": true
+        },
+        {
+          "text": "The memory is written to disk and freed on the host.",
+          "text_de": "Der Speicher wird auf die Platte geschrieben und auf dem Host freigegeben."
+        },
+        {
+          "text": "The guest operating system performs an orderly shutdown.",
+          "text_de": "Das Gastbetriebssystem fährt geordnet herunter."
+        },
+        {
+          "text": "A disk snapshot is created automatically.",
+          "text_de": "Ein Platten-Snapshot wird automatisch erzeugt."
+        }
+      ],
+      "explanation_de": "suspend/resume pausieren nur die Ausführung. virsh save schreibt den Speicher in eine Datei und beendet die VM (managedsave ebenso), shutdown fährt den Gast per ACPI herunter, Snapshots sind getrennte Operationen.",
+      "terms": []
+    },
+    {
+      "id": "305-351.1-06",
+      "objective": "351.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which open source platform combines KVM virtualization and LXC containers in a web-managed cluster and is often used in small data centers?",
+      "question_de": "Welche Open-Source-Plattform kombiniert KVM-Virtualisierung und LXC-Container in einem webverwalteten Cluster und wird oft in kleinen Rechenzentren eingesetzt?",
+      "choices": [
+        {
+          "text": "Proxmox VE",
+          "text_de": "Proxmox VE",
+          "correct": true
+        },
+        {
+          "text": "Open vSwitch",
+          "text_de": "Open vSwitch"
+        },
+        {
+          "text": "systemd-machined",
+          "text_de": "systemd-machined"
+        },
+        {
+          "text": "Packer",
+          "text_de": "Packer"
+        }
+      ],
+      "explanation_de": "Proxmox VE basiert auf Debian, nutzt KVM/QEMU und LXC, bietet Cluster, HA und Ceph-Integration. oVirt ist die Alternative auf KVM-Basis. Open vSwitch ist ein virtueller Switch, systemd-machined verwaltet lokale Container und VMs, Packer baut Images.",
+      "terms": []
+    },
+    {
+      "id": "305-351.2-03",
+      "objective": "351.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which xl.cfg setting defines a paravirtualized Xen guest that boots a kernel provided by the Dom0?",
+      "question_de": "Welche xl.cfg-Einstellung definiert einen paravirtualisierten Xen-Gast, der einen vom Dom0 bereitgestellten Kernel bootet?",
+      "choices": [
+        {
+          "text": "type = \"pv\" together with kernel = \"/boot/vmlinuz-guest\"",
+          "text_de": "type = \"pv\" zusammen mit kernel = \"/boot/vmlinuz-guest\"",
+          "correct": true
+        },
+        {
+          "text": "type = \"hvm\" together with boot = \"c\"",
+          "text_de": "type = \"hvm\" zusammen mit boot = \"c\""
+        },
+        {
+          "text": "builder = \"qemu\"",
+          "text_de": "builder = \"qemu\""
+        },
+        {
+          "text": "bootloader = \"grub\" together with type = \"hvm\"",
+          "text_de": "bootloader = \"grub\" zusammen mit type = \"hvm\""
+        }
+      ],
+      "explanation_de": "PV-Gäste erhalten Kernel und initrd aus dem Dom0 (kernel=, ramdisk=) oder über bootloader = \"pygrub\" aus dem Gast-Image. HVM-Gäste booten über ihr eigenes BIOS/UEFI von der virtuellen Platte (boot=\"c\").",
+      "terms": []
+    },
+    {
+      "id": "305-351.3-04",
+      "objective": "351.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which QEMU monitor command creates a snapshot of the running VM including memory inside a qcow2 image?",
+      "question_de": "Welcher QEMU-Monitor-Befehl erzeugt einen Snapshot der laufenden VM einschließlich Speicher in einem qcow2-Image?",
+      "choices": [
+        {
+          "text": "savevm snap1",
+          "text_de": "savevm snap1",
+          "correct": true
+        },
+        {
+          "text": "snapshot_blkdev drive0 snap1",
+          "text_de": "snapshot_blkdev drive0 snap1"
+        },
+        {
+          "text": "migrate exec:cat>snap1",
+          "text_de": "migrate exec:cat>snap1"
+        },
+        {
+          "text": "info snapshots",
+          "text_de": "info snapshots"
+        }
+      ],
+      "explanation_de": "savevm speichert einen internen Snapshot mit VM-Zustand, loadvm lädt ihn, delvm löscht ihn, info snapshots listet sie. snapshot_blkdev erzeugt einen externen Disk-Snapshot ohne Speicher, migrate exec speichert den Zustand in eine Datei.",
+      "terms": []
+    },
+    {
+      "id": "305-351.3-05",
+      "objective": "351.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "What is the role of the QEMU guest agent?",
+      "question_de": "Welche Rolle hat der QEMU Guest Agent?",
+      "choices": [
+        {
+          "text": "It runs inside the guest and lets the host execute actions such as freezing file systems, reading IP addresses or setting the time.",
+          "text_de": "Er läuft im Gast und erlaubt dem Host Aktionen wie das Einfrieren von Dateisystemen, Abfragen von IP-Adressen oder Setzen der Uhrzeit.",
+          "correct": true
+        },
+        {
+          "text": "It replaces the VirtIO drivers.",
+          "text_de": "Er ersetzt die VirtIO-Treiber."
+        },
+        {
+          "text": "It provides the graphical console via SPICE.",
+          "text_de": "Er stellt die grafische Konsole über SPICE bereit."
+        },
+        {
+          "text": "It emulates the CPU for guests without KVM.",
+          "text_de": "Er emuliert die CPU für Gäste ohne KVM."
+        }
+      ],
+      "explanation_de": "qemu-guest-agent kommuniziert über einen virtio-serial-Kanal (org.qemu.guest_agent.0). virsh domfsfreeze, domifaddr --source agent oder konsistente Snapshots (--quiesce) nutzen ihn.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-06",
+      "objective": "351.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which virsh command shows the libvirt virtual networks and which file defines the default network?",
+      "question_de": "Welcher virsh-Befehl zeigt die virtuellen libvirt-Netze, und welche Datei definiert das Netz default?",
+      "choices": [
+        {
+          "text": "virsh net-list --all; /etc/libvirt/qemu/networks/default.xml",
+          "text_de": "virsh net-list --all; /etc/libvirt/qemu/networks/default.xml",
+          "correct": true
+        },
+        {
+          "text": "virsh iface-list; /etc/network/interfaces",
+          "text_de": "virsh iface-list; /etc/network/interfaces"
+        },
+        {
+          "text": "virsh domiflist; /etc/libvirt/libvirtd.conf",
+          "text_de": "virsh domiflist; /etc/libvirt/libvirtd.conf"
+        },
+        {
+          "text": "virsh net-dumpxml; /etc/dnsmasq.conf",
+          "text_de": "virsh net-dumpxml; /etc/dnsmasq.conf"
+        }
+      ],
+      "explanation_de": "Virtuelle Netze werden mit net-list, net-start, net-autostart, net-edit und net-dumpxml verwaltet; ihre XML-Definitionen liegen unter /etc/libvirt/qemu/networks/. Das Netz default ist ein NAT-Netz mit virbr0, für das libvirt eine eigene dnsmasq-Instanz startet.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-07",
+      "objective": "351.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which virsh command attaches an additional disk image to the running domain vm1 and keeps it in the persistent configuration?",
+      "question_de": "Welcher virsh-Befehl hängt ein zusätzliches Disk-Image an die laufende Domäne vm1 an und behält es in der dauerhaften Konfiguration?",
+      "choices": [
+        {
+          "text": "virsh attach-disk vm1 /var/lib/libvirt/images/data.qcow2 vdb --driver qemu --subdriver qcow2 --persistent",
+          "text_de": "virsh attach-disk vm1 /var/lib/libvirt/images/data.qcow2 vdb --driver qemu --subdriver qcow2 --persistent",
+          "correct": true
+        },
+        {
+          "text": "virsh vol-attach vm1 data.qcow2",
+          "text_de": "virsh vol-attach vm1 data.qcow2"
+        },
+        {
+          "text": "virsh blockresize vm1 vdb data.qcow2",
+          "text_de": "virsh blockresize vm1 vdb data.qcow2"
+        },
+        {
+          "text": "qemu-img attach data.qcow2 vm1",
+          "text_de": "qemu-img attach data.qcow2 vm1"
+        }
+      ],
+      "explanation_de": "attach-disk fügt ein Gerät hinzu; --live wirkt auf die laufende, --config auf die gespeicherte Definition, --persistent auf beides. detach-disk entfernt es. blockresize ändert die Größe eines angeschlossenen Blockgeräts.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-08",
+      "objective": "351.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which URI connects virsh to the system libvirt daemon on the remote host kvm2 via SSH?",
+      "question_de": "Welche URI verbindet virsh über SSH mit dem System-libvirt-Daemon auf dem entfernten Host kvm2?",
+      "choices": [
+        {
+          "text": "qemu+ssh://root@kvm2/system",
+          "text_de": "qemu+ssh://root@kvm2/system",
+          "correct": true
+        },
+        {
+          "text": "qemu:///session@kvm2",
+          "text_de": "qemu:///session@kvm2"
+        },
+        {
+          "text": "ssh://kvm2/libvirt",
+          "text_de": "ssh://kvm2/libvirt"
+        },
+        {
+          "text": "xen+tcp://kvm2/system",
+          "text_de": "xen+tcp://kvm2/system"
+        }
+      ],
+      "explanation_de": "Die URI besteht aus Treiber, Transport, Host und Pfad: /system ist der privilegierte Daemon, /session der Benutzerdaemon. qemu:///system ist die lokale Standardverbindung. tcp und tls sind weitere Transporte, xen der Treiber für Xen-Hosts.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-09",
+      "objective": "351.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which virsh command shows CPU time, memory usage and block I/O statistics of the domain vm1 for resource analysis?",
+      "question_de": "Welcher virsh-Befehl zeigt zur Ressourcenanalyse CPU-Zeit, Speichernutzung und Block-I/O-Statistiken der Domäne vm1?",
+      "choices": [
+        {
+          "text": "virsh domstats vm1",
+          "text_de": "virsh domstats vm1",
+          "correct": true
+        },
+        {
+          "text": "virsh dominfo vm1",
+          "text_de": "virsh dominfo vm1"
+        },
+        {
+          "text": "virsh dumpxml vm1",
+          "text_de": "virsh dumpxml vm1"
+        },
+        {
+          "text": "virsh capabilities",
+          "text_de": "virsh capabilities"
+        }
+      ],
+      "explanation_de": "domstats liefert alle Statistikgruppen (--cpu-total, --balloon, --block, --interface). dominfo zeigt nur Basisdaten wie vCPUs und maximalen Speicher. Einzelwerte liefern auch domblkstat, domifstat und dommemstat; virt-top fasst alles live zusammen.",
+      "terms": []
+    },
+    {
+      "id": "305-351.5-03",
+      "objective": "351.5",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command increases the size of the qcow2 image disk.qcow2 by 10 GB, and what has to be done afterwards inside the guest?",
+      "question_de": "Welcher Befehl vergrößert das qcow2-Image disk.qcow2 um 10 GB, und was ist danach im Gast zu tun?",
+      "choices": [
+        {
+          "text": "qemu-img resize disk.qcow2 +10G; afterwards grow partition and file system inside the guest (or use virt-resize)",
+          "text_de": "qemu-img resize disk.qcow2 +10G; danach Partition und Dateisystem im Gast vergrößern (oder virt-resize nutzen)",
+          "correct": true
+        },
+        {
+          "text": "qemu-img convert -O qcow2 -s +10G disk.qcow2; nothing else",
+          "text_de": "qemu-img convert -O qcow2 -s +10G disk.qcow2; nichts weiter"
+        },
+        {
+          "text": "virt-sparsify --grow 10G disk.qcow2; reboot the guest",
+          "text_de": "virt-sparsify --grow 10G disk.qcow2; Gast neu starten"
+        },
+        {
+          "text": "truncate -s +10G disk.qcow2; run fsck",
+          "text_de": "truncate -s +10G disk.qcow2; fsck ausführen"
+        }
+      ],
+      "explanation_de": "qemu-img resize ändert nur die virtuelle Plattengröße. Partitionstabelle und Dateisystem müssen anschließend angepasst werden (growpart, resize2fs, xfs_growfs) oder man nutzt virt-resize --expand auf eine Kopie. truncate würde das qcow2-Format beschädigen.",
+      "terms": []
+    },
+    {
+      "id": "305-352.1-04",
+      "objective": "352.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Linux kernel feature filters the system calls a container process may invoke?",
+      "question_de": "Welche Linux-Kernelfunktion filtert die Systemaufrufe, die ein Containerprozess verwenden darf?",
+      "choices": [
+        {
+          "text": "seccomp",
+          "text_de": "seccomp",
+          "correct": true
+        },
+        {
+          "text": "cgroups",
+          "text_de": "cgroups"
+        },
+        {
+          "text": "overlayfs",
+          "text_de": "overlayfs"
+        },
+        {
+          "text": "netfilter",
+          "text_de": "netfilter"
+        }
+      ],
+      "explanation_de": "seccomp-BPF-Profile erlauben oder verbieten einzelne Syscalls; Docker liefert ein Standardprofil mit. cgroups begrenzen Ressourcen, overlayfs stellt die Image-Schichten bereit, netfilter filtert Netzwerkpakete.",
+      "terms": []
+    },
+    {
+      "id": "305-352.1-05",
+      "objective": "352.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "What is the difference between a system container and an application container?",
+      "question_de": "Was ist der Unterschied zwischen einem Systemcontainer und einem Anwendungscontainer?",
+      "choices": [
+        {
+          "text": "A system container runs a full init system with several services like a lightweight VM; an application container runs a single process.",
+          "text_de": "Ein Systemcontainer betreibt ein vollständiges Init-System mit mehreren Diensten wie eine leichte VM; ein Anwendungscontainer führt einen einzelnen Prozess aus.",
+          "correct": true
+        },
+        {
+          "text": "System containers need a hypervisor, application containers do not.",
+          "text_de": "Systemcontainer brauchen einen Hypervisor, Anwendungscontainer nicht."
+        },
+        {
+          "text": "Application containers share no kernel with the host.",
+          "text_de": "Anwendungscontainer teilen keinen Kernel mit dem Host."
+        },
+        {
+          "text": "There is no difference.",
+          "text_de": "Es gibt keinen Unterschied."
+        }
+      ],
+      "explanation_de": "LXC/LXD und systemd-nspawn sind typische Systemcontainer, Docker und podman stehen für Anwendungscontainer. Beide teilen den Host-Kernel und nutzen Namespaces und cgroups.",
+      "terms": [
+        {
+          "term": "lightweight",
+          "de": "leichtgewichtig"
+        }
+      ]
+    },
+    {
+      "id": "305-352.1-06",
+      "objective": "352.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command starts a shell in new user and PID namespaces so that the shell appears to run as root without real privileges?",
+      "question_de": "Welcher Befehl startet eine Shell in neuen User- und PID-Namensräumen, so dass die Shell scheinbar als root läuft, ohne echte Rechte zu haben?",
+      "choices": [
+        {
+          "text": "unshare --user --map-root-user --pid --fork /bin/bash",
+          "text_de": "unshare --user --map-root-user --pid --fork /bin/bash",
+          "correct": true
+        },
+        {
+          "text": "nsenter --user --root /bin/bash",
+          "text_de": "nsenter --user --root /bin/bash"
+        },
+        {
+          "text": "capsh --user=root -- /bin/bash",
+          "text_de": "capsh --user=root -- /bin/bash"
+        },
+        {
+          "text": "sudo -u root unshare /bin/bash",
+          "text_de": "sudo -u root unshare /bin/bash"
+        }
+      ],
+      "explanation_de": "Ein User-Namespace bildet die eigene UID auf 0 ab (--map-root-user). Das ist die Grundlage rootloser Container (podman, unprivilegiertes LXC). nsenter tritt nur in bestehende Namensräume ein.",
+      "terms": [
+        {
+          "term": "appear",
+          "de": "erscheinen, scheinbar sein"
+        }
+      ]
+    },
+    {
+      "id": "305-352.1-07",
+      "objective": "352.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which tool copies container images between registries and inspects them without a running daemon?",
+      "question_de": "Welches Werkzeug kopiert Container-Images zwischen Registries und untersucht sie ohne laufenden Daemon?",
+      "choices": [
+        {
+          "text": "skopeo",
+          "text_de": "skopeo",
+          "correct": true
+        },
+        {
+          "text": "buildah",
+          "text_de": "buildah"
+        },
+        {
+          "text": "runc",
+          "text_de": "runc"
+        },
+        {
+          "text": "containerd",
+          "text_de": "containerd"
+        }
+      ],
+      "explanation_de": "skopeo copy, inspect und delete arbeiten direkt mit Registries und Image-Speichern. buildah baut Images, podman führt sie aus, runc ist die Low-Level-Laufzeit, containerd der Daemon hinter Docker und Kubernetes.",
+      "terms": []
+    },
+    {
+      "id": "305-352.2-03",
+      "objective": "352.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command lists the images available in the public LXD image server and which one copies one into the local store?",
+      "question_de": "Welcher Befehl listet die Images des öffentlichen LXD-Image-Servers, und welcher kopiert eines in den lokalen Speicher?",
+      "choices": [
+        {
+          "text": "lxc image list images:; lxc image copy images:debian/12 local: --alias debian12",
+          "text_de": "lxc image list images:; lxc image copy images:debian/12 local: --alias debian12",
+          "correct": true
+        },
+        {
+          "text": "lxc list images; lxc pull debian/12",
+          "text_de": "lxc list images; lxc pull debian/12"
+        },
+        {
+          "text": "lxd images; lxd fetch debian/12",
+          "text_de": "lxd images; lxd fetch debian/12"
+        },
+        {
+          "text": "lxc remote list; lxc remote add debian/12",
+          "text_de": "lxc remote list; lxc remote add debian/12"
+        }
+      ],
+      "explanation_de": "Remotes wie images: oder ubuntu: werden mit lxc remote list angezeigt. lxc image list, copy, import, export und delete verwalten Images; lxc list zeigt Container.",
+      "terms": []
+    },
+    {
+      "id": "305-352.2-04",
+      "objective": "352.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command runs an interactive shell inside the running LXD container web?",
+      "question_de": "Welcher Befehl startet eine interaktive Shell im laufenden LXD-Container web?",
+      "choices": [
+        {
+          "text": "lxc exec web -- /bin/bash",
+          "text_de": "lxc exec web -- /bin/bash",
+          "correct": true
+        },
+        {
+          "text": "lxc attach web",
+          "text_de": "lxc attach web"
+        },
+        {
+          "text": "lxc console web --shell",
+          "text_de": "lxc console web --shell"
+        },
+        {
+          "text": "lxc-attach -n web",
+          "text_de": "lxc-attach -n web"
+        }
+      ],
+      "explanation_de": "lxc exec führt Befehle im Container aus; lxc console verbindet mit der seriellen Konsole (Login nötig). lxc-attach gehört zu den klassischen LXC-Werkzeugen ohne LXD.",
+      "terms": []
+    },
+    {
+      "id": "305-352.2-05",
+      "objective": "352.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which LXD command publishes a stopped container as a reusable image?",
+      "question_de": "Welcher LXD-Befehl veröffentlicht einen gestoppten Container als wiederverwendbares Image?",
+      "choices": [
+        {
+          "text": "lxc publish web --alias web-base",
+          "text_de": "lxc publish web --alias web-base",
+          "correct": true
+        },
+        {
+          "text": "lxc snapshot web web-base",
+          "text_de": "lxc snapshot web web-base"
+        },
+        {
+          "text": "lxc image import web",
+          "text_de": "lxc image import web"
+        },
+        {
+          "text": "lxc copy web web-base",
+          "text_de": "lxc copy web web-base"
+        }
+      ],
+      "explanation_de": "publish erzeugt aus einem Container oder Snapshot ein Image mit Alias. snapshot legt einen Snapshot an, copy klont einen Container, image import liest Image-Dateien ein.",
+      "terms": [
+        {
+          "term": "reusable",
+          "de": "wiederverwendbar"
+        }
+      ]
+    },
+    {
+      "id": "305-352.2-06",
+      "objective": "352.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "What is an LXD profile?",
+      "question_de": "Was ist ein LXD-Profil?",
+      "choices": [
+        {
+          "text": "A reusable set of configuration keys and devices (e.g. network, root disk) that can be applied to many containers.",
+          "text_de": "Ein wiederverwendbarer Satz von Konfigurationsschlüsseln und Geräten (z. B. Netzwerk, Root-Platte), der auf viele Container angewendet werden kann.",
+          "correct": true
+        },
+        {
+          "text": "A performance report of a container.",
+          "text_de": "Ein Leistungsbericht eines Containers."
+        },
+        {
+          "text": "The seccomp policy of LXD.",
+          "text_de": "Die seccomp-Richtlinie von LXD."
+        },
+        {
+          "text": "A backup of the container file system.",
+          "text_de": "Eine Sicherung des Container-Dateisystems."
+        }
+      ],
+      "explanation_de": "Das Profil default enthält Netzwerkkarte und Root-Disk. Mit lxc profile create, edit und lxc profile add <container> <profil> werden Einstellungen zentral gepflegt; Container-eigene Werte überschreiben Profilwerte.",
+      "terms": []
+    },
+    {
+      "id": "305-352.3-05",
+      "objective": "352.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Dockerfile instruction copies files into the image and can additionally extract local tar archives and fetch URLs?",
+      "question_de": "Welche Dockerfile-Anweisung kopiert Dateien ins Image und kann zusätzlich lokale tar-Archive entpacken und URLs laden?",
+      "choices": [
+        {
+          "text": "ADD",
+          "text_de": "ADD",
+          "correct": true
+        },
+        {
+          "text": "COPY",
+          "text_de": "COPY"
+        },
+        {
+          "text": "VOLUME",
+          "text_de": "VOLUME"
+        },
+        {
+          "text": "WORKDIR",
+          "text_de": "WORKDIR"
+        }
+      ],
+      "explanation_de": "ADD hat die Zusatzfunktionen, COPY kopiert nur und wird deshalb für einfache Kopien empfohlen. VOLUME deklariert Einhängepunkte, WORKDIR setzt das Arbeitsverzeichnis.",
+      "terms": [
+        {
+          "term": "extract",
+          "de": "entpacken"
+        }
+      ]
+    },
+    {
+      "id": "305-352.3-06",
+      "objective": "352.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command creates a user-defined bridge network and which option connects a new container to it?",
+      "question_de": "Welcher Befehl erzeugt ein benutzerdefiniertes Bridge-Netz, und welche Option verbindet einen neuen Container damit?",
+      "choices": [
+        {
+          "text": "docker network create appnet; docker run --network appnet ...",
+          "text_de": "docker network create appnet; docker run --network appnet ...",
+          "correct": true
+        },
+        {
+          "text": "docker bridge add appnet; docker run --bridge appnet ...",
+          "text_de": "docker bridge add appnet; docker run --bridge appnet ..."
+        },
+        {
+          "text": "brctl addbr appnet; docker run --net-bridge appnet ...",
+          "text_de": "brctl addbr appnet; docker run --net-bridge appnet ..."
+        },
+        {
+          "text": "docker network create --driver host appnet; docker run -p appnet ...",
+          "text_de": "docker network create --driver host appnet; docker run -p appnet ..."
+        }
+      ],
+      "explanation_de": "Benutzerdefinierte Bridge-Netze bieten eingebaute DNS-Auflösung der Containernamen und Isolation. docker network connect verbindet laufende Container nachträglich. Der Treiber host nutzt den Host-Netzwerkstack ohne eigenes Netz.",
+      "terms": []
+    },
+    {
+      "id": "305-352.3-07",
+      "objective": "352.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which file configures the Docker daemon, for example its logging driver or storage driver?",
+      "question_de": "Welche Datei konfiguriert den Docker-Daemon, zum Beispiel Logging- oder Speichertreiber?",
+      "choices": [
+        {
+          "text": "/etc/docker/daemon.json",
+          "text_de": "/etc/docker/daemon.json",
+          "correct": true
+        },
+        {
+          "text": "/var/lib/docker/config.json",
+          "text_de": "/var/lib/docker/config.json"
+        },
+        {
+          "text": "~/.docker/config.json",
+          "text_de": "~/.docker/config.json"
+        },
+        {
+          "text": "/etc/default/dockerd.conf",
+          "text_de": "/etc/default/dockerd.conf"
+        }
+      ],
+      "explanation_de": "daemon.json enthält z. B. \"log-driver\": \"journald\", \"storage-driver\": \"overlay2\" oder \"insecure-registries\". ~/.docker/config.json ist die Client-Konfiguration mit Registry-Logins, /var/lib/docker speichert Images und Container.",
+      "terms": []
+    },
+    {
+      "id": "305-352.3-08",
+      "objective": "352.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command removes all stopped containers, unused networks, dangling images and build cache?",
+      "question_de": "Welcher Befehl entfernt alle gestoppten Container, ungenutzten Netze, verwaisten Images und den Build-Cache?",
+      "choices": [
+        {
+          "text": "docker system prune",
+          "text_de": "docker system prune",
+          "correct": true
+        },
+        {
+          "text": "docker rm -a",
+          "text_de": "docker rm -a"
+        },
+        {
+          "text": "docker image clean --all",
+          "text_de": "docker image clean --all"
+        },
+        {
+          "text": "docker volume rm --unused",
+          "text_de": "docker volume rm --unused"
+        }
+      ],
+      "explanation_de": "docker system prune räumt auf; mit -a auch alle nicht genutzten Images, mit --volumes auch Volumes. Einzelne Bereiche: container prune, image prune, network prune, volume prune.",
+      "terms": [
+        {
+          "term": "dangling",
+          "de": "verwaist, ohne Referenz"
+        }
+      ]
+    },
+    {
+      "id": "305-352.3-09",
+      "objective": "352.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Dockerfile practice reduces the image size and the number of layers for a package installation?",
+      "question_de": "Welche Dockerfile-Praxis verringert bei einer Paketinstallation die Imagegröße und die Zahl der Schichten?",
+      "choices": [
+        {
+          "text": "Combine update, install and cache cleanup in one RUN instruction with &&",
+          "text_de": "Update, Installation und Cache-Bereinigung in einer RUN-Anweisung mit && zusammenfassen",
+          "correct": true
+        },
+        {
+          "text": "Use one RUN instruction per command for readability",
+          "text_de": "Je Befehl eine eigene RUN-Anweisung für bessere Lesbarkeit"
+        },
+        {
+          "text": "Run the cleanup in CMD",
+          "text_de": "Die Bereinigung in CMD ausführen"
+        },
+        {
+          "text": "Declare a VOLUME for /var/cache/apt",
+          "text_de": "Ein VOLUME für /var/cache/apt deklarieren"
+        }
+      ],
+      "explanation_de": "Jede RUN-Anweisung erzeugt eine Schicht. Dateien, die in einer späteren Schicht gelöscht werden, bleiben in der früheren erhalten. Deshalb apt-get update && apt-get install -y ... && rm -rf /var/lib/apt/lists/* in einem Schritt; Multi-Stage-Builds helfen zusätzlich.",
+      "terms": []
+    },
+    {
+      "id": "305-352.4-03",
+      "objective": "352.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command initializes a Docker Swarm on the current node and which command deploys a stack from a Compose file?",
+      "question_de": "Welcher Befehl initialisiert einen Docker Swarm auf dem aktuellen Knoten, und welcher rollt einen Stack aus einer Compose-Datei aus?",
+      "choices": [
+        {
+          "text": "docker swarm init; docker stack deploy -c docker-compose.yml app",
+          "text_de": "docker swarm init; docker stack deploy -c docker-compose.yml app",
+          "correct": true
+        },
+        {
+          "text": "docker cluster create; docker compose deploy app",
+          "text_de": "docker cluster create; docker compose deploy app"
+        },
+        {
+          "text": "docker swarm join --manager; docker service up app",
+          "text_de": "docker swarm join --manager; docker service up app"
+        },
+        {
+          "text": "kubeadm init; kubectl apply -f docker-compose.yml",
+          "text_de": "kubeadm init; kubectl apply -f docker-compose.yml"
+        }
+      ],
+      "explanation_de": "swarm init macht den Knoten zum Manager und gibt den Join-Token für Worker aus. Dienste werden als Services oder Stacks verwaltet (docker service ls, docker stack ps). kubeadm und kubectl gehören zu Kubernetes.",
+      "terms": []
+    },
+    {
+      "id": "305-353.2-02",
+      "objective": "353.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "In which order does Packer process the parts of a template during a build?",
+      "question_de": "In welcher Reihenfolge verarbeitet Packer die Teile eines Templates während eines Builds?",
+      "choices": [
+        {
+          "text": "Builder creates the machine, provisioners configure it, post-processors handle the resulting artifact.",
+          "text_de": "Der Builder erzeugt die Maschine, Provisioner konfigurieren sie, Post-Processors verarbeiten das entstandene Artefakt.",
+          "correct": true
+        },
+        {
+          "text": "Post-processors run first to prepare the source image.",
+          "text_de": "Post-Processors laufen zuerst, um das Quell-Image vorzubereiten."
+        },
+        {
+          "text": "Provisioners create the machine, builders upload it.",
+          "text_de": "Provisioner erzeugen die Maschine, Builder laden sie hoch."
+        },
+        {
+          "text": "All parts run in parallel.",
+          "text_de": "Alle Teile laufen parallel."
+        }
+      ],
+      "explanation_de": "packer build startet die Builder (parallel, wenn mehrere), in jeder Maschine laufen die Provisioner nacheinander, danach Post-Processors wie compress, manifest oder vagrant. packer validate prüft das Template vorher.",
+      "terms": [
+        {
+          "term": "artifact",
+          "de": "Artefakt, Build-Ergebnis"
+        }
+      ]
+    },
+    {
+      "id": "305-353.3-03",
+      "objective": "353.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which datasource lets you test cloud-init locally by providing meta-data and user-data on an attached ISO image?",
+      "question_de": "Welche Datenquelle erlaubt es, cloud-init lokal zu testen, indem meta-data und user-data auf einem angehängten ISO-Image bereitgestellt werden?",
+      "choices": [
+        {
+          "text": "NoCloud (config drive), e.g. created with cloud-localds",
+          "text_de": "NoCloud (Config Drive), z. B. erzeugt mit cloud-localds",
+          "correct": true
+        },
+        {
+          "text": "EC2 metadata service at 169.254.169.254",
+          "text_de": "EC2-Metadatendienst unter 169.254.169.254"
+        },
+        {
+          "text": "OpenStack Nova API",
+          "text_de": "OpenStack-Nova-API"
+        },
+        {
+          "text": "Vagrant shared folders",
+          "text_de": "Vagrant Shared Folders"
+        }
+      ],
+      "explanation_de": "Die NoCloud-Datenquelle liest ein Medium mit dem Label cidata, das meta-data und user-data enthält. cloud-localds seed.iso user-data erzeugt es. Der Metadatendienst steht nur in Clouds zur Verfügung.",
+      "terms": []
+    },
+    {
+      "id": "305-353.4-03",
+      "objective": "353.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Vagrantfile snippet defines two machines web and db in one environment?",
+      "question_de": "Welcher Vagrantfile-Ausschnitt definiert zwei Maschinen web und db in einer Umgebung?",
+      "choices": [
+        {
+          "text": "config.vm.define \"web\" do |web| ... end\nconfig.vm.define \"db\" do |db| ... end",
+          "text_de": "config.vm.define \"web\" do |web| ... end\nconfig.vm.define \"db\" do |db| ... end",
+          "correct": true
+        },
+        {
+          "text": "config.vm.box = [\"web\", \"db\"]",
+          "text_de": "config.vm.box = [\"web\", \"db\"]"
+        },
+        {
+          "text": "config.vm.multi = 2",
+          "text_de": "config.vm.multi = 2"
+        },
+        {
+          "text": "config.vm.provision \"machines\", names: [\"web\", \"db\"]",
+          "text_de": "config.vm.provision \"machines\", names: [\"web\", \"db\"]"
+        }
+      ],
+      "explanation_de": "Multi-Machine-Setups nutzen config.vm.define je Maschine mit eigener Box, Netzwerk und Provisionierung. vagrant up web startet nur eine davon, vagrant status zeigt alle.",
+      "terms": []
+    }
   ]
 }

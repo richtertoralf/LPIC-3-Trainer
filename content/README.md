@@ -33,9 +33,11 @@ Jede Datei wird vor dem Import vollständig geprüft. Bei einem Fehler wird nich
   "schema_version": 1,
   "kind": "questions",
   "module": "303",
+  "source": "LPIC-3 Trainer Projekt",
+  "exam_version": "3.0",
+  "rights": "cleared",
   "license": "CC BY-SA 4.0",
   "author": "Name",
-  "visibility": "public",
   "questions": [
     {
       "id": "303-331.1-01",
@@ -64,11 +66,11 @@ Regeln:
 - `type`: `single` (genau eine richtige Antwort) oder `multiple` (mindestens zwei richtige und mindestens eine falsche).
 - `difficulty`: 1 bis 3, Standard 2.
 - `choices`: 2 bis 6 Einträge.
-- `visibility`: `public` oder `private`. Beim Import über die Weboberfläche gilt die dort gewählte Sichtbarkeit.
+- `source` (Pflicht): nachvollziehbare Quelle der Fragen, max. 160 Zeichen. Wird bei importierten Fragen angezeigt.
+- `exam_version` (Pflicht): Prüfungsgeneration, auf die sich die Fragen beziehen, z. B. `3.0`.
+- `rights`: `cleared` (Lizenz bekannt), `unknown` (Standard) oder `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt).
 - `terms`: fragenbezogene Fachbegriffe. Sie landen zusätzlich im Glossar.
-- `supplementary`: `true` kennzeichnet eine Zusatzquelle. Die Fragen sind für Lernende erst sichtbar, wenn ein Betreuer die Quelle für eine Lerngruppe freischaltet. Dann ist `source` Pflicht.
-- `source`: Quellenbezeichnung, z. B. `ExamTopics 04.11.2026` (max. 160 Zeichen). Wird bei jeder Zusatzfrage angezeigt.
-- `rights`: `cleared`, `unknown` (Standard) oder `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt).
+- `supplementary`: nur für mitgelieferte Dateien relevant. `true` kennzeichnet eine mitgelieferte Datei als externe Quelle, die unveröffentlicht bleibt. Alle Importe über Weboberfläche oder CLI sind automatisch externe Quellen.
 
 ### Glossar (`kind: terms`)
 
@@ -103,7 +105,6 @@ Befehle werden nur angezeigt, nie ausgeführt.
 ## Eigene Inhalte
 
 - Prüfen: `lpic3ctl validate datei.json`
-- Importieren: `lpic3ctl import datei.json --visibility private` oder über die Weboberfläche unter Verwaltung › Import.
-- Zusatzfragen: `lpic3ctl import datei.json --supplementary --source "Quelle Datum" --rights unverified` oder in der Weboberfläche die Option „Als Zusatzfragen importieren“ mit Quellenbezeichnung und Rechtestatus. Die Felder in der Datei gelten, Angaben beim Import überschreiben sie.
-- Importierte Fragen sind standardmäßig privat. Nur Administratoren können sie öffentlich stellen.
+- Importieren: `lpic3ctl import datei.json --source "Quelle Datum" --exam-version 3.0 --rights unverified` oder über die Weboberfläche unter Verwaltung › Import (nur Administratoren und Betreuer). Angaben beim Import überschreiben die Felder im Dateikopf.
+- Importierte Fragen sind unveröffentlicht, bis ein Betreuer sie für seine Lerngruppen oder ein Administrator sie systemweit freigibt (Verwaltung › Freigaben).
 - Nutzungsrechte importierter Inhalte sind vom Importierenden zu beachten. Unerlaubt kopierte Prüfungsfragen dürfen nicht in dieses Repository aufgenommen werden.

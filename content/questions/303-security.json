@@ -2,9 +2,11 @@
   "schema_version": 1,
   "kind": "questions",
   "module": "303",
+  "source": "LPIC-3 Trainer Projekt",
+  "exam_version": "3.0",
+  "rights": "cleared",
   "license": "CC BY-SA 4.0",
   "author": "LPIC-3 Trainer Projekt",
-  "visibility": "public",
   "questions": [
     {
       "id": "303-331.1-01",

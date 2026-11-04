@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand und Zusatzfragen (erste Entwicklungsversion, keine stabile Produktionsversion).
+Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand und Freigabeverwaltung für importierte Fragen (erste Entwicklungsversion, keine stabile Produktionsversion).
 
 ## Zusammenfassung
 
@@ -52,7 +52,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 - Import über Weboberfläche (max. 5 MB) und `lpic3ctl import`, Sichtbarkeit privat/öffentlich, Importchargen mit Lizenz und Autor, Löschen von Chargen, Deaktivieren einzelner Fragen.
 - Private Fragen sind für Importierende, Administratoren und Mitglieder betreuter Gruppen sichtbar.
 - Importierte Texte werden immer escaped (getestet).
-- Zusatzfragen: Importdateien können mit `supplementary`, `source` und `rights` als Zusatzquelle gekennzeichnet werden (Weboberfläche, CLI `--supplementary`, oder Ablage unter `content/questions/extra/`). Sie bleiben für Lernende unsichtbar, bis ein Betreuer die Quelle unter *Verwaltung › Zusatzfragen* für eine Lerngruppe freischaltet. Jede Zusatzfrage ist mit Quelle und Rechtestatus markiert; Lernende können wahlweise nur Zusatzfragen oder nur den regulären Bestand üben. Migration `0002`.
+- Rollen und Freigabe: Nur Administratoren und Betreuer importieren Fragen; Lernende können nichts importieren, anlegen, ändern oder freigeben. Jeder Import braucht Quelle und Prüfungsgeneration (`source`, `exam_version`) sowie einen Rechtestatus und bleibt unveröffentlicht. Betreuer geben eigene Importe unter *Verwaltung › Freigaben* für eigene Gruppen frei, Administratoren systemweit oder für beliebige Gruppen. Lernende sehen den freigegebenen Grundbestand und die Freigaben ihrer Gruppen; freigegebene Importe sind bei jeder Frage als Zusatzfrage mit Quelle, Prüfungsgeneration und Rechtestatus markiert, mit Pool-Filter beim Üben. Die mitgelieferten Projektfragen bilden den bereits freigegebenen Grundbestand. Migrationen `0002` und `0003`.
 - Mitgelieferte Zusatzquellen unter `content/questions/extra/`: je zwei Fragen aus den öffentlich abrufbaren ExamTopics-Dumps zu den Prüfungen 305-300 und 300-300 (Herkunft per Websuche geprüft, Nutzungsrechte nicht geklärt, Fundstellen in `content/questions/extra/README.md`). Diese Dateien sind von der CC-BY-SA-Lizenz der übrigen Inhalte ausgenommen.
 
 ### Offline
@@ -76,8 +76,8 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 | Suite | Umfang | Ergebnis |
 |-------|--------|----------|
-| pytest Backend (`tests/`, ohne e2e) | 80 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Zusatzfragen (Validierung, Import über Web und CLI, Freischaltung je Gruppe, Sichtbarkeit, Pool-Filter) | 80 bestanden |
-| Playwright (`tests/e2e/`, Chromium) | 10 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Zusatzfragen (Import, Freischaltung, Kennzeichnung) | 10 bestanden |
+| pytest Backend (`tests/`, ohne e2e) | 82 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Import- und Freigaberechte (Lernende 403, Pflichtfelder Quelle und Prüfungsgeneration, Import unveröffentlicht, Freigabe durch Betreuer nur für eigene Importe und Gruppen, systemweite Freigabe nur Administrator, Grundbestand freigegeben, externe Quellen nicht) | 82 bestanden |
+| Playwright (`tests/e2e/`, Chromium) | 10 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Import und Freigabe durch Betreuer mit Kennzeichnung beim Lernenden, Lernender ohne Zugriff auf Verwaltungsseiten | 10 bestanden |
 | ruff check / ruff format | `app`, `tests`, `migrations` | ohne Befunde |
 
 JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertests erfasst; keine aufgetreten.

@@ -43,10 +43,14 @@ def test_supervisor_sees_only_own_groups(client, admin):
     assert sup.post(f"/admin/groups/{other_id}/delete").status_code == 403
 
 
-def test_supervisor_private_questions_visible_to_group_members(client, admin):
+def test_supervisor_import_needs_release_for_group_members(client, admin):
     import copy
     import json
 
+    from sqlalchemy import select
+
+    from app.db import session_scope
+    from app.models import ImportBatch
     from tests.test_content_import import QUESTION_DOC
 
     sup = new_client(unique("supq"))
@@ -57,16 +61,23 @@ def test_supervisor_private_questions_visible_to_group_members(client, admin):
     doc = copy.deepcopy(QUESTION_DOC)
     ext = unique("supq-")
     doc["questions"] = [doc["questions"][0] | {"id": ext}]
+    doc["source"] = unique("Kursquelle ")
     files = {"file": ("kurs.json", json.dumps(doc).encode(), "application/json")}
-    assert sup.post("/admin/import", data={"visibility": "public"}, files=files).status_code == 303
+    assert sup.post("/admin/import", data={}, files=files).status_code == 303
     page = sup.get(f"/admin/questions?q={ext}").text
     qid = int(re.search(r'href="/question/(\d+)"', page).group(1))
-    assert "private" in page  # supervisors cannot publish
-    outsider = new_client(unique("out"))
-    assert outsider.get(f"/question/{qid}").status_code == 404
+    assert "unveröffentlicht" in page
     insider = new_client(unique("in"))
     insider.post(f"/groups/{gid}/join")
+    assert insider.get(f"/question/{qid}").status_code == 404  # not released yet
+    with session_scope() as db:
+        batch_id = db.execute(
+            select(ImportBatch.id).where(ImportBatch.source == doc["source"])
+        ).scalar_one()
+    assert sup.post(f"/admin/releases/group/{gid}", data={"batch": [batch_id]}).status_code == 303
     assert insider.get(f"/question/{qid}").status_code == 200
+    outsider = new_client(unique("out"))
+    assert outsider.get(f"/question/{qid}").status_code == 404
 
 
 def test_admin_user_management(client, admin):

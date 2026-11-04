@@ -36,7 +36,7 @@ from app.models import (
     UserModule,
 )
 from app.security import delete_user_sessions, hash_password
-from app.services import all_modules, module_progress
+from app.services import all_modules, module_progress, set_batch_release
 from app.web import redirect, render
 
 router = APIRouter(prefix="/admin")
@@ -205,17 +205,13 @@ def import_form(
 async def import_upload(
     request: Request,
     file: UploadFile = File(...),
-    visibility: str = Form("private"),
-    supplementary: str = Form(""),
     source: str = Form(""),
+    exam_version: str = Form(""),
     rights: str = Form("unknown"),
     user: User = Depends(require_supervisor),
     db: Session = Depends(get_db),
 ):
-    if visibility not in ("public", "private"):
-        raise HTTPException(400, "Ungültige Sichtbarkeit")
-    if visibility == "public" and not user.is_admin:
-        visibility = "private"
+    """Import a question or lab file. Imported questions stay unreleased until released."""
     raw = await file.read()
     if len(raw) > MAX_UPLOAD_BYTES:
         return redirect("/admin/import", "Die Datei ist größer als 5 MB.", "error")
@@ -228,19 +224,15 @@ async def import_upload(
             )
         if rights not in ("cleared", "unknown", "unverified"):
             raise ContentError(["Ungültiger Rechtestatus."])
-        is_supplementary = supplementary == "1" or bool(data.get("supplementary"))
-        if is_supplementary and not (source.strip() or data.get("source")):
-            raise ContentError(["Zusatzfragen brauchen eine Quellenbezeichnung."])
-        result = import_document(
-            db,
-            data,
-            filename=filename,
-            imported_by=user.id,
-            visibility=visibility,
-            supplementary=is_supplementary,
-            source=source.strip() or None,
-            rights=rights if rights != "unknown" else None,
-        )
+        if data.get("kind") == "questions":
+            # form values complete or override the file header
+            if source.strip():
+                data["source"] = source.strip()
+            if exam_version.strip():
+                data["exam_version"] = exam_version.strip()
+            if rights != "unknown":
+                data["rights"] = rights
+        result = import_document(db, data, filename=filename, imported_by=user.id)
     except ContentError as exc:
         db.rollback()
         batches = list(
@@ -260,6 +252,8 @@ async def import_upload(
             status_code=400,
         )
     msg = f"{filename}: {result.created} neu, {result.updated} aktualisiert ({result.kind})."
+    if result.kind == "questions":
+        msg += " Die Fragen sind noch nicht freigegeben (Verwaltung › Freigaben)."
     return redirect("/admin/import", msg, "success")
 
 
@@ -493,7 +487,7 @@ def delete_group(group_id: int, user: User = Depends(require_admin), db: Session
     return redirect("/admin/groups", "Gruppe gelöscht.")
 
 
-# --------------------------------------------------------- supplementary pools
+# ----------------------------------------------------------------- releases
 
 
 def _supervised_groups(db: Session, user: User) -> list[Group]:
@@ -509,18 +503,24 @@ def _supervised_groups(db: Session, user: User) -> list[Group]:
     ]
 
 
-@router.get("/extra")
-def extra_sources(
+def _releasable_batches(db: Session, user: User) -> list[ImportBatch]:
+    """External question pools the user may release: own imports, or all for administrators."""
+    stmt = (
+        select(ImportBatch)
+        .where(ImportBatch.kind == "questions", ImportBatch.supplementary.is_(True))
+        .order_by(ImportBatch.module_code, ImportBatch.source, ImportBatch.imported_at)
+    )
+    if not user.is_admin:
+        stmt = stmt.where(ImportBatch.imported_by == user.id)
+    return list(db.execute(stmt).scalars())
+
+
+@router.get("/releases")
+def releases(
     request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
 ):
-    """Supplementary question pools and the groups they are enabled for."""
-    batches = list(
-        db.execute(
-            select(ImportBatch)
-            .where(ImportBatch.supplementary.is_(True))
-            .order_by(ImportBatch.module_code, ImportBatch.source)
-        ).scalars()
-    )
+    """External question pools and the groups they are released for."""
+    batches = _releasable_batches(db, user)
     groups = _supervised_groups(db, user)
     enabled = {
         (gs.group_id, gs.batch_id)
@@ -531,24 +531,37 @@ def extra_sources(
     counts = dict(
         db.execute(
             select(Question.import_batch_id, func.count(Question.id))
-            .where(Question.supplementary.is_(True))
+            .where(Question.import_batch_id.in_([b.id for b in batches]))
             .group_by(Question.import_batch_id)
         ).all()
     )
+    importers = {
+        u.id: u.username
+        for u in db.execute(
+            select(User).where(User.id.in_([b.imported_by for b in batches if b.imported_by]))
+        ).scalars()
+    }
     return render(
         request,
-        "admin/extra.html",
-        {"batches": batches, "groups": groups, "enabled": enabled, "counts": counts},
+        "admin/releases.html",
+        {
+            "batches": batches,
+            "groups": groups,
+            "enabled": enabled,
+            "counts": counts,
+            "importers": importers,
+        },
     )
 
 
-@router.post("/extra/{group_id}")
-async def save_extra_sources(
+@router.post("/releases/group/{group_id}")
+async def save_group_releases(
     request: Request,
     group_id: int,
     user: User = Depends(require_supervisor),
     db: Session = Depends(get_db),
 ):
+    """Enable the selected pools for one group. Supervisors may only use their own imports."""
     group = _group_for(db, user, group_id)
     form = await request.form()
     wanted: set[int] = set()
@@ -557,19 +570,32 @@ async def save_extra_sources(
             wanted.add(int(raw))
         except ValueError:
             continue
-    valid = set(
-        db.execute(select(ImportBatch.id).where(ImportBatch.supplementary.is_(True))).scalars()
-    )
-    wanted &= valid
+    allowed = {b.id for b in _releasable_batches(db, user)}
     current = {
         gs.batch_id: gs
         for gs in db.execute(select(GroupSource).where(GroupSource.group_id == group.id)).scalars()
     }
-    for batch_id in wanted - set(current):
+    for batch_id in (wanted & allowed) - set(current):
         db.add(GroupSource(group_id=group.id, batch_id=batch_id, enabled_by=user.id))
-    for batch_id in set(current) - wanted:
+    for batch_id in (set(current) & allowed) - wanted:
         db.delete(current[batch_id])
-    return redirect("/admin/extra", f"Zusatzfragen für {group.name} gespeichert.", "success")
+    return redirect("/admin/releases", f"Freigaben für {group.name} gespeichert.", "success")
+
+
+@router.post("/releases/{batch_id}/global")
+def release_global(
+    batch_id: int,
+    released: str = Form("0"),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Release or withdraw a pool system-wide (administrators only)."""
+    batch = db.get(ImportBatch, batch_id)
+    if batch is None or batch.kind != "questions":
+        raise HTTPException(404, "Import nicht gefunden")
+    set_batch_release(db, batch, released == "1")
+    state = "systemweit freigegeben" if batch.released else "systemweite Freigabe zurückgenommen"
+    return redirect("/admin/releases", f"{batch.source}: {state}.", "success")
 
 
 # ---------------------------------------------------------------- statistics

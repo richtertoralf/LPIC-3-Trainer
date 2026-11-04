@@ -40,6 +40,7 @@ VISIBILITIES = ("public", "private")
 # Rights status of an imported question pool: cleared (licence known), unknown, or
 # unverified (origin known, usage rights not cleared; only for supervisor-enabled pools).
 RIGHTS = ("cleared", "unknown", "unverified")
+EXAM_VERSION_PATTERN = re.compile(r"^\d+\.\d+(\.\d+)?$")
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$")
 CODE_PATTERN = re.compile(r"^\d{3}(\.\d)?$")
 MAX_TEXT = 4000
@@ -259,8 +260,12 @@ def validate_questions(data: dict) -> list[str]:
         errors.append("'visibility' must be public or private")
     if not isinstance(data.get("supplementary", False), bool):
         errors.append("'supplementary' must be true or false")
-    if data.get("supplementary") and not _is_str(data.get("source"), max_len=160):
-        errors.append("a supplementary file needs a non-empty 'source' label (max 160 chars)")
+    if not _is_str(data.get("source"), max_len=160):
+        errors.append("'source' is required: who or where the questions come from (max 160 chars)")
+    if not isinstance(data.get("exam_version"), str) or not EXAM_VERSION_PATTERN.match(
+        data.get("exam_version") or ""
+    ):
+        errors.append("'exam_version' is required, e.g. \"3.0\" (exam objectives generation)")
     if data.get("rights", "unknown") not in RIGHTS:
         errors.append(f"'rights' must be one of {', '.join(RIGHTS)}")
     questions = data.get("questions")
@@ -494,9 +499,13 @@ def import_questions(
             and objectives[code].topic.module_id != module.id
         ):
             raise ContentError([f"question {q['id']}: objective {code} belongs to another module"])
-    vis = visibility or data.get("visibility", "private")
-    supplementary = bool(data.get("supplementary", False)) or bool(kwargs.get("supplementary"))
+    # Every external (non-bundled) import is a supplementary pool that stays unreleased until
+    # a supervisor enables it for a group or an administrator releases it system-wide.
+    # Bundled files are released unless they declare themselves supplementary.
+    supplementary = (not bundled) or bool(data.get("supplementary", False))
     batch = _batch(db, "questions", filename, bundled)
+    released = batch.released if batch.id and not bundled else (bundled and not supplementary)
+    vis = "public" if released else "private"
     batch.module_code = module.code
     batch.license = data.get("license", "")
     batch.author = data.get("author", "")
@@ -504,7 +513,9 @@ def import_questions(
     batch.imported_by = imported_by
     batch.checksum = checksum
     batch.supplementary = supplementary
+    batch.released = released
     batch.source = (kwargs.get("source") or data.get("source") or "")[:160]
+    batch.exam_version = (kwargs.get("exam_version") or data.get("exam_version") or "")[:16]
     batch.rights = kwargs.get("rights") or data.get("rights", "unknown")
     db.flush()
     cache: dict[str, Term] = {}
@@ -626,7 +637,15 @@ def import_document(
     bundled: bool = False,
     **kwargs,
 ) -> ImportResult:
-    """Validate and import one content document. Raises ContentError when invalid."""
+    """Validate and import one content document. Raises ContentError when invalid.
+
+    ``source``, ``exam_version`` and ``rights`` given as keyword arguments complete or
+    override the file header before validation (web form and CLI options).
+    """
+    if data.get("kind") == "questions":
+        for key in ("source", "exam_version", "rights"):
+            if kwargs.get(key):
+                data[key] = kwargs[key]
     errors = validate(data)
     if errors:
         raise ContentError(errors)

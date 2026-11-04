@@ -19,7 +19,7 @@
 | `lpic3ctl uninstall` | entfernen, Daten behalten | ja |
 | `lpic3ctl purge [--yes]` | alles entfernen | ja |
 | `lpic3ctl user ...` | Benutzer verwalten | nein* |
-| `lpic3ctl import DATEI... [--visibility public\|private] [--supplementary --source TEXT --rights STATUS]` | Inhalte importieren | nein* |
+| `lpic3ctl import DATEI... [--source TEXT --exam-version X.Y --rights STATUS]` | Inhalte importieren (Fragen bleiben unveröffentlicht) | nein* |
 | `lpic3ctl validate DATEI...` | Inhalte prüfen | nein |
 | `lpic3ctl content-sync` | mitgelieferte Inhalte importieren | nein* |
 | `lpic3ctl migrate` | Migrationen ausführen | nein* |
@@ -33,9 +33,9 @@ Exit-Codes: `0` Erfolg, `1` Fehler, `2` Bedienfehler oder Abbruch, `3` fehlende 
 
 Rollen:
 
-- **Administrator**: alles, einschließlich Einstellungen, Rollen, Löschen, öffentliche Importe.
-- **Betreuer**: Benutzer freigeben, eigene Gruppen anlegen und betreuen, Fragen importieren (privat, sichtbar für die eigenen Gruppen), Lernstand der Gruppenmitglieder sehen.
-- **Lernender**: lernen, Gruppen beitreten.
+- **Administrator**: alles, einschließlich Einstellungen, Rollen, Löschen und systemweiter Freigabe von Importen.
+- **Betreuer**: Benutzer freigeben, eigene Gruppen anlegen und betreuen, Fragen importieren und die eigenen Importe für die eigenen Gruppen freigeben, Lernstand der Gruppenmitglieder sehen.
+- **Lernender**: lernen, Gruppen beitreten. Kein Import, keine Freigabe, keine Änderung von Fragen.
 
 Weboberfläche: *Verwaltung › Benutzer*. Dort Freigeben, Rolle ändern, Deaktivieren, Passwort zurücksetzen (neues Passwort wird einmalig angezeigt) und Löschen.
 
@@ -56,29 +56,29 @@ Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit 
 
 *Verwaltung › Gruppen*: Gruppe anlegen mit Beitritt `offen` oder `mit Freigabe`. Wer eine Gruppe anlegt, ist ihr Betreuer. Auf der Gruppenseite: Beitrittsanfragen freigeben, Mitglieder hinzufügen oder entfernen, Lernstand je Mitglied und Modul (geübte Fragen, Trefferquote, Hilfequote, beste Simulation). Lernende treten unter *Gruppen* bei.
 
-## Fragen bereitstellen
+## Fragenimport, Herkunft und Freigabe
 
-- *Verwaltung › Import*: JSON-Datei hochladen (max. 5 MB). Sichtbarkeit `privat` oder, nur für Administratoren, `öffentlich`. Fehlerhafte Dateien werden mit Fehlerliste abgelehnt.
-- *Verwaltung › Fragen*: filtern nach Modul, Text oder Importcharge; Fragen deaktivieren oder aktivieren.
-- *Verwaltung › Import › Löschen* entfernt eine Importcharge mit allen Fragen.
-- Kommandozeile: `lpic3ctl validate datei.json`, `sudo lpic3ctl import datei.json --visibility private`.
+Rollen und Rechte:
 
-Format und Regeln: `content/README.md`. Die Nutzungsrechte importierter Inhalte liegen beim Importierenden.
+- Nur Administratoren und Betreuer (Lehrer, Tutoren) importieren Fragen. Lernende können Fragen weder importieren noch anlegen, ändern oder freigeben; alle Verwaltungsseiten antworten ihnen mit 403 (getestet).
+- Jeder Import braucht eine nachvollziehbare **Quelle** (`source`, z. B. „ExamTopics 04.11.2026“ oder „Eigene Fragen Kurs A“) und eine **Prüfungsgeneration** (`exam_version`, z. B. `3.0`). Beide stehen im Dateikopf oder werden im Importformular beziehungsweise per CLI angegeben. Ohne diese Angaben wird die Datei abgelehnt. Dazu kommt ein Rechtestatus (`rights`: geklärt, unbekannt, nicht geklärt).
+- Importierte Fragen bleiben **unveröffentlicht**. Sie sind nur für den Importierenden und für Administratoren sichtbar.
+- **Betreuer** geben unter *Verwaltung › Freigaben* ihre eigenen Importe für ihre eigenen Lerngruppen frei und nehmen die Freigabe dort wieder zurück. Fremde Importe oder fremde Gruppen können sie nicht freigeben.
+- **Administratoren** geben einen Import systemweit für alle Lernenden frei (Schaltfläche „Systemweit freigeben“) oder für beliebige Gruppen.
+- **Lernende** sehen den freigegebenen Grundbestand (mitgelieferte Projektfragen und systemweit freigegebene Importe) sowie die Freigaben ihrer eigenen Lerngruppen. Freigegebene Importe sind bei jeder Frage als „Zusatzfrage“ mit Quelle, Prüfungsgeneration und Rechtestatus markiert.
+- Die **mitgelieferten Projektfragen** (`content/questions/*.json`, Quelle „LPIC-3 Trainer Projekt“, Prüfungsgeneration 3.0, CC BY-SA 4.0) bilden den bereits freigegebenen Grundbestand. Dateien unter `content/questions/extra/` sind externe Quellen und werden beim `content-sync` zwar importiert, bleiben aber unveröffentlicht.
+- Wer freigibt, verantwortet die Zulässigkeit der Nutzung, insbesondere bei Quellen mit Rechtestatus „nicht geklärt“.
 
-## Zusatzfragen
-
-Zusatzfragen sind Fragen aus gesondert gekennzeichneten Quellen, zum Beispiel öffentlich im Internet kursierenden Fragensammlungen, deren Nutzungsrechte nicht geklärt sind. Sie werden getrennt vom regulären Bestand behandelt:
-
-- Import mit der Option „Als Zusatzfragen importieren“ (Weboberfläche) oder `--supplementary` (CLI), immer mit Quellenbezeichnung (`source`, z. B. „ExamTopics 04.11.2026“) und Rechtestatus (`rights`: geklärt, unbekannt, nicht geklärt). Dateien unter `content/questions/extra/` werden bei `content-sync` automatisch als Zusatzquelle importiert.
-- Für Lernende bleiben Zusatzfragen unsichtbar, bis ein Betreuer die Quelle unter *Verwaltung › Zusatzfragen* für eine seiner Lerngruppen freischaltet. Die Freischaltung lässt sich jederzeit zurücknehmen. Administratoren können jede Gruppe freischalten.
-- Freigeschaltete Zusatzfragen erscheinen beim Üben und in Simulationen und sind bei jeder Frage als „Zusatzfrage“ mit Quelle und Rechtestatus markiert. In der Modulübersicht sieht der Lernende die freigeschalteten Quellen und kann wahlweise nur Zusatzfragen oder nur den regulären Bestand üben.
-- Wer eine Quelle freischaltet, verantwortet die Zulässigkeit der Nutzung in seiner Gruppe. Importierende und Administratoren sehen Zusatzfragen immer.
+Weboberfläche: *Verwaltung › Import* (JSON-Datei, max. 5 MB, Quelle, Prüfungsgeneration, Rechtestatus), *Verwaltung › Freigaben* (Liste der Importe mit Quelle, Prüfungsgeneration, Modul, Fragenzahl, Rechtestatus und Importierendem; Freigabe je Gruppe, systemweit nur für Administratoren), *Verwaltung › Fragen* (Filter, Deaktivieren) und *Verwaltung › Import › Löschen* (Importcharge mit allen Fragen entfernen).
 
 Kommandozeile:
 
 ```bash
-sudo lpic3ctl import fragen.json --supplementary --source "ExamTopics 04.11.2026" --rights unverified
+lpic3ctl validate fragen.json
+sudo lpic3ctl import fragen.json --source "ExamTopics 04.11.2026" --exam-version 3.0 --rights unverified
 ```
+
+Importe über die Kommandozeile sind ebenfalls unveröffentlicht und werden in der Weboberfläche freigegeben. Format und Regeln: `content/README.md`.
 
 ## Backup und Restore
 

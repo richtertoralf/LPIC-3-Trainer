@@ -138,6 +138,8 @@ def question_file(tmp_path) -> Path:
         "kind": "questions",
         "module": "303",
         "license": "Test",
+        "source": f"E2E-Quelle {int(time.time())}",
+        "exam_version": "3.0",
         "questions": [
             {
                 "id": f"e2e-q-{int(time.time() * 1000)}",

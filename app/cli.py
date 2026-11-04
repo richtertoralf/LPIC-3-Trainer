@@ -170,10 +170,9 @@ def cmd_import(args) -> int:
                 result = import_path(
                     db,
                     path,
-                    visibility=args.visibility,
                     bundled=False,
-                    supplementary=args.supplementary,
                     source=args.source,
+                    exam_version=args.exam_version,
                     rights=args.rights,
                 )
             say(f"{path.name}: {result.created} neu, {result.updated} aktualisiert ({result.kind})")
@@ -891,17 +890,15 @@ def build_parser() -> argparse.ArgumentParser:
         func=cmd_content_sync
     )
 
-    p = sub.add_parser("import", help="Inhaltsdateien (JSON) importieren")
-    p.add_argument("files", nargs="+")
-    p.add_argument("--visibility", choices=["public", "private"], default=None)
-    p.add_argument(
-        "--supplementary",
-        action="store_true",
-        help="als Zusatzfragen importieren (nur nach Freischaltung durch Betreuer sichtbar)",
+    p = sub.add_parser(
+        "import",
+        help="Inhaltsdateien (JSON) importieren; Fragen bleiben bis zur Freigabe unveröffentlicht",
     )
+    p.add_argument("files", nargs="+")
     p.add_argument(
         "--source", default=None, help="Quellenbezeichnung, z. B. 'ExamTopics 04.11.2026'"
     )
+    p.add_argument("--exam-version", default=None, help="Prüfungsgeneration, z. B. 3.0")
     p.add_argument(
         "--rights",
         choices=["cleared", "unknown", "unverified"],

@@ -47,7 +47,7 @@ Lerninhalte:
 - `questions` → `choices`: englische Frage und Antworten, optional deutsche Übersetzung, deutsche Erklärung, Schwierigkeit, Sichtbarkeit (`public`/`private`), Ersteller, Importcharge.
 - `terms`: Glossar Fachenglisch. `question_terms` verknüpft fragenbezogene Begriffe.
 - `labs`: Laboranleitungen mit Schritten (`steps`, JSON) und Selbstkontrollfragen (`checks`, JSON).
-- `import_batches`: jede Importdatei mit Lizenz, Autor, Sichtbarkeit, Prüfsumme sowie Kennzeichnung als Zusatzquelle (`supplementary`, `source`, `rights`).
+- `import_batches`: jede Importdatei mit Quelle (`source`), Prüfungsgeneration (`exam_version`), Rechtestatus (`rights`), Lizenz, Autor, Prüfsumme, Kennzeichnung als externe Quelle (`supplementary`) und systemweiter Freigabe (`released`).
 
 Persönliche Daten:
 
@@ -58,7 +58,7 @@ Persönliche Daten:
 - `exams`: Prüfungssimulationen und Eingangstests mit Fragenliste und Antworten (JSON)
 - `user_terms`: gemerkte Fachbegriffe (`learning`/`known`)
 - `lab_progress`: erledigte Labs
-- `group_sources`: Zusatzquellen (Importchargen), die ein Betreuer für eine Gruppe freigeschaltet hat
+- `group_sources`: Importchargen, die ein Betreuer oder Administrator für eine Gruppe freigegeben hat
 
 Alle Benutzerdaten tragen eine `user_id`. Beim Löschen eines Benutzers werden sie per `ON DELETE CASCADE` entfernt.
 
@@ -69,7 +69,8 @@ Alle Benutzerdaten tragen eine `user_id`. Beim Löschen eines Benutzers werden s
 - Zustandsändernde Anfragen werden zusätzlich über den `Origin`-Header gegen den `Host` geprüft (Schutz vor Cross-Site-Requests).
 - Rollen: `admin`, `supervisor`, `learner`. Die Prüfung erfolgt im Backend über die Abhängigkeiten `require_admin` und `require_supervisor`.
 - Das erste registrierte Konto wird Administrator.
-- Sichtbarkeit von Fragen: öffentliche Fragen sehen alle. Private Fragen sehen der Importierende, Administratoren und aktive Mitglieder der Gruppen, die der Importierende betreut. Zusatzfragen (`questions.supplementary`) sehen zusätzlich nur Mitglieder von Gruppen, für die die Importcharge in `group_sources` freigeschaltet ist; Administratoren und Importierende sehen sie immer.
+- Sichtbarkeit von Fragen (`services.visible_questions`): Lernende sehen aktive Fragen mit `visibility = public` (mitgelieferter Grundbestand und systemweit freigegebene Importe) sowie Fragen aus Importchargen, die über `group_sources` für eine ihrer aktiven Gruppen freigegeben sind. Importierende sehen ihre eigenen Importe, Administratoren alles. `questions.visibility` wird bei Import und Freigabe aus `import_batches.released` abgeleitet.
+- Import und Freigabe: nur Administratoren und Betreuer importieren (`require_supervisor`). Jeder Import ist eine externe Charge (`supplementary`), bleibt unveröffentlicht und braucht Quelle und Prüfungsgeneration. Betreuer geben eigene Chargen für eigene Gruppen frei, Administratoren systemweit (`set_batch_release`) oder für beliebige Gruppen.
 
 ## Lernlogik
 
@@ -86,7 +87,7 @@ Alle Benutzerdaten tragen eine `user_id`. Beim Löschen eines Benutzers werden s
 - Format: JSON mit `schema_version` und `kind` (`objectives`, `terms`, `questions`, `labs`). Beschreibung in `content/README.md`.
 - Jede Datei wird vollständig validiert, bevor etwas geschrieben wird. Fehlerhafte Dateien werden mit allen Fehlern abgelehnt.
 - Importierte Texte werden ausschließlich als Daten behandelt und beim Rendern durch Jinja2 escaped. Zeilenumbrüche in Erklärungen werden über den Filter `nl2p` in Absätze umgesetzt, ebenfalls escaped.
-- Zusatzquellen liegen unter `content/questions/extra/` mit `supplementary: true`, `source` und `rights`. Sie werden mitimportiert, aber erst nach Freischaltung durch einen Betreuer sichtbar (Migration `0002`).
+- Mitgelieferte Projektfragen tragen `source`, `exam_version` und `rights: cleared` und werden als freigegebener Grundbestand importiert. Externe Quellen unter `content/questions/extra/` (`supplementary: true`) werden mitimportiert, bleiben aber unveröffentlicht (Migrationen `0002`, `0003`).
 - Mitgelieferte Inhalte werden bei `install`, `upgrade` und `serve` synchronisiert. Eine Prüfsumme je Datei verhindert unnötige Wiederholungen. Erneuter Import aktualisiert Fragen anhand ihrer `id`, Lernstände bleiben erhalten.
 
 ## Offline-Verhalten

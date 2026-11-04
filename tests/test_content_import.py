@@ -16,6 +16,8 @@ QUESTION_DOC = {
     "kind": "questions",
     "module": "303",
     "license": "CC BY-SA 4.0",
+    "source": "Testquelle",
+    "exam_version": "3.0",
     "questions": [
         {
             "id": "test-q-1",
@@ -108,17 +110,22 @@ def test_unknown_objective_rejected(client):
 def test_import_and_reimport_updates_in_place(client):
     doc = copy.deepcopy(QUESTION_DOC)
     with session_scope() as db:
-        result = import_document(db, doc, filename="t.json", visibility="private")
+        result = import_document(db, doc, filename="t.json")
         assert result.created == 2 and result.updated == 0
         q = db.execute(select(Question).where(Question.external_id == "test-q-1")).scalar_one()
         qid = q.id
-        assert q.visibility == "private" and len(q.choices) == 2 and q.objective.code == "331.1"
+        assert (
+            q.visibility == "private"
+            and q.supplementary
+            and len(q.choices) == 2
+            and q.objective.code == "331.1"
+        )
         term = db.execute(select(Term).where(Term.term == "sign")).scalar_one()
         assert term.translation_de == "signieren"
     doc["questions"][0]["question"] = "Which tool signs a CSR? (updated)"
     doc["questions"][0]["choices"].append({"text": "gpg"})
     with session_scope() as db:
-        result = import_document(db, doc, filename="t.json", visibility="private")
+        result = import_document(db, doc, filename="t.json")
         assert result.created == 0 and result.updated == 2
         q = db.execute(select(Question).where(Question.external_id == "test-q-1")).scalar_one()
         assert q.id == qid and q.text_en.endswith("(updated)") and len(q.choices) == 3
@@ -128,20 +135,19 @@ def test_import_and_reimport_updates_in_place(client):
         assert orphan == 3
 
 
-def test_import_via_web_upload_and_visibility(client, admin):
+def test_import_via_web_upload_is_unreleased(client, admin):
     doc = copy.deepcopy(QUESTION_DOC)
     doc["questions"][0]["id"] = unique("web-q-")
     doc["questions"][1]["id"] = unique("web-q-")
+    doc["source"] = unique("Webquelle ")
     files = {"file": ("upload.json", json.dumps(doc).encode(), "application/json")}
-    r = admin.post("/admin/import", data={"visibility": "private"}, files=files)
+    r = admin.post("/admin/import", data={"exam_version": "3.0"}, files=files)
     assert r.status_code == 303
     page = admin.get("/admin/import").text
-    assert "upload.json" in page
-    # a learner must not see private questions of the admin
+    assert "upload.json" in page and "unveröffentlicht" in page
     learner = new_client(unique("imp"))
     learner.post("/modules/select", data={"module_code": "303", "action": "add"})
-    r = learner.get(f"/admin/questions?q={doc['questions'][0]['id']}")
-    assert r.status_code == 403
+    assert learner.get(f"/admin/questions?q={doc['questions'][0]['id']}").status_code == 403
     with session_scope() as db:
         q = db.execute(
             select(Question).where(Question.external_id == doc["questions"][0]["id"])
@@ -153,13 +159,14 @@ def test_import_via_web_upload_and_visibility(client, admin):
 
 def test_web_upload_rejects_invalid_file(client, admin):
     files = {"file": ("broken.json", b"{not json", "application/json")}
-    r = admin.post("/admin/import", data={"visibility": "private"}, files=files)
+    r = admin.post("/admin/import", data={}, files=files)
     assert r.status_code == 400 and "abgelehnt" in r.text
 
 
 def test_imported_text_is_escaped(client, admin):
     doc = copy.deepcopy(QUESTION_DOC)
     qid = unique("xss-q-")
+    doc["source"] = unique("XSS-Quelle ")
     doc["questions"] = [
         {
             "id": qid,
@@ -170,9 +177,7 @@ def test_imported_text_is_escaped(client, admin):
         }
     ]
     files = {"file": ("xss.json", json.dumps(doc).encode(), "application/json")}
-    assert (
-        admin.post("/admin/import", data={"visibility": "public"}, files=files).status_code == 303
-    )
+    assert admin.post("/admin/import", data={}, files=files).status_code == 303
     with session_scope() as db:
         q = db.execute(select(Question).where(Question.external_id == qid)).scalar_one()
         db_id = q.id
@@ -201,7 +206,7 @@ def test_cli_validate_and_import(tmp_path, data_dir):
     )
     assert r.returncode == 1 and "gültig" in r.stdout and "bad.json" in r.stderr
     r = subprocess.run(
-        [sys.executable, "-m", "app.cli", "import", str(path), "--visibility", "private"],
+        [sys.executable, "-m", "app.cli", "import", str(path)],
         capture_output=True,
         text=True,
         env=env,
@@ -215,9 +220,7 @@ def test_delete_batch_removes_questions(client, admin):
     doc = copy.deepcopy(QUESTION_DOC)
     doc["questions"] = [doc["questions"][0] | {"id": unique("del-q-")}]
     files = {"file": ("del.json", json.dumps(doc).encode(), "application/json")}
-    assert (
-        admin.post("/admin/import", data={"visibility": "private"}, files=files).status_code == 303
-    )
+    assert admin.post("/admin/import", data={}, files=files).status_code == 303
     with session_scope() as db:
         q = db.execute(
             select(Question).where(Question.external_id == doc["questions"][0]["id"])

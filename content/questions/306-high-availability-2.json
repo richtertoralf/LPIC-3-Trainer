@@ -2,289 +2,863 @@
   "schema_version": 1,
   "kind": "questions",
   "module": "306",
+  "source": "LPIC-3 Trainer Projekt",
+  "exam_version": "3.0",
+  "rights": "cleared",
   "license": "CC BY-SA 4.0",
   "author": "LPIC-3 Trainer Projekt",
-  "visibility": "public",
   "questions": [
-    {"id": "306-361.1-04", "objective": "361.1", "type": "single", "difficulty": 2,
-     "question": "Which cluster architecture lets every node serve requests at the same time and requires the application to handle concurrent access to shared data?",
-     "question_de": "Welche Cluster-Architektur lässt alle Knoten gleichzeitig Anfragen bedienen und verlangt von der Anwendung, gleichzeitigen Zugriff auf gemeinsame Daten zu beherrschen?",
-     "choices": [
-       {"text": "Active/active cluster", "text_de": "Aktiv/Aktiv-Cluster", "correct": true},
-       {"text": "Active/passive cluster", "text_de": "Aktiv/Passiv-Cluster"},
-       {"text": "Cold standby", "text_de": "Cold Standby"},
-       {"text": "Shared-nothing failover cluster", "text_de": "Shared-Nothing-Failover-Cluster"}],
-     "explanation_de": "Im Aktiv/Aktiv-Betrieb arbeiten alle Knoten produktiv, was Lastverteilung erlaubt, aber Sperren oder Replikation zwischen den Knoten erfordert. Aktiv/Passiv hält einen Knoten in Reserve, der nur bei Failover übernimmt.",
-     "terms": [{"term": "at the same time", "de": "gleichzeitig"}]},
-    {"id": "306-361.1-05", "objective": "361.1", "type": "single", "difficulty": 2,
-     "question": "A service guarantees 99.9 % availability per year in its SLA. Roughly how much downtime per year is allowed?",
-     "question_de": "Ein Dienst garantiert im SLA 99,9 % Verfügbarkeit pro Jahr. Wie viel Ausfallzeit pro Jahr ist ungefähr erlaubt?",
-     "choices": [
-       {"text": "About 8.8 hours", "text_de": "Etwa 8,8 Stunden", "correct": true},
-       {"text": "About 53 minutes", "text_de": "Etwa 53 Minuten"},
-       {"text": "About 3.6 days", "text_de": "Etwa 3,6 Tage"},
-       {"text": "About 5 minutes", "text_de": "Etwa 5 Minuten"}],
-     "explanation_de": "0,1 % von 365 Tagen sind 8,76 Stunden. 99,99 % entsprechen rund 53 Minuten, 99 % etwa 3,65 Tagen, 99,999 % etwa 5 Minuten. Solche Werte bestimmen, wie viel Redundanz nötig ist.",
-     "terms": [{"term": "roughly", "de": "ungefähr"}]},
-    {"id": "306-361.1-06", "objective": "361.1", "type": "single", "difficulty": 2,
-     "question": "Why is session handling a concern when a web application is placed behind a load balancer?",
-     "question_de": "Warum ist die Sitzungsbehandlung ein Thema, wenn eine Webanwendung hinter einen Lastverteiler gestellt wird?",
-     "choices": [
-       {"text": "Requests of one user may reach different backends; sessions must be shared or the balancer must keep the user on one server.", "text_de": "Anfragen eines Benutzers können auf verschiedene Backends treffen; Sitzungen müssen geteilt werden oder der Balancer muss den Benutzer auf einem Server halten.", "correct": true},
-       {"text": "Load balancers cannot forward cookies.", "text_de": "Lastverteiler können keine Cookies weiterleiten."},
-       {"text": "Sessions are only possible with TLS termination on the balancer.", "text_de": "Sitzungen sind nur mit TLS-Terminierung auf dem Balancer möglich."},
-       {"text": "Backends must share the same IP address.", "text_de": "Backends müssen dieselbe IP-Adresse haben."}],
-     "explanation_de": "Lösungen sind Sticky Sessions (Persistenz nach Quell-IP oder Cookie, in HAProxy z. B. cookie oder stick-table) oder ein gemeinsamer Sitzungsspeicher, so dass jeder Backend-Server jede Sitzung bedienen kann.",
-     "terms": [{"term": "concern", "de": "Anliegen, Problem"}]},
-    {"id": "306-361.2-05", "objective": "361.2", "type": "single", "difficulty": 2,
-     "question": "Which ipvsadm command adds the real server 10.0.0.11:80 to the virtual service 192.168.1.100:80 using direct routing with weight 2?",
-     "question_de": "Welcher ipvsadm-Befehl fügt dem virtuellen Dienst 192.168.1.100:80 den Real-Server 10.0.0.11:80 mit Direct Routing und Gewicht 2 hinzu?",
-     "choices": [
-       {"text": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -g -w 2", "text_de": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -g -w 2", "correct": true},
-       {"text": "ipvsadm -A -t 192.168.1.100:80 -r 10.0.0.11:80 -m -w 2", "text_de": "ipvsadm -A -t 192.168.1.100:80 -r 10.0.0.11:80 -m -w 2"},
-       {"text": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -i -s 2", "text_de": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -i -s 2"},
-       {"text": "ipvsadm -e -t 10.0.0.11:80 -r 192.168.1.100:80 -g", "text_de": "ipvsadm -e -t 10.0.0.11:80 -r 192.168.1.100:80 -g"}],
-     "explanation_de": "-a fügt einen Real-Server hinzu, -r nennt ihn, -g wählt Direct Routing (gatewaying), -m NAT (masquerading), -i Tunneling (ipip), -w setzt das Gewicht. -A legt den virtuellen Dienst an, -e ändert einen Eintrag.",
-     "terms": []},
-    {"id": "306-361.2-06", "objective": "361.2", "type": "single", "difficulty": 2,
-     "question": "In a keepalived configuration, what does the vrrp_instance option priority control?",
-     "question_de": "Was steuert in einer keepalived-Konfiguration die Option priority einer vrrp_instance?",
-     "choices": [
-       {"text": "Which node becomes MASTER: the highest priority wins the election.", "text_de": "Welcher Knoten MASTER wird: die höchste Priorität gewinnt die Wahl.", "correct": true},
-       {"text": "The weight of the real servers in the IPVS table.", "text_de": "Das Gewicht der Real-Server in der IPVS-Tabelle."},
-       {"text": "The process priority (nice value) of keepalived.", "text_de": "Die Prozesspriorität (nice-Wert) von keepalived."},
-       {"text": "The interval of the health checks.", "text_de": "Das Intervall der Health Checks."}],
-     "explanation_de": "Die VRRP-Priorität (1 bis 254) entscheidet über die Master-Rolle; track_script kann sie dynamisch senken, wenn ein Dienst ausfällt. Real-Server-Gewichte stehen in virtual_server/real_server, das Check-Intervall in delay_loop.",
-     "terms": [{"term": "election", "de": "Wahl, Auswahl"}]},
-    {"id": "306-361.2-07", "objective": "361.2", "type": "single", "difficulty": 2,
-     "question": "Which HAProxy configuration sends requests whose path starts with /api to a separate backend?",
-     "question_de": "Welche HAProxy-Konfiguration leitet Anfragen, deren Pfad mit /api beginnt, an ein eigenes Backend?",
-     "choices": [
-       {"text": "acl is_api path_beg /api\nuse_backend api_servers if is_api", "text_de": "acl is_api path_beg /api\nuse_backend api_servers if is_api", "correct": true},
-       {"text": "route /api api_servers", "text_de": "route /api api_servers"},
-       {"text": "backend api_servers path /api", "text_de": "backend api_servers path /api"},
-       {"text": "balance uri /api api_servers", "text_de": "balance uri /api api_servers"}],
-     "explanation_de": "ACLs im frontend prüfen Bedingungen (path_beg, hdr(host), src), use_backend ... if wählt das Backend, default_backend greift sonst. balance legt nur den Verteilungsalgorithmus innerhalb eines Backends fest.",
-     "terms": []},
-    {"id": "306-361.2-08", "objective": "361.2", "type": "single", "difficulty": 2,
-     "question": "Which tool generates the MD5 digest of a web page that ldirectord or keepalived can use for HTTP health checks?",
-     "question_de": "Welches Werkzeug erzeugt den MD5-Digest einer Webseite, den ldirectord oder keepalived für HTTP-Health-Checks nutzen können?",
-     "choices": [
-       {"text": "genhash", "text_de": "genhash", "correct": true},
-       {"text": "ipvsadm --digest", "text_de": "ipvsadm --digest"},
-       {"text": "md5sum http://server/", "text_de": "md5sum http://server/"},
-       {"text": "keepalived --checksum", "text_de": "keepalived --checksum"}],
-     "explanation_de": "genhash -s server -p 80 -u /index.html liefert den Hash für HTTP_GET-Checks mit digest in keepalived. ldirectord nutzt alternativ receive=\"Zeichenkette\" zum Prüfen des Seiteninhalts.",
-     "terms": []},
-    {"id": "306-361.3-06", "objective": "361.3", "type": "single", "difficulty": 2,
-     "question": "Which command shows the live status of a Pacemaker cluster including nodes, resources and failed actions?",
-     "question_de": "Welcher Befehl zeigt den Live-Status eines Pacemaker-Clusters mit Knoten, Ressourcen und fehlgeschlagenen Aktionen?",
-     "choices": [
-       {"text": "crm_mon", "text_de": "crm_mon", "correct": true},
-       {"text": "crm_verify -L", "text_de": "crm_verify -L"},
-       {"text": "cibadmin --query", "text_de": "cibadmin --query"},
-       {"text": "corosync-cmapctl", "text_de": "corosync-cmapctl"}],
-     "explanation_de": "crm_mon (oder pcs status) aktualisiert die Anzeige laufend, -1 gibt sie einmal aus. crm_verify prüft die Konfiguration auf Fehler, cibadmin zeigt die rohe XML-CIB, corosync-cmapctl die Corosync-Konfigurationsdatenbank.",
-     "terms": []},
-    {"id": "306-361.3-07", "objective": "361.3", "type": "single", "difficulty": 2,
-     "question": "Which resource class is used for scripts following the Open Cluster Framework standard, such as ocf:heartbeat:IPaddr2?",
-     "question_de": "Welche Ressourcenklasse wird für Skripte nach dem Open-Cluster-Framework-Standard wie ocf:heartbeat:IPaddr2 verwendet?",
-     "choices": [
-       {"text": "OCF", "text_de": "OCF", "correct": true},
-       {"text": "LSB", "text_de": "LSB"},
-       {"text": "systemd", "text_de": "systemd"},
-       {"text": "STONITH", "text_de": "STONITH"}],
-     "explanation_de": "OCF-Agents liegen unter /usr/lib/ocf/resource.d/<provider>/ und unterstützen Parameter, monitor und Metadaten. LSB sind klassische Init-Skripte, systemd-Units werden direkt angesprochen, STONITH-Agents fencen Knoten.",
-     "terms": []},
-    {"id": "306-361.3-08", "objective": "361.3", "type": "single", "difficulty": 2,
-     "question": "Which pcs command prevents the resource web from ever running on node3?",
-     "question_de": "Welcher pcs-Befehl verhindert, dass die Ressource web jemals auf node3 läuft?",
-     "choices": [
-       {"text": "pcs constraint location web avoids node3", "text_de": "pcs constraint location web avoids node3", "correct": true},
-       {"text": "pcs constraint order web then node3", "text_de": "pcs constraint order web then node3"},
-       {"text": "pcs resource ban web --all", "text_de": "pcs resource ban web --all"},
-       {"text": "pcs node standby node3 web", "text_de": "pcs node standby node3 web"}],
-     "explanation_de": "avoids setzt eine Location-Constraint mit Score -INFINITY, prefers mit +INFINITY. pcs resource ban web node3 wirkt gleich, ist aber als temporäre Maßnahme gedacht (pcs resource clear hebt es auf). Standby betrifft den ganzen Knoten.",
-     "terms": []},
-    {"id": "306-361.3-09", "objective": "361.3", "type": "single", "difficulty": 3,
-     "question": "A Pacemaker cluster uses SBD. What is the role of SBD in fencing?",
-     "question_de": "Ein Pacemaker-Cluster nutzt SBD. Welche Rolle hat SBD beim Fencing?",
-     "choices": [
-       {"text": "Nodes exchange messages through a shared disk; a node that receives a poison pill or loses the disk and quorum resets itself via the watchdog.", "text_de": "Knoten tauschen Nachrichten über eine gemeinsame Platte aus; ein Knoten, der eine Poison Pill erhält oder Platte und Quorum verliert, setzt sich über den Watchdog selbst zurück.", "correct": true},
-       {"text": "SBD switches off the power of a failed node via IPMI.", "text_de": "SBD schaltet den Strom eines ausgefallenen Knotens per IPMI ab."},
-       {"text": "SBD replicates the CIB to a backup disk.", "text_de": "SBD repliziert die CIB auf eine Sicherungsplatte."},
-       {"text": "SBD is the quorum device of Corosync.", "text_de": "SBD ist das Quorum-Gerät von Corosync."}],
-     "explanation_de": "Storage Based Death nutzt eine kleine gemeinsame Platte (oder diskless nur den Watchdog) als Fencing-Kanal; stonith:fence_sbd schreibt die Poison Pill. Strom-Fencing per IPMI leisten fence_ipmilan und ähnliche Agents; das Quorum-Gerät heißt qdevice.",
-     "terms": [{"term": "watchdog", "de": "Watchdog, Hardware-Zeitgeber für Selbstreset"}]},
-    {"id": "306-362.1-04", "objective": "362.1", "type": "single", "difficulty": 2,
-     "question": "Which DRBD command creates the metadata of the resource r0 on a new backing device before the resource is brought up for the first time?",
-     "question_de": "Welcher DRBD-Befehl erzeugt die Metadaten der Ressource r0 auf einem neuen Hintergrundgerät, bevor die Ressource erstmals aktiviert wird?",
-     "choices": [
-       {"text": "drbdadm create-md r0", "text_de": "drbdadm create-md r0", "correct": true},
-       {"text": "drbdadm up r0", "text_de": "drbdadm up r0"},
-       {"text": "drbdadm attach r0", "text_de": "drbdadm attach r0"},
-       {"text": "drbdsetup new-resource r0", "text_de": "drbdsetup new-resource r0"}],
-     "explanation_de": "create-md schreibt die Metadaten (bei meta-disk internal am Ende des Geräts). up fasst attach, connect und die Einrichtung des Geräts zusammen; drbdsetup ist die Low-Level-Schicht, die drbdadm aufruft.",
-     "terms": [{"term": "backing device", "de": "Hintergrundgerät, darunterliegendes Blockgerät"}]},
-    {"id": "306-362.1-05", "objective": "362.1", "type": "single", "difficulty": 3,
-     "question": "After a network outage both DRBD nodes report StandAlone and a split brain. node2 should discard its changes. Which commands resolve this?",
-     "question_de": "Nach einem Netzausfall melden beide DRBD-Knoten StandAlone und Split Brain. node2 soll seine Änderungen verwerfen. Welche Befehle lösen das?",
-     "choices": [
-       {"text": "On node2: drbdadm secondary r0; drbdadm connect --discard-my-data r0. On node1: drbdadm connect r0", "text_de": "Auf node2: drbdadm secondary r0; drbdadm connect --discard-my-data r0. Auf node1: drbdadm connect r0", "correct": true},
-       {"text": "On both nodes: drbdadm create-md r0; drbdadm up r0", "text_de": "Auf beiden Knoten: drbdadm create-md r0; drbdadm up r0"},
-       {"text": "On node2: drbdadm primary --force r0", "text_de": "Auf node2: drbdadm primary --force r0"},
-       {"text": "On node1: drbdadm invalidate-remote r0; reboot node2", "text_de": "Auf node1: drbdadm invalidate-remote r0; node2 neu starten"}],
-     "explanation_de": "Der Split-Brain-Verlierer wird Secondary und verbindet mit --discard-my-data, der Überlebende verbindet normal; danach synchronisiert DRBD vom Überlebenden. create-md würde Daten zerstören, primary --force löst den Konflikt nicht.",
-     "terms": [{"term": "discard", "de": "verwerfen"}]},
-    {"id": "306-362.1-06", "objective": "362.1", "type": "single", "difficulty": 2,
-     "question": "Which statement about DRBD 9 compared to DRBD 8 is correct?",
-     "question_de": "Welche Aussage über DRBD 9 im Vergleich zu DRBD 8 ist richtig?",
-     "choices": [
-       {"text": "DRBD 9 supports more than two nodes per resource (e.g. three-way replication) and can be managed centrally with LINSTOR.", "text_de": "DRBD 9 unterstützt mehr als zwei Knoten je Ressource (z. B. Dreifach-Replikation) und lässt sich zentral mit LINSTOR verwalten.", "correct": true},
-       {"text": "DRBD 9 only supports protocol A.", "text_de": "DRBD 9 unterstützt nur Protokoll A."},
-       {"text": "DRBD 9 no longer needs a kernel module.", "text_de": "DRBD 9 braucht kein Kernelmodul mehr."},
-       {"text": "DRBD 9 removed the Secondary role.", "text_de": "DRBD 9 hat die Rolle Secondary abgeschafft."}],
-     "explanation_de": "DRBD 9 bringt Multi-Node-Replikation, automatische Promotion beim Mounten und die Verwaltung über LINSTOR (Controller und Satellites). Statt /proc/drbd zeigen drbdadm status und drbdmon den Zustand.",
-     "terms": []},
-    {"id": "306-362.2-03", "objective": "362.2", "type": "single", "difficulty": 2,
-     "question": "Which command on an iSCSI target server (tgt) shows the configured targets, LUNs and connected initiators?",
-     "question_de": "Welcher Befehl zeigt auf einem iSCSI-Target-Server (tgt) die konfigurierten Targets, LUNs und verbundenen Initiatoren?",
-     "choices": [
-       {"text": "tgtadm --lld iscsi --mode target --op show", "text_de": "tgtadm --lld iscsi --mode target --op show", "correct": true},
-       {"text": "iscsiadm -m session", "text_de": "iscsiadm -m session"},
-       {"text": "multipath -ll", "text_de": "multipath -ll"},
-       {"text": "tgt-admin --list", "text_de": "tgt-admin --list"}],
-     "explanation_de": "tgtadm ist das Verwaltungswerkzeug des tgt-Daemons; targets.conf hält die dauerhafte Konfiguration (tgt-admin --execute lädt sie). iscsiadm -m session zeigt die Sicht des Initiators, multipath -ll die Multipath-Geräte.",
-     "terms": []},
-    {"id": "306-362.3-03", "objective": "362.3", "type": "single", "difficulty": 2,
-     "question": "A GFS2 file system is mounted by three nodes but was created with two journals. Which command adds a journal?",
-     "question_de": "Ein GFS2-Dateisystem wird von drei Knoten eingehängt, wurde aber mit zwei Journalen erzeugt. Welcher Befehl fügt ein Journal hinzu?",
-     "choices": [
-       {"text": "gfs2_jadd -j 1 /mnt/gfs2", "text_de": "gfs2_jadd -j 1 /mnt/gfs2", "correct": true},
-       {"text": "mkfs.gfs2 -j 3 /dev/vg/lv", "text_de": "mkfs.gfs2 -j 3 /dev/vg/lv"},
-       {"text": "gfs2_grow -j /mnt/gfs2", "text_de": "gfs2_grow -j /mnt/gfs2"},
-       {"text": "tunefs.gfs2 -J 3 /dev/vg/lv", "text_de": "tunefs.gfs2 -J 3 /dev/vg/lv"}],
-     "explanation_de": "gfs2_jadd fügt Journale einem eingehängten Dateisystem hinzu; jeder Knoten braucht ein eigenes. mkfs.gfs2 würde das Dateisystem neu erzeugen, gfs2_grow vergrößert es nach einer LV-Erweiterung.",
-     "terms": []},
-    {"id": "306-362.3-04", "objective": "362.3", "type": "single", "difficulty": 2,
-     "question": "Which command shows the OCFS2 file systems currently mounted and the nodes using them?",
-     "question_de": "Welcher Befehl zeigt die aktuell eingehängten OCFS2-Dateisysteme und die Knoten, die sie nutzen?",
-     "choices": [
-       {"text": "mounted.ocfs2 -f", "text_de": "mounted.ocfs2 -f", "correct": true},
-       {"text": "o2info --volinfo", "text_de": "o2info --volinfo"},
-       {"text": "tunefs.ocfs2 -Q", "text_de": "tunefs.ocfs2 -Q"},
-       {"text": "fsck.ocfs2 -n", "text_de": "fsck.ocfs2 -n"}],
-     "explanation_de": "mounted.ocfs2 -d listet OCFS2-Geräte, -f zeigt zusätzlich die Knoten. o2info liefert Informationen zu einem Volume, tunefs.ocfs2 ändert Parameter wie die Anzahl der Node-Slots, fsck.ocfs2 prüft.",
-     "terms": []},
-    {"id": "306-363.1-03", "objective": "363.1", "type": "single", "difficulty": 2,
-     "question": "Which command adds the host node3 to the trusted storage pool of an existing GlusterFS cluster?",
-     "question_de": "Welcher Befehl nimmt den Host node3 in den Trusted Storage Pool eines bestehenden GlusterFS-Clusters auf?",
-     "choices": [
-       {"text": "gluster peer probe node3", "text_de": "gluster peer probe node3", "correct": true},
-       {"text": "gluster volume add-brick node3", "text_de": "gluster volume add-brick node3"},
-       {"text": "gluster pool join node3", "text_de": "gluster pool join node3"},
-       {"text": "glusterd --peer node3", "text_de": "glusterd --peer node3"}],
-     "explanation_de": "peer probe wird von einem bereits zugehörigen Knoten aus aufgerufen; gluster peer status und gluster pool list zeigen die Mitglieder. Erst danach können Bricks von node3 in Volumes verwendet werden.",
-     "terms": []},
-    {"id": "306-363.1-04", "objective": "363.1", "type": "single", "difficulty": 2,
-     "question": "How is a GlusterFS volume mounted natively on a client, and which component provides the file system?",
-     "question_de": "Wie wird ein GlusterFS-Volume auf einem Client nativ eingehängt, und welche Komponente stellt das Dateisystem bereit?",
-     "choices": [
-       {"text": "mount -t glusterfs node1:/gv0 /mnt/gv0, provided by the FUSE client", "text_de": "mount -t glusterfs node1:/gv0 /mnt/gv0, bereitgestellt durch den FUSE-Client", "correct": true},
-       {"text": "mount -t nfs node1:/gv0 /mnt/gv0, provided by the kernel NFS client only", "text_de": "mount -t nfs node1:/gv0 /mnt/gv0, nur über den Kernel-NFS-Client"},
-       {"text": "mount -t cifs //node1/gv0 /mnt/gv0", "text_de": "mount -t cifs //node1/gv0 /mnt/gv0"},
-       {"text": "gluster volume mount gv0 /mnt/gv0", "text_de": "gluster volume mount gv0 /mnt/gv0"}],
-     "explanation_de": "Der native Client nutzt FUSE und verbindet sich nach dem Lesen der Volume-Datei direkt mit allen Bricks, daher ist er ausfallsicher gegenüber dem genannten Server. NFS (GNFS/NFS-Ganesha) und SMB sind alternative Zugriffswege.",
-     "terms": []},
-    {"id": "306-363.1-05", "objective": "363.1", "type": "single", "difficulty": 2,
-     "question": "Which GlusterFS volume type stores every file on all bricks so that the volume survives the loss of a brick?",
-     "question_de": "Welcher GlusterFS-Volume-Typ speichert jede Datei auf allen Bricks, so dass das Volume den Verlust eines Bricks übersteht?",
-     "choices": [
-       {"text": "Replicated volume", "text_de": "Repliziertes Volume", "correct": true},
-       {"text": "Distributed volume", "text_de": "Verteiltes Volume"},
-       {"text": "Striped volume", "text_de": "Gestreiftes Volume"},
-       {"text": "Arbiter-only volume", "text_de": "Nur-Arbiter-Volume"}],
-     "explanation_de": "Replica-Volumes spiegeln Dateien; distributed-replicated kombiniert Verteilung und Spiegelung. Ein verteiltes Volume ohne Replikation verliert bei Brick-Ausfall die darauf liegenden Dateien. Ein Arbiter ist ein dritter Metadaten-Brick gegen Split Brain, kein eigener Volume-Typ.",
-     "terms": []},
-    {"id": "306-363.2-04", "objective": "363.2", "type": "single", "difficulty": 2,
-     "question": "Which Ceph component is required to use CephFS but not for RBD block devices?",
-     "question_de": "Welche Ceph-Komponente wird für CephFS benötigt, nicht aber für RBD-Blockgeräte?",
-     "choices": [
-       {"text": "MDS (Metadata Server)", "text_de": "MDS (Metadata Server)", "correct": true},
-       {"text": "MON", "text_de": "MON"},
-       {"text": "OSD", "text_de": "OSD"},
-       {"text": "MGR", "text_de": "MGR"}],
-     "explanation_de": "CephFS speichert Verzeichnisbaum und Metadaten über den MDS in einem Metadaten-Pool; Daten liegen wie bei RBD in den OSDs. MON, MGR und OSD braucht jeder Cluster.",
-     "terms": []},
-    {"id": "306-363.2-05", "objective": "363.2", "type": "single", "difficulty": 2,
-     "question": "Which commands create an RBD image of 10 GB in the pool vms and map it as a block device on a client?",
-     "question_de": "Welche Befehle erzeugen ein RBD-Image mit 10 GB im Pool vms und binden es auf einem Client als Blockgerät ein?",
-     "choices": [
-       {"text": "rbd create vms/disk1 --size 10240; rbd map vms/disk1", "text_de": "rbd create vms/disk1 --size 10240; rbd map vms/disk1", "correct": true},
-       {"text": "ceph osd pool create disk1 10G; mount -t rbd vms/disk1", "text_de": "ceph osd pool create disk1 10G; mount -t rbd vms/disk1"},
-       {"text": "rados put vms disk1 10G; rados map disk1", "text_de": "rados put vms disk1 10G; rados map disk1"},
-       {"text": "ceph-volume create vms/disk1 --size 10G", "text_de": "ceph-volume create vms/disk1 --size 10G"}],
-     "explanation_de": "rbd verwaltet Images (create, ls, info, snap create, rm); --size in MiB. rbd map erzeugt /dev/rbd0 über das Kernelmodul rbd. rados arbeitet mit rohen Objekten, ceph-volume bereitet OSD-Platten vor.",
-     "terms": []},
-    {"id": "306-363.2-06", "objective": "363.2", "type": "single", "difficulty": 2,
-     "question": "What does the CRUSH map define in Ceph?",
-     "question_de": "Was definiert die CRUSH-Map in Ceph?",
-     "choices": [
-       {"text": "The hierarchy of OSDs (hosts, racks, rooms) and the rules that decide how replicas are distributed across failure domains.", "text_de": "Die Hierarchie der OSDs (Hosts, Racks, Räume) und die Regeln, nach denen Replikate über Fehlerdomänen verteilt werden.", "correct": true},
-       {"text": "The list of clients allowed to access a pool.", "text_de": "Die Liste der Clients, die auf einen Pool zugreifen dürfen."},
-       {"text": "The network addresses of the monitors.", "text_de": "Die Netzwerkadressen der Monitore."},
-       {"text": "The snapshot schedule of RBD images.", "text_de": "Den Snapshot-Zeitplan der RBD-Images."}],
-     "explanation_de": "ceph osd tree zeigt die CRUSH-Hierarchie, ceph osd getcrushmap und crushtool bearbeiten sie. Eine Regel wie \"chooseleaf firstn 0 type host\" sorgt dafür, dass Replikate auf verschiedenen Hosts liegen. Zugriffsrechte regeln cephx-Schlüssel, Monitore stehen in ceph.conf.",
-     "terms": [{"term": "failure domain", "de": "Fehlerdomäne, gemeinsam ausfallender Bereich"}]},
-    {"id": "306-363.2-07", "objective": "363.2", "type": "single", "difficulty": 2,
-     "question": "A Ceph cluster reports HEALTH_WARN with some placement groups in the state active+undersized+degraded. What does this mean?",
-     "question_de": "Ein Ceph-Cluster meldet HEALTH_WARN mit einigen Placement Groups im Zustand active+undersized+degraded. Was bedeutet das?",
-     "choices": [
-       {"text": "The PGs serve I/O but currently have fewer replicas than the pool size requires, usually because an OSD is down.", "text_de": "Die PGs bedienen I/O, haben aber derzeit weniger Replikate, als die Pool-Größe verlangt, meist weil ein OSD ausgefallen ist.", "correct": true},
-       {"text": "The PGs are lost and the data must be restored from backup.", "text_de": "Die PGs sind verloren und die Daten müssen aus der Sicherung wiederhergestellt werden."},
-       {"text": "The pool is full.", "text_de": "Der Pool ist voll."},
-       {"text": "The monitors have lost quorum.", "text_de": "Die Monitore haben das Quorum verloren."}],
-     "explanation_de": "degraded heißt, Objekte sind nicht in voller Replikatzahl vorhanden; undersized, dass die PG weniger OSDs als size hat. Nach Rückkehr oder Ersatz des OSD erfolgt Recovery/Backfill. Datenverlust zeigt sich als incomplete oder unfound.",
-     "terms": []},
-    {"id": "306-364.1-02", "objective": "364.1", "type": "single", "difficulty": 2,
-     "question": "Which /etc/smartd.conf line monitors all disks, runs a short self-test every day at 2 a.m. and mails on problems?",
-     "question_de": "Welche Zeile in /etc/smartd.conf überwacht alle Platten, führt täglich um 2 Uhr einen kurzen Selbsttest aus und mailt bei Problemen?",
-     "choices": [
-       {"text": "DEVICESCAN -a -s S/../.././02 -m admin@example.org", "text_de": "DEVICESCAN -a -s S/../.././02 -m admin@example.org", "correct": true},
-       {"text": "ALL -t short -d 02:00 -M admin@example.org", "text_de": "ALL -t short -d 02:00 -M admin@example.org"},
-       {"text": "/dev/sd* -H -l error -x", "text_de": "/dev/sd* -H -l error -x"},
-       {"text": "smartctl -t short -s on --cron 02", "text_de": "smartctl -t short -s on --cron 02"}],
-     "explanation_de": "DEVICESCAN erfasst alle Geräte, -a aktiviert alle Standardprüfungen, -s S/MM/DD/d/HH plant Selbsttests (S kurz, L lang) mit regulären Ausdrücken für Monat, Tag, Wochentag und Stunde, -m setzt die Mailadresse.",
-     "terms": []},
-    {"id": "306-364.3-04", "objective": "364.3", "type": "single", "difficulty": 2,
-     "question": "Which command creates a thin pool of 100 GB in the volume group vg0 and a thin volume of 500 GB from it?",
-     "question_de": "Welche Befehle erzeugen einen Thin-Pool mit 100 GB in der Volume Group vg0 und daraus ein Thin-Volume mit 500 GB?",
-     "choices": [
-       {"text": "lvcreate -L 100G --thinpool pool0 vg0; lvcreate -V 500G --thin -n data vg0/pool0", "text_de": "lvcreate -L 100G --thinpool pool0 vg0; lvcreate -V 500G --thin -n data vg0/pool0", "correct": true},
-       {"text": "lvcreate -L 500G -n data vg0 --thin", "text_de": "lvcreate -L 500G -n data vg0 --thin"},
-       {"text": "vgcreate --thin pool0 100G; lvcreate -L 500G data pool0", "text_de": "vgcreate --thin pool0 100G; lvcreate -L 500G data pool0"},
-       {"text": "lvconvert --type thin -L 500G vg0/data", "text_de": "lvconvert --type thin -L 500G vg0/data"}],
-     "explanation_de": "Thin Provisioning erlaubt virtuelle Größen (-V) über der physischen Poolgröße; Blöcke werden erst bei Schreibzugriff belegt. lvs zeigt die Belegung des Pools, die überwacht werden muss, damit er nicht voll läuft.",
-     "terms": []},
-    {"id": "306-364.4-04", "objective": "364.4", "type": "single", "difficulty": 2,
-     "question": "Which bonding mode provides fault tolerance without any switch support by keeping only one slave active at a time?",
-     "question_de": "Welcher Bonding-Modus bietet Ausfallsicherheit ohne Switch-Unterstützung, indem nur eine Leitung gleichzeitig aktiv ist?",
-     "choices": [
-       {"text": "active-backup (mode 1)", "text_de": "active-backup (Modus 1)", "correct": true},
-       {"text": "balance-rr (mode 0)", "text_de": "balance-rr (Modus 0)"},
-       {"text": "802.3ad (mode 4)", "text_de": "802.3ad (Modus 4)"},
-       {"text": "balance-xor (mode 2)", "text_de": "balance-xor (Modus 2)"}],
-     "explanation_de": "active-backup funktioniert mit beliebigen Switches und eignet sich auch für zwei verschiedene Switches. balance-rr und balance-xor setzen voraus, dass der Switch die Ports als Gruppe behandelt, 802.3ad braucht LACP.",
-     "terms": []},
-    {"id": "306-364.4-05", "objective": "364.4", "type": "single", "difficulty": 2,
-     "question": "Which systemd-networkd files define a bond interface bond0 with mode active-backup and assign eth0 and eth1 to it?",
-     "question_de": "Welche systemd-networkd-Dateien definieren eine Bond-Schnittstelle bond0 im Modus active-backup und ordnen ihr eth0 und eth1 zu?",
-     "choices": [
-       {"text": "A .netdev file with [NetDev] Name=bond0 Kind=bond and [Bond] Mode=active-backup, plus .network files for eth0 and eth1 with Bond=bond0", "text_de": "Eine .netdev-Datei mit [NetDev] Name=bond0 Kind=bond und [Bond] Mode=active-backup, dazu .network-Dateien für eth0 und eth1 mit Bond=bond0", "correct": true},
-       {"text": "A single bond0.conf under /etc/modprobe.d/", "text_de": "Eine einzelne bond0.conf unter /etc/modprobe.d/"},
-       {"text": "An ifcfg-bond0 file with BONDING_OPTS in /etc/systemd/network/", "text_de": "Eine ifcfg-bond0-Datei mit BONDING_OPTS in /etc/systemd/network/"},
-       {"text": "A .link file with Bond=active-backup", "text_de": "Eine .link-Datei mit Bond=active-backup"}],
-     "explanation_de": ".netdev erzeugt virtuelle Geräte (bond, vlan, bridge), .network konfiguriert Schnittstellen und bindet Slaves per Bond=. ifcfg-Dateien gehören zu den klassischen Red-Hat-Skripten, /etc/network/interfaces mit bond-slaves zu Debian ifupdown.",
-     "terms": []}
+    {
+      "id": "306-361.1-04",
+      "objective": "361.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which cluster architecture lets every node serve requests at the same time and requires the application to handle concurrent access to shared data?",
+      "question_de": "Welche Cluster-Architektur lässt alle Knoten gleichzeitig Anfragen bedienen und verlangt von der Anwendung, gleichzeitigen Zugriff auf gemeinsame Daten zu beherrschen?",
+      "choices": [
+        {
+          "text": "Active/active cluster",
+          "text_de": "Aktiv/Aktiv-Cluster",
+          "correct": true
+        },
+        {
+          "text": "Active/passive cluster",
+          "text_de": "Aktiv/Passiv-Cluster"
+        },
+        {
+          "text": "Cold standby",
+          "text_de": "Cold Standby"
+        },
+        {
+          "text": "Shared-nothing failover cluster",
+          "text_de": "Shared-Nothing-Failover-Cluster"
+        }
+      ],
+      "explanation_de": "Im Aktiv/Aktiv-Betrieb arbeiten alle Knoten produktiv, was Lastverteilung erlaubt, aber Sperren oder Replikation zwischen den Knoten erfordert. Aktiv/Passiv hält einen Knoten in Reserve, der nur bei Failover übernimmt.",
+      "terms": [
+        {
+          "term": "at the same time",
+          "de": "gleichzeitig"
+        }
+      ]
+    },
+    {
+      "id": "306-361.1-05",
+      "objective": "361.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "A service guarantees 99.9 % availability per year in its SLA. Roughly how much downtime per year is allowed?",
+      "question_de": "Ein Dienst garantiert im SLA 99,9 % Verfügbarkeit pro Jahr. Wie viel Ausfallzeit pro Jahr ist ungefähr erlaubt?",
+      "choices": [
+        {
+          "text": "About 8.8 hours",
+          "text_de": "Etwa 8,8 Stunden",
+          "correct": true
+        },
+        {
+          "text": "About 53 minutes",
+          "text_de": "Etwa 53 Minuten"
+        },
+        {
+          "text": "About 3.6 days",
+          "text_de": "Etwa 3,6 Tage"
+        },
+        {
+          "text": "About 5 minutes",
+          "text_de": "Etwa 5 Minuten"
+        }
+      ],
+      "explanation_de": "0,1 % von 365 Tagen sind 8,76 Stunden. 99,99 % entsprechen rund 53 Minuten, 99 % etwa 3,65 Tagen, 99,999 % etwa 5 Minuten. Solche Werte bestimmen, wie viel Redundanz nötig ist.",
+      "terms": [
+        {
+          "term": "roughly",
+          "de": "ungefähr"
+        }
+      ]
+    },
+    {
+      "id": "306-361.1-06",
+      "objective": "361.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Why is session handling a concern when a web application is placed behind a load balancer?",
+      "question_de": "Warum ist die Sitzungsbehandlung ein Thema, wenn eine Webanwendung hinter einen Lastverteiler gestellt wird?",
+      "choices": [
+        {
+          "text": "Requests of one user may reach different backends; sessions must be shared or the balancer must keep the user on one server.",
+          "text_de": "Anfragen eines Benutzers können auf verschiedene Backends treffen; Sitzungen müssen geteilt werden oder der Balancer muss den Benutzer auf einem Server halten.",
+          "correct": true
+        },
+        {
+          "text": "Load balancers cannot forward cookies.",
+          "text_de": "Lastverteiler können keine Cookies weiterleiten."
+        },
+        {
+          "text": "Sessions are only possible with TLS termination on the balancer.",
+          "text_de": "Sitzungen sind nur mit TLS-Terminierung auf dem Balancer möglich."
+        },
+        {
+          "text": "Backends must share the same IP address.",
+          "text_de": "Backends müssen dieselbe IP-Adresse haben."
+        }
+      ],
+      "explanation_de": "Lösungen sind Sticky Sessions (Persistenz nach Quell-IP oder Cookie, in HAProxy z. B. cookie oder stick-table) oder ein gemeinsamer Sitzungsspeicher, so dass jeder Backend-Server jede Sitzung bedienen kann.",
+      "terms": [
+        {
+          "term": "concern",
+          "de": "Anliegen, Problem"
+        }
+      ]
+    },
+    {
+      "id": "306-361.2-05",
+      "objective": "361.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which ipvsadm command adds the real server 10.0.0.11:80 to the virtual service 192.168.1.100:80 using direct routing with weight 2?",
+      "question_de": "Welcher ipvsadm-Befehl fügt dem virtuellen Dienst 192.168.1.100:80 den Real-Server 10.0.0.11:80 mit Direct Routing und Gewicht 2 hinzu?",
+      "choices": [
+        {
+          "text": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -g -w 2",
+          "text_de": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -g -w 2",
+          "correct": true
+        },
+        {
+          "text": "ipvsadm -A -t 192.168.1.100:80 -r 10.0.0.11:80 -m -w 2",
+          "text_de": "ipvsadm -A -t 192.168.1.100:80 -r 10.0.0.11:80 -m -w 2"
+        },
+        {
+          "text": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -i -s 2",
+          "text_de": "ipvsadm -a -t 192.168.1.100:80 -r 10.0.0.11:80 -i -s 2"
+        },
+        {
+          "text": "ipvsadm -e -t 10.0.0.11:80 -r 192.168.1.100:80 -g",
+          "text_de": "ipvsadm -e -t 10.0.0.11:80 -r 192.168.1.100:80 -g"
+        }
+      ],
+      "explanation_de": "-a fügt einen Real-Server hinzu, -r nennt ihn, -g wählt Direct Routing (gatewaying), -m NAT (masquerading), -i Tunneling (ipip), -w setzt das Gewicht. -A legt den virtuellen Dienst an, -e ändert einen Eintrag.",
+      "terms": []
+    },
+    {
+      "id": "306-361.2-06",
+      "objective": "361.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "In a keepalived configuration, what does the vrrp_instance option priority control?",
+      "question_de": "Was steuert in einer keepalived-Konfiguration die Option priority einer vrrp_instance?",
+      "choices": [
+        {
+          "text": "Which node becomes MASTER: the highest priority wins the election.",
+          "text_de": "Welcher Knoten MASTER wird: die höchste Priorität gewinnt die Wahl.",
+          "correct": true
+        },
+        {
+          "text": "The weight of the real servers in the IPVS table.",
+          "text_de": "Das Gewicht der Real-Server in der IPVS-Tabelle."
+        },
+        {
+          "text": "The process priority (nice value) of keepalived.",
+          "text_de": "Die Prozesspriorität (nice-Wert) von keepalived."
+        },
+        {
+          "text": "The interval of the health checks.",
+          "text_de": "Das Intervall der Health Checks."
+        }
+      ],
+      "explanation_de": "Die VRRP-Priorität (1 bis 254) entscheidet über die Master-Rolle; track_script kann sie dynamisch senken, wenn ein Dienst ausfällt. Real-Server-Gewichte stehen in virtual_server/real_server, das Check-Intervall in delay_loop.",
+      "terms": [
+        {
+          "term": "election",
+          "de": "Wahl, Auswahl"
+        }
+      ]
+    },
+    {
+      "id": "306-361.2-07",
+      "objective": "361.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which HAProxy configuration sends requests whose path starts with /api to a separate backend?",
+      "question_de": "Welche HAProxy-Konfiguration leitet Anfragen, deren Pfad mit /api beginnt, an ein eigenes Backend?",
+      "choices": [
+        {
+          "text": "acl is_api path_beg /api\nuse_backend api_servers if is_api",
+          "text_de": "acl is_api path_beg /api\nuse_backend api_servers if is_api",
+          "correct": true
+        },
+        {
+          "text": "route /api api_servers",
+          "text_de": "route /api api_servers"
+        },
+        {
+          "text": "backend api_servers path /api",
+          "text_de": "backend api_servers path /api"
+        },
+        {
+          "text": "balance uri /api api_servers",
+          "text_de": "balance uri /api api_servers"
+        }
+      ],
+      "explanation_de": "ACLs im frontend prüfen Bedingungen (path_beg, hdr(host), src), use_backend ... if wählt das Backend, default_backend greift sonst. balance legt nur den Verteilungsalgorithmus innerhalb eines Backends fest.",
+      "terms": []
+    },
+    {
+      "id": "306-361.2-08",
+      "objective": "361.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which tool generates the MD5 digest of a web page that ldirectord or keepalived can use for HTTP health checks?",
+      "question_de": "Welches Werkzeug erzeugt den MD5-Digest einer Webseite, den ldirectord oder keepalived für HTTP-Health-Checks nutzen können?",
+      "choices": [
+        {
+          "text": "genhash",
+          "text_de": "genhash",
+          "correct": true
+        },
+        {
+          "text": "ipvsadm --digest",
+          "text_de": "ipvsadm --digest"
+        },
+        {
+          "text": "md5sum http://server/",
+          "text_de": "md5sum http://server/"
+        },
+        {
+          "text": "keepalived --checksum",
+          "text_de": "keepalived --checksum"
+        }
+      ],
+      "explanation_de": "genhash -s server -p 80 -u /index.html liefert den Hash für HTTP_GET-Checks mit digest in keepalived. ldirectord nutzt alternativ receive=\"Zeichenkette\" zum Prüfen des Seiteninhalts.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-06",
+      "objective": "361.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command shows the live status of a Pacemaker cluster including nodes, resources and failed actions?",
+      "question_de": "Welcher Befehl zeigt den Live-Status eines Pacemaker-Clusters mit Knoten, Ressourcen und fehlgeschlagenen Aktionen?",
+      "choices": [
+        {
+          "text": "crm_mon",
+          "text_de": "crm_mon",
+          "correct": true
+        },
+        {
+          "text": "crm_verify -L",
+          "text_de": "crm_verify -L"
+        },
+        {
+          "text": "cibadmin --query",
+          "text_de": "cibadmin --query"
+        },
+        {
+          "text": "corosync-cmapctl",
+          "text_de": "corosync-cmapctl"
+        }
+      ],
+      "explanation_de": "crm_mon (oder pcs status) aktualisiert die Anzeige laufend, -1 gibt sie einmal aus. crm_verify prüft die Konfiguration auf Fehler, cibadmin zeigt die rohe XML-CIB, corosync-cmapctl die Corosync-Konfigurationsdatenbank.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-07",
+      "objective": "361.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which resource class is used for scripts following the Open Cluster Framework standard, such as ocf:heartbeat:IPaddr2?",
+      "question_de": "Welche Ressourcenklasse wird für Skripte nach dem Open-Cluster-Framework-Standard wie ocf:heartbeat:IPaddr2 verwendet?",
+      "choices": [
+        {
+          "text": "OCF",
+          "text_de": "OCF",
+          "correct": true
+        },
+        {
+          "text": "LSB",
+          "text_de": "LSB"
+        },
+        {
+          "text": "systemd",
+          "text_de": "systemd"
+        },
+        {
+          "text": "STONITH",
+          "text_de": "STONITH"
+        }
+      ],
+      "explanation_de": "OCF-Agents liegen unter /usr/lib/ocf/resource.d/<provider>/ und unterstützen Parameter, monitor und Metadaten. LSB sind klassische Init-Skripte, systemd-Units werden direkt angesprochen, STONITH-Agents fencen Knoten.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-08",
+      "objective": "361.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which pcs command prevents the resource web from ever running on node3?",
+      "question_de": "Welcher pcs-Befehl verhindert, dass die Ressource web jemals auf node3 läuft?",
+      "choices": [
+        {
+          "text": "pcs constraint location web avoids node3",
+          "text_de": "pcs constraint location web avoids node3",
+          "correct": true
+        },
+        {
+          "text": "pcs constraint order web then node3",
+          "text_de": "pcs constraint order web then node3"
+        },
+        {
+          "text": "pcs resource ban web --all",
+          "text_de": "pcs resource ban web --all"
+        },
+        {
+          "text": "pcs node standby node3 web",
+          "text_de": "pcs node standby node3 web"
+        }
+      ],
+      "explanation_de": "avoids setzt eine Location-Constraint mit Score -INFINITY, prefers mit +INFINITY. pcs resource ban web node3 wirkt gleich, ist aber als temporäre Maßnahme gedacht (pcs resource clear hebt es auf). Standby betrifft den ganzen Knoten.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-09",
+      "objective": "361.3",
+      "type": "single",
+      "difficulty": 3,
+      "question": "A Pacemaker cluster uses SBD. What is the role of SBD in fencing?",
+      "question_de": "Ein Pacemaker-Cluster nutzt SBD. Welche Rolle hat SBD beim Fencing?",
+      "choices": [
+        {
+          "text": "Nodes exchange messages through a shared disk; a node that receives a poison pill or loses the disk and quorum resets itself via the watchdog.",
+          "text_de": "Knoten tauschen Nachrichten über eine gemeinsame Platte aus; ein Knoten, der eine Poison Pill erhält oder Platte und Quorum verliert, setzt sich über den Watchdog selbst zurück.",
+          "correct": true
+        },
+        {
+          "text": "SBD switches off the power of a failed node via IPMI.",
+          "text_de": "SBD schaltet den Strom eines ausgefallenen Knotens per IPMI ab."
+        },
+        {
+          "text": "SBD replicates the CIB to a backup disk.",
+          "text_de": "SBD repliziert die CIB auf eine Sicherungsplatte."
+        },
+        {
+          "text": "SBD is the quorum device of Corosync.",
+          "text_de": "SBD ist das Quorum-Gerät von Corosync."
+        }
+      ],
+      "explanation_de": "Storage Based Death nutzt eine kleine gemeinsame Platte (oder diskless nur den Watchdog) als Fencing-Kanal; stonith:fence_sbd schreibt die Poison Pill. Strom-Fencing per IPMI leisten fence_ipmilan und ähnliche Agents; das Quorum-Gerät heißt qdevice.",
+      "terms": [
+        {
+          "term": "watchdog",
+          "de": "Watchdog, Hardware-Zeitgeber für Selbstreset"
+        }
+      ]
+    },
+    {
+      "id": "306-362.1-04",
+      "objective": "362.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which DRBD command creates the metadata of the resource r0 on a new backing device before the resource is brought up for the first time?",
+      "question_de": "Welcher DRBD-Befehl erzeugt die Metadaten der Ressource r0 auf einem neuen Hintergrundgerät, bevor die Ressource erstmals aktiviert wird?",
+      "choices": [
+        {
+          "text": "drbdadm create-md r0",
+          "text_de": "drbdadm create-md r0",
+          "correct": true
+        },
+        {
+          "text": "drbdadm up r0",
+          "text_de": "drbdadm up r0"
+        },
+        {
+          "text": "drbdadm attach r0",
+          "text_de": "drbdadm attach r0"
+        },
+        {
+          "text": "drbdsetup new-resource r0",
+          "text_de": "drbdsetup new-resource r0"
+        }
+      ],
+      "explanation_de": "create-md schreibt die Metadaten (bei meta-disk internal am Ende des Geräts). up fasst attach, connect und die Einrichtung des Geräts zusammen; drbdsetup ist die Low-Level-Schicht, die drbdadm aufruft.",
+      "terms": [
+        {
+          "term": "backing device",
+          "de": "Hintergrundgerät, darunterliegendes Blockgerät"
+        }
+      ]
+    },
+    {
+      "id": "306-362.1-05",
+      "objective": "362.1",
+      "type": "single",
+      "difficulty": 3,
+      "question": "After a network outage both DRBD nodes report StandAlone and a split brain. node2 should discard its changes. Which commands resolve this?",
+      "question_de": "Nach einem Netzausfall melden beide DRBD-Knoten StandAlone und Split Brain. node2 soll seine Änderungen verwerfen. Welche Befehle lösen das?",
+      "choices": [
+        {
+          "text": "On node2: drbdadm secondary r0; drbdadm connect --discard-my-data r0. On node1: drbdadm connect r0",
+          "text_de": "Auf node2: drbdadm secondary r0; drbdadm connect --discard-my-data r0. Auf node1: drbdadm connect r0",
+          "correct": true
+        },
+        {
+          "text": "On both nodes: drbdadm create-md r0; drbdadm up r0",
+          "text_de": "Auf beiden Knoten: drbdadm create-md r0; drbdadm up r0"
+        },
+        {
+          "text": "On node2: drbdadm primary --force r0",
+          "text_de": "Auf node2: drbdadm primary --force r0"
+        },
+        {
+          "text": "On node1: drbdadm invalidate-remote r0; reboot node2",
+          "text_de": "Auf node1: drbdadm invalidate-remote r0; node2 neu starten"
+        }
+      ],
+      "explanation_de": "Der Split-Brain-Verlierer wird Secondary und verbindet mit --discard-my-data, der Überlebende verbindet normal; danach synchronisiert DRBD vom Überlebenden. create-md würde Daten zerstören, primary --force löst den Konflikt nicht.",
+      "terms": [
+        {
+          "term": "discard",
+          "de": "verwerfen"
+        }
+      ]
+    },
+    {
+      "id": "306-362.1-06",
+      "objective": "362.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which statement about DRBD 9 compared to DRBD 8 is correct?",
+      "question_de": "Welche Aussage über DRBD 9 im Vergleich zu DRBD 8 ist richtig?",
+      "choices": [
+        {
+          "text": "DRBD 9 supports more than two nodes per resource (e.g. three-way replication) and can be managed centrally with LINSTOR.",
+          "text_de": "DRBD 9 unterstützt mehr als zwei Knoten je Ressource (z. B. Dreifach-Replikation) und lässt sich zentral mit LINSTOR verwalten.",
+          "correct": true
+        },
+        {
+          "text": "DRBD 9 only supports protocol A.",
+          "text_de": "DRBD 9 unterstützt nur Protokoll A."
+        },
+        {
+          "text": "DRBD 9 no longer needs a kernel module.",
+          "text_de": "DRBD 9 braucht kein Kernelmodul mehr."
+        },
+        {
+          "text": "DRBD 9 removed the Secondary role.",
+          "text_de": "DRBD 9 hat die Rolle Secondary abgeschafft."
+        }
+      ],
+      "explanation_de": "DRBD 9 bringt Multi-Node-Replikation, automatische Promotion beim Mounten und die Verwaltung über LINSTOR (Controller und Satellites). Statt /proc/drbd zeigen drbdadm status und drbdmon den Zustand.",
+      "terms": []
+    },
+    {
+      "id": "306-362.2-03",
+      "objective": "362.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command on an iSCSI target server (tgt) shows the configured targets, LUNs and connected initiators?",
+      "question_de": "Welcher Befehl zeigt auf einem iSCSI-Target-Server (tgt) die konfigurierten Targets, LUNs und verbundenen Initiatoren?",
+      "choices": [
+        {
+          "text": "tgtadm --lld iscsi --mode target --op show",
+          "text_de": "tgtadm --lld iscsi --mode target --op show",
+          "correct": true
+        },
+        {
+          "text": "iscsiadm -m session",
+          "text_de": "iscsiadm -m session"
+        },
+        {
+          "text": "multipath -ll",
+          "text_de": "multipath -ll"
+        },
+        {
+          "text": "tgt-admin --list",
+          "text_de": "tgt-admin --list"
+        }
+      ],
+      "explanation_de": "tgtadm ist das Verwaltungswerkzeug des tgt-Daemons; targets.conf hält die dauerhafte Konfiguration (tgt-admin --execute lädt sie). iscsiadm -m session zeigt die Sicht des Initiators, multipath -ll die Multipath-Geräte.",
+      "terms": []
+    },
+    {
+      "id": "306-362.3-03",
+      "objective": "362.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "A GFS2 file system is mounted by three nodes but was created with two journals. Which command adds a journal?",
+      "question_de": "Ein GFS2-Dateisystem wird von drei Knoten eingehängt, wurde aber mit zwei Journalen erzeugt. Welcher Befehl fügt ein Journal hinzu?",
+      "choices": [
+        {
+          "text": "gfs2_jadd -j 1 /mnt/gfs2",
+          "text_de": "gfs2_jadd -j 1 /mnt/gfs2",
+          "correct": true
+        },
+        {
+          "text": "mkfs.gfs2 -j 3 /dev/vg/lv",
+          "text_de": "mkfs.gfs2 -j 3 /dev/vg/lv"
+        },
+        {
+          "text": "gfs2_grow -j /mnt/gfs2",
+          "text_de": "gfs2_grow -j /mnt/gfs2"
+        },
+        {
+          "text": "tunefs.gfs2 -J 3 /dev/vg/lv",
+          "text_de": "tunefs.gfs2 -J 3 /dev/vg/lv"
+        }
+      ],
+      "explanation_de": "gfs2_jadd fügt Journale einem eingehängten Dateisystem hinzu; jeder Knoten braucht ein eigenes. mkfs.gfs2 würde das Dateisystem neu erzeugen, gfs2_grow vergrößert es nach einer LV-Erweiterung.",
+      "terms": []
+    },
+    {
+      "id": "306-362.3-04",
+      "objective": "362.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command shows the OCFS2 file systems currently mounted and the nodes using them?",
+      "question_de": "Welcher Befehl zeigt die aktuell eingehängten OCFS2-Dateisysteme und die Knoten, die sie nutzen?",
+      "choices": [
+        {
+          "text": "mounted.ocfs2 -f",
+          "text_de": "mounted.ocfs2 -f",
+          "correct": true
+        },
+        {
+          "text": "o2info --volinfo",
+          "text_de": "o2info --volinfo"
+        },
+        {
+          "text": "tunefs.ocfs2 -Q",
+          "text_de": "tunefs.ocfs2 -Q"
+        },
+        {
+          "text": "fsck.ocfs2 -n",
+          "text_de": "fsck.ocfs2 -n"
+        }
+      ],
+      "explanation_de": "mounted.ocfs2 -d listet OCFS2-Geräte, -f zeigt zusätzlich die Knoten. o2info liefert Informationen zu einem Volume, tunefs.ocfs2 ändert Parameter wie die Anzahl der Node-Slots, fsck.ocfs2 prüft.",
+      "terms": []
+    },
+    {
+      "id": "306-363.1-03",
+      "objective": "363.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command adds the host node3 to the trusted storage pool of an existing GlusterFS cluster?",
+      "question_de": "Welcher Befehl nimmt den Host node3 in den Trusted Storage Pool eines bestehenden GlusterFS-Clusters auf?",
+      "choices": [
+        {
+          "text": "gluster peer probe node3",
+          "text_de": "gluster peer probe node3",
+          "correct": true
+        },
+        {
+          "text": "gluster volume add-brick node3",
+          "text_de": "gluster volume add-brick node3"
+        },
+        {
+          "text": "gluster pool join node3",
+          "text_de": "gluster pool join node3"
+        },
+        {
+          "text": "glusterd --peer node3",
+          "text_de": "glusterd --peer node3"
+        }
+      ],
+      "explanation_de": "peer probe wird von einem bereits zugehörigen Knoten aus aufgerufen; gluster peer status und gluster pool list zeigen die Mitglieder. Erst danach können Bricks von node3 in Volumes verwendet werden.",
+      "terms": []
+    },
+    {
+      "id": "306-363.1-04",
+      "objective": "363.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "How is a GlusterFS volume mounted natively on a client, and which component provides the file system?",
+      "question_de": "Wie wird ein GlusterFS-Volume auf einem Client nativ eingehängt, und welche Komponente stellt das Dateisystem bereit?",
+      "choices": [
+        {
+          "text": "mount -t glusterfs node1:/gv0 /mnt/gv0, provided by the FUSE client",
+          "text_de": "mount -t glusterfs node1:/gv0 /mnt/gv0, bereitgestellt durch den FUSE-Client",
+          "correct": true
+        },
+        {
+          "text": "mount -t nfs node1:/gv0 /mnt/gv0, provided by the kernel NFS client only",
+          "text_de": "mount -t nfs node1:/gv0 /mnt/gv0, nur über den Kernel-NFS-Client"
+        },
+        {
+          "text": "mount -t cifs //node1/gv0 /mnt/gv0",
+          "text_de": "mount -t cifs //node1/gv0 /mnt/gv0"
+        },
+        {
+          "text": "gluster volume mount gv0 /mnt/gv0",
+          "text_de": "gluster volume mount gv0 /mnt/gv0"
+        }
+      ],
+      "explanation_de": "Der native Client nutzt FUSE und verbindet sich nach dem Lesen der Volume-Datei direkt mit allen Bricks, daher ist er ausfallsicher gegenüber dem genannten Server. NFS (GNFS/NFS-Ganesha) und SMB sind alternative Zugriffswege.",
+      "terms": []
+    },
+    {
+      "id": "306-363.1-05",
+      "objective": "363.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which GlusterFS volume type stores every file on all bricks so that the volume survives the loss of a brick?",
+      "question_de": "Welcher GlusterFS-Volume-Typ speichert jede Datei auf allen Bricks, so dass das Volume den Verlust eines Bricks übersteht?",
+      "choices": [
+        {
+          "text": "Replicated volume",
+          "text_de": "Repliziertes Volume",
+          "correct": true
+        },
+        {
+          "text": "Distributed volume",
+          "text_de": "Verteiltes Volume"
+        },
+        {
+          "text": "Striped volume",
+          "text_de": "Gestreiftes Volume"
+        },
+        {
+          "text": "Arbiter-only volume",
+          "text_de": "Nur-Arbiter-Volume"
+        }
+      ],
+      "explanation_de": "Replica-Volumes spiegeln Dateien; distributed-replicated kombiniert Verteilung und Spiegelung. Ein verteiltes Volume ohne Replikation verliert bei Brick-Ausfall die darauf liegenden Dateien. Ein Arbiter ist ein dritter Metadaten-Brick gegen Split Brain, kein eigener Volume-Typ.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-04",
+      "objective": "363.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Ceph component is required to use CephFS but not for RBD block devices?",
+      "question_de": "Welche Ceph-Komponente wird für CephFS benötigt, nicht aber für RBD-Blockgeräte?",
+      "choices": [
+        {
+          "text": "MDS (Metadata Server)",
+          "text_de": "MDS (Metadata Server)",
+          "correct": true
+        },
+        {
+          "text": "MON",
+          "text_de": "MON"
+        },
+        {
+          "text": "OSD",
+          "text_de": "OSD"
+        },
+        {
+          "text": "MGR",
+          "text_de": "MGR"
+        }
+      ],
+      "explanation_de": "CephFS speichert Verzeichnisbaum und Metadaten über den MDS in einem Metadaten-Pool; Daten liegen wie bei RBD in den OSDs. MON, MGR und OSD braucht jeder Cluster.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-05",
+      "objective": "363.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which commands create an RBD image of 10 GB in the pool vms and map it as a block device on a client?",
+      "question_de": "Welche Befehle erzeugen ein RBD-Image mit 10 GB im Pool vms und binden es auf einem Client als Blockgerät ein?",
+      "choices": [
+        {
+          "text": "rbd create vms/disk1 --size 10240; rbd map vms/disk1",
+          "text_de": "rbd create vms/disk1 --size 10240; rbd map vms/disk1",
+          "correct": true
+        },
+        {
+          "text": "ceph osd pool create disk1 10G; mount -t rbd vms/disk1",
+          "text_de": "ceph osd pool create disk1 10G; mount -t rbd vms/disk1"
+        },
+        {
+          "text": "rados put vms disk1 10G; rados map disk1",
+          "text_de": "rados put vms disk1 10G; rados map disk1"
+        },
+        {
+          "text": "ceph-volume create vms/disk1 --size 10G",
+          "text_de": "ceph-volume create vms/disk1 --size 10G"
+        }
+      ],
+      "explanation_de": "rbd verwaltet Images (create, ls, info, snap create, rm); --size in MiB. rbd map erzeugt /dev/rbd0 über das Kernelmodul rbd. rados arbeitet mit rohen Objekten, ceph-volume bereitet OSD-Platten vor.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-06",
+      "objective": "363.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "What does the CRUSH map define in Ceph?",
+      "question_de": "Was definiert die CRUSH-Map in Ceph?",
+      "choices": [
+        {
+          "text": "The hierarchy of OSDs (hosts, racks, rooms) and the rules that decide how replicas are distributed across failure domains.",
+          "text_de": "Die Hierarchie der OSDs (Hosts, Racks, Räume) und die Regeln, nach denen Replikate über Fehlerdomänen verteilt werden.",
+          "correct": true
+        },
+        {
+          "text": "The list of clients allowed to access a pool.",
+          "text_de": "Die Liste der Clients, die auf einen Pool zugreifen dürfen."
+        },
+        {
+          "text": "The network addresses of the monitors.",
+          "text_de": "Die Netzwerkadressen der Monitore."
+        },
+        {
+          "text": "The snapshot schedule of RBD images.",
+          "text_de": "Den Snapshot-Zeitplan der RBD-Images."
+        }
+      ],
+      "explanation_de": "ceph osd tree zeigt die CRUSH-Hierarchie, ceph osd getcrushmap und crushtool bearbeiten sie. Eine Regel wie \"chooseleaf firstn 0 type host\" sorgt dafür, dass Replikate auf verschiedenen Hosts liegen. Zugriffsrechte regeln cephx-Schlüssel, Monitore stehen in ceph.conf.",
+      "terms": [
+        {
+          "term": "failure domain",
+          "de": "Fehlerdomäne, gemeinsam ausfallender Bereich"
+        }
+      ]
+    },
+    {
+      "id": "306-363.2-07",
+      "objective": "363.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "A Ceph cluster reports HEALTH_WARN with some placement groups in the state active+undersized+degraded. What does this mean?",
+      "question_de": "Ein Ceph-Cluster meldet HEALTH_WARN mit einigen Placement Groups im Zustand active+undersized+degraded. Was bedeutet das?",
+      "choices": [
+        {
+          "text": "The PGs serve I/O but currently have fewer replicas than the pool size requires, usually because an OSD is down.",
+          "text_de": "Die PGs bedienen I/O, haben aber derzeit weniger Replikate, als die Pool-Größe verlangt, meist weil ein OSD ausgefallen ist.",
+          "correct": true
+        },
+        {
+          "text": "The PGs are lost and the data must be restored from backup.",
+          "text_de": "Die PGs sind verloren und die Daten müssen aus der Sicherung wiederhergestellt werden."
+        },
+        {
+          "text": "The pool is full.",
+          "text_de": "Der Pool ist voll."
+        },
+        {
+          "text": "The monitors have lost quorum.",
+          "text_de": "Die Monitore haben das Quorum verloren."
+        }
+      ],
+      "explanation_de": "degraded heißt, Objekte sind nicht in voller Replikatzahl vorhanden; undersized, dass die PG weniger OSDs als size hat. Nach Rückkehr oder Ersatz des OSD erfolgt Recovery/Backfill. Datenverlust zeigt sich als incomplete oder unfound.",
+      "terms": []
+    },
+    {
+      "id": "306-364.1-02",
+      "objective": "364.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which /etc/smartd.conf line monitors all disks, runs a short self-test every day at 2 a.m. and mails on problems?",
+      "question_de": "Welche Zeile in /etc/smartd.conf überwacht alle Platten, führt täglich um 2 Uhr einen kurzen Selbsttest aus und mailt bei Problemen?",
+      "choices": [
+        {
+          "text": "DEVICESCAN -a -s S/../.././02 -m admin@example.org",
+          "text_de": "DEVICESCAN -a -s S/../.././02 -m admin@example.org",
+          "correct": true
+        },
+        {
+          "text": "ALL -t short -d 02:00 -M admin@example.org",
+          "text_de": "ALL -t short -d 02:00 -M admin@example.org"
+        },
+        {
+          "text": "/dev/sd* -H -l error -x",
+          "text_de": "/dev/sd* -H -l error -x"
+        },
+        {
+          "text": "smartctl -t short -s on --cron 02",
+          "text_de": "smartctl -t short -s on --cron 02"
+        }
+      ],
+      "explanation_de": "DEVICESCAN erfasst alle Geräte, -a aktiviert alle Standardprüfungen, -s S/MM/DD/d/HH plant Selbsttests (S kurz, L lang) mit regulären Ausdrücken für Monat, Tag, Wochentag und Stunde, -m setzt die Mailadresse.",
+      "terms": []
+    },
+    {
+      "id": "306-364.3-04",
+      "objective": "364.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which command creates a thin pool of 100 GB in the volume group vg0 and a thin volume of 500 GB from it?",
+      "question_de": "Welche Befehle erzeugen einen Thin-Pool mit 100 GB in der Volume Group vg0 und daraus ein Thin-Volume mit 500 GB?",
+      "choices": [
+        {
+          "text": "lvcreate -L 100G --thinpool pool0 vg0; lvcreate -V 500G --thin -n data vg0/pool0",
+          "text_de": "lvcreate -L 100G --thinpool pool0 vg0; lvcreate -V 500G --thin -n data vg0/pool0",
+          "correct": true
+        },
+        {
+          "text": "lvcreate -L 500G -n data vg0 --thin",
+          "text_de": "lvcreate -L 500G -n data vg0 --thin"
+        },
+        {
+          "text": "vgcreate --thin pool0 100G; lvcreate -L 500G data pool0",
+          "text_de": "vgcreate --thin pool0 100G; lvcreate -L 500G data pool0"
+        },
+        {
+          "text": "lvconvert --type thin -L 500G vg0/data",
+          "text_de": "lvconvert --type thin -L 500G vg0/data"
+        }
+      ],
+      "explanation_de": "Thin Provisioning erlaubt virtuelle Größen (-V) über der physischen Poolgröße; Blöcke werden erst bei Schreibzugriff belegt. lvs zeigt die Belegung des Pools, die überwacht werden muss, damit er nicht voll läuft.",
+      "terms": []
+    },
+    {
+      "id": "306-364.4-04",
+      "objective": "364.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which bonding mode provides fault tolerance without any switch support by keeping only one slave active at a time?",
+      "question_de": "Welcher Bonding-Modus bietet Ausfallsicherheit ohne Switch-Unterstützung, indem nur eine Leitung gleichzeitig aktiv ist?",
+      "choices": [
+        {
+          "text": "active-backup (mode 1)",
+          "text_de": "active-backup (Modus 1)",
+          "correct": true
+        },
+        {
+          "text": "balance-rr (mode 0)",
+          "text_de": "balance-rr (Modus 0)"
+        },
+        {
+          "text": "802.3ad (mode 4)",
+          "text_de": "802.3ad (Modus 4)"
+        },
+        {
+          "text": "balance-xor (mode 2)",
+          "text_de": "balance-xor (Modus 2)"
+        }
+      ],
+      "explanation_de": "active-backup funktioniert mit beliebigen Switches und eignet sich auch für zwei verschiedene Switches. balance-rr und balance-xor setzen voraus, dass der Switch die Ports als Gruppe behandelt, 802.3ad braucht LACP.",
+      "terms": []
+    },
+    {
+      "id": "306-364.4-05",
+      "objective": "364.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which systemd-networkd files define a bond interface bond0 with mode active-backup and assign eth0 and eth1 to it?",
+      "question_de": "Welche systemd-networkd-Dateien definieren eine Bond-Schnittstelle bond0 im Modus active-backup und ordnen ihr eth0 und eth1 zu?",
+      "choices": [
+        {
+          "text": "A .netdev file with [NetDev] Name=bond0 Kind=bond and [Bond] Mode=active-backup, plus .network files for eth0 and eth1 with Bond=bond0",
+          "text_de": "Eine .netdev-Datei mit [NetDev] Name=bond0 Kind=bond und [Bond] Mode=active-backup, dazu .network-Dateien für eth0 und eth1 mit Bond=bond0",
+          "correct": true
+        },
+        {
+          "text": "A single bond0.conf under /etc/modprobe.d/",
+          "text_de": "Eine einzelne bond0.conf unter /etc/modprobe.d/"
+        },
+        {
+          "text": "An ifcfg-bond0 file with BONDING_OPTS in /etc/systemd/network/",
+          "text_de": "Eine ifcfg-bond0-Datei mit BONDING_OPTS in /etc/systemd/network/"
+        },
+        {
+          "text": "A .link file with Bond=active-backup",
+          "text_de": "Eine .link-Datei mit Bond=active-backup"
+        }
+      ],
+      "explanation_de": ".netdev erzeugt virtuelle Geräte (bond, vlan, bridge), .network konfiguriert Schnittstellen und bindet Slaves per Bond=. ifcfg-Dateien gehören zu den klassischen Red-Hat-Skripten, /etc/network/interfaces mit bond-slaves zu Debian ifupdown.",
+      "terms": []
+    }
   ]
 }

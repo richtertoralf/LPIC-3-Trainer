@@ -32,19 +32,6 @@ from app.models import (
 # ------------------------------------------------------------------- visibility
 
 
-def supervisor_ids_for(db: Session, user: User) -> list[int]:
-    """Users who supervise a group the given user is an active member of."""
-    my_groups = select(GroupMember.group_id).where(
-        GroupMember.user_id == user.id, GroupMember.status == "active"
-    )
-    rows = db.execute(
-        select(GroupMember.user_id).where(
-            GroupMember.group_id.in_(my_groups), GroupMember.role == "supervisor"
-        )
-    ).scalars()
-    return list(set(rows))
-
-
 def enabled_batch_ids(db: Session, user: User) -> list[int]:
     """Supplementary import batches enabled for a group the user is an active member of."""
     my_groups = select(GroupMember.group_id).where(
@@ -57,32 +44,48 @@ def enabled_batch_ids(db: Session, user: User) -> list[int]:
 def visible_questions(db: Session, user: User):
     """Select statement for active questions the user may see.
 
-    Supplementary pools are hidden until a supervisor enables them for one of the user's
-    groups. Administrators and the importer of a pool always see it.
+    Learners see the released pool (bundled project questions and imports released
+    system-wide by an administrator) plus imports a supervisor enabled for one of their
+    groups. Administrators see everything, importers see their own imports.
     """
     stmt = select(Question).where(Question.is_active.is_(True))
     if user.is_admin:
         return stmt
-    owners = [user.id, *supervisor_ids_for(db, user)]
-    stmt = stmt.where(or_(Question.visibility == "public", Question.created_by.in_(owners)))
     enabled = enabled_batch_ids(db, user)
     return stmt.where(
         or_(
-            Question.supplementary.is_(False),
+            Question.visibility == "public",
             Question.created_by == user.id,
             Question.import_batch_id.in_(enabled),
         )
     )
 
 
+def set_batch_release(db: Session, batch: ImportBatch, released: bool) -> None:
+    """Release or withdraw an import batch system-wide (administrators only)."""
+    batch.released = released
+    batch.visibility = "public" if released else "private"
+    db.add(batch)
+    db.execute(
+        Question.__table__.update()
+        .where(Question.import_batch_id == batch.id)
+        .values(visibility=batch.visibility)
+    )
+    db.flush()
+
+
 def enabled_sources(db: Session, user: User, module: Module) -> list[ImportBatch]:
-    """Supplementary batches of a module the user may currently practise."""
+    """External (supplementary) batches of a module the user may currently practise."""
     stmt = select(ImportBatch).where(
         ImportBatch.supplementary.is_(True), ImportBatch.module_code == module.code
     )
     if not user.is_admin:
         stmt = stmt.where(
-            or_(ImportBatch.id.in_(enabled_batch_ids(db, user)), ImportBatch.imported_by == user.id)
+            or_(
+                ImportBatch.released.is_(True),
+                ImportBatch.id.in_(enabled_batch_ids(db, user)),
+                ImportBatch.imported_by == user.id,
+            )
         )
     return list(db.execute(stmt.order_by(ImportBatch.source)).scalars())
 

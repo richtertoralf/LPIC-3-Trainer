@@ -125,13 +125,14 @@ def test_admin_import_and_role_check(
     login(page, base, admin_credentials["username"], admin_credentials["password"])
     page.goto(base + "/admin/import")
     page.set_input_files("input[type=file]", str(question_file))
-    page.check("input[value=public]")
     page.click("button:has-text('Importieren')")
     expect(page.locator(".flash-success")).to_contain_text("1 neu")
+    expect(page.locator(".flash-success")).to_contain_text("nicht freigegeben")
     expect(page.locator("table")).to_contain_text("e2e-questions.json")
     bad = tmp_path / "bad.json"
     bad.write_text(
-        '{"schema_version": 1, "kind": "questions", "module": "303", "questions": [{"id": "x"}]}'
+        '{"schema_version": 1, "kind": "questions", "module": "303", "source": "x", '
+        '"exam_version": "3.0", "questions": [{"id": "x"}]}'
     )
     page.set_input_files("input[type=file]", str(bad))
     page.click("button:has-text('Importieren')")
@@ -188,10 +189,10 @@ def test_mobile_layout(page: Page, server, username, browser_errors, admin_crede
     assert page.evaluate("document.documentElement.scrollWidth") <= viewport["width"]
 
 
-def test_supplementary_questions_enabled_by_supervisor(
+def test_external_questions_released_by_supervisor(
     page: Page, server, username, browser_errors, admin_credentials, tmp_path
 ):
-    """Teacher imports a marked extra source and enables it; the learner sees the tag."""
+    """Teacher imports an external source and releases it; the learner sees the tag."""
     import json
     import time
 
@@ -201,8 +202,8 @@ def test_supplementary_questions_enabled_by_supervisor(
         "schema_version": 1,
         "kind": "questions",
         "module": "305",
-        "supplementary": True,
         "source": source,
+        "exam_version": "3.0",
         "rights": "unverified",
         "license": "Rechte nicht geklärt (Test)",
         "questions": [
@@ -225,18 +226,17 @@ def test_supplementary_questions_enabled_by_supervisor(
     login(page, base, admin_credentials["username"], admin_credentials["password"])
     page.goto(base + "/admin/import")
     page.set_input_files("input[type=file]", str(path))
-    page.check("input[value=public]")
     page.click("button:has-text('Importieren')")
     expect(page.locator(".flash-success")).to_contain_text("1 neu")
-    expect(page.locator("table")).to_contain_text(f"Zusatz: {source}")
-    group = f"Zusatz {username}"
+    expect(page.locator("table")).to_contain_text(f"{source} · unveröffentlicht")
+    group = f"Kurs {username}"
     page.goto(base + "/admin/groups")
     page.fill("input[name=name]", group)
     page.select_option("select[name=join_mode]", "open")
     page.click("button:has-text('Anlegen')")
-    page.goto(base + "/admin/extra")
+    page.goto(base + "/admin/releases")
     expect(page.locator("table")).to_contain_text(source)
-    section = page.locator(f"section:has-text('Gruppe {group}')")
+    section = page.locator(f"section:has-text('Freigaben für Gruppe {group}')")
     section.locator(f"label:has-text('{source}') input").check()
     section.locator("button:has-text('Speichern')").click()
     expect(page.locator(".flash-success")).to_contain_text("gespeichert")
@@ -250,8 +250,12 @@ def test_supplementary_questions_enabled_by_supervisor(
     page.click("a:has-text('Nur Zusatzfragen üben')")
     expect(page.locator(".source-tag")).to_contain_text("Zusatzfrage")
     expect(page.locator(".source-tag")).to_contain_text(source)
+    expect(page.locator(".source-tag")).to_contain_text("Prüfungsgeneration 3.0")
     expect(page.locator(".source-tag")).to_contain_text("nicht geklärt")
     page.locator(".choice input").first.check()
     page.click("form[data-question-form] button[type=submit]")
     expect(page.locator(".verdict")).to_be_visible()
     expect(page.locator(".source-tag")).to_contain_text("Zusatzfrage")
+    # a learner has no access to import or release pages
+    page.goto(base + "/admin/releases")
+    expect(page.locator("h1")).to_contain_text("403")

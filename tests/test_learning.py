@@ -176,7 +176,8 @@ def test_private_questions_visible_only_to_owner(client):
     doc["questions"][0]["id"] = unique("own-a-")
     doc["questions"][1]["id"] = unique("own-b-")
     with session_scope() as db:
-        import_document(db, doc, filename="o.json", imported_by=uid, visibility="private")
+        doc["source"] = unique("Ownerquelle ")
+        import_document(db, doc, filename="o.json", imported_by=uid)
         ids = [
             q.id for q in db.execute(select(Question).where(Question.created_by == uid)).scalars()
         ]

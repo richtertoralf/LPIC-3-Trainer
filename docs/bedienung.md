@@ -30,7 +30,7 @@ Die Modulübersicht zeigt zu jedem Prüfungsziel eine deutsche Zusammenfassung u
 
 ## Zusatzfragen
 
-Betreuer können für ihre Lerngruppe Zusatzfragen aus gesondert gekennzeichneten Quellen freischalten. Sie erscheinen dann beim Üben und in Simulationen und sind mit „Zusatzfrage“, der Quelle und dem Rechtestatus markiert. In der Modulübersicht siehst du die freigeschalteten Quellen und kannst mit *Nur Zusatzfragen üben* oder *Ohne Zusatzfragen üben* die Auswahl eingrenzen.
+Neben den mitgelieferten Projektfragen können Betreuer eigene oder importierte Fragen für ihre Lerngruppe freigeben, Administratoren auch für alle. Solche Fragen erscheinen beim Üben und in Simulationen und sind mit „Zusatzfrage“, Quelle, Prüfungsgeneration und Rechtestatus markiert. Als Lernender siehst du nur freigegebene Fragen. In der Modulübersicht siehst du die freigeschalteten Quellen und kannst mit *Nur Zusatzfragen üben* oder *Ohne Zusatzfragen üben* die Auswahl eingrenzen.
 
 ## Vokabeln
 
@@ -66,8 +66,8 @@ Einmal aufgerufene Seiten (Fragen, Ergebnisse, Labs, Vokabeln) bleiben im Browse
 
 - *Verwaltung › Benutzer*: Konten freigeben.
 - *Verwaltung › Gruppen*: Gruppe anlegen, Beitritte freigeben, Lernstand einsehen.
-- *Verwaltung › Import*: eigene Fragen als JSON hochladen (privat, sichtbar für die eigenen Gruppen). Format in `content/README.md`.
+- *Verwaltung › Import*: eigene Fragen als JSON hochladen, mit Quelle und Prüfungsgeneration. Format in `content/README.md`. Die Fragen bleiben unveröffentlicht.
+- *Verwaltung › Freigaben*: eigene Importe für die eigenen Lerngruppen freigeben oder die Freigabe zurücknehmen.
 - *Verwaltung › Fragen*: eigene Fragen deaktivieren oder aktivieren.
-- *Verwaltung › Zusatzfragen*: gekennzeichnete Quellen für eine Lerngruppe freischalten oder sperren.
 
 Details in `docs/administration.md`.

@@ -214,9 +214,12 @@ class ImportBatch(Base):
     imported_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     bundled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     checksum: Mapped[str] = mapped_column(String(64), nullable=False, default="")
-    # Supplementary question pools are hidden until a supervisor enables them for a group.
+    # External (imported) pools stay unreleased until a supervisor enables them for a group
+    # or an administrator releases them system-wide. Bundled project content is released.
     supplementary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    released: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     source: Mapped[str] = mapped_column(String(160), nullable=False, default="")
+    exam_version: Mapped[str] = mapped_column(String(16), nullable=False, default="")
     rights: Mapped[str] = mapped_column(String(32), nullable=False, default="unknown")
 
 
