@@ -3,6 +3,20 @@
 {% block content %}
 <h1>Benutzer</h1>
 {% include "admin/_nav.html" %}
+{% if user.is_admin %}
+<details class="card narrow">
+  <summary><strong>Benutzer anlegen</strong></summary>
+  <form method="post" action="/admin/users">
+    <label>Benutzername<input name="username" required pattern="[a-z0-9][a-z0-9._\-]{2,31}"><small>3 bis 32 Zeichen, Kleinbuchstaben, Ziffern, Punkt, Minus, Unterstrich.</small></label>
+    <label>Anzeigename (optional)<input name="display_name"></label>
+    <label>Rolle<select name="role">{% for r in roles %}<option value="{{ r }}">{{ {'admin': 'Administrator', 'supervisor': 'Betreuer', 'learner': 'Lernender'}[r] }}</option>{% endfor %}</select></label>
+    <label>Startpasswort<input type="password" name="password" required minlength="8"><small>Mindestens 8 Zeichen. Bitte der Person mitteilen; sie kann es unter „Konto“ ändern.</small></label>
+    <button class="btn btn-primary" type="submit">Anlegen</button>
+  </form>
+</details>
+{% else %}
+<p class="muted small">Angezeigt werden Konten, die auf Freigabe warten, und Mitglieder deiner Lerngruppen.</p>
+{% endif %}
 <table class="table">
   <thead><tr><th>Benutzer</th><th>Rolle</th><th>Status</th><th>Aktionen</th></tr></thead>
   <tbody>

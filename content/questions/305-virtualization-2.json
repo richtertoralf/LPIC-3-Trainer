@@ -3,6 +3,8 @@
   "kind": "questions",
   "module": "305",
   "source": "LPIC-3 Trainer Projekt",
+  "source_url": "https://github.com/richtertoralf/LPIC-3-Trainer",
+  "exam_code": "305-300",
   "exam_version": "3.0",
   "rights": "cleared",
   "license": "CC BY-SA 4.0",

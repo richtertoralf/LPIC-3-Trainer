@@ -1,14 +1,32 @@
 # Installation
 
-Der LPIC-3-Trainer läuft auf Ubuntu 24.04/26.04 LTS und Debian 12/13 (x86_64 und ARM64). Benötigt werden Python 3.11 oder neuer, `python3-venv` und systemd. Ein Reverse Proxy mit HTTPS ist für den öffentlichen Betrieb Pflicht.
+Der LPIC-3-Trainer läuft auf Ubuntu 24.04/26.04 LTS und Debian 12/13 (x86_64 und ARM64). Die native Installation mit systemd ist der Standardweg; Docker Compose ist optional.
 
-## Native Installation mit systemd
+Voraussetzungen:
+
+- Python 3.11 oder neuer, `python3-venv`, `git`, systemd.
+- Root-Rechte (sudo) für die Installation; der Dienst selbst läuft ohne Root als Benutzer `lpic3`.
+- Internetzugang während der Installation (pip lädt die Python-Abhängigkeiten).
+- Für den öffentlichen Betrieb ein Reverse Proxy mit HTTPS.
+
+Prüfstand: Der Ablauf wurde aus einem frischen Klon ohne Root (venv, `lpic3ctl serve`) tatsächlich ausgeführt. Die Schritte mit Root und systemd (`install`, `upgrade`, `rollback`, `uninstall`, `purge`) sind nur in einem automatisierten Test mit Stub-Befehlen geprüft, nicht auf einem echten Server. Siehe `docs/stand.md`.
+
+## Native Installation mit systemd (Standardweg)
+
+### 1. Quellcode holen
 
 ```bash
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout v0.0.1
+git checkout v0.0.2
+```
+
+Immer den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
+
+### 2. Installieren
+
+```bash
 sudo python3 -m app.cli install
 ```
 
@@ -21,13 +39,30 @@ sudo python3 -m app.cli install
 5. Datenverzeichnis `/var/lib/lpic3-trainer` mit Datenbank, Migrationen und mitgelieferten Inhalten.
 6. systemd-Unit `lpic3-trainer.service`, Symlink `/usr/local/bin/lpic3ctl`, Dienst aktivieren und starten.
 
-Ist der Port bereits belegt, warnt die Installation. Dann `LPIC3_PORT` in der Konfiguration anpassen und `lpic3ctl restart` ausführen.
+Ist der Port bereits belegt, warnt die Installation. Dann `LPIC3_PORT` in der Konfiguration anpassen und `sudo lpic3ctl restart` ausführen.
 
-Danach im Browser `http://127.0.0.1:8000/` öffnen. Das erste registrierte Konto erhält Administratorrechte. Alternativ:
+Dateirechte nach der Installation: `/opt/lpic3-trainer` gehört root (nur lesbar für den Dienst), `/etc/lpic3-trainer/lpic3-trainer.env` ist `0640 root:lpic3`, `/var/lib/lpic3-trainer` gehört `lpic3` (`0750`). Die systemd-Unit läuft mit `ProtectSystem=strict` und darf nur in das Datenverzeichnis schreiben.
+
+### 3. Status prüfen
+
+```bash
+sudo lpic3ctl status     # Dienst, Datenbank, Schema, Health-Check
+sudo lpic3ctl check      # Prüfliste mit [OK]/[!!]
+sudo lpic3ctl logs -n 50 # Protokolle aus journald
+curl http://127.0.0.1:8000/health
+```
+
+### 4. Erster Administrator und Browserzugriff
+
+Im Browser `http://127.0.0.1:8000/` öffnen (bei entferntem Server über den Reverse Proxy, siehe unten). Solange noch kein Konto existiert, erhält das erste über *Registrieren* angelegte Konto Administratorrechte. Alternativ auf der Kommandozeile:
 
 ```bash
 sudo lpic3ctl user create admin --role admin
 ```
+
+Hinweis: Sobald ein Konto existiert (auch ein per CLI angelegtes), werden weitere Registrierungen normale Lernende.
+
+Weitere Benutzer legt der Administrator unter *Verwaltung › Benutzer* an oder gibt Registrierungen frei. Ein vergessenes Administratorpasswort setzt `sudo lpic3ctl user set-password <name>` zurück.
 
 ## Konfiguration
 
@@ -78,12 +113,12 @@ In der Konfiguration `LPIC3_SECURE_COOKIES=true` setzen. Der `Host`- beziehungsw
 
 ## Update
 
-Neue Version aus Git holen und aus dem frischen Checkout upgraden:
+Neue Version aus Git holen und aus dem Checkout upgraden:
 
 ```bash
 cd ~/LPIC-3-Trainer
 git fetch --tags
-git checkout v0.0.2
+git checkout v0.0.3        # gewünschte neue Version, siehe git tag
 sudo lpic3ctl upgrade --source "$PWD"
 ```
 
@@ -112,6 +147,16 @@ Version prüfen:
 lpic3ctl version
 ```
 
+## Backup und Restore
+
+```bash
+sudo lpic3ctl backup                 # nach /var/lib/lpic3-trainer/backups/
+sudo lpic3ctl restore <Archiv>       # stoppt den systemd-Dienst, sichert die aktuelle Datenbank,
+                                     # spielt das Archiv ein, prüft die Integrität, startet den Dienst
+```
+
+`restore` verweigert die Ausführung, wenn ein Server läuft, der nicht über systemd verwaltet wird (Docker, Vordergrundstart). Diesen zuerst stoppen. Einzelheiten in `docs/administration.md`.
+
 ## Docker Compose
 
 Alternativ zur nativen Installation:
@@ -122,9 +167,19 @@ cd LPIC-3-Trainer
 docker compose -f deploy/docker-compose.yml up -d --build
 ```
 
-Die Anwendung ist dann unter `http://127.0.0.1:8000/` erreichbar. Daten liegen im Volume `lpic3-data` unter `/var/lib/lpic3-trainer`, also in derselben Struktur wie bei der nativen Installation. Backups im Container: `docker compose -f deploy/docker-compose.yml exec lpic3-trainer lpic3ctl backup`.
+Die Anwendung ist dann unter `http://127.0.0.1:8000/` erreichbar. Daten liegen im Volume `lpic3-data` unter `/var/lib/lpic3-trainer`, also in derselben Struktur wie bei der nativen Installation.
 
-Hinweis: Der Docker-Betrieb wurde in dieser Version nicht getestet, weil auf dem Entwicklungssystem kein Docker verfügbar war (siehe `docs/stand.md`).
+Backup im laufenden Container: `docker compose -f deploy/docker-compose.yml exec lpic3-trainer lpic3ctl backup --to /var/lib/lpic3-trainer/backups`.
+
+Restore nur bei gestopptem Container, sonst verweigert `restore` die Ausführung:
+
+```bash
+docker compose -f deploy/docker-compose.yml stop
+docker compose -f deploy/docker-compose.yml run --rm lpic3-trainer lpic3ctl restore /var/lib/lpic3-trainer/backups/<Archiv> --yes
+docker compose -f deploy/docker-compose.yml start
+```
+
+Hinweis: Der Docker-Betrieb wurde nicht getestet, weil auf dem Entwicklungssystem kein Docker verfügbar war (siehe `docs/stand.md`).
 
 ## Entfernen
 

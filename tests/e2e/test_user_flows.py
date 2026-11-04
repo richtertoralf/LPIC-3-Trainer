@@ -259,3 +259,44 @@ def test_external_questions_released_by_supervisor(
     # a learner has no access to import or release pages
     page.goto(base + "/admin/releases")
     expect(page.locator("h1")).to_contain_text("403")
+
+
+def test_exam_submit_asks_before_leaving_questions_open(
+    page: Page, server, username, browser_errors, admin_credentials
+):
+    base = server["base"]
+    register(page, base, username)
+    select_module(page, base, "303")
+    page.goto(base + "/exam/303/start")
+    expect(page).to_have_url(re.compile(r"/exam/\d+$"))
+    dialogs = []
+
+    def on_dialog(dialog):
+        dialogs.append(dialog.message)
+        dialog.dismiss()
+
+    page.on("dialog", on_dialog)
+    page.click("button:has-text('Abgeben')")
+    assert dialogs and "unbeantwortet" in dialogs[0]
+    expect(page).to_have_url(re.compile(r"/exam/\d+$"))  # still on the exam
+    page.remove_listener("dialog", on_dialog)
+    page.on("dialog", lambda d: d.accept())
+    page.click("button:has-text('Abgeben')")
+    expect(page).to_have_url(re.compile(r"/exam/\d+/result$"))
+
+
+def test_admin_creates_user_in_browser(
+    page: Page, server, username, browser_errors, admin_credentials
+):
+    base = server["base"]
+    login(page, base, admin_credentials["username"], admin_credentials["password"])
+    page.goto(base + "/admin/users")
+    page.click("summary:has-text('Benutzer anlegen')")
+    page.fill("form[action='/admin/users'] input[name=username]", username)
+    page.select_option("form[action='/admin/users'] select[name=role]", "supervisor")
+    page.fill("form[action='/admin/users'] input[name=password]", "geheim123")
+    page.click("form[action='/admin/users'] button[type=submit]")
+    expect(page.locator(".flash-success")).to_contain_text("angelegt")
+    page.click("button:has-text('Abmelden')")
+    login(page, base, username)
+    expect(page.locator("nav.nav a[href='/admin']")).to_be_visible()

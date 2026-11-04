@@ -37,6 +37,7 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     connectable = config.attributes.get("connection")
     if connectable is not None:
+        connectable.connection.execute("PRAGMA foreign_keys=OFF")
         context.configure(
             connection=connectable, target_metadata=target_metadata, render_as_batch=True
         )
@@ -46,11 +47,19 @@ def run_migrations_online() -> None:
 
     engine = build_engine(_url())
     with engine.connect() as connection:
+        # SQLite "move and copy" table rebuilds drop the old table. With foreign keys enabled
+        # that fires ON DELETE actions on child rows (NULLed question links, cascaded group
+        # releases). Foreign keys must be off while migrations run (SQLite documentation,
+        # "Making Other Kinds Of Table Schema Changes").
+        # The PRAGMA goes through the DBAPI connection so that it does not open a SQLAlchemy
+        # transaction that would swallow Alembic's commit.
+        connection.connection.execute("PRAGMA foreign_keys=OFF")
         context.configure(
             connection=connection, target_metadata=target_metadata, render_as_batch=True
         )
         with context.begin_transaction():
             context.run_migrations()
+        connection.connection.execute("PRAGMA foreign_keys=ON")
     engine.dispose()
 
 

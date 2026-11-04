@@ -55,7 +55,13 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
 ## Status
 
-Das Projekt befindet sich in der Planungsphase. Die technischen Vorgaben stehen in [AGENTS.md](AGENTS.md).
+Erste Entwicklungsversion (0.0.x), noch keine stabile Produktionsversion. Die technischen Vorgaben stehen in [AGENTS.md](AGENTS.md).
+
+## Installation und Dokumentation
+
+- [Installation](docs/installation.md): native Installation mit systemd (Standardweg), Konfiguration, Update, Docker Compose (optional)
+- [Administration](docs/administration.md): Benutzer, Gruppen, Fragenimport und Freigabe, Backup und Restore, `lpic3ctl`
+- [Bedienung](docs/bedienung.md), [Architektur](docs/architektur.md), [Entwicklung](docs/entwicklung.md), [Entwicklungsstand](docs/stand.md)
 
 ## Lizenz
 

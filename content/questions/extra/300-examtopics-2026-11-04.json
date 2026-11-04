@@ -4,6 +4,8 @@
   "module": "300",
   "supplementary": true,
   "source": "ExamTopics 04.11.2026",
+  "source_url": "https://www.examtopics.com/exams/lpi/300-300/view/",
+  "exam_code": "300-300",
   "exam_version": "3.0",
   "rights": "unverified",
   "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 300-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freigabe sichtbar; nicht unter CC BY-SA 4.0.",
@@ -417,7 +419,7 @@
           "correct": false
         }
       ],
-      "explanation_de": "`valid users` beschränkt, wer die Freigabe öffnen darf. `write list` steuert Schreibberechtigungen bei einer ansonsten schreibgeschützten Freigabe. Sie beschränkt nicht den allgemeinen Verbindungszugriff; die Ausgangsfrage fasst beide Aspekte unter „access“ zusammen.",
+      "explanation_de": "`valid users` beschränkt, wer die Freigabe öffnen darf. `write list` steuert Schreibberechtigungen bei einer ansonsten schreibgeschützten Freigabe. Sie beschränkt nicht den allgemeinen Verbindungszugriff; die Ausgangsfrage fasst beide Aspekte unter „access“ zusammen. Hinweis: Diese Frage ist als fachlich unsicher eingestuft (siehe content/questions/extra/README.md) und deshalb inaktiv.",
       "terms": [
         {
           "term": "limit access",
@@ -435,7 +437,8 @@
           "term": "valid users",
           "de": "zugelassene Nutzer"
         }
-      ]
+      ],
+      "active": false
     },
     {
       "id": "300-examtopics-screenshot-09",
