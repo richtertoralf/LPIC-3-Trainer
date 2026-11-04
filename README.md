@@ -1,20 +1,33 @@
 # LPIC-3 Trainer
 
-Gezielte Vorbereitung auf die **LPIC-3-Prüfungen** mit geringem Zeitaufwand.
+Vorbereitung auf die **LPIC-3-Prüfungen** für Linux-Kenner, deren Englisch für die Prüfung noch nicht ausreicht.
 
-Die App läuft im Browser auf eigener Infrastruktur. Sie benötigt keine Cloud, keine externen Dienste und keine KI.
+Die App verbindet gezielte LPIC-3-Prüfungsvorbereitung mit individuellem technischem Englischtraining. Sie läuft im Browser auf eigener Infrastruktur und benötigt keine Cloud, keine externen Dienste und keine KI.
 
 ## Zielgruppe
 
-Die App richtet sich an deutschsprachige Linux-Anwender mit geringen Englischkenntnissen, die sich auf eine LPIC-3-Prüfung vorbereiten.
+Die App richtet sich an deutschsprachige Linux-Anwender mit vorhandenen Linux-Kenntnissen, deren Englisch für die LPIC-3-Prüfungen nicht ausreicht.
 
 Sie kann allein oder gemeinsam genutzt werden. Linux-Vereine, Lerngruppen, Privatpersonen und Bildungseinrichtungen können sie auf einem eigenen Server betreiben und ihren Mitgliedern und Teilnehmern bereitstellen.
 
 ## Zweck
 
-Die LPIC-3-Prüfungen werden auf Englisch abgelegt. Die App verbindet die fachliche Vorbereitung mit dem dafür nötigen technischen Fachenglisch, damit Sprachhürden nicht zum Prüfungsrisiko werden.
+Die LPIC-3-Prüfungen werden auf Englisch abgelegt. Englischsprachige Lernmaterialien gibt es viele. Diese App ist keine weitere Fragensammlung und kein Englischkurs.
 
-Abgedeckt werden die LPIC-3-Prüfungen:
+Ein Lernender kann den technischen Zusammenhang verstehen und trotzdem an der englischen Frage scheitern. Die App erkennt diesen Unterschied und reagiert gezielt darauf.
+
+Das Lernprinzip:
+
+- Die Prüfungsfragen bleiben auf Englisch.
+- Deutsche Übersetzungen und Erklärungen sind bei Bedarf verfügbar.
+- Technisches Fachenglisch wird direkt an den Prüfungsfragen gelernt.
+- Fachwissen und Sprachverständnis werden getrennt bewertet.
+- Vorhandenes Linux-Wissen wird berücksichtigt.
+- Sprachhilfen werden mit dem Lernfortschritt reduziert.
+
+Ziel ist das sichere, selbstständige Verstehen und Beantworten englischer LPIC-3-Prüfungsfragen.
+
+Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
 - 300: Mixed Environments
 - 303: Security
@@ -23,9 +36,11 @@ Abgedeckt werden die LPIC-3-Prüfungen:
 
 ## Funktionen
 
-- Prüfungsfragen mit deutschen Sprachhilfen
-- Technisches Fachenglisch zu jedem Thema
-- Prüfungssimulationen für einzelne Kapitel und ganze Module
+- Englische Prüfungsfragen mit zuschaltbaren deutschen Übersetzungen und Erklärungen
+- Technisches Englischtraining anhand der Prüfungsfragen
+- Getrennte Auswertung von Fachwissen und Sprachverständnis
+- Kurze Eingangstests zur Berücksichtigung vorhandener Linux-Kenntnisse
+- Prüfungssimulationen ohne Sprachhilfen für einzelne Kapitel und ganze Module
 - Praktische Übungen für das eigene Linux-Lab (Anleitungen und Selbstkontrolle, keine Ausführung durch die App)
 - Import eigener Prüfungsfragen
 - Persönlicher Lernfortschritt je Nutzer
@@ -33,6 +48,14 @@ Abgedeckt werden die LPIC-3-Prüfungen:
 - Betreuer stellen Fragen bereit und begleiten Lerngruppen
 - Anmeldung offen oder mit Freigabe durch einen Betreuer oder Administrator
 - Nutzung auch offline: einmal geladene Lerninhalte bleiben im Browser verfügbar
+
+## Abgrenzung
+
+- Kein allgemeiner Englischkurs.
+- Keine vollständige Übersetzung der LPIC-3-Prüfung ins Deutsche.
+- Kein Ersatz für die englischsprachige Prüfungsvorbereitung.
+- Keine KI-Abhängigkeit.
+- Keine Wiederholung bereits beherrschter Linux-Grundlagen.
 
 ## Status
 

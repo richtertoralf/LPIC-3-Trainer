@@ -16,8 +16,23 @@
 
 ## Sprache
 
-- Dokumentation, Benutzeroberfläche, Lerninhalte und Kommunikation: Deutsch.
-- Programmcode, Kommentare, technische Bezeichner und Commit-Nachrichten: Englisch.
+- Programmcode, Kommentare, Docstrings, technische Bezeichner und Commit-Nachrichten: Englisch.
+- Dokumentation und Kommunikation mit dem Auftraggeber: Deutsch.
+- Benutzeroberfläche und Navigation: Deutsch.
+- Prüfungsfragen: Englisch.
+- Fachliche Erklärungen: Deutsch verfügbar.
+- Technisches Englischtraining: Englisch mit deutschen Hilfen.
+
+## Lernlogik
+
+- Fachwissen und Englischverständnis getrennt erfassen und auswerten.
+- Falsche Antworten nicht automatisch als fachliches Wissensdefizit bewerten.
+- Nutzung von Übersetzungen und Sprachhilfen je Frage erfassen und in die Auswertung einbeziehen.
+- Sprachhilfen gezielt anbieten und mit dem Lernfortschritt schrittweise reduzieren.
+- Vorhandenes Fachwissen durch kurze Eingangstests erfassen und berücksichtigen.
+- Prüfungssimulationen ohne Sprachhilfen durchführen.
+- Für alle LPIC-3-Module dieselbe Lernmethodik verwenden.
+- Die Lernlogik läuft vollständig im Backend, ohne externe Dienste oder zusätzliche Abhängigkeiten.
 
 ## Lizenz
 
