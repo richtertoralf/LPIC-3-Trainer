@@ -1,27 +1,39 @@
 # LPIC-3 Trainer
 
-Schnelle Vorbereitung auf alle **LPIC-3-Prüfungen**.
+Gezielte Vorbereitung auf die **LPIC-3-Prüfungen** mit geringem Zeitaufwand.
 
-Die App richtet sich an deutschsprachige Linux-Anwender mit geringen Englischkenntnissen.
+Die App läuft im Browser auf eigener Infrastruktur. Sie benötigt keine Cloud, keine externen Dienste und keine KI.
 
-Sie verbindet:
+## Zielgruppe
+
+Die App richtet sich an deutschsprachige Linux-Anwender mit geringen Englischkenntnissen, die sich auf eine LPIC-3-Prüfung vorbereiten.
+
+Sie kann allein oder gemeinsam genutzt werden. Linux-Vereine, Lerngruppen, Privatpersonen und Bildungseinrichtungen können sie auf einem eigenen Server betreiben und ihren Mitgliedern und Teilnehmern bereitstellen.
+
+## Zweck
+
+Die LPIC-3-Prüfungen werden auf Englisch abgelegt. Die App verbindet die fachliche Vorbereitung mit dem dafür nötigen technischen Fachenglisch, damit Sprachhürden nicht zum Prüfungsrisiko werden.
+
+Abgedeckt werden die LPIC-3-Prüfungen:
+
+- 300: Mixed Environments
+- 303: Security
+- 305: Virtualization and Containerization
+- 306: High Availability and Storage
+
+## Funktionen
+
 - Prüfungsfragen mit deutschen Sprachhilfen
-- Technisches Fachenglisch
-- Praktische Übungen im eigenen Linux-Lab
-- Import eigener Prüfungsfragen
+- Technisches Fachenglisch zu jedem Thema
 - Prüfungssimulationen für einzelne Kapitel und ganze Module
+- Praktische Übungen für das eigene Linux-Lab (Anleitungen und Selbstkontrolle, keine Ausführung durch die App)
+- Import eigener Prüfungsfragen
+- Persönlicher Lernfortschritt je Nutzer
+- Lernende wählen ihre LPIC-3-Module selbst
+- Betreuer stellen Fragen bereit und begleiten Lerngruppen
+- Anmeldung offen oder mit Freigabe durch einen Betreuer oder Administrator
+- Nutzung auch offline: einmal geladene Lerninhalte bleiben im Browser verfügbar
 
-## Nutzung
+## Status
 
-Die App kann allein oder gemeinsam genutzt werden.
-
-Linux-Vereine, Lerngruppen und Bildungseinrichtungen können sie ihren Mitgliedern und Teilnehmern bereitstellen.
-
-- Lernende wählen ihre LPIC-3-Module selbst.
-- Jeder hat seinen eigenen Lernfortschritt.
-- Betreuer können Fragen bereitstellen und Lerngruppen begleiten.
-- Die Anmeldung ist offen oder erfolgt mit Freigabe.
-
-**Ziel:** Gezielte Prüfungsvorbereitung mit geringem Zeitaufwand.
-
-Die App läuft im Browser und benötigt keine KI.
+Das Projekt befindet sich in der Planungsphase. Die technischen Vorgaben stehen in [AGENTS.md](AGENTS.md).

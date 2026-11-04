@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tests und Werkzeuge
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+test-results/
+playwright-report/
+
+# Datenbanken und Laufzeitdaten
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+data/
+backups/
+
+# Konfiguration mit Zugangsdaten
+.env
+.env.*
+!.env.example
+
+# Editoren und Betriebssystem
+.idea/
+.vscode/
+*.swp
+.DS_Store
