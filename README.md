@@ -53,7 +53,6 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
 - Kein allgemeiner Englischkurs.
 - Keine vollständige Übersetzung der LPIC-3-Prüfung ins Deutsche.
-- Kein Ersatz für die englischsprachige Prüfungsvorbereitung.
 - Keine KI-Abhängigkeit.
 - Keine Wiederholung bereits beherrschter Linux-Grundlagen.
 

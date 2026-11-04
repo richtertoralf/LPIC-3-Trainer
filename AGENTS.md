@@ -25,14 +25,15 @@
 
 ## Lernlogik
 
-- Fachwissen und Englischverständnis getrennt erfassen und auswerten.
-- Falsche Antworten nicht automatisch als fachliches Wissensdefizit bewerten.
-- Nutzung von Übersetzungen und Sprachhilfen je Frage erfassen und in die Auswertung einbeziehen.
-- Sprachhilfen gezielt anbieten und mit dem Lernfortschritt schrittweise reduzieren.
-- Vorhandenes Fachwissen durch kurze Eingangstests erfassen und berücksichtigen.
-- Prüfungssimulationen ohne Sprachhilfen durchführen.
+- Prüfungsfragen erscheinen auf Englisch.
+- Einzelne Wörter oder vollständige Fragen können bei Bedarf ins Deutsche übersetzt werden.
+- Die Antwort wird unabhängig von der Nutzung der Sprachhilfe bewertet.
+- Nach der Antwort wird die richtige Lösung erklärt.
+- Unbekannte Fachbegriffe können gezielt wiederholt werden.
+- Im Prüfungssimulationsmodus sind Sprachhilfen deaktiviert.
+- Vorhandenes Linux-Wissen kann durch kurze Eingangstests berücksichtigt werden.
 - Für alle LPIC-3-Module dieselbe Lernmethodik verwenden.
-- Die Lernlogik läuft vollständig im Backend, ohne externe Dienste oder zusätzliche Abhängigkeiten.
+- Keine komplizierte Lernanalyse entwickeln.
 
 ## Lizenz
 
