@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Gruppen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Lerngruppen verwalten</h1>
+{% include "admin/_nav.html" %}
+<section class="card narrow">
+  <h2>Neue Gruppe</h2>
+  <form method="post" action="/admin/groups">
+    <label>Name<input name="name" required maxlength="128"></label>
+    <label>Beschreibung<textarea name="description" rows="2"></textarea></label>
+    <label>Beitritt<select name="join_mode"><option value="approval">mit Freigabe</option><option value="open">offen</option></select></label>
+    <button class="btn btn-primary" type="submit">Anlegen</button>
+  </form>
+</section>
+<table class="table">
+  <thead><tr><th>Gruppe</th><th>Mitglieder</th><th>offen</th><th></th></tr></thead>
+  <tbody>
+  {% for g in groups %}
+  <tr><td><a href="/admin/groups/{{ g.id }}">{{ g.name }}</a></td>
+    <td>{{ g.members | selectattr('status', 'equalto', 'active') | list | length }}</td>
+    <td>{{ g.members | selectattr('status', 'equalto', 'pending') | list | length }}</td>
+    <td>{% if user.is_admin %}<form method="post" action="/admin/groups/{{ g.id }}/delete" class="inline" data-confirm="Gruppe {{ g.name }} löschen?"><button class="btn btn-small btn-danger" type="submit">Löschen</button></form>{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

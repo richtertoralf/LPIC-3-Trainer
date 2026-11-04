@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Ergebnis · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>{% if exam.mode == 'entry' %}Eingangstest{% else %}Prüfungssimulation{% endif %} {{ exam.module.code }}{% if exam.topic %} · Kapitel {{ exam.topic.code }}{% endif %}</h1>
+<section class="card">
+  <div class="verdict {% if exam.passed %}verdict-ok{% else %}verdict-wrong{% endif %}">{{ exam.correct_count }} von {{ exam.total_count }} richtig ({{ exam.percent }} %)</div>
+  {% if exam.mode == 'exam' %}<p class="muted">Orientierung: Für die echte Prüfung sind etwa 60 % nötig (500 von 800 Punkten, skaliert). {% if exam.passed %}Das hätte gereicht.{% else %}Das hätte noch nicht gereicht.{% endif %}</p>{% endif %}
+  <table class="table">
+    <thead><tr><th>Thema</th><th>richtig</th></tr></thead>
+    <tbody>{% for code, t in topic_scores.items() %}<tr><td>{{ code }} {{ t.title }}</td><td>{{ t.correct }}/{{ t.total }}</td></tr>{% endfor %}</tbody>
+  </table>
+  <p class="actions"><a class="btn btn-primary" href="/module/{{ exam.module.code }}">Zum Modul</a> <a class="btn" href="/exams">Alle Ergebnisse</a></p>
+</section>
+<h2>Fragen im Detail</h2>
+{% for d in details %}
+<section class="card question-card {% if d.correct %}result-ok{% else %}result-wrong{% endif %}">
+  <p class="muted small">Frage {{ loop.index }} · {{ d.question.external_id }} · {% if d.correct %}richtig{% else %}falsch{% endif %}</p>
+  {% with help=False, show_result=True, question=d.question, selected=d.selected %}{% include "learn/_question_body.html" %}{% endwith %}
+  <details><summary>Erklärung und Sprachhilfe</summary>
+    {% if d.question.explanation_de %}{{ d.question.explanation_de | nl2p }}{% endif %}
+    <p><a href="/question/{{ d.question.id }}">Frage mit Sprachhilfe öffnen</a></p>
+  </details>
+</section>
+{% endfor %}
+{% endblock %}

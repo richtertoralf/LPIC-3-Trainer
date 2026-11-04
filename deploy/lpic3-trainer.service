@@ -1,0 +1,31 @@
+[Unit]
+Description=LPIC-3 Trainer
+After=network.target
+
+[Service]
+Type=simple
+User=lpic3
+Group=lpic3
+EnvironmentFile=/etc/lpic3-trainer/lpic3-trainer.env
+WorkingDirectory=/opt/lpic3-trainer/app
+ExecStart=/opt/lpic3-trainer/venv/bin/lpic3ctl serve
+Restart=on-failure
+RestartSec=5
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lpic3-trainer
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Registrieren · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Konto anlegen</h1>
+  {% if first_user %}<div class="flash flash-info">Noch kein Konto vorhanden. Das erste Konto erhält Administratorrechte.</div>
+  {% elif mode == 'approval' %}<div class="flash flash-info">Neue Konten werden von einem Betreuer oder Administrator freigegeben.</div>{% endif %}
+  {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
+  <form method="post" action="/register">
+    <label>Benutzername<input name="username" required autocomplete="username" pattern="[a-z0-9][a-z0-9._-]{2,31}" value="{{ username or '' }}"><small>3 bis 32 Zeichen, Kleinbuchstaben, Ziffern, Punkt, Minus, Unterstrich.</small></label>
+    <label>Anzeigename (optional)<input name="display_name" autocomplete="name" value="{{ display_name or '' }}"></label>
+    <label>Passwort<input type="password" name="password" required minlength="8" autocomplete="new-password"><small>Mindestens 8 Zeichen.</small></label>
+    <label>Passwort wiederholen<input type="password" name="password2" required minlength="8" autocomplete="new-password"></label>
+    <button class="btn btn-primary" type="submit">Registrieren</button>
+  </form>
+  <p class="muted">Schon ein Konto? <a href="/login">Anmelden</a></p>
+</section>
+{% endblock %}

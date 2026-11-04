@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "kind": "labs",
+  "module": "305",
+  "license": "CC BY-SA 4.0",
+  "visibility": "public",
+  "labs": [
+    {
+      "id": "lab-305-01", "objective": "351.4", "title": "Virtuelle Maschine mit libvirt und QEMU/KVM betreiben",
+      "goal_de": "Mit virsh ein Disk-Image anlegen, eine VM aus einem Cloud-Image definieren, Snapshots erzeugen und die XML-Konfiguration bearbeiten.",
+      "environment_de": "Linux-Host mit aktivierter Hardware-Virtualisierung (vmx oder svm), mindestens 4 GB RAM. Nested Virtualization in einer VM ist möglich, aber langsam.",
+      "duration_minutes": 60,
+      "steps": [
+        {"title": "Voraussetzungen prüfen und installieren", "text_de": "Prüfe die CPU-Flags und installiere QEMU, libvirt und die Werkzeuge. Füge deinen Benutzer der Gruppe libvirt hinzu.", "commands": ["grep -cE 'vmx|svm' /proc/cpuinfo", "sudo apt install qemu-system-x86 libvirt-daemon-system virtinst libguestfs-tools cloud-image-utils", "sudo usermod -aG libvirt $USER", "virsh -c qemu:///system nodeinfo"]},
+        {"title": "Image und cloud-init-Daten", "text_de": "Lade ein Debian-Cloud-Image, lege ein qcow2-Overlay an und erzeuge eine cloud-init-Seed-Datei mit Benutzer und SSH-Schlüssel.", "commands": ["cd /var/lib/libvirt/images", "sudo wget -O debian12.qcow2 https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2", "sudo qemu-img create -f qcow2 -b debian12.qcow2 -F qcow2 vm1.qcow2 10G", "printf '#cloud-config\\nusers:\\n  - name: ops\\n    sudo: ALL=(ALL) NOPASSWD:ALL\\n    shell: /bin/bash\\n    ssh_authorized_keys:\\n      - %s\\n' \"$(cat ~/.ssh/id_ed25519.pub)\" > /tmp/user-data", "sudo cloud-localds seed.iso /tmp/user-data"]},
+        {"title": "VM definieren und starten", "text_de": "Erzeuge die Domäne mit virt-install. Sie wird dauerhaft definiert und sofort gestartet.", "commands": ["sudo virt-install --name vm1 --memory 1024 --vcpus 1 --os-variant debian12 --import --disk path=/var/lib/libvirt/images/vm1.qcow2,format=qcow2 --disk path=/var/lib/libvirt/images/seed.iso,device=cdrom --network network=default --graphics none --noautoconsole", "virsh list --all", "virsh domifaddr vm1"]},
+        {"title": "Snapshot anlegen und testen", "text_de": "Erzeuge einen Snapshot, ändere etwas in der VM und kehre zum Snapshot zurück.", "commands": ["virsh snapshot-create-as vm1 clean 'frisch installiert'", "virsh snapshot-list vm1", "ssh ops@$(virsh domifaddr vm1 | awk '/ipv4/ {print $4}' | cut -d/ -f1) 'touch /tmp/changed; ls /tmp'", "virsh snapshot-revert vm1 clean", "virsh snapshot-list vm1"]},
+        {"title": "Konfiguration bearbeiten", "text_de": "Erhöhe den Speicher dauerhaft auf 2 GB über die XML-Konfiguration und prüfe die Änderung.", "commands": ["virsh dumpxml vm1 | grep -E '<memory|<currentMemory'", "virsh setmaxmem vm1 2G --config", "virsh setmem vm1 2G --config", "virsh dominfo vm1 | grep -i memory", "virsh edit vm1"]},
+        {"title": "Image untersuchen und aufräumen", "text_de": "Sieh dir mit libguestfs den Inhalt des Images an, ohne die VM zu starten. Lösche danach VM und Images.", "commands": ["virsh shutdown vm1", "sudo virt-cat -a /var/lib/libvirt/images/vm1.qcow2 /etc/hostname", "sudo virt-df -a /var/lib/libvirt/images/vm1.qcow2 -h", "virsh undefine vm1 --snapshots-metadata --remove-all-storage"]}
+      ],
+      "checks": [
+        {"question_de": "Was unterscheidet das Overlay vm1.qcow2 vom Basis-Image?", "answer_de": "Das Overlay speichert nur geänderte Blöcke (Copy-on-Write) und verweist auf das Backing File. Das Basis-Image darf nicht verändert werden."},
+        {"question_de": "Warum ist --config bei setmaxmem nötig?", "answer_de": "Ohne --config gilt die Änderung nur für die laufende Instanz (--live). --config schreibt sie in die dauerhafte Definition für den nächsten Start."},
+        {"question_de": "Worin unterscheiden sich virsh create und virsh define?", "answer_de": "create startet eine transiente Domäne aus XML, die nach dem Herunterfahren verschwindet. define registriert sie dauerhaft; start startet sie."}
+      ]
+    },
+    {
+      "id": "lab-305-02", "objective": "352.3", "title": "Docker: Image bauen, Volume nutzen, Registry betreiben",
+      "goal_de": "Einen Webdienst in einem Dockerfile beschreiben, bauen, mit Volume und Portweiterleitung betreiben, Logs lesen und das Image in eine lokale Registry pushen.",
+      "environment_de": "Test-VM mit Debian 12 oder Ubuntu 24.04, Internetzugang zum Laden von Images.",
+      "duration_minutes": 50,
+      "steps": [
+        {"title": "Docker installieren", "text_de": "Installiere Docker aus den Distributionspaketen und prüfe den Daemon.", "commands": ["sudo apt install docker.io", "sudo systemctl enable --now docker", "sudo docker info | head -20"]},
+        {"title": "Dockerfile schreiben", "text_de": "Lege ein Verzeichnis mit einer Startseite und einem Dockerfile auf Basis von nginx:alpine an.", "commands": ["mkdir -p ~/web && cd ~/web", "echo '<h1>Hallo aus dem Container</h1>' > index.html", "printf 'FROM nginx:alpine\\nCOPY index.html /usr/share/nginx/html/index.html\\nEXPOSE 80\\n' > Dockerfile", "sudo docker build -t labweb:1.0 ."]},
+        {"title": "Container mit Volume starten", "text_de": "Starte den Container im Hintergrund mit Portweiterleitung und einem benannten Volume für Logs. Prüfe die Antwort.", "commands": ["sudo docker volume create weblogs", "sudo docker run -d --name web -p 8080:80 -v weblogs:/var/log/nginx labweb:1.0", "curl -s http://localhost:8080/", "sudo docker ps", "sudo docker logs web"]},
+        {"title": "Container untersuchen", "text_de": "Sieh dir Netzwerk und Volume des Containers an und führe einen Befehl im Container aus.", "commands": ["sudo docker inspect web --format '{{.NetworkSettings.IPAddress}}'", "sudo docker exec web ls /var/log/nginx", "sudo docker volume inspect weblogs"]},
+        {"title": "Lokale Registry", "text_de": "Starte eine Registry aus dem offiziellen Image, tagge dein Image und lade es hoch. Prüfe den Katalog.", "commands": ["sudo docker run -d --name registry -p 5000:5000 -v registry-data:/var/lib/registry registry:2", "sudo docker tag labweb:1.0 localhost:5000/labweb:1.0", "sudo docker push localhost:5000/labweb:1.0", "curl -s http://localhost:5000/v2/_catalog"]},
+        {"title": "Aufräumen", "text_de": "Stoppe und entferne Container, Images und Volumes.", "commands": ["sudo docker rm -f web registry", "sudo docker rmi labweb:1.0 localhost:5000/labweb:1.0", "sudo docker volume rm weblogs registry-data"]}
+      ],
+      "checks": [
+        {"question_de": "Was passiert mit den Daten in /var/log/nginx, wenn der Container ohne Volume gelöscht wird?", "answer_de": "Sie gehen mit der beschreibbaren Containerschicht verloren. Volumes überleben das Löschen des Containers."},
+        {"question_de": "Warum konnte ohne TLS auf die Registry gepusht werden?", "answer_de": "localhost gilt bei Docker als unsicher erlaubte Registry. Für andere Hosts ist TLS oder ein Eintrag unter insecure-registries in /etc/docker/daemon.json nötig."},
+        {"question_de": "Welche Schichten hat das Image labweb:1.0?", "answer_de": "Die Schichten von nginx:alpine plus eine Schicht für die kopierte index.html. docker history zeigt sie an."}
+      ]
+    },
+    {
+      "id": "lab-305-03", "objective": "352.1", "title": "Container-Grundlagen mit Namespaces und cgroups von Hand",
+      "goal_de": "Ohne Container-Engine einen isolierten Prozess mit unshare erzeugen, Namensräume vergleichen, mit nsenter hineinspringen und per cgroup den Speicher begrenzen.",
+      "environment_de": "Test-VM mit Root-Rechten und cgroup v2 (Standard bei Debian 12 und Ubuntu 24.04).",
+      "duration_minutes": 40,
+      "steps": [
+        {"title": "Namensräume des eigenen Prozesses ansehen", "text_de": "Jeder Prozess hat Verweise auf seine Namensräume unter /proc. Notiere die Nummern für den Vergleich.", "commands": ["ls -l /proc/$$/ns", "grep -E 'NSpid|CapEff' /proc/$$/status"]},
+        {"title": "Isolierten Prozess starten", "text_de": "Starte eine Shell mit eigenen PID-, Mount-, UTS- und Netz-Namensräumen. Innerhalb siehst du nur dich selbst und kannst den Hostnamen ändern, ohne den Host zu beeinflussen.", "commands": ["sudo unshare --pid --fork --mount-proc --uts --net --mount /bin/bash", "hostname container1 && hostname", "ps aux", "ip link", "ls -l /proc/$$/ns"]},
+        {"title": "Von außen hineinspringen", "text_de": "Öffne ein zweites Terminal auf dem Host. Finde die PID der isolierten Shell und tritt mit nsenter in ihre Namensräume ein.", "commands": ["pgrep -f 'unshare --pid' ", "sudo nsenter -t <PID der bash unter unshare> -p -m -u -n /bin/bash", "hostname", "ps aux", "exit"]},
+        {"title": "Speicher per cgroup begrenzen", "text_de": "Lege eine cgroup an, begrenze den Speicher auf 50 MB, verschiebe die isolierte Shell hinein und provoziere das Limit.", "commands": ["sudo mkdir /sys/fs/cgroup/lab", "echo 50M | sudo tee /sys/fs/cgroup/lab/memory.max", "echo <PID der bash unter unshare> | sudo tee /sys/fs/cgroup/lab/cgroup.procs", "cat /sys/fs/cgroup/lab/memory.current", "# in der isolierten Shell: python3 -c 'x = bytearray(100*1024*1024)'", "cat /sys/fs/cgroup/lab/memory.events"]},
+        {"title": "Capabilities betrachten", "text_de": "Vergleiche die Capabilities von root und einer Shell mit reduzierten Rechten.", "commands": ["sudo capsh --print | grep Current", "sudo capsh --drop=cap_net_raw,cap_sys_admin -- -c 'capsh --print | grep Current; ping -c1 127.0.0.1'"]},
+        {"title": "Aufräumen", "text_de": "Beende die isolierte Shell und entferne die cgroup.", "commands": ["exit", "sudo rmdir /sys/fs/cgroup/lab"]}
+      ],
+      "checks": [
+        {"question_de": "Warum zeigt ps in der isolierten Shell nur wenige Prozesse?", "answer_de": "Durch den eigenen PID-Namensraum und --mount-proc sieht die Shell ein eigenes /proc, in dem nur ihre Prozesse mit PIDs ab 1 erscheinen."},
+        {"question_de": "Was passiert, wenn der Prozess mehr als 50 MB belegt?", "answer_de": "Der OOM-Killer der cgroup beendet den Prozess; memory.events zählt oom_kill hoch."},
+        {"question_de": "Welche dieser Mechanismen nutzt Docker ebenfalls?", "answer_de": "Alle drei: Namespaces für die Isolation, cgroups für Limits und Capabilities (plus seccomp und optional SELinux/AppArmor) für die Rechtebegrenzung."}
+      ]
+    }
+  ]
+}

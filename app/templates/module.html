@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ module.code }} {{ module.title }} · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>{{ module.code }} · {{ module.title }}</h1>
+<p class="muted">{{ module.title_de }} · Prüfungsziele Version {{ module.version }} · <a href="{{ module.source_url }}" rel="noopener" target="_blank">Quelle: LPI</a></p>
+{% if not um %}
+<form method="post" action="/modules/select" class="card">
+  <input type="hidden" name="module_code" value="{{ module.code }}"><input type="hidden" name="action" value="add">
+  <p>Dieses Modul ist noch nicht in deiner Auswahl.</p>
+  <button class="btn btn-primary" type="submit">Modul wählen</button>
+</form>
+{% endif %}
+<section class="card">
+  <p class="actions">
+    <a class="btn btn-primary" href="/learn/{{ module.code }}">Üben (ganzes Modul)</a>
+    <a class="btn" href="/exam/{{ module.code }}/start">Prüfungssimulation</a>
+    {% if um and not um.entry_done %}<a class="btn" href="/entry/{{ module.code }}/start">Eingangstest</a>{% endif %}
+  </p>
+  <ul class="stats">
+    <li><strong>{{ progress.answered }}</strong>/{{ progress.total }} Fragen geübt</li>
+    <li><strong>{{ progress.percent_correct }} %</strong> richtig</li>
+    <li><strong>{{ progress.help_rate }} %</strong> mit Sprachhilfe</li>
+  </ul>
+  {% if um and um.entry_done and um.entry_result %}
+  <details>
+    <summary>Eingangstest: {{ um.entry_result.percent }} % richtig</summary>
+    <ul>
+      {% for code, t in um.entry_result.topics.items() %}
+      <li>{{ code }} {{ t.title }}: {{ t.correct }}/{{ t.total }}
+        {% if t.total and t.correct == t.total %}<span class="tag tag-ok">sicher</span>{% elif t.correct * 2 < t.total %}<span class="tag tag-warn">üben</span>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    <p class="muted">Themen mit „sicher“ kannst du überspringen. Der Test prüft Linux-Wissen, nicht Englisch.</p>
+  </details>
+  {% endif %}
+</section>
+
+{% for topic in module.topics %}
+<section class="card">
+  <h2>{{ topic.code }} · {{ topic.title }} <span class="muted">({{ topic.title_de }}, Gewicht {{ topic.weight }})</span></h2>
+  <p class="actions">
+    <a class="btn btn-small" href="/exam/{{ module.code }}/start?topic={{ topic.code }}">Kapiteltest</a>
+  </p>
+  <table class="table">
+    <thead><tr><th>Ziel</th><th>Gewicht</th><th>Fragen</th><th>Richtig</th><th></th></tr></thead>
+    <tbody>
+    {% for op in progress.topics[topic.code] %}
+      <tr>
+        <td>
+          <details>
+            <summary><strong>{{ op.objective.code }}</strong> {{ op.objective.title }}<br><span class="muted">{{ op.objective.title_de }}</span></summary>
+            <div class="objective-detail">
+              {{ op.objective.summary_de | nl2p }}
+              {% if op.objective.tools %}<p class="muted"><strong>Begriffe und Werkzeuge:</strong> {{ op.objective.tools }}</p>{% endif %}
+            </div>
+          </details>
+        </td>
+        <td>{{ op.objective.weight }}</td>
+        <td>{{ op.answered }}/{{ op.total }}</td>
+        <td>{% if op.total %}{{ op.percent_correct }} %{% else %}–{% endif %}</td>
+        <td>{% if op.total %}<a class="btn btn-small" href="/learn/{{ module.code }}?objective={{ op.objective.code }}">Üben</a>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+
+{% if labs %}
+<section class="card">
+  <h2>Laboraufgaben</h2>
+  <ul>
+    {% for lab in labs %}<li><a href="/lab/{{ lab.id }}">{{ lab.title }}</a> <span class="muted">({{ lab.duration_minutes }} min)</span></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

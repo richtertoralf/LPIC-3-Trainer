@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Fehler {{ status_code }} · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Fehler {{ status_code }}</h1>
+<p>{{ detail }}</p>
+<p><a class="btn" href="/">Zur Startseite</a></p>
+{% endblock %}

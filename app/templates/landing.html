@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>LPIC-3-Prüfungen bestehen, auch wenn das Englisch noch wackelt</h1>
+  <p>Die Prüfungsfragen bleiben auf Englisch. Deutsche Worterklärungen und Übersetzungen sind einen Klick entfernt. In der Prüfungssimulation sind sie aus.</p>
+  <p>
+    <a class="btn btn-primary" href="/register">Konto anlegen</a>
+    <a class="btn" href="/login">Anmelden</a>
+  </p>
+</section>
+<section class="grid">
+  {% for m in modules %}
+  <article class="card">
+    <h2>{{ m.code }}</h2>
+    <h3>{{ m.title }}</h3>
+    <p class="muted">{{ m.title_de }}</p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

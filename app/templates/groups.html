@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Gruppen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Lerngruppen</h1>
+{% if not groups %}<p>Es gibt noch keine Lerngruppen.</p>{% endif %}
+{% for g in groups %}
+<section class="card">
+  <h2>{{ g.name }}</h2>
+  <p>{{ g.description }}</p>
+  {% set m = memberships.get(g.id) %}
+  {% if m %}
+    <p>{% if m.status == 'active' %}Du bist Mitglied{% if m.role == 'supervisor' %} (Betreuer){% endif %}.{% else %}Beitritt angefragt, wartet auf Freigabe.{% endif %}</p>
+    <form method="post" action="/groups/{{ g.id }}/leave"><button class="btn btn-small" type="submit">Verlassen</button></form>
+  {% else %}
+    <form method="post" action="/groups/{{ g.id }}/join"><button class="btn btn-primary btn-small" type="submit">{% if g.join_mode == 'open' %}Beitreten{% else %}Beitritt anfragen{% endif %}</button></form>
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

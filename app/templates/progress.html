@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Fortschritt · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Mein Lernfortschritt</h1>
+{% if not progress %}<p>Noch keine Module gewählt. <a href="/modules">Module wählen</a></p>{% endif %}
+{% for p in progress %}
+<section class="card">
+  <h2><a href="/module/{{ p.module.code }}">{{ p.module.code }} · {{ p.module.title }}</a></h2>
+  <ul class="stats">
+    <li><strong>{{ p.answered }}</strong>/{{ p.total }} Fragen geübt</li>
+    <li><strong>{{ p.percent_correct }} %</strong> richtig</li>
+    <li><strong>{{ p.help_rate }} %</strong> mit Sprachhilfe</li>
+    <li><strong>{{ p.labs_done }}</strong>/{{ p.labs_total }} Labs</li>
+  </ul>
+  <table class="table">
+    <thead><tr><th>Thema</th><th>geübt</th><th>richtig</th><th>mit Hilfe</th></tr></thead>
+    <tbody>
+    {% for topic in p.module.topics %}
+      {% set ns = namespace(t=0, a=0, c=0, h=0) %}
+      {% for op in p.topics[topic.code] %}{% set ns.t = ns.t + op.total %}{% set ns.a = ns.a + op.answered %}{% set ns.c = ns.c + op.correct %}{% set ns.h = ns.h + op.with_help %}{% endfor %}
+      <tr><td>{{ topic.code }} {{ topic.title }}</td><td>{{ ns.a }}/{{ ns.t }}</td><td>{{ ns.c | percent(ns.t) }} %</td><td>{{ ns.h }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if p.exams %}
+  <h3>Simulationen und Tests</h3>
+  <ul>
+    {% for e in p.exams[:10] %}<li><a href="/exam/{{ e.id }}/result">{{ e.finished_at.strftime('%d.%m.%Y %H:%M') }}</a> · {% if e.mode == 'entry' %}Eingangstest{% elif e.topic %}Kapitel {{ e.topic.code }}{% else %}Modul{% endif %} · {{ e.correct_count }}/{{ e.total_count }} ({{ e.percent }} %)</li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endfor %}
+<section class="card">
+  <h2>Fachbegriffe</h2>
+  <p>{{ terms_learning }} zum Wiederholen, {{ terms_known }} gelernt. <a href="/vocab">Zur Vokabelliste</a></p>
+</section>
+{% endblock %}

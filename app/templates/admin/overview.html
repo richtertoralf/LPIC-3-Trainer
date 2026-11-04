@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Verwaltung · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Verwaltung</h1>
+{% include "admin/_nav.html" %}
+<section class="grid">
+  <article class="card"><h2>{{ counts.users }}</h2><p>Benutzer{% if counts.pending %}, <a href="/admin/users">{{ counts.pending }} warten auf Freigabe</a>{% endif %}</p></article>
+  <article class="card"><h2>{{ counts.questions }}</h2><p>Fragen</p></article>
+  <article class="card"><h2>{{ counts.terms }}</h2><p>Fachbegriffe</p></article>
+  <article class="card"><h2>{{ counts.labs }}</h2><p>Labs</p></article>
+  <article class="card"><h2>{{ counts.groups }}</h2><p>Gruppen</p></article>
+  <article class="card"><h2>{{ counts.exams }}</h2><p>abgeschlossene Simulationen</p></article>
+</section>
+<p class="muted">Registrierung: {% if registration_mode == 'open' %}offen{% else %}mit Freigabe{% endif %}.</p>
+{% endblock %}

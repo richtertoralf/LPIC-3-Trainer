@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "objectives",
+  "module": {
+    "code": "306",
+    "title": "LPIC-3 High Availability and Storage Clusters",
+    "title_de": "Hochverfügbarkeit und Storage-Cluster",
+    "description_de": "Hochverfügbare Cluster mit Pacemaker, Corosync, keepalived und HAProxy, replizierter Speicher mit DRBD, Cluster-Dateisysteme GFS2 und OCFS2, verteilter Speicher mit GlusterFS und Ceph sowie Hochverfügbarkeit einzelner Knoten.",
+    "version": "3.0",
+    "source_url": "https://www.lpi.org/our-certifications/exam-306-objectives/",
+    "position": 4
+  },
+  "topics": [
+    {
+      "code": "361", "title": "High Availability Cluster Management", "title_de": "Hochverfügbarkeits-Cluster verwalten",
+      "objectives": [
+        {"code": "361.1", "title": "High Availability Concepts and Theory", "title_de": "Konzepte der Hochverfügbarkeit", "weight": 6,
+         "summary_de": "Ziele von Hochverfügbarkeit und Site Reliability Engineering verstehen, gängige Cluster-Architekturen kennen, Mechanismen zur Wiederherstellung einordnen und einen Cluster für einen Zweck entwerfen. Begriffe wie Quorum, Fencing, Split Brain, MTBF, MTTR und SLA sicher verwenden.",
+         "tools": "Active/Passive Cluster, Active/Active Cluster, Failover Cluster, Load Balanced Cluster, Shared-Nothing Cluster, Shared-Disk Cluster, Cluster resources, Cluster services, Quorum, Fencing, Split brain, Redundancy, MTBF, MTTR, SLA, Disaster Recovery, State Handling, Replication, Session handling"},
+        {"code": "361.2", "title": "Load Balanced Clusters", "title_de": "Lastverteilte Cluster", "weight": 8,
+         "summary_de": "LVS/IPVS und VRRP verstehen, keepalived und ldirectord konfigurieren, das Netzwerk der Backend-Server einrichten und HAProxy mit Algorithmen und ACLs konfigurieren.",
+         "tools": "ipvsadm, syncd, LVS Forwarding, NAT, Direct Routing, Tunneling, Local Node, connection scheduling algorithms, keepalived configuration file, ldirectord configuration file, genhash, HAProxy configuration file, load balancing algorithms, ACLs"},
+        {"code": "361.3", "title": "Failover Clusters", "title_de": "Failover-Cluster", "weight": 8,
+         "summary_de": "Architektur von Pacemaker mit CIB, CRMd, PEngine, LRMd, DC und STONITHd verstehen, Cluster konfigurieren, Ressourcenklassen und Constraints (location, order, colocation) setzen, Gruppen, Klone und Multi-State-Ressourcen nutzen, Quorum und Fencing einrichten, mit pcs und crmsh arbeiten und Corosync konfigurieren.",
+         "tools": "pcs, crm, crm_mon, crm_verify, crm_simulate, crm_shadow, crm_resource, crm_attribute, crm_node, crm_standby, cibadmin, corosync.conf, authkey, corosync-cfgtool, corosync-cmapctl, corosync-quorumtool, stonith_admin, stonith, ocf:pacemaker:ping, sbd"}
+      ]
+    },
+    {
+      "code": "362", "title": "High Availability Cluster Storage", "title_de": "Hochverfügbarer Cluster-Speicher",
+      "objectives": [
+        {"code": "362.1", "title": "DRBD", "title_de": "DRBD", "weight": 6,
+         "summary_de": "Architektur von DRBD verstehen, Ressourcen, Zustände und Replikationsprotokolle A, B und C kennen, Platten, Geräte und Netzwerk konfigurieren, Split Brain und Fencing behandeln, mit drbdadm, drbdsetup und drbdmeta arbeiten und DRBD in Pacemaker integrieren. Grundwissen zu LINSTOR.",
+         "tools": "Protocol A, Protocol B, Protocol C, Primary, Secondary, Three-way replication, drbd kernel module, drbdadm, drbdmon, drbdsetup, drbdmeta, /etc/drbd.conf, /etc/drbd.d/, /proc/drbd"},
+        {"code": "362.2", "title": "Cluster Storage Access", "title_de": "Zugriff auf Cluster-Speicher", "weight": 3,
+         "summary_de": "SAN-Konzepte und Fibre-Channel-Topologien kennen, iSCSI-Targets und -Initiatoren einrichten, Multipathing mit DM-MPIO konfigurieren, den Distributed Lock Manager verstehen und geclustertes LVM unter Pacemaker betreiben.",
+         "tools": "tgtadm, targets.conf, iscsiadm, iscsid.conf, /etc/multipath.conf, multipath, kpartx, pvmove, vgchange, lvchange"},
+        {"code": "362.3", "title": "Clustered File Systems", "title_de": "Cluster-Dateisysteme", "weight": 4,
+         "summary_de": "Prinzipien von Cluster- und verteilten Dateisystemen verstehen, GFS2 und OCFS2 anlegen, pflegen und Fehler beheben. Grundwissen zu O2CB, AFS und Lustre.",
+         "tools": "mkfs.gfs2, mount.gfs2, fsck.gfs2, gfs2_grow, gfs2_edit, gfs2_jadd, mkfs.ocfs2, mount.ocfs2, fsck.ocfs2, tunefs.ocfs2, mounted.ocfs2, o2info, o2image"}
+      ]
+    },
+    {
+      "code": "363", "title": "High Availability Distributed Storage", "title_de": "Hochverfügbarer verteilter Speicher",
+      "objectives": [
+        {"code": "363.1", "title": "GlusterFS Storage Clusters", "title_de": "GlusterFS-Speichercluster", "weight": 5,
+         "summary_de": "Architektur von GlusterFS verstehen, Peers, Trusted Storage Pools, Bricks und Volumes verwalten, Volumes einhängen, Hochverfügbarkeit konfigurieren, erweitern, Bricks ersetzen und nach Ausfällen wiederherstellen. Grundwissen zu GNFS.",
+         "tools": "gluster"},
+        {"code": "363.2", "title": "Ceph Storage Clusters", "title_de": "Ceph-Speichercluster", "weight": 8,
+         "summary_de": "Architektur von Ceph mit OSD, MGR, MON und MDS verstehen, Placement Groups und Pools kennen, FileStore und BlueStore unterscheiden, Cluster initialisieren, RBD und CephFS samt Snapshots nutzen, CRUSH-Maps verstehen, erweitern und nach Ausfällen wiederherstellen.",
+         "tools": "ceph-deploy, ceph.conf, ceph, rados, rbd, cephfs, ceph-volume, ceph-authtool, ceph-bluestore-tool, crushtool"}
+      ]
+    },
+    {
+      "code": "364", "title": "Single Node High Availability", "title_de": "Hochverfügbarkeit einzelner Knoten",
+      "objectives": [
+        {"code": "364.1", "title": "Hardware and Resource High Availability", "title_de": "Hardware- und Ressourcen-Hochverfügbarkeit", "weight": 2,
+         "summary_de": "Festplatten mit smartmontools überwachen und Selbsttests auslösen, bei USV-Ereignissen herunterfahren und mit monit auf Ressourcenengpässe reagieren.",
+         "tools": "smartctl, /etc/smartd.conf, smartd, nvme-cli, apcupsd, apctest, monit"},
+        {"code": "364.2", "title": "Advanced RAID", "title_de": "Fortgeschrittenes RAID", "weight": 2,
+         "summary_de": "RAID-Level, Hot Spares, partitionierbare RAIDs und Container mit mdadm verwalten, Geräte hinzufügen und entfernen, RAID-Level ändern, nach Ausfällen wiederherstellen, Metadatenformate kennen und RAIDs überwachen.",
+         "tools": "mdadm, /proc/mdstat, /proc/sys/dev/raid/*"},
+        {"code": "364.3", "title": "Advanced Logical Volume Manager (LVM)", "title_de": "Fortgeschrittenes LVM", "weight": 3,
+         "summary_de": "Lineare und gestreifte Volumes anlegen, Volumes vergrößern, verkleinern und verschieben, Snapshots nutzen, Thin- und Thick-Pools unterscheiden und LVM-RAIDs einsetzen.",
+         "tools": "/etc/lvm/lvm.conf, pvcreate, pvdisplay, pvmove, pvremove, pvresize, vgcreate, vgdisplay, vgreduce, lvconvert, lvcreate, lvdisplay, lvextend, lvreduce, lvresize"},
+        {"code": "364.4", "title": "Network High Availability", "title_de": "Netzwerk-Hochverfügbarkeit", "weight": 5,
+         "summary_de": "Bonding und seine Modi (active-backup, balance-tlb, balance-alb, 802.3ad, balance-rr, balance-xor, broadcast) verstehen, Switches mit RSTP konfigurieren, VLANs auf normalen und gebondeten Schnittstellen einrichten, Konfigurationen persistent machen und BGP-Grundlagen für redundante Uplinks kennen.",
+         "tools": "bonding.ko, /etc/network/interfaces, ifcfg-*, /etc/systemd/network/*.network, /etc/systemd/network/*.netdev, nmcli, /sys/class/net/bonding_masters, ifenslave, ip"}
+      ]
+    }
+  ]
+}

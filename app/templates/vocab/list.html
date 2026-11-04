@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Vokabeln · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Meine Fachbegriffe</h1>
+<p class="actions"><a class="btn btn-primary" href="/vocab/review">Wiederholen ({{ learning | length }})</a> <a class="btn" href="/glossary">Glossar durchsuchen</a></p>
+<section class="card">
+  <h2>Zum Wiederholen</h2>
+  {% if not learning %}<p class="muted">Noch keine Begriffe gemerkt. Markiere beim Üben Fachbegriffe mit „merken“.</p>{% endif %}
+  <ul class="term-rows">
+    {% for r in learning %}
+    <li><strong>{{ r.term.term }}</strong> – {{ r.term.translation_de }}
+      <form method="post" action="/vocab/{{ r.term_id }}/status" class="inline"><input type="hidden" name="status" value="known"><button class="link" type="submit">gelernt</button></form>
+      <form method="post" action="/vocab/{{ r.term_id }}/status" class="inline"><input type="hidden" name="status" value="remove"><button class="link" type="submit">entfernen</button></form>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+<section class="card">
+  <h2>Gelernt</h2>
+  {% if not known %}<p class="muted">Noch nichts als gelernt markiert.</p>{% endif %}
+  <ul class="term-rows">
+    {% for r in known %}
+    <li><strong>{{ r.term.term }}</strong> – {{ r.term.translation_de }}
+      <form method="post" action="/vocab/{{ r.term_id }}/status" class="inline"><input type="hidden" name="status" value="learning"><button class="link" type="submit">nochmal lernen</button></form>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

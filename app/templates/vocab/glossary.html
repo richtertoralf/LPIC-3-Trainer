@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Glossar · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Glossar Fachenglisch</h1>
+<form method="get" action="/glossary" class="searchbar"><input type="search" name="q" value="{{ q }}" placeholder="Begriff suchen (englisch oder deutsch)"><button class="btn" type="submit">Suchen</button></form>
+<p class="muted">{{ terms | length }} Begriffe</p>
+<ul class="term-rows">
+  {% for t in terms %}
+  <li><strong>{{ t.term }}</strong> – {{ t.translation_de }}{% if t.explanation_de %}<br><span class="muted">{{ t.explanation_de }}</span>{% endif %}
+    {% set st = mine.get(t.id) %}
+    {% if st == 'learning' %}<span class="tag">wird gelernt</span>{% elif st == 'known' %}<span class="tag tag-ok">gelernt</span>{% else %}
+    <form method="post" action="/vocab/{{ t.id }}/status" class="inline"><input type="hidden" name="status" value="learning"><input type="hidden" name="next" value="/glossary?q={{ q | urlencode }}"><button class="link" type="submit">merken</button></form>{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

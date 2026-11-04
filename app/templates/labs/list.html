@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Labs · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Laboraufgaben</h1>
+<p class="muted">Anleitungen für dein eigenes Linux-Lab mit Selbstkontrolle. Die App führt nichts aus. Nutze ausschließlich Testsysteme, zum Beispiel virtuelle Maschinen.</p>
+{% for m in modules %}
+{% set mlabs = labs | selectattr('module_id', 'equalto', m.id) | list %}
+{% if mlabs %}
+<section class="card {% if m.id not in selected %}card-dim{% endif %}">
+  <h2>{{ m.code }} · {{ m.title }}</h2>
+  <ul class="lab-list">
+    {% for lab in mlabs %}
+    <li>{% if lab.id in done %}<span class="tag tag-ok">erledigt</span>{% endif %} <a href="/lab/{{ lab.id }}">{{ lab.title }}</a>
+      <span class="muted small">{% if lab.objective %}Ziel {{ lab.objective.code }} · {% endif %}ca. {{ lab.duration_minutes }} min</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endfor %}
+{% endblock %}

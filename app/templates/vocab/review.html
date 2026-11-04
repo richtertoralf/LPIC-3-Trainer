@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Begriffe wiederholen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Begriff wiederholen</h1>
+<p class="muted">{{ remaining }} Begriffe in der Wiederholung.</p>
+<section class="card flashcard" data-flashcard>
+  <p class="flashcard-term">{{ item.term.term }}</p>
+  <button class="btn" type="button" data-reveal>Deutsche Bedeutung zeigen</button>
+  <div class="flashcard-answer" data-answer hidden>
+    <p><strong>{{ item.term.translation_de }}</strong></p>
+    {% if item.term.explanation_de %}<p>{{ item.term.explanation_de }}</p>{% endif %}
+    <p class="actions">
+      <form method="post" action="/vocab/{{ item.term_id }}/status" class="inline"><input type="hidden" name="status" value="known"><input type="hidden" name="next" value="/vocab/review"><button class="btn btn-primary" type="submit">Gewusst</button></form>
+      <form method="post" action="/vocab/{{ item.term_id }}/status" class="inline"><input type="hidden" name="status" value="learning"><input type="hidden" name="next" value="/vocab/review"><button class="btn" type="submit">Nochmal</button></form>
+    </p>
+  </div>
+</section>
+<p><a href="/vocab">Zur Liste</a></p>
+{% endblock %}

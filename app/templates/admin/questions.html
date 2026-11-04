@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Fragen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Fragenverwaltung</h1>
+{% include "admin/_nav.html" %}
+<form method="get" action="/admin/questions" class="searchbar">
+  <select name="module"><option value="">Alle Module</option>{% for m in modules %}<option value="{{ m.code }}" {% if m.code == module %}selected{% endif %}>{{ m.code }}</option>{% endfor %}</select>
+  <input type="search" name="q" value="{{ q }}" placeholder="Text oder ID">
+  {% if batch %}<input type="hidden" name="batch" value="{{ batch }}">{% endif %}
+  <button class="btn" type="submit">Filtern</button>
+</form>
+<p class="muted">{{ questions | length }} Fragen (maximal 300 angezeigt)</p>
+<table class="table">
+  <thead><tr><th>ID</th><th>Ziel</th><th>Frage</th><th>Typ</th><th>Sichtbar</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for q in questions %}
+  <tr class="{% if not q.is_active %}row-dim{% endif %}">
+    <td>{{ q.external_id }}</td>
+    <td>{{ q.objective.code if q.objective else '–' }}</td>
+    <td><a href="/question/{{ q.id }}">{{ q.text_en[:120] }}{% if q.text_en | length > 120 %}…{% endif %}</a></td>
+    <td>{{ q.kind }}</td><td>{{ q.visibility }}</td><td>{% if q.is_active %}aktiv{% else %}inaktiv{% endif %}</td>
+    <td>{% if user.is_admin or q.created_by == user.id %}<form method="post" action="/admin/questions/{{ q.id }}/toggle" class="inline"><button class="btn btn-small" type="submit">{% if q.is_active %}Deaktivieren{% else %}Aktivieren{% endif %}</button></form>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

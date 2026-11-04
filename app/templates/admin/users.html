@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Benutzer · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Benutzer</h1>
+{% include "admin/_nav.html" %}
+<table class="table">
+  <thead><tr><th>Benutzer</th><th>Rolle</th><th>Status</th><th>Aktionen</th></tr></thead>
+  <tbody>
+  {% for u in users %}
+  <tr>
+    <td><strong>{{ u.username }}</strong>{% if u.display_name %}<br><span class="muted">{{ u.display_name }}</span>{% endif %}</td>
+    <td>
+      {% if user.is_admin %}
+      <form method="post" action="/admin/users/{{ u.id }}/role" class="inline">
+        <select name="role" onchange="this.form.submit()">{% for r in roles %}<option value="{{ r }}" {% if r == u.role %}selected{% endif %}>{{ r }}</option>{% endfor %}</select>
+      </form>
+      {% else %}{{ u.role }}{% endif %}
+    </td>
+    <td>{{ u.status }}</td>
+    <td class="actions-cell">
+      {% if u.status == 'pending' %}<form method="post" action="/admin/users/{{ u.id }}/approve" class="inline"><button class="btn btn-small btn-primary" type="submit">Freigeben</button></form>{% endif %}
+      {% if user.is_admin and u.id != user.id %}
+        {% if u.status == 'active' %}<form method="post" action="/admin/users/{{ u.id }}/status" class="inline"><input type="hidden" name="status" value="disabled"><button class="btn btn-small" type="submit">Deaktivieren</button></form>
+        {% elif u.status == 'disabled' %}<form method="post" action="/admin/users/{{ u.id }}/status" class="inline"><input type="hidden" name="status" value="active"><button class="btn btn-small" type="submit">Aktivieren</button></form>{% endif %}
+        <form method="post" action="/admin/users/{{ u.id }}/reset-password" class="inline"><button class="btn btn-small" type="submit">Passwort zurücksetzen</button></form>
+        <form method="post" action="/admin/users/{{ u.id }}/delete" class="inline" data-confirm="Benutzer {{ u.username }} und alle Lernstände löschen?"><button class="btn btn-small btn-danger" type="submit">Löschen</button></form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

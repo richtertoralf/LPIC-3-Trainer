@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "306",
+  "license": "CC BY-SA 4.0",
+  "author": "LPIC-3 Trainer Projekt",
+  "visibility": "public",
+  "questions": [
+    {
+      "id": "306-361.1-01", "objective": "361.1", "type": "single", "difficulty": 1,
+      "question": "In a two-node cluster the network link between the nodes fails and both nodes start the same service with the same virtual IP. What is this situation called?",
+      "question_de": "In einem Zwei-Knoten-Cluster fällt die Netzwerkverbindung zwischen den Knoten aus, und beide Knoten starten denselben Dienst mit derselben virtuellen IP. Wie heißt diese Situation?",
+      "choices": [
+        {"text": "Split brain", "text_de": "Split Brain", "correct": true},
+        {"text": "Failover", "text_de": "Failover"},
+        {"text": "Fencing", "text_de": "Fencing"},
+        {"text": "Load balancing", "text_de": "Lastverteilung"}
+      ],
+      "explanation_de": "Beim Split Brain halten sich getrennte Clusterteile für den jeweils aktiven Teil und arbeiten unabhängig, was Daten beschädigen kann. Quorum und Fencing (STONITH) verhindern das. Failover ist die geplante Übernahme eines Dienstes.",
+      "terms": []
+    },
+    {
+      "id": "306-361.1-02", "objective": "361.1", "type": "single", "difficulty": 2,
+      "question": "What does the term quorum mean in a cluster?",
+      "question_de": "Was bedeutet der Begriff Quorum in einem Cluster?",
+      "choices": [
+        {"text": "The minimum number of votes a partition needs to be allowed to run cluster resources", "text_de": "Die minimale Anzahl von Stimmen, die eine Partition braucht, um Clusterressourcen betreiben zu dürfen", "correct": true},
+        {"text": "The maximum number of nodes that may be in standby", "text_de": "Die maximale Anzahl von Knoten im Standby"},
+        {"text": "The time a node waits before fencing another node", "text_de": "Die Zeit, die ein Knoten wartet, bevor er einen anderen Knoten fenct"},
+        {"text": "The amount of shared storage reserved for the cluster", "text_de": "Die Menge an gemeinsamem Speicher, die für den Cluster reserviert ist"}
+      ],
+      "explanation_de": "Quorum ist die Mehrheit der Stimmen (meist eine je Knoten). Nur die Partition mit Quorum darf Ressourcen betreiben; die andere stoppt oder wird gefenct. Bei zwei Knoten helfen qdevice, Zwei-Knoten-Modus oder SBD.",
+      "terms": [{"term": "partition", "de": "Partition, abgetrennter Teil des Clusters"}]
+    },
+    {
+      "id": "306-361.1-03", "objective": "361.1", "type": "single", "difficulty": 2,
+      "question": "Which metric describes the average time needed to repair a failed component and bring it back into service?",
+      "question_de": "Welche Kennzahl beschreibt die durchschnittliche Zeit, eine ausgefallene Komponente zu reparieren und wieder in Betrieb zu nehmen?",
+      "choices": [
+        {"text": "MTTR", "text_de": "MTTR", "correct": true},
+        {"text": "MTBF", "text_de": "MTBF"},
+        {"text": "SLA", "text_de": "SLA"},
+        {"text": "RPO", "text_de": "RPO"}
+      ],
+      "explanation_de": "MTTR (Mean Time To Repair) ist die mittlere Reparaturzeit, MTBF (Mean Time Between Failures) die mittlere Zeit zwischen Ausfällen. SLA ist eine vertragliche Dienstgütevereinbarung, RPO der maximal tolerierte Datenverlust.",
+      "terms": [{"term": "metric", "de": "Kennzahl, Messgröße"}]
+    },
+    {
+      "id": "306-361.2-01", "objective": "361.2", "type": "single", "difficulty": 2,
+      "question": "Which LVS forwarding method requires the real servers to have the virtual IP configured on a non-ARP interface and to be in the same network segment as the director?",
+      "question_de": "Welche LVS-Weiterleitungsmethode erfordert, dass die Real-Server die virtuelle IP auf einer Schnittstelle ohne ARP konfiguriert haben und im selben Netzsegment wie der Director liegen?",
+      "choices": [
+        {"text": "Direct Routing", "text_de": "Direct Routing", "correct": true},
+        {"text": "NAT", "text_de": "NAT"},
+        {"text": "Tunneling", "text_de": "Tunneling"},
+        {"text": "Local Node", "text_de": "Local Node"}
+      ],
+      "explanation_de": "Bei Direct Routing schreibt der Director nur die MAC-Adresse um; die Antworten gehen direkt vom Real-Server zum Client. Dafür muss die VIP auf dem Real-Server liegen, ohne ARP dafür zu beantworten. NAT schreibt Adressen um, Tunneling kapselt in IPIP, Local Node nutzt den Director selbst als Real-Server.",
+      "terms": [{"term": "real server", "de": "Real-Server, tatsächlicher Backend-Server"}]
+    },
+    {
+      "id": "306-361.2-02", "objective": "361.2", "type": "single", "difficulty": 2,
+      "question": "Which protocol does keepalived use to move a virtual IP address between two load balancers?",
+      "question_de": "Welches Protokoll nutzt keepalived, um eine virtuelle IP-Adresse zwischen zwei Lastverteilern zu verschieben?",
+      "choices": [
+        {"text": "VRRP", "text_de": "VRRP", "correct": true},
+        {"text": "BGP", "text_de": "BGP"},
+        {"text": "HSRP", "text_de": "HSRP"},
+        {"text": "RSTP", "text_de": "RSTP"}
+      ],
+      "explanation_de": "keepalived implementiert das Virtual Router Redundancy Protocol: Der Knoten mit der höchsten Priorität wird MASTER und hält die VIP, bei Ausfall übernimmt der BACKUP. HSRP ist Ciscos Pendant, BGP ein Routingprotokoll, RSTP verhindert Schleifen in Switch-Netzen.",
+      "terms": []
+    },
+    {
+      "id": "306-361.2-03", "objective": "361.2", "type": "single", "difficulty": 2,
+      "question": "Which ipvsadm command adds a virtual TCP service on 192.168.1.100:80 using the round-robin scheduler?",
+      "question_de": "Welcher ipvsadm-Befehl legt einen virtuellen TCP-Dienst auf 192.168.1.100:80 mit dem Round-Robin-Scheduler an?",
+      "choices": [
+        {"text": "ipvsadm -A -t 192.168.1.100:80 -s rr", "text_de": "ipvsadm -A -t 192.168.1.100:80 -s rr", "correct": true},
+        {"text": "ipvsadm -a -t 192.168.1.100:80 -r rr", "text_de": "ipvsadm -a -t 192.168.1.100:80 -r rr"},
+        {"text": "ipvsadm -L -t 192.168.1.100:80 --rr", "text_de": "ipvsadm -L -t 192.168.1.100:80 --rr"},
+        {"text": "ipvsadm --add-real 192.168.1.100:80 -s rr", "text_de": "ipvsadm --add-real 192.168.1.100:80 -s rr"}
+      ],
+      "explanation_de": "-A legt einen virtuellen Dienst an, -s wählt den Scheduler (rr, wrr, lc, wlc, sh ...). -a fügt einem Dienst einen Real-Server hinzu (-r Adresse, -g/-m/-i für DR/NAT/Tunnel). -L listet die Tabelle.",
+      "terms": []
+    },
+    {
+      "id": "306-361.2-04", "objective": "361.2", "type": "single", "difficulty": 2,
+      "question": "In an HAProxy configuration, which section defines the servers that receive the forwarded requests?",
+      "question_de": "Welcher Abschnitt einer HAProxy-Konfiguration definiert die Server, die die weitergeleiteten Anfragen erhalten?",
+      "choices": [
+        {"text": "backend", "text_de": "backend", "correct": true},
+        {"text": "frontend", "text_de": "frontend"},
+        {"text": "global", "text_de": "global"},
+        {"text": "defaults", "text_de": "defaults"}
+      ],
+      "explanation_de": "frontend nimmt Verbindungen an (bind) und wählt per ACL oder default_backend ein backend, das die server-Zeilen mit balance-Algorithmus und Health Checks enthält. global und defaults setzen Prozess- bzw. Standardparameter.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-01", "objective": "361.3", "type": "single", "difficulty": 2,
+      "question": "Which Pacemaker component stores the cluster configuration and status and is replicated to all nodes?",
+      "question_de": "Welche Pacemaker-Komponente speichert Konfiguration und Status des Clusters und wird auf alle Knoten repliziert?",
+      "choices": [
+        {"text": "CIB (Cluster Information Base)", "text_de": "CIB (Cluster Information Base)", "correct": true},
+        {"text": "LRMd (Local Resource Manager daemon)", "text_de": "LRMd (Local Resource Manager Daemon)"},
+        {"text": "PEngine (Policy Engine)", "text_de": "PEngine (Policy Engine)"},
+        {"text": "STONITHd", "text_de": "STONITHd"}
+      ],
+      "explanation_de": "Die CIB ist das XML-Dokument mit Konfiguration und Zustand, verwaltet von cib und über Corosync verteilt. Die PEngine berechnet daraus den Zielzustand, der DC verteilt Aufgaben, LRMd führt Resource-Agent-Aktionen lokal aus, STONITHd fenct Knoten.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-02", "objective": "361.3", "type": "single", "difficulty": 2,
+      "question": "Which pcs command creates a virtual IP resource named vip with address 10.0.0.50?",
+      "question_de": "Welcher pcs-Befehl legt eine virtuelle-IP-Ressource namens vip mit der Adresse 10.0.0.50 an?",
+      "choices": [
+        {"text": "pcs resource create vip ocf:heartbeat:IPaddr2 ip=10.0.0.50 cidr_netmask=24", "text_de": "pcs resource create vip ocf:heartbeat:IPaddr2 ip=10.0.0.50 cidr_netmask=24", "correct": true},
+        {"text": "pcs cluster ip add vip 10.0.0.50", "text_de": "pcs cluster ip add vip 10.0.0.50"},
+        {"text": "pcs stonith create vip IPaddr2 ip=10.0.0.50", "text_de": "pcs stonith create vip IPaddr2 ip=10.0.0.50"},
+        {"text": "crm_resource --create vip --ip 10.0.0.50", "text_de": "crm_resource --create vip --ip 10.0.0.50"}
+      ],
+      "explanation_de": "pcs resource create nimmt Name, Resource-Agent (Klasse:Provider:Typ) und Parameter. IPaddr2 aus ocf:heartbeat verwaltet IP-Adressen. pcs stonith create ist für Fencing-Geräte, crm_resource verwaltet bestehende Ressourcen.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-03", "objective": "361.3", "type": "single", "difficulty": 2,
+      "question": "Which constraint type ensures that the resource webserver always runs on the same node as the resource vip?",
+      "question_de": "Welcher Constraint-Typ stellt sicher, dass die Ressource webserver immer auf demselben Knoten wie die Ressource vip läuft?",
+      "choices": [
+        {"text": "colocation", "text_de": "colocation", "correct": true},
+        {"text": "order", "text_de": "order"},
+        {"text": "location", "text_de": "location"},
+        {"text": "ticket", "text_de": "ticket"}
+      ],
+      "explanation_de": "Colocation-Constraints binden Ressourcen aneinander (pcs constraint colocation add webserver with vip INFINITY). order legt Start- und Stoppreihenfolge fest, location bevorzugt oder verbietet Knoten, ticket betrifft Multi-Site-Cluster mit Booth.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-04", "objective": "361.3", "type": "single", "difficulty": 2,
+      "question": "Which command puts the node node2 into standby mode so that its resources move to other nodes?",
+      "question_de": "Welcher Befehl versetzt den Knoten node2 in den Standby-Modus, so dass seine Ressourcen auf andere Knoten wechseln?",
+      "choices": [
+        {"text": "pcs node standby node2", "text_de": "pcs node standby node2", "correct": true},
+        {"text": "pcs cluster stop node2", "text_de": "pcs cluster stop node2"},
+        {"text": "stonith_admin --reboot node2", "text_de": "stonith_admin --reboot node2"},
+        {"text": "corosync-cfgtool -k node2", "text_de": "corosync-cfgtool -k node2"}
+      ],
+      "explanation_de": "Standby lässt den Knoten im Cluster, aber ohne Ressourcen, zum Beispiel für Wartung; pcs node unstandby hebt es auf. cluster stop beendet die Clusterdienste, stonith_admin fenct den Knoten hart.",
+      "terms": []
+    },
+    {
+      "id": "306-361.3-05", "objective": "361.3", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of the file /etc/corosync/authkey?",
+      "question_de": "Welchen Zweck hat die Datei /etc/corosync/authkey?",
+      "choices": [
+        {"text": "It contains the shared secret that authenticates and encrypts cluster communication between nodes.", "text_de": "Sie enthält das gemeinsame Geheimnis, das die Clusterkommunikation zwischen den Knoten authentifiziert und verschlüsselt.", "correct": true},
+        {"text": "It stores the SSH key used by pcs to connect to other nodes.", "text_de": "Sie speichert den SSH-Schlüssel, den pcs für Verbindungen zu anderen Knoten nutzt."},
+        {"text": "It holds the fencing device passwords.", "text_de": "Sie enthält die Passwörter der Fencing-Geräte."},
+        {"text": "It defines the quorum votes of each node.", "text_de": "Sie definiert die Quorum-Stimmen jedes Knotens."}
+      ],
+      "explanation_de": "authkey wird mit corosync-keygen erzeugt und muss auf allen Knoten identisch sein. Knoten und Quorum stehen in corosync.conf, Fencing-Parameter in der CIB.",
+      "terms": []
+    },
+    {
+      "id": "306-362.1-01", "objective": "362.1", "type": "single", "difficulty": 2,
+      "question": "Which DRBD replication protocol considers a write complete only after it has reached the disk of the remote node?",
+      "question_de": "Welches DRBD-Replikationsprotokoll gilt ein Schreiben erst dann als abgeschlossen, wenn es die Platte des entfernten Knotens erreicht hat?",
+      "choices": [
+        {"text": "Protocol C", "text_de": "Protokoll C", "correct": true},
+        {"text": "Protocol A", "text_de": "Protokoll A"},
+        {"text": "Protocol B", "text_de": "Protokoll B"},
+        {"text": "Protocol D", "text_de": "Protokoll D"}
+      ],
+      "explanation_de": "Protokoll C ist synchron: lokal geschrieben und auf dem Peer auf Platte. Protokoll B gilt als fertig, sobald der Peer das Paket im Speicher hat, Protokoll A sobald es lokal geschrieben und ins Netz gesendet ist. Protokoll D existiert nicht.",
+      "terms": []
+    },
+    {
+      "id": "306-362.1-02", "objective": "362.1", "type": "single", "difficulty": 2,
+      "question": "Which command promotes the DRBD resource r0 to the Primary role on the local node?",
+      "question_de": "Welcher Befehl versetzt die DRBD-Ressource r0 auf dem lokalen Knoten in die Rolle Primary?",
+      "choices": [
+        {"text": "drbdadm primary r0", "text_de": "drbdadm primary r0", "correct": true},
+        {"text": "drbdadm up r0 --primary", "text_de": "drbdadm up r0 --primary"},
+        {"text": "drbdsetup promote r0", "text_de": "drbdsetup promote r0"},
+        {"text": "drbdmeta r0 set-role primary", "text_de": "drbdmeta r0 set-role primary"}
+      ],
+      "explanation_de": "drbdadm primary (bzw. secondary) wechselt die Rolle. drbdadm up aktiviert die Ressource als Secondary. Bei der Erstsynchronisation ist drbdadm primary --force nötig. drbdmeta bearbeitet Metadaten.",
+      "terms": [{"term": "promote", "de": "hochstufen"}]
+    },
+    {
+      "id": "306-362.1-03", "objective": "362.1", "type": "single", "difficulty": 2,
+      "question": "Where can the current connection state and roles of DRBD 8 resources be read from on a running system?",
+      "question_de": "Wo lassen sich auf einem laufenden System der aktuelle Verbindungszustand und die Rollen von DRBD-8-Ressourcen ablesen?",
+      "choices": [
+        {"text": "/proc/drbd", "text_de": "/proc/drbd", "correct": true},
+        {"text": "/etc/drbd.d/global_common.conf", "text_de": "/etc/drbd.d/global_common.conf"},
+        {"text": "/sys/fs/drbd/state", "text_de": "/sys/fs/drbd/state"},
+        {"text": "/var/log/drbd.status", "text_de": "/var/log/drbd.status"}
+      ],
+      "explanation_de": "/proc/drbd zeigt bei DRBD 8 Zustand, Rolle und Platten-Status jeder Ressource. Bei DRBD 9 liefert drbdadm status oder drbdmon den Überblick. Die Dateien unter /etc/drbd.d sind Konfiguration.",
+      "terms": []
+    },
+    {
+      "id": "306-362.2-01", "objective": "362.2", "type": "single", "difficulty": 2,
+      "question": "Which command discovers the iSCSI targets offered by the portal 10.0.0.20?",
+      "question_de": "Welcher Befehl ermittelt die iSCSI-Targets, die das Portal 10.0.0.20 anbietet?",
+      "choices": [
+        {"text": "iscsiadm -m discovery -t sendtargets -p 10.0.0.20", "text_de": "iscsiadm -m discovery -t sendtargets -p 10.0.0.20", "correct": true},
+        {"text": "iscsiadm -m node --login -p 10.0.0.20", "text_de": "iscsiadm -m node --login -p 10.0.0.20"},
+        {"text": "tgtadm --lld iscsi --op show --mode target", "text_de": "tgtadm --lld iscsi --op show --mode target"},
+        {"text": "multipath -ll 10.0.0.20", "text_de": "multipath -ll 10.0.0.20"}
+      ],
+      "explanation_de": "Der Initiator nutzt iscsiadm im Modus discovery, um Targets zu finden, und dann -m node --login, um sich zu verbinden. tgtadm verwaltet Targets auf der Serverseite, multipath -ll zeigt Multipath-Geräte.",
+      "terms": [{"term": "discover", "de": "entdecken, ermitteln"}]
+    },
+    {
+      "id": "306-362.2-02", "objective": "362.2", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of DM-Multipath (DM-MPIO)?",
+      "question_de": "Welchen Zweck hat DM-Multipath (DM-MPIO)?",
+      "choices": [
+        {"text": "It combines several physical paths to the same storage LUN into one device for redundancy and load distribution.", "text_de": "Es fasst mehrere physische Pfade zur selben Speicher-LUN zu einem Gerät zusammen, für Redundanz und Lastverteilung.", "correct": true},
+        {"text": "It mirrors data between two independent disks.", "text_de": "Es spiegelt Daten zwischen zwei unabhängigen Platten."},
+        {"text": "It provides a cluster file system on top of iSCSI.", "text_de": "Es stellt ein Cluster-Dateisystem auf iSCSI bereit."},
+        {"text": "It encrypts SAN traffic between host and storage.", "text_de": "Es verschlüsselt den SAN-Verkehr zwischen Host und Speicher."}
+      ],
+      "explanation_de": "Über Fibre Channel oder iSCSI ist dieselbe LUN oft über mehrere Pfade sichtbar (sda, sdb ...). multipathd legt ein gemeinsames Gerät /dev/mapper/mpathX an und wechselt bei Pfadausfall transparent.",
+      "terms": []
+    },
+    {
+      "id": "306-362.3-01", "objective": "362.3", "type": "single", "difficulty": 2,
+      "question": "Which command creates a GFS2 file system with lock_dlm locking for the cluster mycluster with two journals?",
+      "question_de": "Welcher Befehl erzeugt ein GFS2-Dateisystem mit lock_dlm-Sperren für den Cluster mycluster mit zwei Journalen?",
+      "choices": [
+        {"text": "mkfs.gfs2 -p lock_dlm -t mycluster:data -j 2 /dev/vg/lv", "text_de": "mkfs.gfs2 -p lock_dlm -t mycluster:data -j 2 /dev/vg/lv", "correct": true},
+        {"text": "mkfs.gfs2 -o cluster=mycluster -n 2 /dev/vg/lv", "text_de": "mkfs.gfs2 -o cluster=mycluster -n 2 /dev/vg/lv"},
+        {"text": "gfs2_jadd -c mycluster -j 2 /dev/vg/lv", "text_de": "gfs2_jadd -c mycluster -j 2 /dev/vg/lv"},
+        {"text": "mkfs.ocfs2 -L mycluster -N 2 /dev/vg/lv", "text_de": "mkfs.ocfs2 -L mycluster -N 2 /dev/vg/lv"}
+      ],
+      "explanation_de": "-p wählt das Lock-Protokoll, -t den Lock-Tabellennamen clustername:fsname, -j die Anzahl Journale (eins je Knoten, der einhängt). gfs2_jadd fügt Journale nachträglich hinzu, mkfs.ocfs2 erzeugt OCFS2.",
+      "terms": []
+    },
+    {
+      "id": "306-362.3-02", "objective": "362.3", "type": "single", "difficulty": 2,
+      "question": "Why does a cluster file system such as GFS2 or OCFS2 need a Distributed Lock Manager?",
+      "question_de": "Warum braucht ein Cluster-Dateisystem wie GFS2 oder OCFS2 einen Distributed Lock Manager?",
+      "choices": [
+        {"text": "Several nodes access the same block device concurrently and must coordinate locks and cache coherence.", "text_de": "Mehrere Knoten greifen gleichzeitig auf dasselbe Blockgerät zu und müssen Sperren und Cache-Kohärenz abstimmen.", "correct": true},
+        {"text": "The DLM replicates the data blocks to all nodes.", "text_de": "Der DLM repliziert die Datenblöcke auf alle Knoten."},
+        {"text": "The DLM encrypts the file system metadata.", "text_de": "Der DLM verschlüsselt die Metadaten des Dateisystems."},
+        {"text": "The DLM is only required for NFS exports of the file system.", "text_de": "Der DLM wird nur für NFS-Exporte des Dateisystems benötigt."}
+      ],
+      "explanation_de": "Bei Shared-Disk-Dateisystemen schreiben alle Knoten in dieselben Strukturen. Der DLM verteilt Sperren clusterweit, so dass Metadaten konsistent bleiben. Replikation leisten DRBD oder GlusterFS, nicht der DLM.",
+      "terms": [{"term": "coherence", "de": "Kohärenz, Übereinstimmung"}]
+    },
+    {
+      "id": "306-363.1-01", "objective": "363.1", "type": "single", "difficulty": 2,
+      "question": "Which gluster command creates a replicated volume named gv0 across two bricks?",
+      "question_de": "Welcher gluster-Befehl erzeugt ein repliziertes Volume namens gv0 über zwei Bricks?",
+      "choices": [
+        {"text": "gluster volume create gv0 replica 2 node1:/bricks/b1 node2:/bricks/b1", "text_de": "gluster volume create gv0 replica 2 node1:/bricks/b1 node2:/bricks/b1", "correct": true},
+        {"text": "gluster peer probe gv0 replica 2", "text_de": "gluster peer probe gv0 replica 2"},
+        {"text": "gluster volume add-brick gv0 node1:/bricks/b1 node2:/bricks/b1", "text_de": "gluster volume add-brick gv0 node1:/bricks/b1 node2:/bricks/b1"},
+        {"text": "gluster volume start gv0 --replica node1 node2", "text_de": "gluster volume start gv0 --replica node1 node2"}
+      ],
+      "explanation_de": "volume create nimmt Namen, Typ (replica N, disperse, verteilt ohne Angabe) und die Bricks als host:/pfad. Vorher werden die Knoten mit peer probe in den Trusted Storage Pool aufgenommen, danach startet volume start das Volume.",
+      "terms": []
+    },
+    {
+      "id": "306-363.1-02", "objective": "363.1", "type": "single", "difficulty": 2,
+      "question": "A brick of a GlusterFS replica volume failed and was replaced by new hardware. Which command tells the volume to use the new brick in place of the failed one?",
+      "question_de": "Ein Brick eines GlusterFS-Replica-Volumes ist ausgefallen und wurde durch neue Hardware ersetzt. Welcher Befehl weist das Volume an, den neuen Brick anstelle des ausgefallenen zu verwenden?",
+      "choices": [
+        {"text": "gluster volume replace-brick gv0 node2:/bricks/b1 node2:/bricks/b2 commit force", "text_de": "gluster volume replace-brick gv0 node2:/bricks/b1 node2:/bricks/b2 commit force", "correct": true},
+        {"text": "gluster volume heal gv0 full node2:/bricks/b2", "text_de": "gluster volume heal gv0 full node2:/bricks/b2"},
+        {"text": "gluster volume rebalance gv0 start node2:/bricks/b2", "text_de": "gluster volume rebalance gv0 start node2:/bricks/b2"},
+        {"text": "gluster peer detach node2 force", "text_de": "gluster peer detach node2 force"}
+      ],
+      "explanation_de": "replace-brick tauscht einen Brick aus; danach gleicht der Self-Heal-Daemon die Daten vom gesunden Replikat ab (gluster volume heal gv0 zeigt den Fortschritt). rebalance verteilt Daten nach dem Hinzufügen von Bricks, peer detach entfernt einen Knoten.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-01", "objective": "363.2", "type": "single", "difficulty": 2,
+      "question": "Which Ceph daemon stores the actual data objects on disk?",
+      "question_de": "Welcher Ceph-Dienst speichert die eigentlichen Datenobjekte auf der Platte?",
+      "choices": [
+        {"text": "OSD", "text_de": "OSD", "correct": true},
+        {"text": "MON", "text_de": "MON"},
+        {"text": "MGR", "text_de": "MGR"},
+        {"text": "MDS", "text_de": "MDS"}
+      ],
+      "explanation_de": "Object Storage Daemons verwalten je eine Platte (BlueStore). Monitore halten die Cluster-Maps und das Quorum, Manager liefern Metriken und Module, Metadata Server werden nur für CephFS benötigt.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-02", "objective": "363.2", "type": "single", "difficulty": 2,
+      "question": "What determines on which OSDs a Ceph object is stored?",
+      "question_de": "Was bestimmt, auf welchen OSDs ein Ceph-Objekt gespeichert wird?",
+      "choices": [
+        {"text": "The object is hashed into a placement group, and the CRUSH map maps the placement group to OSDs.", "text_de": "Das Objekt wird per Hash einer Placement Group zugeordnet, und die CRUSH-Map bildet die Placement Group auf OSDs ab.", "correct": true},
+        {"text": "The MON daemon keeps a lookup table with the location of every object.", "text_de": "Der MON-Dienst führt eine Tabelle mit dem Speicherort jedes Objekts."},
+        {"text": "The client chooses the OSDs with the most free space.", "text_de": "Der Client wählt die OSDs mit dem meisten freien Platz."},
+        {"text": "Objects are stored round-robin on all OSDs.", "text_de": "Objekte werden Round-Robin auf allen OSDs gespeichert."}
+      ],
+      "explanation_de": "Ceph vermeidet zentrale Verzeichnisse: Clients berechnen den Ort selbst aus Objektname, Pool, Anzahl der PGs und der CRUSH-Map. So skaliert der Zugriff ohne Engpass. Die MONs verteilen nur die Maps.",
+      "terms": []
+    },
+    {
+      "id": "306-363.2-03", "objective": "363.2", "type": "single", "difficulty": 1,
+      "question": "Which command shows the overall health state of a Ceph cluster?",
+      "question_de": "Welcher Befehl zeigt den Gesamtzustand eines Ceph-Clusters?",
+      "choices": [
+        {"text": "ceph -s", "text_de": "ceph -s", "correct": true},
+        {"text": "rados df", "text_de": "rados df"},
+        {"text": "rbd ls", "text_de": "rbd ls"},
+        {"text": "crushtool -i map --test", "text_de": "crushtool -i map --test"}
+      ],
+      "explanation_de": "ceph -s (status) oder ceph health zeigt HEALTH_OK, Warnungen, Monitore, OSDs und PGs. rados df zeigt die Belegung je Pool, rbd ls listet Block-Images, crushtool testet CRUSH-Maps offline.",
+      "terms": []
+    },
+    {
+      "id": "306-364.1-01", "objective": "364.1", "type": "single", "difficulty": 1,
+      "question": "Which command starts a short self-test of the disk /dev/sda using S.M.A.R.T.?",
+      "question_de": "Welcher Befehl startet einen kurzen Selbsttest der Platte /dev/sda über S.M.A.R.T.?",
+      "choices": [
+        {"text": "smartctl -t short /dev/sda", "text_de": "smartctl -t short /dev/sda", "correct": true},
+        {"text": "smartctl -a /dev/sda", "text_de": "smartctl -a /dev/sda"},
+        {"text": "smartd --test short /dev/sda", "text_de": "smartd --test short /dev/sda"},
+        {"text": "nvme smart-log /dev/sda", "text_de": "nvme smart-log /dev/sda"}
+      ],
+      "explanation_de": "smartctl -t short startet den kurzen Selbsttest, -t long den ausführlichen; das Ergebnis zeigt smartctl -l selftest. -a zeigt alle Informationen. smartd ist der Überwachungsdaemon (Konfiguration /etc/smartd.conf), nvme-cli gilt für NVMe-Geräte.",
+      "terms": []
+    },
+    {
+      "id": "306-364.2-01", "objective": "364.2", "type": "single", "difficulty": 2,
+      "question": "Which command creates a RAID 5 array md0 from three disks with one hot spare?",
+      "question_de": "Welcher Befehl erzeugt ein RAID-5-Array md0 aus drei Platten mit einer Hot-Spare-Platte?",
+      "choices": [
+        {"text": "mdadm --create /dev/md0 --level=5 --raid-devices=3 --spare-devices=1 /dev/sd[b-e]", "text_de": "mdadm --create /dev/md0 --level=5 --raid-devices=3 --spare-devices=1 /dev/sd[b-e]", "correct": true},
+        {"text": "mdadm --assemble /dev/md0 --level=5 /dev/sd[b-e]", "text_de": "mdadm --assemble /dev/md0 --level=5 /dev/sd[b-e]"},
+        {"text": "mdadm --create /dev/md0 --level=5 --raid-devices=4 --hot-spare /dev/sde", "text_de": "mdadm --create /dev/md0 --level=5 --raid-devices=4 --hot-spare /dev/sde"},
+        {"text": "mdadm --build /dev/md0 --level=raid5 -n 3 -x 1", "text_de": "mdadm --build /dev/md0 --level=raid5 -n 3 -x 1"}
+      ],
+      "explanation_de": "--create legt ein neues Array mit Metadaten an; --raid-devices (-n) ist die Anzahl aktiver Platten, --spare-devices (-x) die Reserveplatten. --assemble setzt ein bestehendes Array zusammen, --build erzeugt Arrays ohne Superblock.",
+      "terms": []
+    },
+    {
+      "id": "306-364.2-02", "objective": "364.2", "type": "single", "difficulty": 2,
+      "question": "A disk in a RAID 1 array has failed. Which sequence replaces it?",
+      "question_de": "Eine Platte in einem RAID-1-Array ist ausgefallen. Welche Befehlsfolge ersetzt sie?",
+      "choices": [
+        {"text": "mdadm /dev/md0 --fail /dev/sdb1 --remove /dev/sdb1; replace disk; mdadm /dev/md0 --add /dev/sdb1", "text_de": "mdadm /dev/md0 --fail /dev/sdb1 --remove /dev/sdb1; Platte tauschen; mdadm /dev/md0 --add /dev/sdb1", "correct": true},
+        {"text": "mdadm --stop /dev/md0; replace disk; mdadm --create /dev/md0", "text_de": "mdadm --stop /dev/md0; Platte tauschen; mdadm --create /dev/md0"},
+        {"text": "mdadm --grow /dev/md0 --raid-devices=1; replace disk", "text_de": "mdadm --grow /dev/md0 --raid-devices=1; Platte tauschen"},
+        {"text": "echo repair > /sys/block/md0/md/sync_action", "text_de": "echo repair > /sys/block/md0/md/sync_action"}
+      ],
+      "explanation_de": "Die defekte Platte wird als fehlerhaft markiert und entfernt, die neue hinzugefügt; der Resync startet automatisch und ist in /proc/mdstat zu verfolgen. --create würde das Array neu anlegen und Daten zerstören, repair prüft nur die Konsistenz.",
+      "terms": [{"term": "sequence", "de": "Reihenfolge, Abfolge"}]
+    },
+    {
+      "id": "306-364.3-01", "objective": "364.3", "type": "single", "difficulty": 1,
+      "question": "Which command extends the logical volume /dev/vg0/data by 10 GB and grows the ext4 file system on it in one step?",
+      "question_de": "Welcher Befehl vergrößert das logische Volume /dev/vg0/data um 10 GB und erweitert das darauf liegende ext4-Dateisystem in einem Schritt?",
+      "choices": [
+        {"text": "lvextend -L +10G -r /dev/vg0/data", "text_de": "lvextend -L +10G -r /dev/vg0/data", "correct": true},
+        {"text": "lvresize -L 10G /dev/vg0/data", "text_de": "lvresize -L 10G /dev/vg0/data"},
+        {"text": "vgextend vg0 +10G; resize2fs /dev/vg0/data", "text_de": "vgextend vg0 +10G; resize2fs /dev/vg0/data"},
+        {"text": "lvcreate -L +10G -n data vg0", "text_de": "lvcreate -L +10G -n data vg0"}
+      ],
+      "explanation_de": "-L +10G vergrößert relativ, -r (--resizefs) ruft das passende Dateisystemwerkzeug auf. lvresize -L 10G setzt die absolute Größe auf 10 GB. vgextend fügt Physical Volumes zur Volume Group hinzu, lvcreate legt neue LVs an.",
+      "terms": []
+    },
+    {
+      "id": "306-364.3-02", "objective": "364.3", "type": "single", "difficulty": 2,
+      "question": "Which command creates a snapshot named data-snap of the logical volume data in the volume group vg0 with 2 GB of space for changes?",
+      "question_de": "Welcher Befehl erzeugt einen Snapshot namens data-snap des logischen Volumes data in der Volume Group vg0 mit 2 GB Platz für Änderungen?",
+      "choices": [
+        {"text": "lvcreate -s -L 2G -n data-snap /dev/vg0/data", "text_de": "lvcreate -s -L 2G -n data-snap /dev/vg0/data", "correct": true},
+        {"text": "lvconvert --snapshot vg0/data data-snap 2G", "text_de": "lvconvert --snapshot vg0/data data-snap 2G"},
+        {"text": "lvcreate -L 2G -n data-snap vg0 --mirror data", "text_de": "lvcreate -L 2G -n data-snap vg0 --mirror data"},
+        {"text": "vgcreate -s 2G data-snap /dev/vg0/data", "text_de": "vgcreate -s 2G data-snap /dev/vg0/data"}
+      ],
+      "explanation_de": "lvcreate -s (--snapshot) erzeugt einen Copy-on-Write-Snapshot des angegebenen Ursprungs; -L bemisst den Platz für geänderte Blöcke. lvconvert --merge spielt einen Snapshot zurück. vgcreate legt Volume Groups an.",
+      "terms": []
+    },
+    {
+      "id": "306-364.3-03", "objective": "364.3", "type": "single", "difficulty": 2,
+      "question": "Which command moves all data from the physical volume /dev/sdb1 to other physical volumes of the same volume group so that the disk can be removed?",
+      "question_de": "Welcher Befehl verschiebt alle Daten vom Physical Volume /dev/sdb1 auf andere Physical Volumes derselben Volume Group, damit die Platte entfernt werden kann?",
+      "choices": [
+        {"text": "pvmove /dev/sdb1", "text_de": "pvmove /dev/sdb1", "correct": true},
+        {"text": "vgreduce vg0 /dev/sdb1", "text_de": "vgreduce vg0 /dev/sdb1"},
+        {"text": "pvremove /dev/sdb1", "text_de": "pvremove /dev/sdb1"},
+        {"text": "lvconvert --move /dev/sdb1", "text_de": "lvconvert --move /dev/sdb1"}
+      ],
+      "explanation_de": "pvmove verschiebt Extents im laufenden Betrieb. Erst danach entfernt vgreduce das PV aus der Volume Group und pvremove löscht die LVM-Signatur. vgreduce auf ein belegtes PV schlägt fehl.",
+      "terms": []
+    },
+    {
+      "id": "306-364.4-01", "objective": "364.4", "type": "single", "difficulty": 2,
+      "question": "Which bonding mode requires support on the switch (LACP) and aggregates bandwidth while providing fault tolerance?",
+      "question_de": "Welcher Bonding-Modus benötigt Unterstützung auf dem Switch (LACP) und bündelt Bandbreite bei gleichzeitiger Ausfallsicherheit?",
+      "choices": [
+        {"text": "802.3ad", "text_de": "802.3ad", "correct": true},
+        {"text": "active-backup", "text_de": "active-backup"},
+        {"text": "balance-tlb", "text_de": "balance-tlb"},
+        {"text": "broadcast", "text_de": "broadcast"}
+      ],
+      "explanation_de": "Modus 4 (802.3ad) ist dynamische Link-Aggregation per LACP und braucht einen passend konfigurierten Switch. active-backup nutzt nur eine Leitung, balance-tlb und balance-alb kommen ohne Switch-Unterstützung aus, broadcast sendet alles über alle Leitungen.",
+      "terms": [{"term": "fault tolerance", "de": "Fehlertoleranz, Ausfallsicherheit"}]
+    },
+    {
+      "id": "306-364.4-02", "objective": "364.4", "type": "single", "difficulty": 2,
+      "question": "Which command creates the VLAN interface for VLAN ID 100 on top of bond0 using iproute2?",
+      "question_de": "Welcher Befehl erzeugt mit iproute2 die VLAN-Schnittstelle für VLAN-ID 100 auf bond0?",
+      "choices": [
+        {"text": "ip link add link bond0 name bond0.100 type vlan id 100", "text_de": "ip link add link bond0 name bond0.100 type vlan id 100", "correct": true},
+        {"text": "ip link set bond0 vlan 100", "text_de": "ip link set bond0 vlan 100"},
+        {"text": "ifenslave bond0 vlan100", "text_de": "ifenslave bond0 vlan100"},
+        {"text": "ip addr add vlan100 dev bond0", "text_de": "ip addr add vlan100 dev bond0"}
+      ],
+      "explanation_de": "VLAN-Schnittstellen sind virtuelle Links vom Typ vlan über einem Elternlink. Danach ip link set bond0.100 up und Adresse zuweisen. ifenslave fügt Slaves zu einem Bond hinzu, ip addr add vergibt IP-Adressen.",
+      "terms": []
+    },
+    {
+      "id": "306-364.4-03", "objective": "364.4", "type": "single", "difficulty": 2,
+      "question": "Where can the current active slave and the link status of the interfaces in bond0 be read?",
+      "question_de": "Wo lassen sich der aktuell aktive Slave und der Link-Status der Schnittstellen in bond0 ablesen?",
+      "choices": [
+        {"text": "/proc/net/bonding/bond0", "text_de": "/proc/net/bonding/bond0", "correct": true},
+        {"text": "/sys/class/net/bonding_masters", "text_de": "/sys/class/net/bonding_masters"},
+        {"text": "/etc/network/interfaces", "text_de": "/etc/network/interfaces"},
+        {"text": "/proc/sys/net/bond0", "text_de": "/proc/sys/net/bond0"}
+      ],
+      "explanation_de": "/proc/net/bonding/<bond> zeigt Modus, aktiven Slave, MII-Status und Fehlerzähler je Slave. /sys/class/net/bonding_masters listet nur die vorhandenen Bonds, /etc/network/interfaces ist Konfiguration.",
+      "terms": []
+    }
+  ]
+}

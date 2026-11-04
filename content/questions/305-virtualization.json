@@ -1,0 +1,427 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "305",
+  "license": "CC BY-SA 4.0",
+  "author": "LPIC-3 Trainer Projekt",
+  "visibility": "public",
+  "questions": [
+    {
+      "id": "305-351.1-01", "objective": "351.1", "type": "single", "difficulty": 1,
+      "question": "Which command shows whether the CPU of a Linux host supports hardware virtualization?",
+      "question_de": "Welcher Befehl zeigt, ob die CPU eines Linux-Hosts Hardware-Virtualisierung unterstützt?",
+      "choices": [
+        {"text": "grep -E 'vmx|svm' /proc/cpuinfo", "text_de": "grep -E 'vmx|svm' /proc/cpuinfo", "correct": true},
+        {"text": "lsmod | grep virt", "text_de": "lsmod | grep virt"},
+        {"text": "cat /proc/kvm", "text_de": "cat /proc/kvm"},
+        {"text": "virsh capabilities --cpu", "text_de": "virsh capabilities --cpu"}
+      ],
+      "explanation_de": "Das Flag vmx (Intel VT-x) oder svm (AMD-V) in /proc/cpuinfo zeigt die Hardwareunterstützung. lsmod zeigt nur geladene Module, /proc/kvm existiert nicht. virsh capabilities zeigt Fähigkeiten des Hypervisors, braucht aber bereits libvirt.",
+      "terms": []
+    },
+    {
+      "id": "305-351.1-02", "objective": "351.1", "type": "single", "difficulty": 2,
+      "question": "What is the main difference between paravirtualization and full hardware virtualization (HVM)?",
+      "question_de": "Was ist der Hauptunterschied zwischen Paravirtualisierung und vollständiger Hardware-Virtualisierung (HVM)?",
+      "choices": [
+        {"text": "Paravirtualized guests run a modified kernel that cooperates with the hypervisor, HVM guests run unmodified operating systems.", "text_de": "Paravirtualisierte Gäste nutzen einen angepassten Kernel, der mit dem Hypervisor zusammenarbeitet, HVM-Gäste laufen mit unveränderten Betriebssystemen.", "correct": true},
+        {"text": "Paravirtualization requires VT-x or AMD-V, HVM does not.", "text_de": "Paravirtualisierung benötigt VT-x oder AMD-V, HVM nicht."},
+        {"text": "HVM guests share the host kernel, paravirtualized guests have their own.", "text_de": "HVM-Gäste teilen den Host-Kernel, paravirtualisierte Gäste haben einen eigenen."},
+        {"text": "There is no difference, the terms are synonyms.", "text_de": "Es gibt keinen Unterschied, die Begriffe sind Synonyme."}
+      ],
+      "explanation_de": "Bei PV weiß der Gastkernel, dass er virtualisiert läuft, und ruft den Hypervisor über Hypercalls auf; das war vor CPU-Virtualisierungserweiterungen effizient. HVM nutzt VT-x/AMD-V und kann unveränderte Systeme ausführen. Gemeinsamer Host-Kernel beschreibt Container.",
+      "terms": [{"term": "unmodified", "de": "unverändert"}]
+    },
+    {
+      "id": "305-351.1-03", "objective": "351.1", "type": "single", "difficulty": 1,
+      "question": "What does the term P2V migration describe?",
+      "question_de": "Was beschreibt der Begriff P2V-Migration?",
+      "choices": [
+        {"text": "Converting a physical machine into a virtual machine", "text_de": "Umwandlung einer physischen Maschine in eine virtuelle Maschine", "correct": true},
+        {"text": "Moving a running VM between two hosts", "text_de": "Verschieben einer laufenden VM zwischen zwei Hosts"},
+        {"text": "Converting a VM image from qcow2 to VMDK", "text_de": "Umwandlung eines VM-Images von qcow2 nach VMDK"},
+        {"text": "Pausing a VM and resuming it later", "text_de": "Pausieren einer VM und späteres Fortsetzen"}
+      ],
+      "explanation_de": "P2V (physical to virtual) überführt ein physisches System in eine VM, zum Beispiel mit virt-p2v. V2V konvertiert zwischen Virtualisierungsplattformen (virt-v2v). Live-Migration verschiebt laufende VMs.",
+      "terms": []
+    },
+    {
+      "id": "305-351.2-01", "objective": "351.2", "type": "single", "difficulty": 1,
+      "question": "In Xen terminology, what is Domain0 (Dom0)?",
+      "question_de": "Was ist in der Xen-Terminologie Domain0 (Dom0)?",
+      "choices": [
+        {"text": "The privileged control domain that manages the hypervisor and provides device drivers", "text_de": "Die privilegierte Verwaltungsdomäne, die den Hypervisor steuert und Gerätetreiber bereitstellt", "correct": true},
+        {"text": "The first unprivileged guest started after boot", "text_de": "Der erste unprivilegierte Gast, der nach dem Booten gestartet wird"},
+        {"text": "A paravirtualized Windows guest", "text_de": "Ein paravirtualisierter Windows-Gast"},
+        {"text": "The storage back end of the hypervisor", "text_de": "Das Speicher-Backend des Hypervisors"}
+      ],
+      "explanation_de": "Dom0 startet direkt nach dem Xen-Hypervisor, hat Hardwarezugriff und verwaltet die Gäste (DomU) mit xl. DomUs sind unprivilegiert und können PV oder HVM sein.",
+      "terms": []
+    },
+    {
+      "id": "305-351.2-02", "objective": "351.2", "type": "single", "difficulty": 2,
+      "question": "Which command starts a Xen guest from its configuration file and shows the running domains afterwards?",
+      "question_de": "Welche Befehle starten einen Xen-Gast aus seiner Konfigurationsdatei und zeigen danach die laufenden Domänen?",
+      "choices": [
+        {"text": "xl create /etc/xen/vm1.cfg; xl list", "text_de": "xl create /etc/xen/vm1.cfg; xl list", "correct": true},
+        {"text": "xl start vm1; xl ps", "text_de": "xl start vm1; xl ps"},
+        {"text": "xentop --create vm1.cfg", "text_de": "xentop --create vm1.cfg"},
+        {"text": "xl boot vm1.cfg; xl status", "text_de": "xl boot vm1.cfg; xl status"}
+      ],
+      "explanation_de": "xl create legt eine Domäne aus der Konfiguration an und startet sie, xl list zeigt alle Domänen mit Zustand. xentop zeigt den Ressourcenverbrauch live. xl start, boot, ps und status existieren nicht.",
+      "terms": []
+    },
+    {
+      "id": "305-351.3-01", "objective": "351.3", "type": "single", "difficulty": 2,
+      "question": "Which QEMU command line starts a VM with 2 GB RAM, KVM acceleration and the disk image disk.qcow2?",
+      "question_de": "Welche QEMU-Kommandozeile startet eine VM mit 2 GB RAM, KVM-Beschleunigung und dem Disk-Image disk.qcow2?",
+      "choices": [
+        {"text": "qemu-system-x86_64 -enable-kvm -m 2048 -drive file=disk.qcow2,format=qcow2", "text_de": "qemu-system-x86_64 -enable-kvm -m 2048 -drive file=disk.qcow2,format=qcow2", "correct": true},
+        {"text": "qemu-img run -kvm -mem 2G disk.qcow2", "text_de": "qemu-img run -kvm -mem 2G disk.qcow2"},
+        {"text": "kvm-start --ram 2048 --disk disk.qcow2", "text_de": "kvm-start --ram 2048 --disk disk.qcow2"},
+        {"text": "qemu-system-x86_64 --memory 2G --image disk.qcow2 --accel none", "text_de": "qemu-system-x86_64 --memory 2G --image disk.qcow2 --accel none"}
+      ],
+      "explanation_de": "-enable-kvm (oder -accel kvm) nutzt /dev/kvm, -m gibt den Speicher in MiB an, -drive bindet das Image ein. qemu-img verwaltet Images, startet aber keine VMs.",
+      "terms": [{"term": "acceleration", "de": "Beschleunigung"}]
+    },
+    {
+      "id": "305-351.3-02", "objective": "351.3", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of VirtIO drivers inside a QEMU/KVM guest?",
+      "question_de": "Welchen Zweck haben VirtIO-Treiber in einem QEMU/KVM-Gast?",
+      "choices": [
+        {"text": "They provide paravirtualized devices for disk and network that are faster than emulated hardware.", "text_de": "Sie stellen paravirtualisierte Geräte für Platte und Netzwerk bereit, die schneller sind als emulierte Hardware.", "correct": true},
+        {"text": "They allow the guest to run without a kernel.", "text_de": "Sie erlauben dem Gast, ohne Kernel zu laufen."},
+        {"text": "They encrypt all traffic between host and guest.", "text_de": "Sie verschlüsseln den gesamten Verkehr zwischen Host und Gast."},
+        {"text": "They are required for nested virtualization.", "text_de": "Sie sind für verschachtelte Virtualisierung erforderlich."}
+      ],
+      "explanation_de": "VirtIO ist eine Schnittstelle für paravirtualisierte Geräte (virtio-blk, virtio-net, virtio-scsi, virtio-balloon). Der Gast weiß, dass er virtualisiert ist, und vermeidet die aufwendige Emulation echter Hardware wie e1000 oder IDE.",
+      "terms": [{"term": "emulated", "de": "emuliert, nachgebildet"}]
+    },
+    {
+      "id": "305-351.4-01", "objective": "351.4", "type": "single", "difficulty": 1,
+      "question": "Which virsh command lists all domains including those that are shut off?",
+      "question_de": "Welcher virsh-Befehl listet alle Domänen einschließlich der ausgeschalteten?",
+      "choices": [
+        {"text": "virsh list --all", "text_de": "virsh list --all", "correct": true},
+        {"text": "virsh list", "text_de": "virsh list"},
+        {"text": "virsh domstate", "text_de": "virsh domstate"},
+        {"text": "virsh nodeinfo", "text_de": "virsh nodeinfo"}
+      ],
+      "explanation_de": "virsh list zeigt standardmäßig nur laufende Domänen; --all ergänzt definierte, aber ausgeschaltete. domstate zeigt den Zustand einer Domäne, nodeinfo Informationen zum Host.",
+      "terms": [{"term": "shut off", "de": "ausgeschaltet"}]
+    },
+    {
+      "id": "305-351.4-02", "objective": "351.4", "type": "single", "difficulty": 2,
+      "question": "Which virsh command makes a domain start automatically when the host boots?",
+      "question_de": "Welcher virsh-Befehl lässt eine Domäne beim Start des Hosts automatisch starten?",
+      "choices": [
+        {"text": "virsh autostart vm1", "text_de": "virsh autostart vm1", "correct": true},
+        {"text": "virsh start vm1 --persistent", "text_de": "virsh start vm1 --persistent"},
+        {"text": "virsh define vm1 --boot", "text_de": "virsh define vm1 --boot"},
+        {"text": "virsh setboot vm1 on", "text_de": "virsh setboot vm1 on"}
+      ],
+      "explanation_de": "virsh autostart markiert die Domäne für den Autostart (Symlink in /etc/libvirt/qemu/autostart), --disable hebt das auf. define registriert eine XML-Definition, start startet einmalig.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-03", "objective": "351.4", "type": "single", "difficulty": 2,
+      "question": "Which command edits the XML configuration of the domain vm1 with validation and applies it on the next start?",
+      "question_de": "Welcher Befehl bearbeitet die XML-Konfiguration der Domäne vm1 mit Prüfung und übernimmt sie beim nächsten Start?",
+      "choices": [
+        {"text": "virsh edit vm1", "text_de": "virsh edit vm1", "correct": true},
+        {"text": "vi /etc/libvirt/qemu/vm1.xml", "text_de": "vi /etc/libvirt/qemu/vm1.xml"},
+        {"text": "virsh dumpxml vm1 > vm1.xml", "text_de": "virsh dumpxml vm1 > vm1.xml"},
+        {"text": "virsh create vm1.xml", "text_de": "virsh create vm1.xml"}
+      ],
+      "explanation_de": "virsh edit öffnet die Definition im Editor, prüft das XML und speichert es über libvirt. Direktes Editieren der Datei unter /etc/libvirt wird von libvirtd nicht erkannt. dumpxml exportiert nur, create startet eine transiente Domäne.",
+      "terms": [{"term": "validation", "de": "Prüfung, Validierung"}]
+    },
+    {
+      "id": "305-351.4-04", "objective": "351.4", "type": "single", "difficulty": 2,
+      "question": "Which virsh command performs a live migration of vm1 to the host kvm2 using SSH?",
+      "question_de": "Welcher virsh-Befehl führt eine Live-Migration von vm1 auf den Host kvm2 über SSH durch?",
+      "choices": [
+        {"text": "virsh migrate --live vm1 qemu+ssh://kvm2/system", "text_de": "virsh migrate --live vm1 qemu+ssh://kvm2/system", "correct": true},
+        {"text": "virsh move vm1 kvm2", "text_de": "virsh move vm1 kvm2"},
+        {"text": "virsh save vm1 kvm2:/var/lib/libvirt/vm1.img", "text_de": "virsh save vm1 kvm2:/var/lib/libvirt/vm1.img"},
+        {"text": "virsh migrate vm1 ssh://kvm2 --offline", "text_de": "virsh migrate vm1 ssh://kvm2 --offline"}
+      ],
+      "explanation_de": "virsh migrate mit --live verschiebt eine laufende Domäne; die Ziel-URI benennt den Treiber und Transport. Gemeinsamer Speicher oder --copy-storage-all ist nötig. save schreibt den Speicherzustand in eine Datei, move existiert nicht.",
+      "terms": []
+    },
+    {
+      "id": "305-351.4-05", "objective": "351.4", "type": "single", "difficulty": 2,
+      "question": "Which virsh command creates a new storage volume of 20 GB in the pool default?",
+      "question_de": "Welcher virsh-Befehl erstellt ein neues Speichervolume mit 20 GB im Pool default?",
+      "choices": [
+        {"text": "virsh vol-create-as default vm2.qcow2 20G --format qcow2", "text_de": "virsh vol-create-as default vm2.qcow2 20G --format qcow2", "correct": true},
+        {"text": "virsh pool-create default 20G", "text_de": "virsh pool-create default 20G"},
+        {"text": "virsh attach-disk default vm2.qcow2 20G", "text_de": "virsh attach-disk default vm2.qcow2 20G"},
+        {"text": "virsh vol-resize default 20G", "text_de": "virsh vol-resize default 20G"}
+      ],
+      "explanation_de": "vol-create-as legt ein Volume mit Name, Größe und Format im angegebenen Pool an. pool-create erzeugt Pools, attach-disk hängt vorhandene Images an Domänen, vol-resize ändert die Größe eines bestehenden Volumes.",
+      "terms": []
+    },
+    {
+      "id": "305-351.5-01", "objective": "351.5", "type": "single", "difficulty": 1,
+      "question": "Which command converts the raw image disk.img into the qcow2 format?",
+      "question_de": "Welcher Befehl konvertiert das Raw-Image disk.img in das Format qcow2?",
+      "choices": [
+        {"text": "qemu-img convert -f raw -O qcow2 disk.img disk.qcow2", "text_de": "qemu-img convert -f raw -O qcow2 disk.img disk.qcow2", "correct": true},
+        {"text": "qemu-img create -f qcow2 disk.img disk.qcow2", "text_de": "qemu-img create -f qcow2 disk.img disk.qcow2"},
+        {"text": "virt-convert raw qcow2 disk.img", "text_de": "virt-convert raw qcow2 disk.img"},
+        {"text": "dd if=disk.img of=disk.qcow2 bs=qcow2", "text_de": "dd if=disk.img of=disk.qcow2 bs=qcow2"}
+      ],
+      "explanation_de": "qemu-img convert wandelt zwischen Formaten; -f ist das Quell-, -O das Zielformat. create erzeugt leere Images, dd kopiert nur Bytes ohne Formatumwandlung.",
+      "terms": []
+    },
+    {
+      "id": "305-351.5-02", "objective": "351.5", "type": "single", "difficulty": 2,
+      "question": "Which libguestfs tool prints the content of a file from inside a disk image without booting the VM?",
+      "question_de": "Welches libguestfs-Werkzeug gibt den Inhalt einer Datei aus einem Disk-Image aus, ohne die VM zu starten?",
+      "choices": [
+        {"text": "virt-cat -a disk.qcow2 /etc/hostname", "text_de": "virt-cat -a disk.qcow2 /etc/hostname", "correct": true},
+        {"text": "virt-df -a disk.qcow2 /etc/hostname", "text_de": "virt-df -a disk.qcow2 /etc/hostname"},
+        {"text": "virt-sparsify disk.qcow2 /etc/hostname", "text_de": "virt-sparsify disk.qcow2 /etc/hostname"},
+        {"text": "qemu-img cat disk.qcow2 /etc/hostname", "text_de": "qemu-img cat disk.qcow2 /etc/hostname"}
+      ],
+      "explanation_de": "virt-cat liest Dateien aus Images, virt-copy-out kopiert sie heraus, guestfish erlaubt interaktive Arbeit. virt-df zeigt die Belegung der Dateisysteme, virt-sparsify verkleinert Images, qemu-img kennt kein cat.",
+      "terms": []
+    },
+    {
+      "id": "305-352.1-01", "objective": "352.1", "type": "multiple", "difficulty": 2,
+      "question": "Which Linux kernel features are the foundation of container virtualization? (Choose two.)",
+      "question_de": "Welche Linux-Kernelfunktionen bilden die Grundlage der Container-Virtualisierung? (Zwei Antworten.)",
+      "choices": [
+        {"text": "Namespaces", "text_de": "Namespaces", "correct": true},
+        {"text": "Control groups (cgroups)", "text_de": "Control Groups (cgroups)", "correct": true},
+        {"text": "KVM kernel modules", "text_de": "KVM-Kernelmodule"},
+        {"text": "The Xen hypervisor", "text_de": "Der Xen-Hypervisor"},
+        {"text": "Device mapper RAID", "text_de": "Device-Mapper-RAID"}
+      ],
+      "explanation_de": "Namespaces isolieren die Sicht auf Prozesse, Netz, Mounts, Benutzer usw.; cgroups begrenzen und messen Ressourcen. Ergänzt werden sie durch Capabilities, seccomp und MAC-Systeme. KVM und Xen gehören zur Vollvirtualisierung.",
+      "terms": [{"term": "foundation", "de": "Grundlage"}]
+    },
+    {
+      "id": "305-352.1-02", "objective": "352.1", "type": "single", "difficulty": 2,
+      "question": "Which command runs a shell inside the network namespace of the process with PID 4242?",
+      "question_de": "Welcher Befehl startet eine Shell im Netzwerk-Namensraum des Prozesses mit PID 4242?",
+      "choices": [
+        {"text": "nsenter -t 4242 -n /bin/bash", "text_de": "nsenter -t 4242 -n /bin/bash", "correct": true},
+        {"text": "unshare -n -p 4242 /bin/bash", "text_de": "unshare -n -p 4242 /bin/bash"},
+        {"text": "ip netns exec 4242 /bin/bash", "text_de": "ip netns exec 4242 /bin/bash"},
+        {"text": "capsh --pid=4242 -- /bin/bash", "text_de": "capsh --pid=4242 -- /bin/bash"}
+      ],
+      "explanation_de": "nsenter tritt in bestehende Namensräume eines Prozesses ein (-t PID, -n Netz, -m Mount, -p PID-Namespace). unshare erzeugt neue Namensräume. ip netns exec arbeitet mit benannten Netz-Namensräumen, nicht mit PIDs.",
+      "terms": []
+    },
+    {
+      "id": "305-352.1-03", "objective": "352.1", "type": "single", "difficulty": 2,
+      "question": "What is the role of runc in a container platform?",
+      "question_de": "Welche Rolle hat runc in einer Container-Plattform?",
+      "choices": [
+        {"text": "It is the low-level OCI runtime that creates and runs containers from a bundle.", "text_de": "Es ist die Low-Level-OCI-Laufzeit, die Container aus einem Bundle erzeugt und ausführt.", "correct": true},
+        {"text": "It is the image registry used by Docker Hub.", "text_de": "Es ist die Image-Registry, die Docker Hub verwendet."},
+        {"text": "It orchestrates containers across a cluster of hosts.", "text_de": "Es orchestriert Container über einen Cluster von Hosts."},
+        {"text": "It builds images from Dockerfiles.", "text_de": "Es baut Images aus Dockerfiles."}
+      ],
+      "explanation_de": "runc implementiert die OCI Runtime Specification und wird von containerd, CRI-O oder Docker aufgerufen. Orchestrierung übernehmen Kubernetes oder Swarm, Images bauen docker build oder buildah.",
+      "terms": []
+    },
+    {
+      "id": "305-352.2-01", "objective": "352.2", "type": "single", "difficulty": 1,
+      "question": "Which LXD command creates and starts a container named web from the image ubuntu:22.04?",
+      "question_de": "Welcher LXD-Befehl erzeugt und startet einen Container namens web aus dem Image ubuntu:22.04?",
+      "choices": [
+        {"text": "lxc launch ubuntu:22.04 web", "text_de": "lxc launch ubuntu:22.04 web", "correct": true},
+        {"text": "lxc init web ubuntu:22.04 --start", "text_de": "lxc init web ubuntu:22.04 --start"},
+        {"text": "lxd create ubuntu:22.04 web", "text_de": "lxd create ubuntu:22.04 web"},
+        {"text": "lxc-start -n web -t ubuntu", "text_de": "lxc-start -n web -t ubuntu"}
+      ],
+      "explanation_de": "lxc launch kombiniert lxc init (anlegen) und lxc start. Die Argumentreihenfolge ist Image, dann Name. lxc-start gehört zu den klassischen LXC-Werkzeugen ohne LXD.",
+      "terms": []
+    },
+    {
+      "id": "305-352.2-02", "objective": "352.2", "type": "single", "difficulty": 2,
+      "question": "Which LXD command limits the container web to 1 GB of memory?",
+      "question_de": "Welcher LXD-Befehl begrenzt den Container web auf 1 GB Speicher?",
+      "choices": [
+        {"text": "lxc config set web limits.memory 1GB", "text_de": "lxc config set web limits.memory 1GB", "correct": true},
+        {"text": "lxc limit web --memory 1GB", "text_de": "lxc limit web --memory 1GB"},
+        {"text": "lxc profile set web memory=1GB", "text_de": "lxc profile set web memory=1GB"},
+        {"text": "lxc exec web -- ulimit -m 1048576", "text_de": "lxc exec web -- ulimit -m 1048576"}
+      ],
+      "explanation_de": "Ressourcenlimits sind Konfigurationsschlüssel (limits.memory, limits.cpu). lxc config set setzt sie pro Container, lxc profile set pro Profil (mit dem Profilnamen, nicht dem Containernamen). ulimit wirkt nur auf die Shell im Container.",
+      "terms": []
+    },
+    {
+      "id": "305-352.3-01", "objective": "352.3", "type": "single", "difficulty": 1,
+      "question": "Which command starts a container from the image nginx in the background and maps host port 8080 to container port 80?",
+      "question_de": "Welcher Befehl startet einen Container aus dem Image nginx im Hintergrund und leitet Host-Port 8080 auf Container-Port 80?",
+      "choices": [
+        {"text": "docker run -d -p 8080:80 nginx", "text_de": "docker run -d -p 8080:80 nginx", "correct": true},
+        {"text": "docker run -d -p 80:8080 nginx", "text_de": "docker run -d -p 80:8080 nginx"},
+        {"text": "docker start nginx --port 8080", "text_de": "docker start nginx --port 8080"},
+        {"text": "docker create -it nginx -expose 8080", "text_de": "docker create -it nginx -expose 8080"}
+      ],
+      "explanation_de": "-d startet im Hintergrund (detached), -p HOST:CONTAINER veröffentlicht einen Port. Die Reihenfolge ist Host zuerst. docker start startet bestehende Container, --expose macht Ports nur innerhalb des Docker-Netzes bekannt.",
+      "terms": [{"term": "map", "de": "abbilden, zuordnen"}]
+    },
+    {
+      "id": "305-352.3-02", "objective": "352.3", "type": "single", "difficulty": 2,
+      "question": "Which Dockerfile instruction defines the command that is executed when a container starts and can be overridden by arguments to docker run?",
+      "question_de": "Welche Dockerfile-Anweisung legt den Befehl fest, der beim Containerstart ausgeführt wird und durch Argumente von docker run überschrieben werden kann?",
+      "choices": [
+        {"text": "CMD", "text_de": "CMD", "correct": true},
+        {"text": "RUN", "text_de": "RUN"},
+        {"text": "ENTRYPOINT", "text_de": "ENTRYPOINT"},
+        {"text": "EXEC", "text_de": "EXEC"}
+      ],
+      "explanation_de": "CMD ist der Standardbefehl und wird durch Argumente nach dem Image-Namen ersetzt. ENTRYPOINT ist der feste Einstiegspunkt, an den CMD als Argumente angehängt wird. RUN führt Befehle beim Bauen des Images aus, EXEC gibt es nicht.",
+      "terms": [{"term": "overridden", "de": "überschrieben"}]
+    },
+    {
+      "id": "305-352.3-03", "objective": "352.3", "type": "single", "difficulty": 2,
+      "question": "Which command creates a named volume and which run option mounts it at /data in a container?",
+      "question_de": "Welcher Befehl erzeugt ein benanntes Volume, und welche run-Option hängt es unter /data in einem Container ein?",
+      "choices": [
+        {"text": "docker volume create appdata; docker run -v appdata:/data image", "text_de": "docker volume create appdata; docker run -v appdata:/data image", "correct": true},
+        {"text": "docker create volume appdata; docker run --mount appdata image", "text_de": "docker create volume appdata; docker run --mount appdata image"},
+        {"text": "docker volume add appdata; docker run -d appdata image", "text_de": "docker volume add appdata; docker run -d appdata image"},
+        {"text": "mkdir /var/lib/docker/appdata; docker run -p appdata:/data image", "text_de": "mkdir /var/lib/docker/appdata; docker run -p appdata:/data image"}
+      ],
+      "explanation_de": "docker volume create legt ein von Docker verwaltetes Volume an. -v NAME:/pfad (oder --mount source=NAME,target=/pfad) hängt es ein. Daten in Volumes überleben das Löschen des Containers.",
+      "terms": []
+    },
+    {
+      "id": "305-352.3-04", "objective": "352.3", "type": "single", "difficulty": 2,
+      "question": "Which command shows the log output of the running container web?",
+      "question_de": "Welcher Befehl zeigt die Protokollausgabe des laufenden Containers web?",
+      "choices": [
+        {"text": "docker logs web", "text_de": "docker logs web", "correct": true},
+        {"text": "docker inspect --logs web", "text_de": "docker inspect --logs web"},
+        {"text": "journalctl -u docker-web", "text_de": "journalctl -u docker-web"},
+        {"text": "docker ps --log web", "text_de": "docker ps --log web"}
+      ],
+      "explanation_de": "docker logs gibt stdout und stderr des Containers aus (-f folgt live). Welcher Logging-Treiber verwendet wird, steht in /etc/docker/daemon.json (json-file, journald, syslog). inspect zeigt Metadaten, ps laufende Container.",
+      "terms": []
+    },
+    {
+      "id": "305-352.4-01", "objective": "352.4", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of a docker-compose.yml file?",
+      "question_de": "Welchen Zweck hat eine docker-compose.yml-Datei?",
+      "choices": [
+        {"text": "It describes a multi-container application with its services, networks and volumes so it can be started with one command.", "text_de": "Sie beschreibt eine Anwendung aus mehreren Containern mit Diensten, Netzen und Volumes, so dass sie mit einem Befehl gestartet werden kann.", "correct": true},
+        {"text": "It replaces the Dockerfile for building a single image.", "text_de": "Sie ersetzt das Dockerfile zum Bauen eines einzelnen Images."},
+        {"text": "It configures the Docker daemon's storage driver.", "text_de": "Sie konfiguriert den Speichertreiber des Docker-Daemons."},
+        {"text": "It defines a Kubernetes deployment.", "text_de": "Sie definiert ein Kubernetes-Deployment."}
+      ],
+      "explanation_de": "Docker Compose orchestriert mehrere Container auf einem Host anhand einer YAML-Datei (docker compose up). Der Daemon wird über daemon.json konfiguriert, Kubernetes nutzt eigene Manifeste.",
+      "terms": []
+    },
+    {
+      "id": "305-352.4-02", "objective": "352.4", "type": "single", "difficulty": 2,
+      "question": "In Kubernetes, what is a Pod?",
+      "question_de": "Was ist in Kubernetes ein Pod?",
+      "choices": [
+        {"text": "The smallest deployable unit: one or more containers sharing network and storage", "text_de": "Die kleinste ausrollbare Einheit: ein oder mehrere Container mit gemeinsamem Netz und Speicher", "correct": true},
+        {"text": "A physical node running the kubelet", "text_de": "Ein physischer Knoten, auf dem das kubelet läuft"},
+        {"text": "A packaged chart installed with Helm", "text_de": "Ein mit Helm installiertes Chart-Paket"},
+        {"text": "A persistent volume claim", "text_de": "Ein Persistent Volume Claim"}
+      ],
+      "explanation_de": "Ein Pod fasst eng gekoppelte Container zusammen, die eine IP-Adresse und Volumes teilen. Knoten führen Pods aus, Deployments verwalten Pod-Replikate, Helm-Charts bündeln Kubernetes-Manifeste.",
+      "terms": [{"term": "deployable", "de": "ausrollbar, bereitstellbar"}]
+    },
+    {
+      "id": "305-353.1-01", "objective": "353.1", "type": "single", "difficulty": 1,
+      "question": "Which cloud service model provides virtual machines, storage and networks that the customer manages at the operating system level?",
+      "question_de": "Welches Cloud-Dienstmodell stellt virtuelle Maschinen, Speicher und Netze bereit, die der Kunde auf Betriebssystemebene verwaltet?",
+      "choices": [
+        {"text": "IaaS", "text_de": "IaaS", "correct": true},
+        {"text": "PaaS", "text_de": "PaaS"},
+        {"text": "SaaS", "text_de": "SaaS"},
+        {"text": "FaaS", "text_de": "FaaS"}
+      ],
+      "explanation_de": "Infrastructure as a Service liefert Rechen-, Speicher- und Netzressourcen (z. B. OpenStack, EC2). PaaS stellt Laufzeitumgebungen bereit, SaaS fertige Anwendungen, FaaS einzelne Funktionen.",
+      "terms": []
+    },
+    {
+      "id": "305-353.1-02", "objective": "353.1", "type": "single", "difficulty": 2,
+      "question": "Which statement describes Terraform correctly?",
+      "question_de": "Welche Aussage beschreibt Terraform richtig?",
+      "choices": [
+        {"text": "It describes infrastructure declaratively in configuration files and creates or changes resources via provider plugins.", "text_de": "Es beschreibt Infrastruktur deklarativ in Konfigurationsdateien und erzeugt oder ändert Ressourcen über Provider-Plugins.", "correct": true},
+        {"text": "It is a hypervisor for running VMs on public clouds.", "text_de": "Es ist ein Hypervisor zum Betrieb von VMs in öffentlichen Clouds."},
+        {"text": "It builds machine images from templates.", "text_de": "Es baut Maschinen-Images aus Templates."},
+        {"text": "It configures the guest operating system at first boot.", "text_de": "Es konfiguriert das Gastbetriebssystem beim ersten Start."}
+      ],
+      "explanation_de": "Terraform ist Infrastructure as Code: terraform plan zeigt Änderungen, terraform apply setzt sie um, der Zustand wird in einer State-Datei geführt. Images baut Packer, den ersten Start konfiguriert cloud-init.",
+      "terms": [{"term": "declaratively", "de": "deklarativ, den Zielzustand beschreibend"}]
+    },
+    {
+      "id": "305-353.2-01", "objective": "353.2", "type": "single", "difficulty": 2,
+      "question": "In a Packer template, what is the role of a builder?",
+      "question_de": "Welche Rolle hat in einem Packer-Template ein Builder?",
+      "choices": [
+        {"text": "It defines the platform on which the image is created, for example qemu, amazon-ebs or lxd.", "text_de": "Er legt die Plattform fest, auf der das Image erzeugt wird, zum Beispiel qemu, amazon-ebs oder lxd.", "correct": true},
+        {"text": "It runs scripts inside the machine to install software.", "text_de": "Er führt Skripte in der Maschine aus, um Software zu installieren."},
+        {"text": "It uploads the finished image to a registry.", "text_de": "Er lädt das fertige Image in eine Registry hoch."},
+        {"text": "It defines variables for the template.", "text_de": "Er definiert Variablen für das Template."}
+      ],
+      "explanation_de": "Builder erzeugen Maschinen und Images für eine Plattform. Provisioner (shell, ansible, file) installieren Software, Post-Processors verarbeiten das Ergebnis weiter, zum Beispiel komprimieren oder hochladen.",
+      "terms": []
+    },
+    {
+      "id": "305-353.3-01", "objective": "353.3", "type": "single", "difficulty": 2,
+      "question": "Which cloud-init user-data snippet creates the user ops with an SSH key and sudo rights?",
+      "question_de": "Welcher cloud-init-user-data-Ausschnitt erzeugt den Benutzer ops mit einem SSH-Schlüssel und sudo-Rechten?",
+      "choices": [
+        {"text": "#cloud-config\nusers:\n  - name: ops\n    sudo: ALL=(ALL) NOPASSWD:ALL\n    ssh_authorized_keys:\n      - ssh-ed25519 AAAA...", "text_de": "#cloud-config\nusers:\n  - name: ops\n    sudo: ALL=(ALL) NOPASSWD:ALL\n    ssh_authorized_keys:\n      - ssh-ed25519 AAAA...", "correct": true},
+        {"text": "#!/bin/sh\nuseradd ops && echo ssh-ed25519 AAAA... > /etc/ssh/ops.pub", "text_de": "#!/bin/sh\nuseradd ops && echo ssh-ed25519 AAAA... > /etc/ssh/ops.pub"},
+        {"text": "[user]\nname=ops\nkey=ssh-ed25519 AAAA...\nsudo=yes", "text_de": "[user]\nname=ops\nkey=ssh-ed25519 AAAA...\nsudo=yes"},
+        {"text": "users: ops; ssh: AAAA...; sudo: true", "text_de": "users: ops; ssh: AAAA...; sudo: true"}
+      ],
+      "explanation_de": "cloud-config ist YAML mit der Kopfzeile #cloud-config. Das Modul users legt Konten mit SSH-Schlüsseln, Shell und sudo-Regeln an. Ein Shell-Skript als user-data ist möglich, aber die gezeigte Variante schreibt den Schlüssel an eine wirkungslose Stelle.",
+      "terms": [{"term": "snippet", "de": "Ausschnitt, Codeschnipsel"}]
+    },
+    {
+      "id": "305-353.3-02", "objective": "353.3", "type": "single", "difficulty": 2,
+      "question": "Where does cloud-init keep its state so that per-instance modules do not run again on the next boot?",
+      "question_de": "Wo bewahrt cloud-init seinen Zustand auf, damit Module pro Instanz beim nächsten Start nicht erneut laufen?",
+      "choices": [
+        {"text": "/var/lib/cloud/", "text_de": "/var/lib/cloud/", "correct": true},
+        {"text": "/etc/cloud/cloud.cfg", "text_de": "/etc/cloud/cloud.cfg"},
+        {"text": "/run/cloud-init/user-data", "text_de": "/run/cloud-init/user-data"},
+        {"text": "/boot/cloud-init.state", "text_de": "/boot/cloud-init.state"}
+      ],
+      "explanation_de": "/var/lib/cloud/instances/<id> und /var/lib/cloud/instance speichern Datenquelle, user-data und Semaphore für bereits ausgeführte Module. Ein cloud-init clean löscht sie, damit ein Image wieder wie neu startet. /etc/cloud/cloud.cfg ist die Konfiguration.",
+      "terms": []
+    },
+    {
+      "id": "305-353.4-01", "objective": "353.4", "type": "single", "difficulty": 1,
+      "question": "Which command creates a Vagrantfile for the box generic/debian12 in the current directory?",
+      "question_de": "Welcher Befehl erzeugt im aktuellen Verzeichnis ein Vagrantfile für die Box generic/debian12?",
+      "choices": [
+        {"text": "vagrant init generic/debian12", "text_de": "vagrant init generic/debian12", "correct": true},
+        {"text": "vagrant up generic/debian12", "text_de": "vagrant up generic/debian12"},
+        {"text": "vagrant box add --init generic/debian12", "text_de": "vagrant box add --init generic/debian12"},
+        {"text": "vagrant new generic/debian12", "text_de": "vagrant new generic/debian12"}
+      ],
+      "explanation_de": "vagrant init schreibt ein Vagrantfile mit config.vm.box. vagrant up startet die Umgebung und lädt die Box bei Bedarf, vagrant box add lädt Boxen in den lokalen Cache, vagrant new existiert nicht.",
+      "terms": []
+    },
+    {
+      "id": "305-353.4-02", "objective": "353.4", "type": "single", "difficulty": 2,
+      "question": "Which Vagrantfile line runs a shell script inside the VM during provisioning?",
+      "question_de": "Welche Vagrantfile-Zeile führt beim Provisionieren ein Shell-Skript in der VM aus?",
+      "choices": [
+        {"text": "config.vm.provision \"shell\", path: \"setup.sh\"", "text_de": "config.vm.provision \"shell\", path: \"setup.sh\"", "correct": true},
+        {"text": "config.vm.synced_folder \"setup.sh\", \"/tmp\"", "text_de": "config.vm.synced_folder \"setup.sh\", \"/tmp\""},
+        {"text": "config.vm.network \"shell\", script: \"setup.sh\"", "text_de": "config.vm.network \"shell\", script: \"setup.sh\""},
+        {"text": "config.ssh.exec \"setup.sh\"", "text_de": "config.ssh.exec \"setup.sh\""}
+      ],
+      "explanation_de": "Der Shell-Provisioner führt Skripte (path:) oder Inline-Befehle (inline:) aus; der File-Provisioner kopiert Dateien. synced_folder teilt Verzeichnisse zwischen Host und VM, network konfiguriert Netzwerkschnittstellen.",
+      "terms": []
+    }
+  ]
+}

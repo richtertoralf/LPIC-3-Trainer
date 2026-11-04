@@ -1,0 +1,71 @@
+"""Application configuration read from environment variables with the LPIC3_ prefix."""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+PREFIX = "LPIC3_"
+PACKAGE_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = PACKAGE_DIR.parent
+
+
+def _env(name: str, default: str) -> str:
+    return os.environ.get(PREFIX + name, default)
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.environ.get(PREFIX + name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+@dataclass
+class Settings:
+    """Runtime settings. All values can be overridden through LPIC3_* variables."""
+
+    data_dir: Path = field(default_factory=lambda: Path(_env("DATA_DIR", str(PROJECT_DIR / "data"))))
+    content_dir: Path = field(
+        default_factory=lambda: Path(_env("CONTENT_DIR", str(PROJECT_DIR / "content")))
+    )
+    host: str = field(default_factory=lambda: _env("HOST", "127.0.0.1"))
+    port: int = field(default_factory=lambda: int(_env("PORT", "8000")))
+    secure_cookies: bool = field(default_factory=lambda: _env_bool("SECURE_COOKIES", False))
+    session_hours: int = field(default_factory=lambda: int(_env("SESSION_HOURS", "720")))
+    log_level: str = field(default_factory=lambda: _env("LOG_LEVEL", "info"))
+    exam_question_count: int = field(default_factory=lambda: int(_env("EXAM_QUESTIONS", "60")))
+    exam_minutes: int = field(default_factory=lambda: int(_env("EXAM_MINUTES", "90")))
+    topic_exam_question_count: int = field(
+        default_factory=lambda: int(_env("TOPIC_EXAM_QUESTIONS", "15"))
+    )
+    entry_test_question_count: int = field(default_factory=lambda: int(_env("ENTRY_QUESTIONS", "10")))
+
+    @property
+    def db_path(self) -> Path:
+        explicit = os.environ.get(PREFIX + "DB_PATH")
+        if explicit:
+            return Path(explicit)
+        return self.data_dir / "lpic3-trainer.db"
+
+    @property
+    def database_url(self) -> str:
+        return f"sqlite:///{self.db_path}"
+
+
+_settings: Settings | None = None
+
+
+def get_settings() -> Settings:
+    """Return the cached settings object."""
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings
+
+
+def reset_settings() -> None:
+    """Drop the cached settings (used by tests after changing the environment)."""
+    global _settings
+    _settings = None

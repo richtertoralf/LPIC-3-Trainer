@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Module · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>LPIC-3-Module wählen</h1>
+<p>Wähle die Module, auf die du dich vorbereitest. Du kannst die Auswahl jederzeit ändern.</p>
+<section class="grid">
+  {% for m in modules %}
+  <article class="card {% if m.id in selected %}card-selected{% endif %}">
+    <h2>{{ m.code }} · {{ m.title }}</h2>
+    <p class="muted">{{ m.title_de }}</p>
+    <p>{{ m.description_de }}</p>
+    <p class="muted">{{ counts.get(m.id, 0) }} Fragen · {{ labs.get(m.id, 0) }} Labs · Prüfungsziele Version {{ m.version }}</p>
+    <form method="post" action="/modules/select">
+      <input type="hidden" name="module_code" value="{{ m.code }}">
+      {% if m.id in selected %}
+        <input type="hidden" name="action" value="remove">
+        <a class="btn btn-primary" href="/module/{{ m.code }}">Öffnen</a>
+        <button class="btn" type="submit">Abwählen</button>
+      {% else %}
+        <input type="hidden" name="action" value="add">
+        <button class="btn btn-primary" type="submit">Modul wählen</button>
+      {% endif %}
+    </form>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

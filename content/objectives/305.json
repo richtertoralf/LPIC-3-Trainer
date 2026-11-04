@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "objectives",
+  "module": {
+    "code": "305",
+    "title": "LPIC-3 Virtualization and Containerization",
+    "title_de": "Virtualisierung und Container",
+    "description_de": "Vollvirtualisierung mit Xen, QEMU/KVM und libvirt, Disk-Images, Container mit LXC/LXD und Docker, Orchestrierung sowie Bereitstellung mit Packer, cloud-init und Vagrant.",
+    "version": "3.0",
+    "source_url": "https://www.lpi.org/our-certifications/exam-305-objectives/",
+    "position": 3
+  },
+  "topics": [
+    {
+      "code": "351", "title": "Full Virtualization", "title_de": "Vollvirtualisierung",
+      "objectives": [
+        {"code": "351.1", "title": "Virtualization Concepts and Theory", "title_de": "Virtualisierungskonzepte", "weight": 6,
+         "summary_de": "Begriffe der Virtualisierung, Vor- und Nachteile, Hypervisor-Typen, P2V- und V2V-Migration, Snapshots, Pausieren, Klonen und Ressourcenlimits verstehen. Grundwissen zu oVirt, Proxmox, systemd-machined, VirtualBox und Open vSwitch.",
+         "tools": "Hypervisor, Hardware Virtual Machine (HVM), Paravirtualization (PV), Emulation, Simulation, CPU flags, /proc/cpuinfo, P2V, V2V"},
+        {"code": "351.2", "title": "Xen", "title_de": "Xen", "weight": 3,
+         "summary_de": "Architektur von Xen mit Dom0 und DomU, Netzwerk und Speicher verstehen, Domänen mit xl konfigurieren und verwalten, einfache Fehler beheben. Grundwissen zu XAPI, XenStore und Xen-Bootparametern.",
+         "tools": "Domain0, Dom0, DomainU, DomU, PV-DomU, HVM-DomU, /etc/xen/, xl, xl.cfg, xl.conf, xentop"},
+        {"code": "351.3", "title": "QEMU", "title_de": "QEMU", "weight": 4,
+         "summary_de": "Architektur von QEMU mit KVM, Netzwerk und Speicher verstehen, Instanzen von der Kommandozeile starten, Snapshots über den QEMU-Monitor verwalten, Guest Agent und VirtIO-Treiber einsetzen.",
+         "tools": "kvm, kvm-intel, kvm-amd, /dev/kvm, QEMU monitor, qemu, qemu-system-x86_64, ip, brctl, tunctl"},
+        {"code": "351.4", "title": "Libvirt Virtual Machine Management", "title_de": "VM-Verwaltung mit libvirt", "weight": 9,
+         "summary_de": "Architektur von libvirt verstehen, Verbindungen zu Hosts herstellen, QEMU- und Xen-Domänen samt Snapshots verwalten, Speicherpools, Volumes und virtuelle Netze anlegen, Domänen migrieren und XML-Konfigurationen bearbeiten. Grundwissen zu virtlogd und virtlockd.",
+         "tools": "libvirtd, /etc/libvirt/, virsh"},
+        {"code": "351.5", "title": "Virtual Machine Disk Image Management", "title_de": "Disk-Images verwalten", "weight": 3,
+         "summary_de": "Formate raw, qcow2 und VMDK kennen, Images mit qemu-img erzeugen, konvertieren und vergrößern, Inhalte mit libguestfs-Werkzeugen lesen und ändern, physische Platten in Images überführen. Grundwissen zu OVF.",
+         "tools": "qemu-img, guestfish, guestmount, guestunmount, virt-cat, virt-copy-in, virt-copy-out, virt-diff, virt-inspector, virt-filesystems, virt-rescue, virt-df, virt-resize, virt-sparsify, virt-p2v, virt-v2v, virt-sysprep"}
+      ]
+    },
+    {
+      "code": "352", "title": "Container Virtualization", "title_de": "Container-Virtualisierung",
+      "objectives": [
+        {"code": "352.1", "title": "Container Virtualization Concepts", "title_de": "Container-Konzepte", "weight": 7,
+         "summary_de": "System- und Anwendungscontainer unterscheiden, Kernel-Namespaces, cgroups und Capabilities verstehen, die Rolle von seccomp, SELinux und AppArmor kennen, Laufzeiten wie runc, CRI-O und containerd sowie die OCI-Spezifikationen einordnen. Grundwissen zu podman, buildah, skopeo, systemd-nspawn und BSD Jails.",
+         "tools": "nsenter, unshare, ip, capsh, /sys/fs/cgroup, /proc/[0-9]+/ns, /proc/[0-9]+/status"},
+        {"code": "352.2", "title": "LXC", "title_de": "LXC", "weight": 6,
+         "summary_de": "Architektur von LXC und LXD verstehen, Container aus Images mit LXD anlegen, Netzwerk und Speicher konfigurieren, Eigenschaften und Ressourcenlimits setzen und Profile nutzen.",
+         "tools": "lxd, lxc"},
+        {"code": "352.3", "title": "Docker", "title_de": "Docker", "weight": 9,
+         "summary_de": "Architektur von Docker verstehen, Container aus Registry-Images starten, Images und Volumes verwalten, Logging und Netzwerk konfigurieren, Dockerfiles schreiben und eine eigene Registry betreiben.",
+         "tools": "dockerd, /etc/docker/daemon.json, /var/lib/docker/, docker, Dockerfile"},
+        {"code": "352.4", "title": "Container Orchestration Platforms", "title_de": "Container-Orchestrierung", "weight": 3,
+         "summary_de": "Bedeutung der Orchestrierung verstehen, Konzepte von Docker Compose, Docker Swarm, Kubernetes und Helm kennen. Grundwissen zu OpenShift, Rancher und DC/OS.",
+         "tools": "Docker Compose, Docker Swarm, Kubernetes, Helm"}
+      ]
+    },
+    {
+      "code": "353", "title": "VM Deployment and Provisioning", "title_de": "VM-Bereitstellung",
+      "objectives": [
+        {"code": "353.1", "title": "Cloud Management Tools", "title_de": "Cloud-Verwaltungswerkzeuge", "weight": 2,
+         "summary_de": "Angebote öffentlicher Clouds einordnen, Grundfunktionen von OpenStack und Terraform kennen. Grundwissen zu CloudStack, Eucalyptus und OpenNebula.",
+         "tools": "IaaS, PaaS, SaaS, OpenStack, Terraform"},
+        {"code": "353.2", "title": "Packer", "title_de": "Packer", "weight": 2,
+         "summary_de": "Mit Packer Templates schreiben und Images für verschiedene Builder erzeugen, auch in Clouds und als LXC/LXD-Container-Images.",
+         "tools": "packer"},
+        {"code": "353.3", "title": "cloud-init", "title_de": "cloud-init", "weight": 3,
+         "summary_de": "Konzepte von cloud-init und user-data verstehen, Dateisysteme anlegen, Benutzer mit SSH-Schlüsseln einrichten, Pakete installieren, cloud-init in Images integrieren und mit der Config-Drive-Datenquelle testen.",
+         "tools": "cloud-init, user-data, /var/lib/cloud/"},
+        {"code": "353.4", "title": "Vagrant", "title_de": "Vagrant", "weight": 3,
+         "summary_de": "Architektur von Vagrant verstehen, Boxen beziehen, Vagrantfiles schreiben und ausführen, auf VMs zugreifen, Shared Folders nutzen, mit File- und Shell-Provisionern konfigurieren und Multi-Machine-Setups aufbauen.",
+         "tools": "vagrant, Vagrantfile"}
+      ]
+    }
+  ]
+}

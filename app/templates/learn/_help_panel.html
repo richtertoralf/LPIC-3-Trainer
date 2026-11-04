@@ -1,0 +1,24 @@
+{# Language help controls. Expects: terms (list of dicts) #}
+<div class="help-panel" data-help-panel data-terms='{{ terms | json_attr }}'>
+  <button class="btn btn-small" type="button" data-toggle-translation>Übersetzung anzeigen</button>
+  <button class="btn btn-small" type="button" data-toggle-terms>Fachbegriffe markieren</button>
+  <span class="muted small">Markierte Begriffe antippen für die deutsche Erklärung.</span>
+  <div class="term-popover" data-term-popover hidden>
+    <strong data-popover-term></strong> <span data-popover-de></span>
+    <p data-popover-explanation></p>
+    <button class="btn btn-small" type="button" data-popover-learn>Begriff merken</button>
+    <button class="link" type="button" data-popover-close>Schließen</button>
+  </div>
+  {% if terms %}
+  <details class="term-list">
+    <summary>Alle Fachbegriffe dieser Frage ({{ terms | length }})</summary>
+    <ul>
+      {% for t in terms %}
+      <li><strong>{{ t.term }}</strong> – {{ t.de }}{% if t.explanation %}<br><span class="muted">{{ t.explanation }}</span>{% endif %}
+        {% if t.status == 'learning' %}<span class="tag">wird gelernt</span>{% elif t.status == 'known' %}<span class="tag tag-ok">gelernt</span>{% else %}<button class="link" type="button" data-learn-term="{{ t.id }}">merken</button>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+</div>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ lab.title }} · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<nav class="breadcrumb"><a href="/labs">Labs</a> › <a href="/module/{{ lab.module.code }}">{{ lab.module.code }}</a>{% if lab.objective %} › {{ lab.objective.code }} {{ lab.objective.title }}{% endif %}</nav>
+<h1>{{ lab.title }}</h1>
+<section class="card">
+  <p><strong>Ziel:</strong> {{ lab.goal_de }}</p>
+  {% if lab.environment_de %}<p><strong>Umgebung:</strong> {{ lab.environment_de }}</p>{% endif %}
+  <p class="muted small">Dauer ca. {{ lab.duration_minutes }} Minuten. Nur in einer Testumgebung ausführen, nie auf produktiven Systemen.</p>
+  {% if progress %}<p><span class="tag tag-ok">erledigt am {{ progress.completed_at.strftime('%d.%m.%Y') }}</span>
+    <form method="post" action="/lab/{{ lab.id }}/reset" class="inline"><button class="link" type="submit">Markierung entfernen</button></form></p>{% endif %}
+</section>
+<ol class="lab-steps">
+  {% for step in lab.steps %}
+  <li class="card">
+    <h2>{{ step.title }}</h2>
+    {{ step.text_de | nl2p }}
+    {% if step.commands %}<pre><code>{% for c in step.commands %}{{ c }}
+{% endfor %}</code></pre>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% if lab.checks %}
+<section class="card">
+  <h2>Selbstkontrolle</h2>
+  <ol class="checks">
+    {% for c in lab.checks %}
+    <li><details><summary>{{ c.question_de }}</summary><p>{{ c.answer_de }}</p></details></li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% if not progress %}
+<form method="post" action="/lab/{{ lab.id }}/complete"><button class="btn btn-primary" type="submit">Lab als erledigt markieren</button></form>
+{% endif %}
+{% endblock %}

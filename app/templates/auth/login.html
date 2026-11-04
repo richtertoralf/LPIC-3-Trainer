@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Anmelden · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Anmelden</h1>
+  {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{ next }}">
+    <label>Benutzername<input name="username" required autocomplete="username" autofocus value="{{ username or '' }}"></label>
+    <label>Passwort<input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn btn-primary" type="submit">Anmelden</button>
+  </form>
+  <p class="muted">Noch kein Konto? <a href="/register">Registrieren</a></p>
+</section>
+{% endblock %}

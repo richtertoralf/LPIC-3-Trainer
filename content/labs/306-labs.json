@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "kind": "labs",
+  "module": "306",
+  "license": "CC BY-SA 4.0",
+  "visibility": "public",
+  "labs": [
+    {
+      "id": "lab-306-01", "objective": "361.3", "title": "Zwei-Knoten-Pacemaker-Cluster mit virtueller IP und Webserver",
+      "goal_de": "Einen Pacemaker/Corosync-Cluster aufbauen, eine virtuelle IP und einen Webserver als Ressourcen anlegen, Constraints setzen und einen Failover auslösen.",
+      "environment_de": "Zwei Test-VMs (node1 192.168.56.11, node2 192.168.56.12) mit Debian 12 oder Ubuntu 24.04, gegenseitig per Hostname erreichbar. Freie Adresse 192.168.56.100 als VIP.",
+      "duration_minutes": 75,
+      "steps": [
+        {"title": "Pakete und Namensauflösung", "text_de": "Auf beiden Knoten: Pakete installieren, Hostnamen in /etc/hosts eintragen, Apache installieren aber nicht automatisch starten lassen.", "commands": ["sudo apt install pacemaker corosync pcs resource-agents-base fence-agents-base apache2", "printf '192.168.56.11 node1\\n192.168.56.12 node2\\n' | sudo tee -a /etc/hosts", "sudo systemctl disable --now apache2", "echo \"<h1>$(hostname)</h1>\" | sudo tee /var/www/html/index.html"]},
+        {"title": "pcs-Authentifizierung und Cluster anlegen", "text_de": "Setze auf beiden Knoten das Passwort des Benutzers hacluster. Dann nur auf node1: Knoten authentifizieren, Cluster einrichten und starten.", "commands": ["sudo passwd hacluster", "sudo systemctl enable --now pcsd", "sudo pcs host auth node1 node2 -u hacluster", "sudo pcs cluster setup labcluster node1 node2 --force", "sudo pcs cluster start --all", "sudo pcs cluster enable --all", "sudo pcs status"]},
+        {"title": "Fencing für das Lab deaktivieren", "text_de": "In Produktion ist STONITH Pflicht. Für dieses Lab ohne Fencing-Gerät wird es abgeschaltet und die Zwei-Knoten-Quorum-Regel gesetzt.", "commands": ["sudo pcs property set stonith-enabled=false", "sudo pcs property set no-quorum-policy=ignore", "sudo corosync-quorumtool -s", "sudo crm_verify -L -V"]},
+        {"title": "Ressourcen anlegen", "text_de": "Erzeuge die virtuelle IP und den Webserver. Binde beide mit Colocation und Reihenfolge zusammen.", "commands": ["sudo pcs resource create vip ocf:heartbeat:IPaddr2 ip=192.168.56.100 cidr_netmask=24 op monitor interval=10s", "sudo pcs resource create web systemd:apache2 op monitor interval=20s", "sudo pcs constraint colocation add web with vip INFINITY", "sudo pcs constraint order vip then web", "sudo pcs status resources", "curl -s http://192.168.56.100/"]},
+        {"title": "Failover auslösen", "text_de": "Versetze den aktiven Knoten in Standby und beobachte den Umzug. Hole ihn danach zurück.", "commands": ["sudo pcs status | grep -E 'vip|web'", "sudo pcs node standby node1", "watch -n1 sudo pcs status resources", "curl -s http://192.168.56.100/", "sudo pcs node unstandby node1"]},
+        {"title": "Ausfall simulieren und Konfiguration sichern", "text_de": "Beende Apache von Hand auf dem aktiven Knoten und sieh zu, wie Pacemaker reagiert. Exportiere danach die CIB.", "commands": ["sudo systemctl kill apache2", "sudo crm_mon -1", "sudo pcs resource failcount show web", "sudo pcs resource cleanup web", "sudo pcs cluster cib > labcluster.xml"]}
+      ],
+      "checks": [
+        {"question_de": "Warum darf stonith-enabled=false nur im Lab verwendet werden?", "answer_de": "Ohne Fencing kann der Cluster einen nicht erreichbaren Knoten nicht sicher stoppen. Bei Split Brain könnten beide Knoten Ressourcen betreiben und Daten beschädigen."},
+        {"question_de": "Was bewirkt die Order-Constraint vip then web?", "answer_de": "Apache startet erst, wenn die IP aktiv ist, und stoppt vor der IP. Die Colocation sorgt zusätzlich dafür, dass beide auf demselben Knoten laufen."},
+        {"question_de": "Welche Komponente hat den Neustart von Apache nach systemctl kill veranlasst?", "answer_de": "Der Monitor-Operation des Resource Agents meldete den Fehler, die Policy Engine berechnete die Wiederherstellung und der LRMd startete die Ressource erneut."}
+      ]
+    },
+    {
+      "id": "lab-306-02", "objective": "362.1", "title": "DRBD-Ressource zwischen zwei Knoten replizieren",
+      "goal_de": "Eine DRBD-Ressource mit Protokoll C einrichten, erstmalig synchronisieren, ein Dateisystem anlegen und einen manuellen Rollenwechsel durchführen.",
+      "environment_de": "Zwei Test-VMs mit je einer zusätzlichen leeren Platte (z. B. /dev/vdb, 1 GB) und direkter Netzverbindung.",
+      "duration_minutes": 50,
+      "steps": [
+        {"title": "DRBD installieren", "text_de": "Auf beiden Knoten DRBD-Werkzeuge installieren und das Kernelmodul laden.", "commands": ["sudo apt install drbd-utils", "sudo modprobe drbd", "cat /proc/drbd || drbdadm --version"]},
+        {"title": "Ressource definieren", "text_de": "Lege auf beiden Knoten die identische Ressourcendatei an. Protokoll C ist synchron.", "commands": ["cat <<'EOT' | sudo tee /etc/drbd.d/r0.res", "resource r0 {", "  protocol C;", "  device /dev/drbd0;", "  disk /dev/vdb;", "  meta-disk internal;", "  on node1 { address 192.168.56.11:7789; }", "  on node2 { address 192.168.56.12:7789; }", "}", "EOT", "sudo drbdadm dump r0"]},
+        {"title": "Metadaten und Start", "text_de": "Auf beiden Knoten Metadaten schreiben und die Ressource aktivieren. Beide sind zunächst Secondary und Inconsistent.", "commands": ["sudo drbdadm create-md r0", "sudo drbdadm up r0", "sudo drbdadm status r0"]},
+        {"title": "Erstsynchronisation", "text_de": "Nur auf node1: die Ressource mit --force zum Primary machen. Beobachte die Synchronisation.", "commands": ["sudo drbdadm primary --force r0", "watch -n1 sudo drbdadm status r0"]},
+        {"title": "Dateisystem nutzen", "text_de": "Auf node1 Dateisystem anlegen, einhängen und Daten schreiben.", "commands": ["sudo mkfs.ext4 /dev/drbd0", "sudo mkdir -p /mnt/drbd && sudo mount /dev/drbd0 /mnt/drbd", "echo 'repliziert' | sudo tee /mnt/drbd/test.txt", "sudo umount /mnt/drbd"]},
+        {"title": "Rollenwechsel", "text_de": "node1 zum Secondary machen, node2 zum Primary. Dort einhängen und die Datei prüfen.", "commands": ["# node1:", "sudo drbdadm secondary r0", "# node2:", "sudo drbdadm primary r0", "sudo mkdir -p /mnt/drbd && sudo mount /dev/drbd0 /mnt/drbd", "cat /mnt/drbd/test.txt", "sudo drbdadm status r0"]}
+      ],
+      "checks": [
+        {"question_de": "Warum wird --force nur bei der Erstsynchronisation benötigt?", "answer_de": "Beide Seiten sind Inconsistent und DRBD weiß nicht, welche die gültigen Daten hat. --force erklärt die lokale Seite zur Quelle (UpToDate)."},
+        {"question_de": "Was passiert, wenn beide Knoten gleichzeitig Primary werden?", "answer_de": "Ohne Dual-Primary-Konfiguration verweigert DRBD das. Bei einem Netzausfall mit getrennten Writes entsteht Split Brain, der manuell (drbdadm connect --discard-my-data) oder per Handler aufgelöst werden muss."},
+        {"question_de": "Wie würde DRBD in Pacemaker integriert?", "answer_de": "Als Multi-State-Ressource ocf:linbit:drbd (promotable clone) mit Constraints, so dass das Dateisystem nur auf dem Primary eingehängt wird."}
+      ]
+    },
+    {
+      "id": "lab-306-03", "objective": "364.2", "title": "Software-RAID 1 mit mdadm: Aufbau, Ausfall und Wiederherstellung",
+      "goal_de": "Ein RAID 1 mit Hot Spare anlegen, den Ausfall einer Platte simulieren, den Rebuild beobachten und die Konfiguration dauerhaft speichern.",
+      "environment_de": "Test-VM mit drei zusätzlichen leeren Platten von je 1 GB (z. B. /dev/vdb, /dev/vdc, /dev/vdd).",
+      "duration_minutes": 35,
+      "steps": [
+        {"title": "RAID anlegen", "text_de": "Erzeuge ein RAID 1 aus zwei Platten mit einer Hot-Spare-Platte und beobachte die Erstsynchronisation.", "commands": ["sudo apt install mdadm", "sudo mdadm --create /dev/md0 --level=1 --raid-devices=2 --spare-devices=1 /dev/vdb /dev/vdc /dev/vdd", "cat /proc/mdstat", "sudo mdadm --detail /dev/md0"]},
+        {"title": "Dateisystem und Konfiguration", "text_de": "Lege ein Dateisystem an, hänge es ein und schreibe die Array-Definition in mdadm.conf, damit das Array beim Booten zusammengesetzt wird.", "commands": ["sudo mkfs.ext4 /dev/md0", "sudo mkdir -p /mnt/raid && sudo mount /dev/md0 /mnt/raid", "echo 'wichtige daten' | sudo tee /mnt/raid/data.txt", "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf", "sudo update-initramfs -u"]},
+        {"title": "Ausfall simulieren", "text_de": "Markiere eine aktive Platte als fehlerhaft. Die Hot-Spare-Platte springt automatisch ein. Beobachte den Rebuild.", "commands": ["sudo mdadm /dev/md0 --fail /dev/vdb", "watch -n1 cat /proc/mdstat", "sudo mdadm --detail /dev/md0", "cat /mnt/raid/data.txt"]},
+        {"title": "Platte ersetzen", "text_de": "Entferne die defekte Platte aus dem Array und füge sie (als Ersatz für die neue Hardware) wieder als Spare hinzu.", "commands": ["sudo mdadm /dev/md0 --remove /dev/vdb", "sudo mdadm --zero-superblock /dev/vdb", "sudo mdadm /dev/md0 --add /dev/vdb", "sudo mdadm --detail /dev/md0 | tail -8"]},
+        {"title": "Überwachung", "text_de": "Prüfe, ob der mdadm-Monitor läuft, und teste eine Benachrichtigung.", "commands": ["systemctl status mdmonitor --no-pager", "grep -E '^MAILADDR' /etc/mdadm/mdadm.conf", "sudo mdadm --monitor --scan --oneshot --test"]}
+      ],
+      "checks": [
+        {"question_de": "Woran erkennst du in /proc/mdstat ein degradiertes Array?", "answer_de": "An [U_] statt [UU] und an einer laufenden Recovery-Zeile mit Fortschritt. mdadm --detail zeigt State : degraded."},
+        {"question_de": "Warum ist --zero-superblock vor dem erneuten Hinzufügen sinnvoll?", "answer_de": "Alte RAID-Metadaten auf der Platte könnten zu Verwechslungen führen. Bei einer echten neuen Platte entfällt der Schritt."},
+        {"question_de": "Welches RAID-Level würde bei drei Platten Kapazität und Redundanz kombinieren?", "answer_de": "RAID 5: nutzbare Kapazität von zwei Platten, eine Platte darf ausfallen. RAID 1 mit Spare bietet dagegen die Kapazität nur einer Platte."}
+      ]
+    }
+  ]
+}

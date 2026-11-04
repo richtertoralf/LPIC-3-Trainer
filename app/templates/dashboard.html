@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Start · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Hallo {{ user.label }}</h1>
+<section class="grid">
+  {% for p in progress %}
+  <article class="card">
+    <h2><a href="/module/{{ p.module.code }}">{{ p.module.code }} · {{ p.module.title }}</a></h2>
+    <p class="muted">{{ p.module.title_de }}</p>
+    <div class="meter" title="{{ p.answered }} von {{ p.total }} Fragen beantwortet"><span style="width: {{ p.percent_answered }}%"></span></div>
+    <ul class="stats">
+      <li><strong>{{ p.answered }}</strong>/{{ p.total }} Fragen geübt</li>
+      <li><strong>{{ p.percent_correct }} %</strong> richtig</li>
+      <li><strong>{{ p.help_rate }} %</strong> mit Sprachhilfe</li>
+      <li><strong>{{ p.labs_done }}</strong>/{{ p.labs_total }} Labs</li>
+      {% if p.best_exam %}<li>Beste Simulation: <strong>{{ p.best_exam.percent }} %</strong></li>{% endif %}
+    </ul>
+    <p class="actions">
+      <a class="btn btn-primary" href="/learn/{{ p.module.code }}">Üben</a>
+      {% if not selected[p.module.id].entry_done %}<a class="btn" href="/entry/{{ p.module.code }}/start">Eingangstest</a>{% endif %}
+      <a class="btn" href="/exam/{{ p.module.code }}/start">Simulation</a>
+    </p>
+  </article>
+  {% endfor %}
+</section>
+<section class="card">
+  <h2>Fachbegriffe</h2>
+  <p>{{ learning_terms }} Begriffe zum Wiederholen.</p>
+  <p class="actions"><a class="btn" href="/vocab/review">Begriffe wiederholen</a> <a class="btn" href="/glossary">Glossar</a></p>
+</section>
+<p><a href="/modules">Module hinzufügen oder abwählen</a></p>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Ergebnis · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<nav class="breadcrumb"><a href="/module/{{ module.code }}">{{ module.code }} {{ module.title }}</a>{% if objective %} › {{ objective.code }} {{ objective.title }}{% endif %}</nav>
+<section class="card question-card">
+  {% if not review %}
+    {% if is_correct %}<div class="verdict verdict-ok">Richtig!</div>{% else %}<div class="verdict verdict-wrong">Leider falsch.</div>{% endif %}
+    {% if used_help %}<p class="muted small">Du hast die Sprachhilfe genutzt. Die Antwort wird trotzdem normal bewertet.</p>{% endif %}
+  {% endif %}
+  <p class="muted small">{{ question.external_id }}{% if question.objective %} · Ziel {{ question.objective.code }} {{ question.objective.title }}{% endif %}</p>
+  <div data-question-form>
+    {% with help=True, show_result=True %}{% include "learn/_question_body.html" %}{% endwith %}
+    {% include "learn/_help_panel.html" %}
+  </div>
+  <div class="explanation">
+    <h2>Erklärung</h2>
+    {% if question.explanation_de %}{{ question.explanation_de | nl2p }}{% else %}<p class="muted">Keine Erklärung hinterlegt.</p>{% endif %}
+    {% if question.explanation_en %}<details><summary>Explanation (English)</summary>{{ question.explanation_en | nl2p }}</details>{% endif %}
+  </div>
+  <p class="actions">
+    {% if review %}
+      <a class="btn" href="javascript:history.back()">Zurück</a>
+    {% else %}
+      <a class="btn btn-primary" href="/learn/{{ module.code }}{% if objective %}?objective={{ objective.code }}{% endif %}">Nächste Frage</a>
+      <a class="btn" href="/module/{{ module.code }}">Modulübersicht</a>
+    {% endif %}
+  </p>
+</section>
+{% endblock %}

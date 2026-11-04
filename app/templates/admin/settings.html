@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Einstellungen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Einstellungen</h1>
+{% include "admin/_nav.html" %}
+<section class="card narrow">
+  <form method="post" action="/admin/settings">
+    <fieldset>
+      <legend>Registrierung</legend>
+      <label class="radio"><input type="radio" name="registration_mode" value="open" {% if registration_mode == 'open' %}checked{% endif %}> Offen: neue Konten sind sofort aktiv</label>
+      <label class="radio"><input type="radio" name="registration_mode" value="approval" {% if registration_mode == 'approval' %}checked{% endif %}> Mit Freigabe durch Betreuer oder Administrator</label>
+    </fieldset>
+    <button class="btn btn-primary" type="submit">Speichern</button>
+  </form>
+</section>
+{% endblock %}

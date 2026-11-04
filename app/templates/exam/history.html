@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Ergebnisse · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Simulationen und Tests</h1>
+{% if not exams %}<p>Noch keine Simulation gestartet.</p>{% endif %}
+<table class="table">
+  <thead><tr><th>Datum</th><th>Modul</th><th>Art</th><th>Ergebnis</th><th></th></tr></thead>
+  <tbody>
+  {% for e in exams %}
+  <tr>
+    <td>{{ e.started_at.strftime('%d.%m.%Y %H:%M') }}</td>
+    <td>{{ e.module.code }}</td>
+    <td>{% if e.mode == 'entry' %}Eingangstest{% elif e.topic %}Kapitel {{ e.topic.code }}{% else %}Modul{% endif %}</td>
+    <td>{% if e.finished_at %}{{ e.correct_count }}/{{ e.total_count }} ({{ e.percent }} %){% else %}offen{% endif %}</td>
+    <td><a class="btn btn-small" href="/exam/{{ e.id }}{% if e.finished_at %}/result{% endif %}">{% if e.finished_at %}Ansehen{% else %}Fortsetzen{% endif %}</a></td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

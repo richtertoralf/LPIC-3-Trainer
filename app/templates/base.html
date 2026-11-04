@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}LPIC-3 Trainer{% endblock %}</title>
+  <meta name="theme-color" content="#1f3a5f">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/icon-192.png">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">LPIC-3 Trainer</a>
+  <button class="nav-toggle" type="button" aria-label="Menü" aria-expanded="false" data-nav-toggle>☰</button>
+  <nav class="nav" data-nav>
+    {% if user %}
+      <a href="/">Start</a>
+      <a href="/modules">Module</a>
+      <a href="/labs">Labs</a>
+      <a href="/vocab">Vokabeln</a>
+      <a href="/progress">Fortschritt</a>
+      <a href="/groups">Gruppen</a>
+      {% if user.is_supervisor %}<a href="/admin">Verwaltung</a>{% endif %}
+      <a href="/account" class="nav-user">{{ user.label }}</a>
+      <form method="post" action="/logout" class="inline"><button class="link" type="submit">Abmelden</button></form>
+    {% else %}
+      <a href="/login">Anmelden</a>
+      <a href="/register">Registrieren</a>
+    {% endif %}
+  </nav>
+</header>
+<div class="offline-banner" data-offline-banner hidden>Offline. Bereits geladene Inhalte sind verfügbar, Lernfortschritt wird nicht gespeichert.</div>
+<main class="container">
+  {% if flash %}<div class="flash flash-{{ flash.kind }}" role="status">{{ flash.text }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="footer">
+  <span>LPIC-3 Trainer {{ app_version }}</span>
+  <span>Unabhängig vom Linux Professional Institute. LPIC-3 ist eine Marke des LPI.</span>
+</footer>
+<script src="/static/app.js" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

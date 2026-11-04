@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "kind": "objectives",
+  "module": {
+    "code": "300",
+    "title": "LPIC-3 Mixed Environments",
+    "title_de": "Gemischte Umgebungen: Samba, Active Directory, FreeIPA, NFS",
+    "description_de": "Integration von Linux in Windows-Netze: Samba als Dateiserver und Active-Directory-Domänencontroller, Domänenmitgliedschaft, Authentifizierung mit Winbind und SSSD, FreeIPA sowie NFSv4.",
+    "version": "3.0",
+    "source_url": "https://www.lpi.org/our-certifications/exam-300-objectives/",
+    "position": 1
+  },
+  "topics": [
+    {
+      "code": "301",
+      "title": "Samba Basics",
+      "title_de": "Samba-Grundlagen",
+      "objectives": [
+        {"code": "301.1", "title": "Samba Concepts and Architecture", "title_de": "Samba-Konzepte und Architektur", "weight": 2,
+         "summary_de": "Aufgaben der Samba-Dienste smbd, nmbd, winbindd und samba verstehen. Welche Netzwerkdienste und Ports SMB und Active Directory nutzen, welche Funktionen die SMB-Versionen 1 bis 3 bringen und was Samba 4 gegenüber Samba 3 verändert hat. Grundwissen zu VFS-Modulen, Samba-Clustering und CTDB.",
+         "tools": "smbd, nmbd, samba, winbindd"},
+        {"code": "301.2", "title": "Samba Configuration", "title_de": "Samba-Konfiguration", "weight": 4,
+         "summary_de": "Samba über smb.conf oder die Registry konfigurieren, Serverrollen und Sicherheitsmodi setzen, TLS einrichten und Konfigurationen mit testparm prüfen. Samba lässt sich auch mit Windows-Werkzeugen wie RSAT, MMC oder ADSI Edit verwalten.",
+         "tools": "smb.conf, security, server role, server string, server services, tls enabled, tls keyfile, tls certfile, config backend, registry shares, include, vfs objects, samba-regedit, testparm, net registry, RSAT, MMC, ADSI Edit, LDP, Regedit"},
+        {"code": "301.3", "title": "Regular Samba Maintenance", "title_de": "Laufende Samba-Wartung", "weight": 2,
+         "summary_de": "Samba-Dienste starten, stoppen und überwachen, laufende Verbindungen anzeigen, TDB-Datenbanken und Domänencontroller sichern und wiederherstellen. Besonderheiten virtualisierter Domänencontroller wie Snapshots und die VM Generation ID kennen.",
+         "tools": "systemctl, smbcontrol, smbstatus, tdbbackup, tdbrestore, samba-tool domain backup, Virtual Machine Generation Identifier, Virtual Machine Snapshots"},
+        {"code": "301.4", "title": "Troubleshooting Samba", "title_de": "Fehlersuche in Samba", "weight": 3,
+         "summary_de": "Protokollstufen setzen und Logdateien auswerten, Passwortdatenbank und TDB-Dateien untersuchen, LDAP-Objekte mit den ldb-Werkzeugen lesen und ändern, Datenbankintegrität eines Domänencontrollers prüfen und Abfragen mit rpcclient durchführen.",
+         "tools": "log level, debuglevel, /var/log/samba/, smbpasswd, pdbedit, registry.tdb, secrets.tdb, tdbdump, tdbtool, ldbsearch, ldbmodify, ldbedit, ldbadd, ldbdel, LDIF, samba-tool dbcheck, rpcclient"}
+      ]
+    },
+    {
+      "code": "302",
+      "title": "Samba and Active Directory Domains",
+      "title_de": "Samba und Active-Directory-Domänen",
+      "objectives": [
+        {"code": "302.1", "title": "Samba as Active Directory Domain Controller", "title_de": "Samba als Active-Directory-Domänencontroller", "weight": 5,
+         "summary_de": "Active Directory und seine Dienste (DNS, Kerberos, NTP, LDAP, CIFS, MS-RPC) verstehen. Domänencontroller einrichten, hinzufügen, herabstufen und entfernen, Replikation, FSMO-Rollen, Standorte, Funktionsebenen und Vertrauensstellungen verwalten. SYSVOL mit rsync replizieren und Zeitsynchronisation mit signiertem NTP einrichten.",
+         "tools": "server role, samba-tool domain, samba-tool fsmo, samba-tool drs, samba-tool sites, rsync, /var/lib/samba/sysvol, robocopy, ntpd.conf, ntpsigndsocket"},
+        {"code": "302.2", "title": "Active Directory Name Resolution", "title_de": "Namensauflösung im Active Directory", "weight": 2,
+         "summary_de": "Den internen DNS-Server von Samba für eine AD-Domäne betreiben, DNS-Einträge pflegen, Weiterleitungen konfigurieren und die standardisierten AD-Namen kennen. Grundwissen zu BIND9 DLZ, mDNS, NetBIOS und WINS.",
+         "tools": "dns forwarder, allow dns updates, samba-tool dns, samba_dnsupdate, dig, host, /etc/resolv.conf"},
+        {"code": "302.3", "title": "Active Directory User Management", "title_de": "Benutzerverwaltung im Active Directory", "weight": 4,
+         "summary_de": "Benutzer und Gruppen anlegen und verwalten, Passwortrichtlinien setzen, SIDs, DNs, GUIDs und UPNs unterscheiden, Sicherheits- und Verteilergruppen kennen, RFC2307-Attribute pflegen, SPNs zuordnen und Keytabs exportieren.",
+         "tools": "samba-tool user, samba-tool group, samba-tool domain passwordsettings, samba-tool domain exportkeytab, samba-tool spn, smbpasswd, pdbedit, kinit, klist"},
+        {"code": "302.4", "title": "Samba Domain Membership", "title_de": "Samba als Domänenmitglied", "weight": 4,
+         "summary_de": "Einen Samba-Server in eine AD-Domäne aufnehmen, Winbind und die ID-Zuordnung (idmap-Backends) konfigurieren sowie PAM und NSS auf Winbind umstellen.",
+         "tools": "security, realm, workgroup, idmap config, winbind enumerate users, winbind offline logon, template shell, template homedir, idmap_ad, idmap_autorid, idmap_ldap, idmap_rfc2307, idmap_rid, idmap_tdb, net ads, /etc/nsswitch.conf, /etc/pam.d/, libnss_winbind, libpam_winbind, getent, wbinfo"},
+        {"code": "302.5", "title": "Samba Local User Management", "title_de": "Lokale Benutzerverwaltung in Samba", "weight": 2,
+         "summary_de": "Lokale Samba-Passwortdatenbanken einrichten, Passwörter mit Unix-Konten synchron halten und zwischen passdb-Backends wechseln.",
+         "tools": "passdb backend, /etc/passwd, /etc/group, pam_smbpass.so, smbpasswd, pdbedit"}
+      ]
+    },
+    {
+      "code": "303",
+      "title": "Samba Share Configuration",
+      "title_de": "Samba-Freigaben konfigurieren",
+      "objectives": [
+        {"code": "303.1", "title": "File Share Configuration", "title_de": "Dateifreigaben konfigurieren", "weight": 4,
+         "summary_de": "CIFS-Freigaben anlegen und absichern, Zugriffsparameter wie valid users, hosts allow oder veto files einsetzen, Profil- und Home-Freigaben bereitstellen, registrybasierte Freigaben nutzen und die IPC$-Freigabe einschränken.",
+         "tools": "path, browsable, writable, read only, valid users, invalid users, read list, write list, guest ok, hosts allow, hosts deny, hide unreadable, hide dot files, veto files, delete veto files, [homes], [IPC$], smbcquotas"},
+        {"code": "303.2", "title": "File Share Security", "title_de": "Sicherheit von Dateifreigaben", "weight": 3,
+         "summary_de": "Besitzer und Rechte erzwingen, Freigabe- und Ordner-ACLs verwalten, POSIX-, erweiterte POSIX- und Windows-ACLs unterscheiden und verstehen, wie Samba Windows-ACLs in Linux-ACLs und erweiterten Attributen ablegt. SMB-Verschlüsselung aktivieren.",
+         "tools": "create mask, directory mask, force create mode, force user, force group, inherit acls, map acl inherit, store dos attributes, smb encrypt, chown, chmod, getfacl, setfacl, getfattr, smbcacls, sharesec, SeDiskOperatorPrivilege, vfs_acl_xattr, vfs_acl_tdb, samba-tool ntacl"},
+        {"code": "303.3", "title": "DFS Share Configuration", "title_de": "DFS-Freigaben konfigurieren", "weight": 1,
+         "summary_de": "Das Distributed File System (DFS) verstehen und Samba als DFS-Wurzel mit Verweisen auf andere Server einrichten.",
+         "tools": "host msdfs, msdfs root, msdfs proxy, ln"},
+        {"code": "303.4", "title": "Print Share Configuration", "title_de": "Druckfreigaben konfigurieren", "weight": 2,
+         "summary_de": "Drucker über Samba bereitstellen, Samba mit CUPS verbinden, Windows-Druckertreiber zum automatischen Download hinterlegen und Treiber vorkonfigurieren.",
+         "tools": "printing, printable, printcap name, [printers], [print$], CUPS, cupsd.conf, /var/spool/samba/, smbspool, rpcclient enumdrivers, rpcclient enumprinters, rpcclient setdriver, SePrintOperatorPrivilege"}
+      ]
+    },
+    {
+      "code": "304",
+      "title": "Samba Client Configuration",
+      "title_de": "Samba-Clients konfigurieren",
+      "objectives": [
+        {"code": "304.1", "title": "Linux Authentication Clients", "title_de": "Linux-Clients für die Authentifizierung", "weight": 5,
+         "summary_de": "NSS und PAM konfigurieren, Passwortrichtlinien und Sperren nach Fehlversuchen umsetzen, Home-Verzeichnisse automatisch anlegen, Authentifizierung gegen LDAP und Kerberos einrichten und SSSD für AD, IPA, LDAP und Kerberos nutzen.",
+         "tools": "/etc/pam.conf, /etc/pam.d/, /etc/nsswitch.conf, /etc/login.defs, pam_ldap.so, pam_krb5.so, pam_cracklib.so, pam_tally2.so, pam_faillock.so, pam_mkhomedir.so, chage, faillog, sssd, sssd.conf, sss_override, sss_cache, sss_debuglevel, krb5.conf, kinit, klist, kdestroy"},
+        {"code": "304.2", "title": "Linux CIFS Clients", "title_de": "Linux-CIFS-Clients", "weight": 3,
+         "summary_de": "CIFS-Freigaben von Linux aus einhängen, Home-Verzeichnisse automatisch einbinden, Zugangsdaten sicher speichern, Rechte auf CIFS-Freigaben verwalten und Quotas abfragen.",
+         "tools": "smbclient, mount, mount.cifs, /etc/fstab, pam_mount.so, pam_mount.conf.xml, cifscreds, getcifsacl, setcifsacl, smbcquotas, cifsiostat, smbget, smbtar"},
+        {"code": "304.3", "title": "Windows Clients", "title_de": "Windows-Clients", "weight": 3,
+         "summary_de": "Windows-Rechner in die Domäne aufnehmen, auf Freigaben und Drucker zugreifen, Gruppenrichtlinien (GPO) verstehen und verwalten, Anmeldeskripte, servergespeicherte Profile und Ordnerumleitung einsetzen.",
+         "tools": "logon path, logon script, net, samba-tool gpo, gpupdate, rdesktop"}
+      ]
+    },
+    {
+      "code": "305",
+      "title": "Linux Identity Management and File Sharing",
+      "title_de": "Identitätsverwaltung und Dateifreigaben unter Linux",
+      "objectives": [
+        {"code": "305.1", "title": "FreeIPA Installation and Maintenance", "title_de": "FreeIPA installieren und warten", "weight": 2,
+         "summary_de": "Aufbau und Funktionen von FreeIPA verstehen, einen Server installieren, Replikate aufbauen, Clients aufnehmen und Backups kennen.",
+         "tools": "ipa-server-install, ipa-replica-prepare, ipa-replica-install, ipa-client-install, ipactl"},
+        {"code": "305.2", "title": "FreeIPA Entity Management", "title_de": "Objekte in FreeIPA verwalten", "weight": 4,
+         "summary_de": "Benutzer, Gruppen, Hosts, Hostgruppen und Dienste verwalten, Berechtigungen, Privilegien und Rollen vergeben, ID-Views nutzen und Grundwissen zu sudo, autofs, SSH, SELinux, HBAC und der IPA-CA haben.",
+         "tools": "ipa user-*, ipa stageuser-*, ipa group-*, ipa idview-*, ipa host-*, ipa hostgroup-*, ipa service-*, ipa-getkeytab, ipa permission-*, ipa privilege-*, ipa role-*, ipa-advise"},
+        {"code": "305.3", "title": "FreeIPA Active Directory Integration", "title_de": "FreeIPA mit Active Directory verbinden", "weight": 2,
+         "summary_de": "Eine Kerberos-Vertrauensstellung zwischen FreeIPA und Active Directory einrichten, ID-Bereiche verwalten und externe Gruppen abbilden.",
+         "tools": "ipa-adtrust-install, ipa trust-*, ipa idrange-*, ipa group-*"},
+        {"code": "305.4", "title": "Network File System", "title_de": "Network File System (NFS)", "weight": 3,
+         "summary_de": "NFSv4-Server und -Clients konfigurieren, das Pseudo-Dateisystem verstehen, NFSv4-ACLs pflegen und NFS mit Kerberos absichern.",
+         "tools": "exportfs, /etc/exports, /etc/idmapd.conf, nfs4_editfacl, nfs4_getfacl, nfs4_setfacl, mount, /etc/fstab"}
+      ]
+    }
+  ]
+}

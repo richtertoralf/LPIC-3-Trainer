@@ -1,0 +1,479 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "303",
+  "license": "CC BY-SA 4.0",
+  "author": "LPIC-3 Trainer Projekt",
+  "visibility": "public",
+  "questions": [
+    {
+      "id": "303-331.1-01", "objective": "331.1", "type": "single", "difficulty": 1,
+      "question": "Which openssl command creates a new certificate signing request together with a new private key?",
+      "question_de": "Welcher openssl-Befehl erstellt einen neuen Zertifikatsantrag (CSR) zusammen mit einem neuen privaten Schlüssel?",
+      "choices": [
+        {"text": "openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr", "text_de": "openssl req -new -newkey rsa:4096 -keyout server.key -out server.csr", "correct": true},
+        {"text": "openssl x509 -req -in server.key -out server.csr", "text_de": "openssl x509 -req -in server.key -out server.csr"},
+        {"text": "openssl ca -newkey -out server.csr", "text_de": "openssl ca -newkey -out server.csr"},
+        {"text": "openssl genrsa -csr server.csr 4096", "text_de": "openssl genrsa -csr server.csr 4096"}
+      ],
+      "explanation_de": "Das Unterkommando req erzeugt Zertifikatsanträge. Mit -newkey wird gleichzeitig ein neuer Schlüssel erzeugt, -keyout gibt die Schlüsseldatei an, -out den CSR. x509 verarbeitet fertige Zertifikate, ca signiert Anträge, genrsa erzeugt nur Schlüssel.",
+      "terms": [{"term": "certificate signing request", "de": "Zertifikatsantrag (CSR)"}, {"term": "private key", "de": "privater Schlüssel"}]
+    },
+    {
+      "id": "303-331.1-02", "objective": "331.1", "type": "multiple", "difficulty": 2,
+      "question": "Which of the following are valid mechanisms to publish the revocation status of an X.509 certificate? (Choose two.)",
+      "question_de": "Welche der folgenden Mechanismen sind gültige Wege, den Sperrstatus eines X.509-Zertifikats zu veröffentlichen? (Zwei Antworten.)",
+      "choices": [
+        {"text": "A certificate revocation list (CRL) signed by the CA", "text_de": "Eine von der CA signierte Zertifikatssperrliste (CRL)", "correct": true},
+        {"text": "An OCSP responder answering status requests", "text_de": "Ein OCSP-Responder, der Statusanfragen beantwortet", "correct": true},
+        {"text": "A DNS TXT record containing the serial number", "text_de": "Ein DNS-TXT-Eintrag mit der Seriennummer"},
+        {"text": "Deleting the private key on the server", "text_de": "Löschen des privaten Schlüssels auf dem Server"},
+        {"text": "Re-signing the certificate with a shorter validity", "text_de": "Erneutes Signieren des Zertifikats mit kürzerer Gültigkeit"}
+      ],
+      "explanation_de": "Sperrinformationen werden über CRLs (periodisch veröffentlichte Listen) oder OCSP (Online-Abfrage je Zertifikat) verteilt. Das Löschen eines Schlüssels oder ein neues Zertifikat informiert Clients nicht über die Sperrung.",
+      "terms": [{"term": "revocation", "de": "Sperrung, Widerruf"}, {"term": "validity", "de": "Gültigkeit"}]
+    },
+    {
+      "id": "303-331.1-03", "objective": "331.1", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of the X.509 v3 extension basicConstraints with the value CA:TRUE?",
+      "question_de": "Welchen Zweck hat die X.509-v3-Erweiterung basicConstraints mit dem Wert CA:TRUE?",
+      "choices": [
+        {"text": "It marks the certificate as being allowed to sign other certificates.", "text_de": "Sie kennzeichnet das Zertifikat als berechtigt, andere Zertifikate zu signieren.", "correct": true},
+        {"text": "It restricts the certificate to client authentication only.", "text_de": "Sie beschränkt das Zertifikat auf die Client-Authentifizierung."},
+        {"text": "It enables the certificate for encrypting e-mail.", "text_de": "Sie erlaubt das Verschlüsseln von E-Mails mit dem Zertifikat."},
+        {"text": "It defines the maximum validity period of the certificate.", "text_de": "Sie legt die maximale Gültigkeitsdauer des Zertifikats fest."}
+      ],
+      "explanation_de": "basicConstraints CA:TRUE kennzeichnet ein CA-Zertifikat. Nur solche Zertifikate dürfen in der Vertrauenskette als Aussteller auftreten. Optional begrenzt pathlen die Tiefe untergeordneter CAs. Verwendungszwecke steuern keyUsage und extendedKeyUsage.",
+      "terms": [{"term": "extension", "de": "Erweiterung"}]
+    },
+    {
+      "id": "303-331.1-04", "objective": "331.1", "type": "single", "difficulty": 2,
+      "question": "Which statement about the PEM and DER encodings of X.509 certificates is correct?",
+      "question_de": "Welche Aussage über die PEM- und DER-Kodierung von X.509-Zertifikaten ist richtig?",
+      "choices": [
+        {"text": "PEM is a Base64 text representation of the binary DER structure.", "text_de": "PEM ist eine Base64-Textdarstellung der binären DER-Struktur.", "correct": true},
+        {"text": "DER files always contain the private key, PEM files never do.", "text_de": "DER-Dateien enthalten immer den privaten Schlüssel, PEM-Dateien nie."},
+        {"text": "PEM is only used for CSRs, DER only for CRLs.", "text_de": "PEM wird nur für CSRs verwendet, DER nur für CRLs."},
+        {"text": "DER is an encrypted form of PEM.", "text_de": "DER ist eine verschlüsselte Form von PEM."}
+      ],
+      "explanation_de": "DER ist die binäre ASN.1-Kodierung. PEM verpackt dieselben Daten Base64-kodiert zwischen BEGIN- und END-Zeilen. Beide Formate können Zertifikate, Schlüssel, CSRs oder CRLs enthalten; die Umwandlung erfolgt mit openssl x509 -inform/-outform.",
+      "terms": [{"term": "encoding", "de": "Kodierung"}]
+    },
+    {
+      "id": "303-331.2-01", "objective": "331.2", "type": "single", "difficulty": 2,
+      "question": "A web server should tell browsers to use HTTPS only for the next year, including subdomains. Which Apache directive accomplishes this?",
+      "question_de": "Ein Webserver soll Browsern mitteilen, für das nächste Jahr nur HTTPS zu verwenden, einschließlich Subdomains. Welche Apache-Direktive erreicht das?",
+      "choices": [
+        {"text": "Header always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\"", "text_de": "Header always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\"", "correct": true},
+        {"text": "SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1", "text_de": "SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1"},
+        {"text": "SSLUseStapling on", "text_de": "SSLUseStapling on"},
+        {"text": "SSLStrictSNIVHostCheck on", "text_de": "SSLStrictSNIVHostCheck on"}
+      ],
+      "explanation_de": "HTTP Strict Transport Security (HSTS) wird über den Antwort-Header Strict-Transport-Security gesetzt (mod_headers). max-age in Sekunden, includeSubDomains erweitert auf Subdomains. SSLProtocol wählt TLS-Versionen, SSLUseStapling aktiviert OCSP Stapling.",
+      "terms": [{"term": "subdomain", "de": "Subdomain, Unterdomäne"}]
+    },
+    {
+      "id": "303-331.2-02", "objective": "331.2", "type": "single", "difficulty": 1,
+      "question": "Which command connects to a TLS server, shows the certificate chain and allows verification of the handshake?",
+      "question_de": "Welcher Befehl verbindet sich mit einem TLS-Server, zeigt die Zertifikatskette und erlaubt die Prüfung des Handshakes?",
+      "choices": [
+        {"text": "openssl s_client -connect www.example.com:443 -showcerts", "text_de": "openssl s_client -connect www.example.com:443 -showcerts", "correct": true},
+        {"text": "openssl verify -connect www.example.com:443", "text_de": "openssl verify -connect www.example.com:443"},
+        {"text": "openssl x509 -connect www.example.com:443", "text_de": "openssl x509 -connect www.example.com:443"},
+        {"text": "openssl s_server -remote www.example.com:443", "text_de": "openssl s_server -remote www.example.com:443"}
+      ],
+      "explanation_de": "openssl s_client ist der generische TLS-Client zum Testen. -showcerts gibt alle Zertifikate der Kette aus. s_server startet einen Testserver, verify prüft lokale Zertifikatsdateien, x509 verarbeitet Zertifikatsdateien.",
+      "terms": [{"term": "chain", "de": "Kette"}]
+    },
+    {
+      "id": "303-331.2-03", "objective": "331.2", "type": "single", "difficulty": 2,
+      "question": "Which Apache configuration requires clients to present a valid certificate issued by a CA listed in the given file?",
+      "question_de": "Welche Apache-Konfiguration verlangt von Clients ein gültiges Zertifikat, das von einer CA aus der angegebenen Datei ausgestellt wurde?",
+      "choices": [
+        {"text": "SSLVerifyClient require\nSSLCACertificateFile /etc/ssl/clientca.pem", "text_de": "SSLVerifyClient require\nSSLCACertificateFile /etc/ssl/clientca.pem", "correct": true},
+        {"text": "SSLCertificateFile /etc/ssl/clientca.pem\nSSLVerifyDepth 0", "text_de": "SSLCertificateFile /etc/ssl/clientca.pem\nSSLVerifyDepth 0"},
+        {"text": "SSLRequireSSL\nSSLCertificateChainFile /etc/ssl/clientca.pem", "text_de": "SSLRequireSSL\nSSLCertificateChainFile /etc/ssl/clientca.pem"},
+        {"text": "AuthType Certificate\nAuthCertFile /etc/ssl/clientca.pem", "text_de": "AuthType Certificate\nAuthCertFile /etc/ssl/clientca.pem"}
+      ],
+      "explanation_de": "SSLVerifyClient require erzwingt Client-Zertifikate, SSLCACertificateFile benennt die CAs, denen für Client-Zertifikate vertraut wird. SSLCertificateFile ist das Serverzertifikat, SSLCertificateChainFile die Serverkette. AuthType Certificate existiert nicht.",
+      "terms": [{"term": "present", "de": "vorlegen, vorzeigen"}]
+    },
+    {
+      "id": "303-331.3-01", "objective": "331.3", "type": "single", "difficulty": 1,
+      "question": "Which command initializes a new LUKS encrypted volume on /dev/sdb1?",
+      "question_de": "Welcher Befehl richtet ein neues LUKS-verschlüsseltes Volume auf /dev/sdb1 ein?",
+      "choices": [
+        {"text": "cryptsetup luksFormat /dev/sdb1", "text_de": "cryptsetup luksFormat /dev/sdb1", "correct": true},
+        {"text": "cryptsetup open /dev/sdb1 secret", "text_de": "cryptsetup open /dev/sdb1 secret"},
+        {"text": "mkfs.luks /dev/sdb1", "text_de": "mkfs.luks /dev/sdb1"},
+        {"text": "cryptsetup luksAddKey /dev/sdb1", "text_de": "cryptsetup luksAddKey /dev/sdb1"}
+      ],
+      "explanation_de": "luksFormat schreibt den LUKS-Header und den ersten Schlüsselplatz. Danach öffnet cryptsetup open (oder luksOpen) das Gerät unter /dev/mapper/<name>, erst dann wird ein Dateisystem angelegt. luksAddKey fügt weitere Passphrasen hinzu.",
+      "terms": [{"term": "initialize", "de": "initialisieren, einrichten"}]
+    },
+    {
+      "id": "303-331.3-02", "objective": "331.3", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of the file /etc/crypttab?",
+      "question_de": "Welchen Zweck hat die Datei /etc/crypttab?",
+      "choices": [
+        {"text": "It lists encrypted block devices that should be set up during boot.", "text_de": "Sie listet verschlüsselte Blockgeräte, die beim Systemstart eingerichtet werden sollen.", "correct": true},
+        {"text": "It stores the LUKS master keys of all volumes.", "text_de": "Sie speichert die LUKS-Hauptschlüssel aller Volumes."},
+        {"text": "It configures eCryptfs home directory encryption per user.", "text_de": "Sie konfiguriert die eCryptfs-Verschlüsselung von Home-Verzeichnissen je Benutzer."},
+        {"text": "It replaces /etc/fstab for encrypted file systems.", "text_de": "Sie ersetzt /etc/fstab für verschlüsselte Dateisysteme."}
+      ],
+      "explanation_de": "/etc/crypttab beschreibt, welche Geräte mit welchem Namen und Schlüssel (Passphrase oder Schlüsseldatei) beim Booten per dm-crypt geöffnet werden. Das Einhängen des entschlüsselten Geräts steht weiterhin in /etc/fstab.",
+      "terms": [{"term": "during boot", "de": "beim Systemstart"}]
+    },
+    {
+      "id": "303-331.3-03", "objective": "331.3", "type": "single", "difficulty": 3,
+      "question": "A LUKS volume should be unlocked automatically when the system is in the company network, using a Tang server. Which component implements this on the client?",
+      "question_de": "Ein LUKS-Volume soll automatisch entsperrt werden, wenn sich das System im Firmennetz befindet, über einen Tang-Server. Welche Komponente setzt das auf dem Client um?",
+      "choices": [
+        {"text": "Clevis", "text_de": "Clevis", "correct": true},
+        {"text": "ecryptfs-setup-private", "text_de": "ecryptfs-setup-private"},
+        {"text": "cryptmount", "text_de": "cryptmount"},
+        {"text": "pam_ecryptfs", "text_de": "pam_ecryptfs"}
+      ],
+      "explanation_de": "Clevis ist das Client-Framework für automatisiertes Entschlüsseln. Mit dem Tang-Pin bindet es ein LUKS-Volume an einen Tang-Server (Network Bound Disk Encryption, NBDE); alternativ gibt es einen TPM2-Pin. Die eCryptfs-Werkzeuge betreffen Dateisystem-Verschlüsselung auf Dateiebene.",
+      "terms": [{"term": "unlock", "de": "entsperren"}]
+    },
+    {
+      "id": "303-331.4-01", "objective": "331.4", "type": "single", "difficulty": 2,
+      "question": "In DNSSEC, which record in the parent zone establishes the chain of trust to a child zone?",
+      "question_de": "Welcher Eintrag in der Elternzone stellt bei DNSSEC die Vertrauenskette zu einer Kindzone her?",
+      "choices": [
+        {"text": "DS", "text_de": "DS", "correct": true},
+        {"text": "RRSIG", "text_de": "RRSIG"},
+        {"text": "NSEC", "text_de": "NSEC"},
+        {"text": "DNSKEY", "text_de": "DNSKEY"}
+      ],
+      "explanation_de": "Der DS-Eintrag (Delegation Signer) in der Elternzone enthält einen Hash des KSK der Kindzone. RRSIG trägt Signaturen, DNSKEY veröffentlicht die Schlüssel in der eigenen Zone, NSEC/NSEC3 beweisen die Nichtexistenz von Namen.",
+      "terms": [{"term": "parent zone", "de": "Elternzone, übergeordnete Zone"}, {"term": "child zone", "de": "Kindzone, delegierte Zone"}]
+    },
+    {
+      "id": "303-331.4-02", "objective": "331.4", "type": "single", "difficulty": 2,
+      "question": "Which statement correctly describes the roles of KSK and ZSK in DNSSEC?",
+      "question_de": "Welche Aussage beschreibt die Rollen von KSK und ZSK bei DNSSEC richtig?",
+      "choices": [
+        {"text": "The KSK signs the DNSKEY record set, the ZSK signs the other records of the zone.", "text_de": "Der KSK signiert den DNSKEY-Eintragssatz, der ZSK signiert die übrigen Einträge der Zone.", "correct": true},
+        {"text": "The ZSK is published in the parent zone, the KSK stays secret on the resolver.", "text_de": "Der ZSK wird in der Elternzone veröffentlicht, der KSK bleibt geheim auf dem Resolver."},
+        {"text": "KSK and ZSK must always be the same key.", "text_de": "KSK und ZSK müssen immer derselbe Schlüssel sein."},
+        {"text": "The KSK encrypts zone transfers, the ZSK encrypts queries.", "text_de": "Der KSK verschlüsselt Zonentransfers, der ZSK verschlüsselt Anfragen."}
+      ],
+      "explanation_de": "Der Key Signing Key signiert nur den DNSKEY-RRset und wird über den DS-Eintrag der Elternzone verankert; er wird selten gewechselt. Der Zone Signing Key signiert die eigentlichen Zonendaten und kann häufiger rotiert werden, ohne die Elternzone zu ändern. DNSSEC signiert, es verschlüsselt nicht.",
+      "terms": []
+    },
+    {
+      "id": "303-331.4-03", "objective": "331.4", "type": "single", "difficulty": 2,
+      "question": "Which DNS record type allows a domain owner to specify which certificate authorities may issue certificates for the domain?",
+      "question_de": "Welcher DNS-Eintragstyp erlaubt es dem Domaininhaber festzulegen, welche Zertifizierungsstellen Zertifikate für die Domain ausstellen dürfen?",
+      "choices": [
+        {"text": "CAA", "text_de": "CAA", "correct": true},
+        {"text": "TLSA", "text_de": "TLSA"},
+        {"text": "SSHFP", "text_de": "SSHFP"},
+        {"text": "CERT", "text_de": "CERT"}
+      ],
+      "explanation_de": "CAA (Certification Authority Authorization) benennt zugelassene CAs; CAs müssen den Eintrag vor der Ausstellung prüfen. TLSA (DANE) bindet ein konkretes Zertifikat oder einen Schlüssel an einen Dienst, SSHFP veröffentlicht SSH-Host-Fingerprints.",
+      "terms": []
+    },
+    {
+      "id": "303-332.1-01", "objective": "332.1", "type": "single", "difficulty": 2,
+      "question": "A systemd service should not be able to see other users' home directories and should get its own /tmp. Which unit options achieve this?",
+      "question_de": "Ein systemd-Dienst soll die Home-Verzeichnisse anderer Benutzer nicht sehen und ein eigenes /tmp bekommen. Welche Unit-Optionen erreichen das?",
+      "choices": [
+        {"text": "ProtectHome=true and PrivateTmp=true", "text_de": "ProtectHome=true und PrivateTmp=true", "correct": true},
+        {"text": "NoNewPrivileges=true and ProtectSystem=full", "text_de": "NoNewPrivileges=true und ProtectSystem=full"},
+        {"text": "PrivateNetwork=true and PrivateDevices=true", "text_de": "PrivateNetwork=true und PrivateDevices=true"},
+        {"text": "User=nobody and Group=nogroup", "text_de": "User=nobody und Group=nogroup"}
+      ],
+      "explanation_de": "ProtectHome blendet /home, /root und /run/user aus; PrivateTmp gibt dem Dienst einen privaten Namensraum für /tmp und /var/tmp. ProtectSystem schützt /usr und /etc, PrivateNetwork trennt vom Netz, PrivateDevices beschränkt den Gerätezugriff.",
+      "terms": [{"term": "unit", "de": "Unit, systemd-Konfigurationseinheit"}]
+    },
+    {
+      "id": "303-332.1-02", "objective": "332.1", "type": "single", "difficulty": 2,
+      "question": "Which command shows the file capabilities set on the binary /usr/bin/ping?",
+      "question_de": "Welcher Befehl zeigt die Datei-Capabilities des Programms /usr/bin/ping?",
+      "choices": [
+        {"text": "getcap /usr/bin/ping", "text_de": "getcap /usr/bin/ping", "correct": true},
+        {"text": "capsh --print /usr/bin/ping", "text_de": "capsh --print /usr/bin/ping"},
+        {"text": "setcap -v /usr/bin/ping", "text_de": "setcap -v /usr/bin/ping"},
+        {"text": "getfattr -n security.capability -d /usr/bin/ping", "text_de": "getfattr -n security.capability -d /usr/bin/ping"}
+      ],
+      "explanation_de": "getcap liest die Capabilities einer Datei. setcap setzt sie (zum Beispiel cap_net_raw+ep), capsh zeigt die Capabilities der eigenen Shell. getfattr würde zwar das Attribut security.capability roh anzeigen, aber nicht dekodiert und ist nicht der vorgesehene Weg.",
+      "terms": [{"term": "binary", "de": "ausführbare Programmdatei"}]
+    },
+    {
+      "id": "303-332.1-03", "objective": "332.1", "type": "single", "difficulty": 2,
+      "question": "What does the kernel parameter kernel.randomize_va_space = 2 enable?",
+      "question_de": "Was aktiviert der Kernelparameter kernel.randomize_va_space = 2?",
+      "choices": [
+        {"text": "Full address space layout randomization including the heap", "text_de": "Vollständige Zufallsanordnung des Adressraums einschließlich des Heaps", "correct": true},
+        {"text": "Mandatory access control for all processes", "text_de": "Regelbasierte Zugriffskontrolle für alle Prozesse"},
+        {"text": "Encryption of swap space", "text_de": "Verschlüsselung des Auslagerungsspeichers"},
+        {"text": "Blocking of unsigned kernel modules", "text_de": "Blockieren nicht signierter Kernelmodule"}
+      ],
+      "explanation_de": "randomize_va_space steuert ASLR: 0 aus, 1 Stack, Bibliotheken und mmap zufällig, 2 zusätzlich den Heap (brk). ASLR erschwert das Ausnutzen von Speicherfehlern, weil Adressen nicht vorhersagbar sind.",
+      "terms": [{"term": "address space", "de": "Adressraum"}]
+    },
+    {
+      "id": "303-332.2-01", "objective": "332.2", "type": "single", "difficulty": 2,
+      "question": "Which command searches the audit log for all events related to the file /etc/shadow?",
+      "question_de": "Welcher Befehl durchsucht das Audit-Protokoll nach allen Ereignissen zur Datei /etc/shadow?",
+      "choices": [
+        {"text": "ausearch -f /etc/shadow", "text_de": "ausearch -f /etc/shadow", "correct": true},
+        {"text": "auditctl -w /etc/shadow -p rwxa", "text_de": "auditctl -w /etc/shadow -p rwxa"},
+        {"text": "aureport --file /etc/shadow", "text_de": "aureport --file /etc/shadow"},
+        {"text": "auditd --search /etc/shadow", "text_de": "auditd --search /etc/shadow"}
+      ],
+      "explanation_de": "ausearch durchsucht die Audit-Logs, -f filtert nach Dateiname. auditctl -w legt eine Überwachungsregel an (das wäre der Schritt davor), aureport erzeugt zusammenfassende Berichte, auditd ist der Daemon ohne Suchoption.",
+      "terms": []
+    },
+    {
+      "id": "303-332.2-02", "objective": "332.2", "type": "single", "difficulty": 2,
+      "question": "After installing AIDE, which step is necessary before AIDE can report changed files?",
+      "question_de": "Welcher Schritt ist nach der Installation von AIDE nötig, bevor AIDE geänderte Dateien melden kann?",
+      "choices": [
+        {"text": "Initialize the database with aide --init and move it to the configured database location.", "text_de": "Die Datenbank mit aide --init erzeugen und an den konfigurierten Datenbankpfad verschieben.", "correct": true},
+        {"text": "Download the current signature database from the AIDE project.", "text_de": "Die aktuelle Signaturdatenbank vom AIDE-Projekt herunterladen."},
+        {"text": "Enable the aide kernel module.", "text_de": "Das aide-Kernelmodul aktivieren."},
+        {"text": "Run aide --check twice to calibrate the baseline.", "text_de": "aide --check zweimal ausführen, um die Basis zu kalibrieren."}
+      ],
+      "explanation_de": "AIDE vergleicht den aktuellen Zustand mit einer selbst erzeugten Referenzdatenbank. aide --init erstellt sie (meist aide.db.new), die dann als aide.db aktiviert wird. aide --check prüft gegen diese Basis; nach gewollten Änderungen aktualisiert aide --update die Datenbank.",
+      "terms": []
+    },
+    {
+      "id": "303-332.2-03", "objective": "332.2", "type": "single", "difficulty": 1,
+      "question": "Which command verifies the integrity of all files installed from the package openssh-server on an RPM-based system?",
+      "question_de": "Welcher Befehl prüft auf einem RPM-System die Integrität aller Dateien des Pakets openssh-server?",
+      "choices": [
+        {"text": "rpm -V openssh-server", "text_de": "rpm -V openssh-server", "correct": true},
+        {"text": "rpm -qi openssh-server", "text_de": "rpm -qi openssh-server"},
+        {"text": "rpm --checksig openssh-server", "text_de": "rpm --checksig openssh-server"},
+        {"text": "dpkg --verify openssh-server", "text_de": "dpkg --verify openssh-server"}
+      ],
+      "explanation_de": "rpm -V (verify) vergleicht Größe, Prüfsumme, Rechte und weitere Attribute installierter Dateien mit der Paketdatenbank. -qi zeigt Paketinformationen, --checksig prüft die Signatur einer Paketdatei. dpkg --verify ist das Gegenstück auf Debian-Systemen.",
+      "terms": []
+    },
+    {
+      "id": "303-332.3-01", "objective": "332.3", "type": "single", "difficulty": 2,
+      "question": "Which systemd unit setting limits the memory a service may use to 512 MB?",
+      "question_de": "Welche systemd-Unit-Einstellung begrenzt den Speicher eines Dienstes auf 512 MB?",
+      "choices": [
+        {"text": "MemoryMax=512M", "text_de": "MemoryMax=512M", "correct": true},
+        {"text": "LimitMEM=512M", "text_de": "LimitMEM=512M"},
+        {"text": "ulimit -m 512M", "text_de": "ulimit -m 512M"},
+        {"text": "CPUQuota=512M", "text_de": "CPUQuota=512M"}
+      ],
+      "explanation_de": "MemoryMax setzt das harte Speicherlimit über den memory-Controller der cgroups (v2). ulimit wirkt pro Prozess und nicht über systemd, CPUQuota begrenzt die CPU-Zeit, LimitMEM existiert nicht (es gibt LimitAS, LimitRSS usw. für klassische ulimits).",
+      "terms": []
+    },
+    {
+      "id": "303-332.3-02", "objective": "332.3", "type": "single", "difficulty": 1,
+      "question": "Which command displays the cgroup hierarchy of the system as a tree?",
+      "question_de": "Welcher Befehl zeigt die cgroup-Hierarchie des Systems als Baum?",
+      "choices": [
+        {"text": "systemd-cgls", "text_de": "systemd-cgls", "correct": true},
+        {"text": "systemd-cgtop", "text_de": "systemd-cgtop"},
+        {"text": "cat /proc/cgroups", "text_de": "cat /proc/cgroups"},
+        {"text": "systemctl list-units", "text_de": "systemctl list-units"}
+      ],
+      "explanation_de": "systemd-cgls listet die cgroups als Baum mit den enthaltenen Prozessen. systemd-cgtop zeigt den Ressourcenverbrauch je cgroup live, /proc/cgroups listet nur die verfügbaren Controller.",
+      "terms": [{"term": "hierarchy", "de": "Hierarchie, Baumstruktur"}]
+    },
+    {
+      "id": "303-333.1-01", "objective": "333.1", "type": "single", "difficulty": 1,
+      "question": "Which command grants the user alice read and write access to the file report.txt using a POSIX ACL?",
+      "question_de": "Welcher Befehl gewährt der Benutzerin alice per POSIX-ACL Lese- und Schreibzugriff auf die Datei report.txt?",
+      "choices": [
+        {"text": "setfacl -m u:alice:rw report.txt", "text_de": "setfacl -m u:alice:rw report.txt", "correct": true},
+        {"text": "chmod u+rw:alice report.txt", "text_de": "chmod u+rw:alice report.txt"},
+        {"text": "getfacl -s alice:rw report.txt", "text_de": "getfacl -s alice:rw report.txt"},
+        {"text": "setfattr -n user.alice -v rw report.txt", "text_de": "setfattr -n user.alice -v rw report.txt"}
+      ],
+      "explanation_de": "setfacl -m ändert (modify) ACL-Einträge; u:alice:rw ist ein Benutzereintrag. chmod kennt keine benutzerspezifischen Einträge, getfacl liest nur, setfattr setzt beliebige erweiterte Attribute ohne Rechtebedeutung.",
+      "terms": []
+    },
+    {
+      "id": "303-333.1-02", "objective": "333.1", "type": "single", "difficulty": 2,
+      "question": "What is the effect of the SetGID bit on a directory?",
+      "question_de": "Welche Wirkung hat das SetGID-Bit auf einem Verzeichnis?",
+      "choices": [
+        {"text": "New files created inside inherit the group of the directory instead of the creator's primary group.", "text_de": "Neu angelegte Dateien erben die Gruppe des Verzeichnisses statt der primären Gruppe des Erstellers.", "correct": true},
+        {"text": "Only the owner of a file may delete it.", "text_de": "Nur der Besitzer einer Datei darf sie löschen."},
+        {"text": "Programs started from the directory run with the owner's privileges.", "text_de": "Aus dem Verzeichnis gestartete Programme laufen mit den Rechten des Besitzers."},
+        {"text": "The directory becomes read-only for the group.", "text_de": "Das Verzeichnis wird für die Gruppe schreibgeschützt."}
+      ],
+      "explanation_de": "SetGID auf Verzeichnissen sorgt für Gruppenvererbung, typisch für Projektverzeichnisse. Das Löschen nur durch den Besitzer regelt das Sticky Bit. SetUID auf Programmen führt sie mit den Rechten des Dateibesitzers aus.",
+      "terms": []
+    },
+    {
+      "id": "303-333.2-01", "objective": "333.2", "type": "single", "difficulty": 1,
+      "question": "Which command switches SELinux from enforcing to permissive mode until the next reboot?",
+      "question_de": "Welcher Befehl schaltet SELinux bis zum nächsten Neustart von enforcing auf permissive?",
+      "choices": [
+        {"text": "setenforce 0", "text_de": "setenforce 0", "correct": true},
+        {"text": "getenforce permissive", "text_de": "getenforce permissive"},
+        {"text": "semanage mode -p", "text_de": "semanage mode -p"},
+        {"text": "sestatus --permissive", "text_de": "sestatus --permissive"}
+      ],
+      "explanation_de": "setenforce 0 setzt permissive, setenforce 1 enforcing; die Änderung gilt nur zur Laufzeit. Dauerhaft wird der Modus in /etc/selinux/config gesetzt. getenforce und sestatus zeigen nur den Zustand an.",
+      "terms": []
+    },
+    {
+      "id": "303-333.2-02", "objective": "333.2", "type": "single", "difficulty": 2,
+      "question": "A web server is denied access to files in /srv/www because they carry the wrong SELinux type. Which command makes the correct label persistent and applies it?",
+      "question_de": "Einem Webserver wird der Zugriff auf Dateien in /srv/www verweigert, weil sie den falschen SELinux-Typ tragen. Welcher Befehl hinterlegt das korrekte Label dauerhaft und wendet es an?",
+      "choices": [
+        {"text": "semanage fcontext -a -t httpd_sys_content_t \"/srv/www(/.*)?\" followed by restorecon -Rv /srv/www", "text_de": "semanage fcontext -a -t httpd_sys_content_t \"/srv/www(/.*)?\" gefolgt von restorecon -Rv /srv/www", "correct": true},
+        {"text": "chcon -R -t httpd_sys_content_t /srv/www", "text_de": "chcon -R -t httpd_sys_content_t /srv/www"},
+        {"text": "setsebool -P httpd_enable_homedirs on", "text_de": "setsebool -P httpd_enable_homedirs on"},
+        {"text": "audit2allow -a -M www", "text_de": "audit2allow -a -M www"}
+      ],
+      "explanation_de": "chcon ändert Labels nur temporär; ein Relabeling setzt sie zurück. semanage fcontext schreibt die Regel in die Policy, restorecon wendet sie auf die vorhandenen Dateien an. Booleans schalten vordefinierte Policy-Optionen, audit2allow erzeugt neue Module aus Denials.",
+      "terms": [{"term": "denied", "de": "verweigert"}]
+    },
+    {
+      "id": "303-333.2-03", "objective": "333.2", "type": "single", "difficulty": 2,
+      "question": "Which tool explains why a specific SELinux denial from the audit log occurred?",
+      "question_de": "Welches Werkzeug erklärt, warum eine bestimmte SELinux-Verweigerung aus dem Audit-Log aufgetreten ist?",
+      "choices": [
+        {"text": "audit2why", "text_de": "audit2why", "correct": true},
+        {"text": "seinfo", "text_de": "seinfo"},
+        {"text": "fixfiles", "text_de": "fixfiles"},
+        {"text": "newrole", "text_de": "newrole"}
+      ],
+      "explanation_de": "audit2why liest AVC-Meldungen und erklärt die Ursache, zum Beispiel fehlende Typregeln oder ein Boolean. seinfo zeigt Policy-Statistiken, fixfiles setzt Labels neu, newrole wechselt die SELinux-Rolle.",
+      "terms": []
+    },
+    {
+      "id": "303-334.1-01", "objective": "334.1", "type": "single", "difficulty": 2,
+      "question": "Which tcpdump command captures only DNS traffic on interface eth0 without resolving host names?",
+      "question_de": "Welcher tcpdump-Befehl erfasst auf eth0 nur DNS-Verkehr, ohne Hostnamen aufzulösen?",
+      "choices": [
+        {"text": "tcpdump -n -i eth0 port 53", "text_de": "tcpdump -n -i eth0 port 53", "correct": true},
+        {"text": "tcpdump -r eth0 dns", "text_de": "tcpdump -r eth0 dns"},
+        {"text": "tcpdump -i eth0 -w 53", "text_de": "tcpdump -i eth0 -w 53"},
+        {"text": "tcpdump -A -i eth0 proto dns", "text_de": "tcpdump -A -i eth0 proto dns"}
+      ],
+      "explanation_de": "-n unterdrückt die Namensauflösung, -i wählt die Schnittstelle, port 53 ist der BPF-Filter für DNS. -r liest aus einer Datei, -w schreibt in eine Datei, dns ist kein gültiges Protokollschlüsselwort in BPF.",
+      "terms": [{"term": "capture", "de": "erfassen, mitschneiden"}]
+    },
+    {
+      "id": "303-334.1-02", "objective": "334.1", "type": "single", "difficulty": 2,
+      "question": "Which command tests a FreeRADIUS server by sending an authentication request for user bob?",
+      "question_de": "Welcher Befehl testet einen FreeRADIUS-Server, indem er eine Authentifizierungsanfrage für den Benutzer bob sendet?",
+      "choices": [
+        {"text": "radtest bob secret123 localhost 0 testing123", "text_de": "radtest bob secret123 localhost 0 testing123", "correct": true},
+        {"text": "radwho bob localhost", "text_de": "radwho bob localhost"},
+        {"text": "radlast -u bob", "text_de": "radlast -u bob"},
+        {"text": "radiusd -X bob", "text_de": "radiusd -X bob"}
+      ],
+      "explanation_de": "radtest sendet eine Access-Request mit Benutzer, Passwort, Server, NAS-Port und Shared Secret. radwho zeigt eingeloggte Benutzer, radlast die letzten Logins, radiusd -X startet den Server im Debug-Modus.",
+      "terms": []
+    },
+    {
+      "id": "303-334.3-01", "objective": "334.3", "type": "single", "difficulty": 2,
+      "question": "Which iptables rule allows incoming packets that belong to connections initiated from the local system?",
+      "question_de": "Welche iptables-Regel erlaubt eingehende Pakete, die zu vom lokalen System aufgebauten Verbindungen gehören?",
+      "choices": [
+        {"text": "iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT", "text_de": "iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT", "correct": true},
+        {"text": "iptables -A OUTPUT -m conntrack --ctstate NEW -j ACCEPT", "text_de": "iptables -A OUTPUT -m conntrack --ctstate NEW -j ACCEPT"},
+        {"text": "iptables -A INPUT -p tcp --syn -j ACCEPT", "text_de": "iptables -A INPUT -p tcp --syn -j ACCEPT"},
+        {"text": "iptables -A FORWARD -m state --state INVALID -j ACCEPT", "text_de": "iptables -A FORWARD -m state --state INVALID -j ACCEPT"}
+      ],
+      "explanation_de": "Das conntrack-Modul kennt den Verbindungszustand. ESTABLISHED sind Antworten bestehender Verbindungen, RELATED zugehörige Verbindungen wie ICMP-Fehler oder FTP-Datenkanäle. Die OUTPUT-Regel betrifft ausgehende Pakete, --syn erlaubt neue eingehende Verbindungen, INVALID sollte verworfen werden.",
+      "terms": [{"term": "initiated", "de": "aufgebaut, begonnen"}]
+    },
+    {
+      "id": "303-334.3-02", "objective": "334.3", "type": "single", "difficulty": 2,
+      "question": "A router with the public interface eth0 should let an internal network reach the internet using the router's address. Which rule implements this?",
+      "question_de": "Ein Router mit der öffentlichen Schnittstelle eth0 soll einem internen Netz den Internetzugang über die Adresse des Routers ermöglichen. Welche Regel setzt das um?",
+      "choices": [
+        {"text": "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", "text_de": "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE", "correct": true},
+        {"text": "iptables -t nat -A PREROUTING -i eth0 -j DNAT", "text_de": "iptables -t nat -A PREROUTING -i eth0 -j DNAT"},
+        {"text": "iptables -A FORWARD -o eth0 -j SNAT", "text_de": "iptables -A FORWARD -o eth0 -j SNAT"},
+        {"text": "iptables -t mangle -A OUTPUT -o eth0 -j MASQUERADE", "text_de": "iptables -t mangle -A OUTPUT -o eth0 -j MASQUERADE"}
+      ],
+      "explanation_de": "Quell-NAT geschieht in der nat-Tabelle in POSTROUTING. MASQUERADE verwendet automatisch die aktuelle Adresse der Ausgangsschnittstelle, SNAT braucht eine feste Adresse. DNAT in PREROUTING wäre Port-Weiterleitung nach innen. In FORWARD oder mangle ist kein NAT möglich.",
+      "terms": [{"term": "reach", "de": "erreichen"}]
+    },
+    {
+      "id": "303-334.3-03", "objective": "334.3", "type": "single", "difficulty": 2,
+      "question": "Which tool allows matching thousands of IP addresses in a single iptables rule efficiently?",
+      "question_de": "Welches Werkzeug erlaubt es, tausende IP-Adressen effizient in einer einzigen iptables-Regel abzugleichen?",
+      "choices": [
+        {"text": "ipset", "text_de": "ipset", "correct": true},
+        {"text": "conntrackd", "text_de": "conntrackd"},
+        {"text": "ebtables", "text_de": "ebtables"},
+        {"text": "iptables-save", "text_de": "iptables-save"}
+      ],
+      "explanation_de": "ipset verwaltet Mengen von Adressen, Netzen oder Ports im Kernel; iptables referenziert sie mit -m set --match-set. conntrackd synchronisiert Verbindungszustände zwischen Firewalls, ebtables filtert auf Ethernet-Ebene, iptables-save exportiert Regeln.",
+      "terms": [{"term": "match", "de": "abgleichen, zutreffen"}]
+    },
+    {
+      "id": "303-334.4-01", "objective": "334.4", "type": "single", "difficulty": 2,
+      "question": "Which statement about WireGuard is correct?",
+      "question_de": "Welche Aussage über WireGuard ist richtig?",
+      "choices": [
+        {"text": "Peers are identified by their public keys and configured with AllowedIPs for routing.", "text_de": "Gegenstellen werden über ihre öffentlichen Schlüssel identifiziert und mit AllowedIPs für das Routing konfiguriert.", "correct": true},
+        {"text": "WireGuard uses X.509 certificates and a CA for peer authentication.", "text_de": "WireGuard nutzt X.509-Zertifikate und eine CA zur Authentifizierung der Gegenstellen."},
+        {"text": "WireGuard only works over TCP port 443.", "text_de": "WireGuard funktioniert nur über TCP-Port 443."},
+        {"text": "WireGuard requires IKEv2 for key exchange.", "text_de": "WireGuard benötigt IKEv2 für den Schlüsselaustausch."}
+      ],
+      "explanation_de": "WireGuard arbeitet mit statischen Curve25519-Schlüsselpaaren pro Peer und UDP. AllowedIPs legt fest, welche Quelladressen von einem Peer akzeptiert und welche Ziele an ihn geroutet werden. Zertifikate und IKEv2 gehören zu IPsec/strongSwan.",
+      "terms": []
+    },
+    {
+      "id": "303-334.4-02", "objective": "334.4", "type": "single", "difficulty": 2,
+      "question": "In OpenVPN, what is the difference between a tun and a tap device?",
+      "question_de": "Was ist bei OpenVPN der Unterschied zwischen einem tun- und einem tap-Gerät?",
+      "choices": [
+        {"text": "tun carries IP packets (routed VPN), tap carries Ethernet frames (bridged VPN).", "text_de": "tun transportiert IP-Pakete (geroutetes VPN), tap transportiert Ethernet-Frames (gebrücktes VPN).", "correct": true},
+        {"text": "tun is for TCP transport, tap is for UDP transport.", "text_de": "tun ist für TCP-Transport, tap für UDP-Transport."},
+        {"text": "tun is used on the server, tap on the client.", "text_de": "tun wird auf dem Server, tap auf dem Client verwendet."},
+        {"text": "tap encrypts traffic, tun does not.", "text_de": "tap verschlüsselt den Verkehr, tun nicht."}
+      ],
+      "explanation_de": "tun arbeitet auf Schicht 3 und eignet sich für geroutete VPNs. tap arbeitet auf Schicht 2, überträgt Broadcasts und erlaubt das Brücken des VPN mit einem lokalen LAN. Transportprotokoll und Verschlüsselung sind davon unabhängig.",
+      "terms": []
+    },
+    {
+      "id": "303-335.1-01", "objective": "335.1", "type": "single", "difficulty": 1,
+      "question": "An attacker sends forged ARP replies to redirect traffic between two hosts through his own machine. What is this attack called?",
+      "question_de": "Ein Angreifer sendet gefälschte ARP-Antworten, um den Verkehr zwischen zwei Hosts über seinen eigenen Rechner umzuleiten. Wie heißt dieser Angriff?",
+      "choices": [
+        {"text": "Man-in-the-middle attack using ARP spoofing", "text_de": "Man-in-the-Middle-Angriff mittels ARP-Spoofing", "correct": true},
+        {"text": "SQL injection", "text_de": "SQL-Injection"},
+        {"text": "Cross-site request forgery", "text_de": "Cross-Site Request Forgery"},
+        {"text": "Rainbow table attack", "text_de": "Rainbow-Table-Angriff"}
+      ],
+      "explanation_de": "Durch gefälschte ARP-Antworten (ARP forgery, ARP spoofing) ordnen Opfer die IP des Gegenübers der MAC-Adresse des Angreifers zu. Der Angreifer kann mitlesen oder verändern: ein Man-in-the-Middle-Angriff auf Schicht 2.",
+      "terms": [{"term": "forged", "de": "gefälscht"}, {"term": "redirect", "de": "umleiten"}]
+    },
+    {
+      "id": "303-335.2-01", "objective": "335.2", "type": "single", "difficulty": 2,
+      "question": "Which nmap command performs a TCP SYN scan with service version detection and operating system detection against 10.0.0.5?",
+      "question_de": "Welcher nmap-Befehl führt gegen 10.0.0.5 einen TCP-SYN-Scan mit Diensterkennung und Betriebssystemerkennung durch?",
+      "choices": [
+        {"text": "nmap -sS -sV -O 10.0.0.5", "text_de": "nmap -sS -sV -O 10.0.0.5", "correct": true},
+        {"text": "nmap -sU -sn -A 10.0.0.5", "text_de": "nmap -sU -sn -A 10.0.0.5"},
+        {"text": "nmap -sT -Pn --script=os 10.0.0.5", "text_de": "nmap -sT -Pn --script=os 10.0.0.5"},
+        {"text": "nmap -sL -sV 10.0.0.5", "text_de": "nmap -sL -sV 10.0.0.5"}
+      ],
+      "explanation_de": "-sS ist der SYN-Scan (halboffen, benötigt Root), -sV erkennt Dienstversionen, -O das Betriebssystem. -sU scannt UDP, -sn macht nur Host-Discovery, -sL listet nur Ziele. -A kombiniert -sV, -O, Skripte und Traceroute.",
+      "terms": [{"term": "detection", "de": "Erkennung"}]
+    },
+    {
+      "id": "303-335.2-02", "objective": "335.2", "type": "single", "difficulty": 1,
+      "question": "Before starting a penetration test against a customer's systems, what is mandatory from a legal point of view?",
+      "question_de": "Was ist aus rechtlicher Sicht zwingend, bevor ein Penetrationstest gegen Kundensysteme beginnt?",
+      "choices": [
+        {"text": "A written authorization defining scope, targets and time frame", "text_de": "Eine schriftliche Beauftragung, die Umfang, Ziele und Zeitraum festlegt", "correct": true},
+        {"text": "Installing Kali Linux on the customer's servers", "text_de": "Die Installation von Kali Linux auf den Kundenservern"},
+        {"text": "Running a full exploit with Metasploit to prove the risk", "text_de": "Ein vollständiger Exploit mit Metasploit, um das Risiko zu belegen"},
+        {"text": "Publishing the found vulnerabilities immediately", "text_de": "Die sofortige Veröffentlichung der gefundenen Schwachstellen"}
+      ],
+      "explanation_de": "Ohne ausdrückliche, dokumentierte Erlaubnis des Eigentümers ist ein Penetrationstest ein unerlaubter Zugriff. Scope, Ziele, Zeitraum und Regeln (Rules of Engagement) werden vorab schriftlich festgelegt.",
+      "terms": [{"term": "scope", "de": "Umfang, Geltungsbereich"}, {"term": "authorization", "de": "Genehmigung, Beauftragung"}]
+    }
+  ]
+}

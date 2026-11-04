@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Statistik · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Statistik</h1>
+{% include "admin/_nav.html" %}
+<section class="card">
+  <p>{{ attempts }} beantwortete Fragen insgesamt.</p>
+  <table class="table"><thead><tr><th>Modul</th><th>Fragen</th></tr></thead><tbody>{% for code, n in by_module %}<tr><td>{{ code }}</td><td>{{ n }}</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}

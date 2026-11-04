@@ -1,0 +1,8 @@
+<nav class="subnav">
+  <a href="/admin">Übersicht</a>
+  <a href="/admin/users">Benutzer</a>
+  <a href="/admin/groups">Gruppen</a>
+  <a href="/admin/import">Import</a>
+  <a href="/admin/questions">Fragen</a>
+  {% if user.is_admin %}<a href="/admin/settings">Einstellungen</a><a href="/admin/stats">Statistik</a>{% endif %}
+</nav>

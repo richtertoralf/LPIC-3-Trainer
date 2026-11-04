@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Import · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Fragenimport</h1>
+{% include "admin/_nav.html" %}
+<section class="card">
+  {% if errors %}
+  <div class="flash flash-error"><strong>{{ filename }} wurde abgelehnt.</strong><ul>{% for e in errors[:30] %}<li>{{ e }}</li>{% endfor %}</ul>{% if errors | length > 30 %}<p>… und {{ errors | length - 30 }} weitere Fehler.</p>{% endif %}</div>
+  {% endif %}
+  <form method="post" action="/admin/import" enctype="multipart/form-data">
+    <label>JSON-Datei (Schema Version 1)<input type="file" name="file" accept="application/json,.json" required></label>
+    <fieldset>
+      <legend>Sichtbarkeit</legend>
+      <label class="radio"><input type="radio" name="visibility" value="private" checked> Privat: nur für dich{% if not user.is_admin %} und deine Gruppenmitglieder{% endif %} sichtbar</label>
+      {% if user.is_admin %}<label class="radio"><input type="radio" name="visibility" value="public"> Öffentlich: für alle Lernenden</label>{% endif %}
+    </fieldset>
+    <button class="btn btn-primary" type="submit">Importieren</button>
+  </form>
+  <p class="muted small">Das Dateiformat ist in <code>content/README.md</code> beschrieben. Importierte Inhalte werden vollständig geprüft; fehlerhafte Dateien werden abgelehnt. Nutzungsrechte importierter Inhalte sind zu beachten.</p>
+</section>
+<section class="card">
+  <h2>Importe</h2>
+  <table class="table">
+    <thead><tr><th>Datei</th><th>Art</th><th>Modul</th><th>Anzahl</th><th>Sichtbarkeit</th><th>Lizenz</th><th>Datum</th><th></th></tr></thead>
+    <tbody>
+    {% for b in batches %}
+    <tr>
+      <td>{{ b.filename }}{% if b.bundled %} <span class="tag">mitgeliefert</span>{% endif %}</td>
+      <td>{{ b.kind }}</td><td>{{ b.module_code }}</td><td><a href="/admin/questions?batch={{ b.id }}">{{ b.item_count }}</a></td>
+      <td>{{ b.visibility }}</td><td>{{ b.license }}</td><td>{{ b.imported_at.strftime('%d.%m.%Y') }}</td>
+      <td>{% if user.is_admin or b.imported_by == user.id %}<form method="post" action="/admin/batches/{{ b.id }}/delete" class="inline" data-confirm="Import {{ b.filename }} mit allen Fragen löschen?"><button class="btn btn-small btn-danger" type="submit">Löschen</button></form>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

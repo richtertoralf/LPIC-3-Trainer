@@ -1,0 +1,20 @@
+{# Renders the English question text and choices. Expects: question, (optional) help (bool), selected (set), show_result (bool), input_name #}
+<div class="question-text" data-question-text>{{ question.text_en }}</div>
+{% if help %}
+<div class="translation" data-translation hidden>
+  {% if question.text_de %}<p><strong>Übersetzung:</strong> {{ question.text_de }}</p>{% else %}<p class="muted">Für diese Frage gibt es keine vollständige Übersetzung.</p>{% endif %}
+</div>
+{% endif %}
+<p class="muted small">{% if question.kind == 'multiple' %}Mehrere Antworten sind richtig (Mehrfachauswahl).{% else %}Genau eine Antwort ist richtig.{% endif %}</p>
+<ol class="choices">
+  {% for c in question.choices %}
+  <li class="choice {% if show_result %}{% if c.is_correct %}choice-correct{% elif c.id in selected %}choice-wrong{% endif %}{% endif %}">
+    <label>
+      <input type="{% if question.kind == 'multiple' %}checkbox{% else %}radio{% endif %}" name="{{ input_name or 'choice' }}" value="{{ c.id }}"
+        {% if show_result %}disabled{% endif %} {% if c.id in selected %}checked{% endif %}>
+      <span class="choice-text" data-question-text>{{ c.text_en }}</span>
+      {% if help and c.text_de %}<span class="translation" data-translation hidden>→ {{ c.text_de }}</span>{% endif %}
+    </label>
+  </li>
+  {% endfor %}
+</ol>

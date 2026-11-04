@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Gruppe {{ group.name }}</h1>
+{% include "admin/_nav.html" %}
+<p>{{ group.description }} <span class="muted">(Beitritt: {% if group.join_mode == 'open' %}offen{% else %}mit Freigabe{% endif %})</span></p>
+{% set pending = group.members | selectattr('status', 'equalto', 'pending') | list %}
+{% if pending %}
+<section class="card">
+  <h2>Beitrittsanfragen</h2>
+  <ul>{% for m in pending %}<li>{{ m.user.username }}
+    <form method="post" action="/admin/groups/{{ group.id }}/members/{{ m.user_id }}/approve" class="inline"><button class="btn btn-small btn-primary" type="submit">Freigeben</button></form>
+    <form method="post" action="/admin/groups/{{ group.id }}/members/{{ m.user_id }}/remove" class="inline"><button class="btn btn-small" type="submit">Ablehnen</button></form></li>{% endfor %}</ul>
+</section>
+{% endif %}
+<section class="card">
+  <h2>Mitglieder und Lernstand</h2>
+  <table class="table">
+    <thead><tr><th>Mitglied</th><th>Rolle</th><th>Module</th><th></th></tr></thead>
+    <tbody>
+    {% for r in report %}
+    <tr>
+      <td>{{ r.member.user.label }}</td>
+      <td>{{ r.member.role }}</td>
+      <td>{% for p in r.progress %}<div>{{ p.module.code }}: {{ p.answered }}/{{ p.total }} geübt, {{ p.percent_correct }} % richtig, {{ p.help_rate }} % Hilfe{% if p.best_exam %}, Simulation {{ p.best_exam.percent }} %{% endif %}</div>{% else %}<span class="muted">keine Module gewählt</span>{% endfor %}</td>
+      <td><form method="post" action="/admin/groups/{{ group.id }}/members/{{ r.member.user_id }}/remove" class="inline"><button class="btn btn-small" type="submit">Entfernen</button></form></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+<section class="card narrow">
+  <h2>Mitglied hinzufügen</h2>
+  <form method="post" action="/admin/groups/{{ group.id }}/members">
+    <label>Benutzer<select name="user_id" required>{% for u in others %}<option value="{{ u.id }}">{{ u.username }}</option>{% endfor %}</select></label>
+    <label>Rolle<select name="role"><option value="member">Mitglied</option><option value="supervisor">Betreuer</option></select></label>
+    <button class="btn btn-primary" type="submit">Hinzufügen</button>
+  </form>
+</section>
+{% endblock %}

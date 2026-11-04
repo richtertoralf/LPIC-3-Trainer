@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "300",
+  "license": "CC BY-SA 4.0",
+  "author": "LPIC-3 Trainer Projekt",
+  "visibility": "public",
+  "questions": [
+    {
+      "id": "300-301.1-01", "objective": "301.1", "type": "single", "difficulty": 1,
+      "question": "Which Samba daemon provides NetBIOS name service and browsing support?",
+      "question_de": "Welcher Samba-Dienst stellt den NetBIOS-Namensdienst und die Netzwerkumgebung (Browsing) bereit?",
+      "choices": [
+        {"text": "nmbd", "text_de": "nmbd", "correct": true},
+        {"text": "smbd", "text_de": "smbd"},
+        {"text": "winbindd", "text_de": "winbindd"},
+        {"text": "samba", "text_de": "samba"}
+      ],
+      "explanation_de": "nmbd beantwortet NetBIOS-Namensanfragen und beteiligt sich an der Netzwerkumgebung. smbd liefert Datei- und Druckdienste, winbindd verbindet Unix mit Domänenkonten, samba ist der AD-Domänencontroller-Prozess.",
+      "terms": [{"term": "browsing", "de": "Netzwerkumgebung durchsuchen"}]
+    },
+    {
+      "id": "300-301.1-02", "objective": "301.1", "type": "multiple", "difficulty": 2,
+      "question": "Which TCP ports are used by SMB over TCP/IP and by the SMB-related services of an Active Directory domain controller? (Choose two.)",
+      "question_de": "Welche TCP-Ports werden von SMB über TCP/IP und von den SMB-bezogenen Diensten eines Active-Directory-Domänencontrollers verwendet? (Zwei Antworten.)",
+      "choices": [
+        {"text": "445", "text_de": "445", "correct": true},
+        {"text": "139", "text_de": "139", "correct": true},
+        {"text": "22", "text_de": "22"},
+        {"text": "3306", "text_de": "3306"},
+        {"text": "8080", "text_de": "8080"}
+      ],
+      "explanation_de": "Port 445 ist SMB direkt über TCP, Port 139 SMB über NetBIOS-Sitzungsdienst. Ein AD-DC nutzt zusätzlich unter anderem 53 (DNS), 88 (Kerberos), 389/636 (LDAP) und 135 (RPC). 22 ist SSH, 3306 MySQL, 8080 ein HTTP-Alternativport.",
+      "terms": []
+    },
+    {
+      "id": "300-301.2-01", "objective": "301.2", "type": "single", "difficulty": 1,
+      "question": "Which command checks smb.conf for syntax errors and prints the effective configuration?",
+      "question_de": "Welcher Befehl prüft smb.conf auf Syntaxfehler und gibt die wirksame Konfiguration aus?",
+      "choices": [
+        {"text": "testparm", "text_de": "testparm", "correct": true},
+        {"text": "smbstatus", "text_de": "smbstatus"},
+        {"text": "smbcontrol all reload-config", "text_de": "smbcontrol all reload-config"},
+        {"text": "net conf list", "text_de": "net conf list"}
+      ],
+      "explanation_de": "testparm lädt smb.conf, meldet unbekannte oder widersprüchliche Parameter und zeigt die resultierende Konfiguration. smbstatus zeigt Verbindungen, smbcontrol lädt die Konfiguration neu, net conf list zeigt registrybasierte Konfiguration.",
+      "terms": []
+    },
+    {
+      "id": "300-301.2-02", "objective": "301.2", "type": "single", "difficulty": 2,
+      "question": "Which smb.conf parameter makes Samba read share definitions from the registry in addition to smb.conf?",
+      "question_de": "Welcher smb.conf-Parameter lässt Samba Freigabedefinitionen zusätzlich zur smb.conf aus der Registry lesen?",
+      "choices": [
+        {"text": "registry shares = yes", "text_de": "registry shares = yes", "correct": true},
+        {"text": "config backend = file", "text_de": "config backend = file"},
+        {"text": "include = registry.tdb", "text_de": "include = registry.tdb"},
+        {"text": "server services = registry", "text_de": "server services = registry"}
+      ],
+      "explanation_de": "registry shares = yes aktiviert die Freigaben aus der Registry (HKLM\\Software\\Samba\\smbconf). config backend = registry würde die gesamte Konfiguration aus der Registry nehmen; include = registry bindet die Registry-Globals ein.",
+      "terms": []
+    },
+    {
+      "id": "300-301.3-01", "objective": "301.3", "type": "single", "difficulty": 1,
+      "question": "Which command shows the currently connected users, open files and locks of a Samba server?",
+      "question_de": "Welcher Befehl zeigt die aktuell verbundenen Benutzer, offenen Dateien und Sperren eines Samba-Servers?",
+      "choices": [
+        {"text": "smbstatus", "text_de": "smbstatus", "correct": true},
+        {"text": "smbcontrol", "text_de": "smbcontrol"},
+        {"text": "pdbedit -L", "text_de": "pdbedit -L"},
+        {"text": "wbinfo -u", "text_de": "wbinfo -u"}
+      ],
+      "explanation_de": "smbstatus listet Sitzungen, Freigabeverbindungen und gesperrte Dateien. smbcontrol sendet Nachrichten an Samba-Prozesse, pdbedit -L listet Konten der Passwortdatenbank, wbinfo -u listet Domänenbenutzer über Winbind.",
+      "terms": [{"term": "lock", "de": "Sperre"}]
+    },
+    {
+      "id": "300-301.3-02", "objective": "301.3", "type": "single", "difficulty": 2,
+      "question": "Which tool creates a consistent backup copy of a TDB database file while Samba is running?",
+      "question_de": "Welches Werkzeug erstellt eine konsistente Sicherungskopie einer TDB-Datenbankdatei, während Samba läuft?",
+      "choices": [
+        {"text": "tdbbackup", "text_de": "tdbbackup", "correct": true},
+        {"text": "tdbdump", "text_de": "tdbdump"},
+        {"text": "cp -a", "text_de": "cp -a"},
+        {"text": "tdbtool erase", "text_de": "tdbtool erase"}
+      ],
+      "explanation_de": "tdbbackup erzeugt verifizierte Kopien (.bak) und kann beschädigte Dateien aus der Sicherung wiederherstellen (-v). tdbdump gibt den Inhalt als Text aus, ein einfaches Kopieren kann inkonsistent sein, tdbtool erase löscht Einträge.",
+      "terms": [{"term": "consistent", "de": "konsistent, in sich stimmig"}]
+    },
+    {
+      "id": "300-301.4-01", "objective": "301.4", "type": "single", "difficulty": 2,
+      "question": "Which command checks the internal consistency of the Samba AD database and can repair errors?",
+      "question_de": "Welcher Befehl prüft die interne Konsistenz der Samba-AD-Datenbank und kann Fehler reparieren?",
+      "choices": [
+        {"text": "samba-tool dbcheck --fix", "text_de": "samba-tool dbcheck --fix", "correct": true},
+        {"text": "ldbsearch --repair", "text_de": "ldbsearch --repair"},
+        {"text": "tdbtool check sam.ldb", "text_de": "tdbtool check sam.ldb"},
+        {"text": "samba-tool drs showrepl", "text_de": "samba-tool drs showrepl"}
+      ],
+      "explanation_de": "samba-tool dbcheck prüft sam.ldb auf Fehler, --fix behebt sie nach Rückfrage (--yes ohne). ldbsearch fragt nur ab, tdbtool kennt keine LDB-Semantik, drs showrepl zeigt den Replikationsstatus.",
+      "terms": []
+    },
+    {
+      "id": "300-301.4-02", "objective": "301.4", "type": "single", "difficulty": 2,
+      "question": "An administrator wants to see which users exist in the local Samba password database. Which command lists them?",
+      "question_de": "Ein Administrator möchte sehen, welche Benutzer in der lokalen Samba-Passwortdatenbank existieren. Welcher Befehl listet sie?",
+      "choices": [
+        {"text": "pdbedit -L", "text_de": "pdbedit -L", "correct": true},
+        {"text": "smbpasswd -L", "text_de": "smbpasswd -L"},
+        {"text": "getent passwd", "text_de": "getent passwd"},
+        {"text": "net user list", "text_de": "net user list"}
+      ],
+      "explanation_de": "pdbedit verwaltet die passdb-Backends; -L listet Konten, -Lv ausführlich. smbpasswd ändert Passwörter und hat keine Listenfunktion. getent passwd zeigt Unix-Konten über NSS, net user ist ein RPC-Befehl gegen entfernte Server.",
+      "terms": []
+    },
+    {
+      "id": "300-302.1-01", "objective": "302.1", "type": "single", "difficulty": 1,
+      "question": "Which command provisions a new Samba Active Directory domain on a fresh server?",
+      "question_de": "Welcher Befehl richtet eine neue Samba-Active-Directory-Domäne auf einem frischen Server ein?",
+      "choices": [
+        {"text": "samba-tool domain provision", "text_de": "samba-tool domain provision", "correct": true},
+        {"text": "samba-tool domain join", "text_de": "samba-tool domain join"},
+        {"text": "net ads join", "text_de": "net ads join"},
+        {"text": "samba-tool domain demote", "text_de": "samba-tool domain demote"}
+      ],
+      "explanation_de": "provision erzeugt eine neue Domäne mit Verzeichnis, DNS und Kerberos. domain join fügt einen weiteren DC oder Member hinzu, net ads join macht einen Server zum Domänenmitglied, demote stuft einen DC herab.",
+      "terms": [{"term": "provision", "de": "einrichten, bereitstellen"}]
+    },
+    {
+      "id": "300-302.1-02", "objective": "302.1", "type": "single", "difficulty": 2,
+      "question": "Which command displays which domain controller currently holds the FSMO roles?",
+      "question_de": "Welcher Befehl zeigt, welcher Domänencontroller die FSMO-Rollen derzeit innehat?",
+      "choices": [
+        {"text": "samba-tool fsmo show", "text_de": "samba-tool fsmo show", "correct": true},
+        {"text": "samba-tool drs showrepl", "text_de": "samba-tool drs showrepl"},
+        {"text": "samba-tool sites list", "text_de": "samba-tool sites list"},
+        {"text": "samba-tool domain level show", "text_de": "samba-tool domain level show"}
+      ],
+      "explanation_de": "FSMO-Rollen (Schema Master, Domain Naming Master, PDC Emulator, RID Master, Infrastructure Master) hat jeweils genau ein DC. samba-tool fsmo show zeigt die Inhaber, fsmo seize oder transfer verschiebt sie. drs showrepl betrifft die Replikation.",
+      "terms": [{"term": "hold", "de": "innehaben, halten"}]
+    },
+    {
+      "id": "300-302.1-03", "objective": "302.1", "type": "single", "difficulty": 3,
+      "question": "Samba does not replicate the SYSVOL share between domain controllers automatically. Which approach is commonly used to keep SYSVOL in sync?",
+      "question_de": "Samba repliziert die SYSVOL-Freigabe nicht automatisch zwischen Domänencontrollern. Welcher Ansatz wird üblicherweise verwendet, um SYSVOL synchron zu halten?",
+      "choices": [
+        {"text": "A scheduled rsync from the PDC emulator to the other DCs, followed by resetting the NT ACLs", "text_de": "Ein zeitgesteuertes rsync vom PDC-Emulator zu den anderen DCs, gefolgt vom Zurücksetzen der NT-ACLs", "correct": true},
+        {"text": "Enabling DFS-R in smb.conf with sysvol replication = yes", "text_de": "Aktivieren von DFS-R in smb.conf mit sysvol replication = yes"},
+        {"text": "Running samba-tool drs replicate for the SYSVOL partition", "text_de": "Ausführen von samba-tool drs replicate für die SYSVOL-Partition"},
+        {"text": "Mounting SYSVOL from the PDC via NFS on all DCs", "text_de": "Einhängen von SYSVOL vom PDC per NFS auf allen DCs"}
+      ],
+      "explanation_de": "Samba unterstützt DFS-R bislang nicht. Üblich ist ein einseitiger rsync (z. B. per cron oder rsync-Daemon) vom PDC-Emulator aus; danach stellt samba-tool ntacl sysvolreset die Rechte wieder her. drs replicate repliziert nur Verzeichnispartitionen.",
+      "terms": [{"term": "scheduled", "de": "zeitgesteuert, geplant"}]
+    },
+    {
+      "id": "300-302.2-01", "objective": "302.2", "type": "single", "difficulty": 2,
+      "question": "Clients of a Samba AD domain cannot resolve internet names. Which smb.conf parameter fixes this when Samba's internal DNS server is used?",
+      "question_de": "Clients einer Samba-AD-Domäne können keine Internetnamen auflösen. Welcher smb.conf-Parameter behebt das bei Nutzung des internen Samba-DNS-Servers?",
+      "choices": [
+        {"text": "dns forwarder = 192.168.1.1", "text_de": "dns forwarder = 192.168.1.1", "correct": true},
+        {"text": "allow dns updates = nonsecure", "text_de": "allow dns updates = nonsecure"},
+        {"text": "dns proxy = yes", "text_de": "dns proxy = yes"},
+        {"text": "name resolve order = host wins", "text_de": "name resolve order = host wins"}
+      ],
+      "explanation_de": "Der interne DNS-Server beantwortet nur Anfragen zu den eigenen Zonen. dns forwarder leitet alle anderen Anfragen an einen externen Resolver weiter. allow dns updates steuert dynamische Updates, dns proxy betrifft NetBIOS-Namen, name resolve order die Reihenfolge der Samba-eigenen Auflösung.",
+      "terms": []
+    },
+    {
+      "id": "300-302.3-01", "objective": "302.3", "type": "single", "difficulty": 1,
+      "question": "Which command creates the user jdoe in a Samba Active Directory domain?",
+      "question_de": "Welcher Befehl legt den Benutzer jdoe in einer Samba-Active-Directory-Domäne an?",
+      "choices": [
+        {"text": "samba-tool user create jdoe", "text_de": "samba-tool user create jdoe", "correct": true},
+        {"text": "smbpasswd -a jdoe", "text_de": "smbpasswd -a jdoe"},
+        {"text": "useradd -m jdoe", "text_de": "useradd -m jdoe"},
+        {"text": "net user add jdoe", "text_de": "net user add jdoe"}
+      ],
+      "explanation_de": "samba-tool user create (alias add) legt AD-Konten an und fragt das Passwort ab. smbpasswd -a fügt Konten in lokale passdb-Backends hinzu, useradd erzeugt Unix-Konten, net user add arbeitet per RPC gegen klassische Server.",
+      "terms": []
+    },
+    {
+      "id": "300-302.3-02", "objective": "302.3", "type": "single", "difficulty": 2,
+      "question": "Which command sets the minimum password length of the domain to 12 characters?",
+      "question_de": "Welcher Befehl setzt die minimale Passwortlänge der Domäne auf 12 Zeichen?",
+      "choices": [
+        {"text": "samba-tool domain passwordsettings set --min-pwd-length=12", "text_de": "samba-tool domain passwordsettings set --min-pwd-length=12", "correct": true},
+        {"text": "samba-tool user setpassword --min-length 12", "text_de": "samba-tool user setpassword --min-length 12"},
+        {"text": "pdbedit -P \"min password length\" -C 12", "text_de": "pdbedit -P \"min password length\" -C 12"},
+        {"text": "net sam policy set \"min password length\" 12", "text_de": "net sam policy set \"min password length\" 12"}
+      ],
+      "explanation_de": "Die Domänen-Passwortrichtlinie wird über samba-tool domain passwordsettings verwaltet (show/set). pdbedit -P und net sam policy betreffen nur klassische NT4-Domänen bzw. lokale passdb-Backends.",
+      "terms": []
+    },
+    {
+      "id": "300-302.3-03", "objective": "302.3", "type": "single", "difficulty": 2,
+      "question": "Which command obtains a Kerberos ticket-granting ticket for the user administrator and which command verifies that it was received?",
+      "question_de": "Welcher Befehl holt ein Kerberos-Ticket-Granting-Ticket für den Benutzer administrator, und welcher Befehl prüft, dass es empfangen wurde?",
+      "choices": [
+        {"text": "kinit administrator; klist", "text_de": "kinit administrator; klist", "correct": true},
+        {"text": "klist administrator; kinit", "text_de": "klist administrator; kinit"},
+        {"text": "kdestroy administrator; klist", "text_de": "kdestroy administrator; klist"},
+        {"text": "wbinfo -K administrator; wbinfo -t", "text_de": "wbinfo -K administrator; wbinfo -t"}
+      ],
+      "explanation_de": "kinit fordert ein TGT an, klist zeigt den Ticket-Cache, kdestroy löscht ihn. wbinfo -K testet Kerberos-Anmeldung über Winbind, wbinfo -t prüft das Maschinenkonto-Vertrauen.",
+      "terms": [{"term": "obtain", "de": "erhalten, beziehen"}]
+    },
+    {
+      "id": "300-302.4-01", "objective": "302.4", "type": "single", "difficulty": 1,
+      "question": "Which command joins a Linux server running Samba to an existing Active Directory domain as a member server?",
+      "question_de": "Welcher Befehl nimmt einen Linux-Server mit Samba als Mitgliedsserver in eine bestehende Active-Directory-Domäne auf?",
+      "choices": [
+        {"text": "net ads join -U Administrator", "text_de": "net ads join -U Administrator", "correct": true},
+        {"text": "samba-tool domain provision --role=member", "text_de": "samba-tool domain provision --role=member"},
+        {"text": "wbinfo --join", "text_de": "wbinfo --join"},
+        {"text": "smbclient -L //dc1 -U Administrator", "text_de": "smbclient -L //dc1 -U Administrator"}
+      ],
+      "explanation_de": "net ads join erzeugt das Maschinenkonto im AD und speichert das Geheimnis in secrets.tdb. Voraussetzung sind security = ads, realm und workgroup in smb.conf. provision legt eine neue Domäne an, smbclient -L listet nur Freigaben.",
+      "terms": []
+    },
+    {
+      "id": "300-302.4-02", "objective": "302.4", "type": "single", "difficulty": 2,
+      "question": "Which idmap backend reads the Unix UID and GID from RFC2307 attributes stored in Active Directory?",
+      "question_de": "Welches idmap-Backend liest die Unix-UID und -GID aus den RFC2307-Attributen im Active Directory?",
+      "choices": [
+        {"text": "idmap_ad", "text_de": "idmap_ad", "correct": true},
+        {"text": "idmap_rid", "text_de": "idmap_rid"},
+        {"text": "idmap_tdb", "text_de": "idmap_tdb"},
+        {"text": "idmap_autorid", "text_de": "idmap_autorid"}
+      ],
+      "explanation_de": "idmap_ad nutzt uidNumber und gidNumber aus dem AD, so dass alle Server dieselben IDs sehen. idmap_rid berechnet IDs aus der RID, idmap_autorid vergibt automatisch Bereiche je Domäne, idmap_tdb speichert lokale Zuordnungen und wird für den Default-Bereich (BUILTIN) genutzt.",
+      "terms": []
+    },
+    {
+      "id": "300-302.4-03", "objective": "302.4", "type": "single", "difficulty": 2,
+      "question": "After joining a domain, getent passwd does not show domain users. Which file most likely needs to be changed?",
+      "question_de": "Nach dem Domänenbeitritt zeigt getent passwd keine Domänenbenutzer. Welche Datei muss am wahrscheinlichsten geändert werden?",
+      "choices": [
+        {"text": "/etc/nsswitch.conf, adding winbind to the passwd and group lines", "text_de": "/etc/nsswitch.conf, mit winbind in den Zeilen passwd und group", "correct": true},
+        {"text": "/etc/passwd, adding each domain user manually", "text_de": "/etc/passwd, mit manuellem Eintrag jedes Domänenbenutzers"},
+        {"text": "/etc/krb5.conf, setting default_realm", "text_de": "/etc/krb5.conf, mit default_realm"},
+        {"text": "/etc/hosts, adding the domain controller", "text_de": "/etc/hosts, mit dem Domänencontroller"}
+      ],
+      "explanation_de": "getent nutzt NSS. Erst wenn in /etc/nsswitch.conf passwd: files winbind und group: files winbind stehen (und libnss_winbind installiert ist), erscheinen Domänenkonten. Zusätzlich muss winbind enumerate users = yes gesetzt sein, damit getent ohne Argument alle Benutzer auflistet.",
+      "terms": []
+    },
+    {
+      "id": "300-302.5-01", "objective": "302.5", "type": "single", "difficulty": 1,
+      "question": "Which smb.conf parameter selects where Samba stores local user accounts, for example in a TDB file or in LDAP?",
+      "question_de": "Welcher smb.conf-Parameter legt fest, wo Samba lokale Benutzerkonten speichert, zum Beispiel in einer TDB-Datei oder in LDAP?",
+      "choices": [
+        {"text": "passdb backend", "text_de": "passdb backend", "correct": true},
+        {"text": "security", "text_de": "security"},
+        {"text": "idmap config", "text_de": "idmap config"},
+        {"text": "server role", "text_de": "server role"}
+      ],
+      "explanation_de": "passdb backend = tdbsam (Standard) oder ldapsam:ldap://server wählt das Konten-Backend. security und server role bestimmen den Betriebsmodus, idmap config die SID-zu-UID-Zuordnung.",
+      "terms": []
+    },
+    {
+      "id": "300-303.1-01", "objective": "303.1", "type": "single", "difficulty": 1,
+      "question": "A share should be writable only for members of the group editors while everybody else may read it. Which parameters implement this?",
+      "question_de": "Eine Freigabe soll nur für Mitglieder der Gruppe editors beschreibbar sein, alle anderen dürfen lesen. Welche Parameter setzen das um?",
+      "choices": [
+        {"text": "read only = yes\nwrite list = @editors", "text_de": "read only = yes\nwrite list = @editors", "correct": true},
+        {"text": "writable = yes\nread list = @editors", "text_de": "writable = yes\nread list = @editors"},
+        {"text": "valid users = @editors\nguest ok = yes", "text_de": "valid users = @editors\nguest ok = yes"},
+        {"text": "browsable = no\nwrite list = editors", "text_de": "browsable = no\nwrite list = editors"}
+      ],
+      "explanation_de": "read only = yes macht die Freigabe grundsätzlich schreibgeschützt, write list hebt das für die genannten Benutzer oder Gruppen (@ oder + Präfix) auf. read list wirkt umgekehrt, valid users begrenzt den Zugang insgesamt.",
+      "terms": []
+    },
+    {
+      "id": "300-303.1-02", "objective": "303.1", "type": "single", "difficulty": 2,
+      "question": "Which smb.conf parameter prevents files matching a pattern from being seen or accessed by clients at all?",
+      "question_de": "Welcher smb.conf-Parameter verhindert, dass Dateien mit einem bestimmten Muster von Clients überhaupt gesehen oder genutzt werden können?",
+      "choices": [
+        {"text": "veto files", "text_de": "veto files", "correct": true},
+        {"text": "hide dot files", "text_de": "hide dot files"},
+        {"text": "hide unreadable", "text_de": "hide unreadable"},
+        {"text": "invalid users", "text_de": "invalid users"}
+      ],
+      "explanation_de": "veto files = /*.exe/*.mp3/ blendet Dateien aus und sperrt den Zugriff. hide dot files und hide unreadable verstecken nur (setzen das Hidden-Attribut), der Zugriff bleibt möglich. invalid users betrifft Benutzer, nicht Dateien.",
+      "terms": [{"term": "pattern", "de": "Muster"}]
+    },
+    {
+      "id": "300-303.2-01", "objective": "303.2", "type": "single", "difficulty": 2,
+      "question": "Which VFS module allows Samba to store full Windows ACLs in extended attributes of the file system?",
+      "question_de": "Welches VFS-Modul erlaubt Samba, vollständige Windows-ACLs in erweiterten Attributen des Dateisystems abzulegen?",
+      "choices": [
+        {"text": "vfs_acl_xattr", "text_de": "vfs_acl_xattr", "correct": true},
+        {"text": "vfs_full_audit", "text_de": "vfs_full_audit"},
+        {"text": "vfs_shadow_copy2", "text_de": "vfs_shadow_copy2"},
+        {"text": "vfs_recycle", "text_de": "vfs_recycle"}
+      ],
+      "explanation_de": "vfs_acl_xattr speichert die NT-ACL im Attribut security.NTACL; vfs_acl_tdb legt sie alternativ in einer TDB ab. full_audit protokolliert Zugriffe, shadow_copy2 liefert Vorgängerversionen aus Snapshots, recycle einen Papierkorb.",
+      "terms": []
+    },
+    {
+      "id": "300-303.2-02", "objective": "303.2", "type": "single", "difficulty": 2,
+      "question": "Which parameter forces all files created on a share to be owned by the user www-data regardless of who connected?",
+      "question_de": "Welcher Parameter erzwingt, dass alle auf einer Freigabe angelegten Dateien dem Benutzer www-data gehören, unabhängig davon, wer verbunden ist?",
+      "choices": [
+        {"text": "force user = www-data", "text_de": "force user = www-data", "correct": true},
+        {"text": "valid users = www-data", "text_de": "valid users = www-data"},
+        {"text": "create mask = www-data", "text_de": "create mask = www-data"},
+        {"text": "guest account = www-data", "text_de": "guest account = www-data"}
+      ],
+      "explanation_de": "force user führt alle Dateioperationen der Freigabe unter dem angegebenen Unix-Konto aus; force group ergänzt die Gruppe. valid users begrenzt den Zugang, create mask setzt Rechtebits, guest account gilt nur für Gastzugriffe.",
+      "terms": []
+    },
+    {
+      "id": "300-303.3-01", "objective": "303.3", "type": "single", "difficulty": 2,
+      "question": "How is a DFS link to the share data on server fs2 created inside a Samba DFS root directory?",
+      "question_de": "Wie wird in einem Samba-DFS-Wurzelverzeichnis ein DFS-Verweis auf die Freigabe data des Servers fs2 angelegt?",
+      "choices": [
+        {"text": "ln -s msdfs:fs2\\\\data data", "text_de": "ln -s msdfs:fs2\\\\data data", "correct": true},
+        {"text": "net dfs add fs2 data", "text_de": "net dfs add fs2 data"},
+        {"text": "mount.cifs //fs2/data data", "text_de": "mount.cifs //fs2/data data"},
+        {"text": "smbclient //fs2/data -c \"dfs add\"", "text_de": "smbclient //fs2/data -c \"dfs add\""}
+      ],
+      "explanation_de": "Samba stellt DFS-Verweise als symbolische Links mit dem Ziel msdfs:server\\share dar. Voraussetzung sind host msdfs = yes global und msdfs root = yes in der Freigabe. Die anderen Befehle legen keine DFS-Verweise an.",
+      "terms": []
+    },
+    {
+      "id": "300-303.4-01", "objective": "303.4", "type": "single", "difficulty": 2,
+      "question": "What is the purpose of the special share [print$] on a Samba print server?",
+      "question_de": "Welchen Zweck hat die spezielle Freigabe [print$] auf einem Samba-Druckserver?",
+      "choices": [
+        {"text": "It stores Windows printer drivers that clients download automatically (Point and Print).", "text_de": "Sie enthält Windows-Druckertreiber, die Clients automatisch herunterladen (Point and Print).", "correct": true},
+        {"text": "It is the spool directory for print jobs.", "text_de": "Sie ist das Spool-Verzeichnis für Druckaufträge."},
+        {"text": "It exposes the CUPS web interface via SMB.", "text_de": "Sie stellt die CUPS-Weboberfläche über SMB bereit."},
+        {"text": "It contains the printcap file for all printers.", "text_de": "Sie enthält die printcap-Datei für alle Drucker."}
+      ],
+      "explanation_de": "[print$] ist die Treiberfreigabe mit Unterverzeichnissen je Architektur (z. B. x64). Treiber werden per rpcclient adddriver/setdriver oder über Windows hochgeladen. Der Spool liegt im path der Druckfreigabe, meist /var/spool/samba.",
+      "terms": []
+    },
+    {
+      "id": "300-304.1-01", "objective": "304.1", "type": "single", "difficulty": 2,
+      "question": "Which PAM module creates a user's home directory automatically at first login?",
+      "question_de": "Welches PAM-Modul legt das Home-Verzeichnis eines Benutzers beim ersten Login automatisch an?",
+      "choices": [
+        {"text": "pam_mkhomedir.so", "text_de": "pam_mkhomedir.so", "correct": true},
+        {"text": "pam_mount.so", "text_de": "pam_mount.so"},
+        {"text": "pam_faillock.so", "text_de": "pam_faillock.so"},
+        {"text": "pam_cracklib.so", "text_de": "pam_cracklib.so"}
+      ],
+      "explanation_de": "pam_mkhomedir (oder pam_oddjob_mkhomedir) erzeugt fehlende Home-Verzeichnisse aus dem Skeleton. pam_mount hängt Freigaben ein, pam_faillock sperrt nach Fehlversuchen, pam_cracklib prüft die Passwortqualität.",
+      "terms": []
+    },
+    {
+      "id": "300-304.1-02", "objective": "304.1", "type": "single", "difficulty": 2,
+      "question": "Which SSSD configuration option in the [domain/...] section selects Active Directory as identity source?",
+      "question_de": "Welche SSSD-Option im Abschnitt [domain/...] wählt Active Directory als Identitätsquelle?",
+      "choices": [
+        {"text": "id_provider = ad", "text_de": "id_provider = ad", "correct": true},
+        {"text": "services = nss, pam", "text_de": "services = nss, pam"},
+        {"text": "auth_provider = krb5 only", "text_de": "auth_provider = krb5 only"},
+        {"text": "domains = ad", "text_de": "domains = ad"}
+      ],
+      "explanation_de": "id_provider bestimmt die Identitätsquelle (ad, ipa, ldap, local). services und domains stehen im Abschnitt [sssd]. auth_provider = krb5 nutzt Kerberos nur für die Authentifizierung, Identitäten kämen woanders her.",
+      "terms": []
+    },
+    {
+      "id": "300-304.1-03", "objective": "304.1", "type": "single", "difficulty": 2,
+      "question": "Which command removes cached entries from the SSSD cache for all users?",
+      "question_de": "Welcher Befehl entfernt zwischengespeicherte Einträge aller Benutzer aus dem SSSD-Cache?",
+      "choices": [
+        {"text": "sss_cache -U", "text_de": "sss_cache -U", "correct": true},
+        {"text": "sss_override user-del", "text_de": "sss_override user-del"},
+        {"text": "sss_debuglevel 0", "text_de": "sss_debuglevel 0"},
+        {"text": "systemctl reload sssd", "text_de": "systemctl reload sssd"}
+      ],
+      "explanation_de": "sss_cache invalidiert Cache-Einträge: -U alle Benutzer, -G alle Gruppen, -E alles. sss_override setzt lokale Überschreibungen von Attributen, sss_debuglevel ändert die Protokollstufe.",
+      "terms": [{"term": "cached", "de": "zwischengespeichert"}]
+    },
+    {
+      "id": "300-304.2-01", "objective": "304.2", "type": "single", "difficulty": 1,
+      "question": "Which /etc/fstab entry mounts the share //fs1/data persistently using credentials stored in a file?",
+      "question_de": "Welcher /etc/fstab-Eintrag hängt die Freigabe //fs1/data dauerhaft mit Zugangsdaten aus einer Datei ein?",
+      "choices": [
+        {"text": "//fs1/data /mnt/data cifs credentials=/etc/cifs.cred,uid=1000 0 0", "text_de": "//fs1/data /mnt/data cifs credentials=/etc/cifs.cred,uid=1000 0 0", "correct": true},
+        {"text": "fs1:/data /mnt/data nfs credentials=/etc/cifs.cred 0 0", "text_de": "fs1:/data /mnt/data nfs credentials=/etc/cifs.cred 0 0"},
+        {"text": "//fs1/data /mnt/data smbfs user=bob,pass=secret 0 0", "text_de": "//fs1/data /mnt/data smbfs user=bob,pass=secret 0 0"},
+        {"text": "\\\\fs1\\data /mnt/data cifs guest 0 0", "text_de": "\\\\fs1\\data /mnt/data cifs guest 0 0"}
+      ],
+      "explanation_de": "Der Dateisystemtyp ist cifs, die Quelle wird als //server/freigabe geschrieben. credentials= verweist auf eine Datei mit username=, password= und optional domain=, damit kein Passwort in /etc/fstab steht. smbfs ist veraltet.",
+      "terms": []
+    },
+    {
+      "id": "300-304.2-02", "objective": "304.2", "type": "single", "difficulty": 2,
+      "question": "Which command lists the shares offered by the server fs1 without mounting anything?",
+      "question_de": "Welcher Befehl listet die vom Server fs1 angebotenen Freigaben, ohne etwas einzuhängen?",
+      "choices": [
+        {"text": "smbclient -L fs1 -U bob", "text_de": "smbclient -L fs1 -U bob", "correct": true},
+        {"text": "mount.cifs -L fs1", "text_de": "mount.cifs -L fs1"},
+        {"text": "smbget -l //fs1", "text_de": "smbget -l //fs1"},
+        {"text": "cifsiostat fs1", "text_de": "cifsiostat fs1"}
+      ],
+      "explanation_de": "smbclient -L (list) fragt die Freigabeliste ab. mount.cifs hängt ein, smbget lädt Dateien herunter, cifsiostat zeigt I/O-Statistiken eingehängter CIFS-Freigaben.",
+      "terms": []
+    },
+    {
+      "id": "300-304.3-01", "objective": "304.3", "type": "single", "difficulty": 2,
+      "question": "Which smb.conf parameter defines where roaming profiles of Windows clients are stored?",
+      "question_de": "Welcher smb.conf-Parameter legt fest, wo servergespeicherte Profile von Windows-Clients abgelegt werden?",
+      "choices": [
+        {"text": "logon path", "text_de": "logon path", "correct": true},
+        {"text": "logon script", "text_de": "logon script"},
+        {"text": "logon home", "text_de": "logon home"},
+        {"text": "template homedir", "text_de": "template homedir"}
+      ],
+      "explanation_de": "logon path = \\\\%N\\profiles\\%U gibt den UNC-Pfad des Profils an. logon script benennt das Anmeldeskript, logon home das Home-Laufwerk, template homedir das Unix-Home für Winbind-Benutzer.",
+      "terms": []
+    },
+    {
+      "id": "300-304.3-02", "objective": "304.3", "type": "single", "difficulty": 2,
+      "question": "Which command forces a Windows client to apply group policies immediately?",
+      "question_de": "Welcher Befehl zwingt einen Windows-Client, Gruppenrichtlinien sofort anzuwenden?",
+      "choices": [
+        {"text": "gpupdate /force", "text_de": "gpupdate /force", "correct": true},
+        {"text": "samba-tool gpo apply", "text_de": "samba-tool gpo apply"},
+        {"text": "net rpc gpo refresh", "text_de": "net rpc gpo refresh"},
+        {"text": "rdesktop --gpo", "text_de": "rdesktop --gpo"}
+      ],
+      "explanation_de": "gpupdate läuft auf dem Windows-Client und erneuert die Richtlinien; /force wendet alle Einstellungen erneut an. samba-tool gpo verwaltet GPOs auf dem DC (listall, create, setlink), wendet sie aber nicht auf Clients an.",
+      "terms": [{"term": "apply", "de": "anwenden"}]
+    },
+    {
+      "id": "300-305.1-01", "objective": "305.1", "type": "single", "difficulty": 1,
+      "question": "Which command installs and configures a new FreeIPA server including its integrated services?",
+      "question_de": "Welcher Befehl installiert und konfiguriert einen neuen FreeIPA-Server einschließlich seiner integrierten Dienste?",
+      "choices": [
+        {"text": "ipa-server-install", "text_de": "ipa-server-install", "correct": true},
+        {"text": "ipa-client-install", "text_de": "ipa-client-install"},
+        {"text": "ipa-replica-install", "text_de": "ipa-replica-install"},
+        {"text": "ipactl start", "text_de": "ipactl start"}
+      ],
+      "explanation_de": "ipa-server-install richtet den ersten Server mit 389 Directory Server, Kerberos KDC, optional DNS und CA ein. ipa-client-install nimmt Clients auf, ipa-replica-install erzeugt weitere Server, ipactl steuert die Dienste.",
+      "terms": [{"term": "integrated", "de": "integriert, eingebaut"}]
+    },
+    {
+      "id": "300-305.2-01", "objective": "305.2", "type": "single", "difficulty": 2,
+      "question": "Which FreeIPA feature allows presenting different UID, GID, shell or home directory values of a user to a specific set of hosts?",
+      "question_de": "Welche FreeIPA-Funktion erlaubt es, bestimmten Hosts andere UID-, GID-, Shell- oder Home-Verzeichniswerte eines Benutzers zu präsentieren?",
+      "choices": [
+        {"text": "ID views", "text_de": "ID-Views", "correct": true},
+        {"text": "Host-based access control", "text_de": "Hostbasierte Zugriffskontrolle (HBAC)"},
+        {"text": "Stage users", "text_de": "Stage-Benutzer"},
+        {"text": "Privileges", "text_de": "Privilegien"}
+      ],
+      "explanation_de": "ID-Views (ipa idview-*, idoverrideuser-*) überschreiben POSIX-Attribute für ausgewählte Hosts, zum Beispiel bei Migrationen. HBAC steuert, wer sich wo anmelden darf, Stage-Benutzer sind noch nicht aktivierte Konten, Privilegien bündeln Berechtigungen.",
+      "terms": []
+    },
+    {
+      "id": "300-305.2-02", "objective": "305.2", "type": "single", "difficulty": 2,
+      "question": "Which command adds the host web1.example.com to the host group webservers in FreeIPA?",
+      "question_de": "Welcher Befehl fügt in FreeIPA den Host web1.example.com zur Hostgruppe webservers hinzu?",
+      "choices": [
+        {"text": "ipa hostgroup-add-member webservers --hosts=web1.example.com", "text_de": "ipa hostgroup-add-member webservers --hosts=web1.example.com", "correct": true},
+        {"text": "ipa host-add webservers --group=web1.example.com", "text_de": "ipa host-add webservers --group=web1.example.com"},
+        {"text": "ipa group-add-member webservers --users=web1.example.com", "text_de": "ipa group-add-member webservers --users=web1.example.com"},
+        {"text": "ipa hostgroup-mod web1.example.com --add=webservers", "text_de": "ipa hostgroup-mod web1.example.com --add=webservers"}
+      ],
+      "explanation_de": "Mitglieder werden mit <objekt>-add-member hinzugefügt; bei Hostgruppen über --hosts oder --hostgroups. group-add-member betrifft Benutzergruppen, host-add legt neue Hosts an.",
+      "terms": []
+    },
+    {
+      "id": "300-305.3-01", "objective": "305.3", "type": "single", "difficulty": 2,
+      "question": "Which command prepares a FreeIPA server to establish a cross-forest trust with Active Directory?",
+      "question_de": "Welcher Befehl bereitet einen FreeIPA-Server darauf vor, eine Vertrauensstellung mit Active Directory einzurichten?",
+      "choices": [
+        {"text": "ipa-adtrust-install", "text_de": "ipa-adtrust-install", "correct": true},
+        {"text": "ipa trust-add", "text_de": "ipa trust-add"},
+        {"text": "ipa-replica-prepare", "text_de": "ipa-replica-prepare"},
+        {"text": "net ads join", "text_de": "net ads join"}
+      ],
+      "explanation_de": "ipa-adtrust-install installiert Samba und die Trust-Komponenten auf dem IPA-Server. Danach legt ipa trust-add die eigentliche Vertrauensstellung an. ipa-replica-prepare betrifft Replikate, net ads join macht einen Server zum AD-Mitglied.",
+      "terms": [{"term": "establish", "de": "einrichten, herstellen"}]
+    },
+    {
+      "id": "300-305.4-01", "objective": "305.4", "type": "single", "difficulty": 2,
+      "question": "Which /etc/exports entry exports /srv/nfs/data to the network 192.168.10.0/24 read-write with root privileges mapped to an anonymous user?",
+      "question_de": "Welcher /etc/exports-Eintrag exportiert /srv/nfs/data für das Netz 192.168.10.0/24 mit Schreibzugriff und bildet Root-Rechte auf einen anonymen Benutzer ab?",
+      "choices": [
+        {"text": "/srv/nfs/data 192.168.10.0/24(rw,root_squash)", "text_de": "/srv/nfs/data 192.168.10.0/24(rw,root_squash)", "correct": true},
+        {"text": "/srv/nfs/data 192.168.10.0/24(rw,no_root_squash)", "text_de": "/srv/nfs/data 192.168.10.0/24(rw,no_root_squash)"},
+        {"text": "/srv/nfs/data 192.168.10.0/24(ro,all_squash)", "text_de": "/srv/nfs/data 192.168.10.0/24(ro,all_squash)"},
+        {"text": "192.168.10.0/24 /srv/nfs/data rw root_squash", "text_de": "192.168.10.0/24 /srv/nfs/data rw root_squash"}
+      ],
+      "explanation_de": "root_squash (Standard) bildet UID 0 des Clients auf den anonymen Benutzer ab, no_root_squash behält Root-Rechte. all_squash bildet alle Benutzer ab. Die Syntax ist Pfad, dann Client mit Optionen in Klammern ohne Leerzeichen.",
+      "terms": []
+    },
+    {
+      "id": "300-305.4-02", "objective": "305.4", "type": "single", "difficulty": 2,
+      "question": "Which statement about the NFSv4 pseudo file system is correct?",
+      "question_de": "Welche Aussage über das NFSv4-Pseudo-Dateisystem ist richtig?",
+      "choices": [
+        {"text": "Clients mount a single root export, and all other exports appear below it in one namespace.", "text_de": "Clients hängen einen einzigen Root-Export ein, alle anderen Exporte erscheinen darunter in einem Namensraum.", "correct": true},
+        {"text": "Each export must be mounted separately with its full server path.", "text_de": "Jeder Export muss einzeln mit seinem vollständigen Serverpfad eingehängt werden."},
+        {"text": "The pseudo file system replaces /etc/exports.", "text_de": "Das Pseudo-Dateisystem ersetzt /etc/exports."},
+        {"text": "It is only available when Kerberos is used.", "text_de": "Es ist nur bei Nutzung von Kerberos verfügbar."}
+      ],
+      "explanation_de": "NFSv4 präsentiert alle Exporte als einen Baum unterhalb einer Wurzel (fsid=0 oder automatisch). Ein Client kann server:/ einhängen und sieht die Exporte als Unterverzeichnisse. Kerberos (sec=krb5) ist optional.",
+      "terms": []
+    }
+  ]
+}

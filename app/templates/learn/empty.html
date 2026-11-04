@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Keine Fragen · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Keine Fragen vorhanden</h1>
+  <p>Für {{ module.code }}{% if objective %} › {{ objective.code }}{% endif %} sind noch keine Fragen hinterlegt.</p>
+  <p><a class="btn" href="/module/{{ module.code }}">Zurück zum Modul</a></p>
+</section>
+{% endblock %}
