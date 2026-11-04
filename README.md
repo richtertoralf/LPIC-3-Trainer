@@ -21,9 +21,7 @@ Das Lernprinzip:
 - Die Prüfungsfragen bleiben auf Englisch.
 - Deutsche Übersetzungen und Erklärungen sind bei Bedarf verfügbar.
 - Technisches Fachenglisch wird direkt an den Prüfungsfragen gelernt.
-- Fachwissen und Sprachverständnis werden getrennt bewertet.
 - Vorhandenes Linux-Wissen wird berücksichtigt.
-- Sprachhilfen werden mit dem Lernfortschritt reduziert.
 
 Ziel ist das sichere, selbstständige Verstehen und Beantworten englischer LPIC-3-Prüfungsfragen.
 
@@ -38,7 +36,6 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
 - Englische Prüfungsfragen mit zuschaltbaren deutschen Übersetzungen und Erklärungen
 - Technisches Englischtraining anhand der Prüfungsfragen
-- Getrennte Auswertung von Fachwissen und Sprachverständnis
 - Kurze Eingangstests zur Berücksichtigung vorhandener Linux-Kenntnisse
 - Prüfungssimulationen ohne Sprachhilfen für einzelne Kapitel und ganze Module
 - Praktische Übungen für das eigene Linux-Lab (Anleitungen und Selbstkontrolle, keine Ausführung durch die App)
