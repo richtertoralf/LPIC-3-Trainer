@@ -19,7 +19,7 @@
 | `lpic3ctl uninstall` | entfernen, Daten behalten | ja |
 | `lpic3ctl purge [--yes]` | alles entfernen | ja |
 | `lpic3ctl user ...` | Benutzer verwalten | nein* |
-| `lpic3ctl import DATEI... [--visibility public\|private]` | Inhalte importieren | nein* |
+| `lpic3ctl import DATEI... [--visibility public\|private] [--supplementary --source TEXT --rights STATUS]` | Inhalte importieren | nein* |
 | `lpic3ctl validate DATEI...` | Inhalte prüfen | nein |
 | `lpic3ctl content-sync` | mitgelieferte Inhalte importieren | nein* |
 | `lpic3ctl migrate` | Migrationen ausführen | nein* |
@@ -64,6 +64,21 @@ Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit 
 - Kommandozeile: `lpic3ctl validate datei.json`, `sudo lpic3ctl import datei.json --visibility private`.
 
 Format und Regeln: `content/README.md`. Die Nutzungsrechte importierter Inhalte liegen beim Importierenden.
+
+## Zusatzfragen
+
+Zusatzfragen sind Fragen aus gesondert gekennzeichneten Quellen, zum Beispiel öffentlich im Internet kursierenden Fragensammlungen, deren Nutzungsrechte nicht geklärt sind. Sie werden getrennt vom regulären Bestand behandelt:
+
+- Import mit der Option „Als Zusatzfragen importieren“ (Weboberfläche) oder `--supplementary` (CLI), immer mit Quellenbezeichnung (`source`, z. B. „ExamTopics 04.11.2026“) und Rechtestatus (`rights`: geklärt, unbekannt, nicht geklärt). Dateien unter `content/questions/extra/` werden bei `content-sync` automatisch als Zusatzquelle importiert.
+- Für Lernende bleiben Zusatzfragen unsichtbar, bis ein Betreuer die Quelle unter *Verwaltung › Zusatzfragen* für eine seiner Lerngruppen freischaltet. Die Freischaltung lässt sich jederzeit zurücknehmen. Administratoren können jede Gruppe freischalten.
+- Freigeschaltete Zusatzfragen erscheinen beim Üben und in Simulationen und sind bei jeder Frage als „Zusatzfrage“ mit Quelle und Rechtestatus markiert. In der Modulübersicht sieht der Lernende die freigeschalteten Quellen und kann wahlweise nur Zusatzfragen oder nur den regulären Bestand üben.
+- Wer eine Quelle freischaltet, verantwortet die Zulässigkeit der Nutzung in seiner Gruppe. Importierende und Administratoren sehen Zusatzfragen immer.
+
+Kommandozeile:
+
+```bash
+sudo lpic3ctl import fragen.json --supplementary --source "ExamTopics 04.11.2026" --rights unverified
+```
 
 ## Backup und Restore
 

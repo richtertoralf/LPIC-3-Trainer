@@ -30,8 +30,10 @@ def fresh(tmp_path):
 
 
 def test_migrate_is_idempotent(fresh):
+    from app.migrate import head_revision
+
     r = run_cli(fresh, "migrate")
-    assert r.returncode == 0 and "0001" in r.stdout
+    assert r.returncode == 0 and head_revision() in r.stdout
     assert (fresh / "lpic3-trainer.db").exists()
 
 
@@ -105,7 +107,9 @@ def test_version_and_help(fresh):
 
 def test_health_endpoint(client):
     data = client.get("/health").json()
-    assert data["status"] == "ok" and data["database"]["schema_version"] == "0001"
+    from app.migrate import head_revision
+
+    assert data["status"] == "ok" and data["database"]["schema_version"] == head_revision()
     assert data["database"]["journal_mode"] == "wal"
 
 

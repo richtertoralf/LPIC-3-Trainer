@@ -167,7 +167,15 @@ def cmd_import(args) -> int:
         path = Path(raw)
         try:
             with session_scope() as db:
-                result = import_path(db, path, visibility=args.visibility, bundled=False)
+                result = import_path(
+                    db,
+                    path,
+                    visibility=args.visibility,
+                    bundled=False,
+                    supplementary=args.supplementary,
+                    source=args.source,
+                    rights=args.rights,
+                )
             say(f"{path.name}: {result.created} neu, {result.updated} aktualisiert ({result.kind})")
         except (ContentError, FileNotFoundError) as exc:
             code = EXIT_ERROR
@@ -886,6 +894,20 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("import", help="Inhaltsdateien (JSON) importieren")
     p.add_argument("files", nargs="+")
     p.add_argument("--visibility", choices=["public", "private"], default=None)
+    p.add_argument(
+        "--supplementary",
+        action="store_true",
+        help="als Zusatzfragen importieren (nur nach Freischaltung durch Betreuer sichtbar)",
+    )
+    p.add_argument(
+        "--source", default=None, help="Quellenbezeichnung, z. B. 'ExamTopics 04.11.2026'"
+    )
+    p.add_argument(
+        "--rights",
+        choices=["cleared", "unknown", "unverified"],
+        default=None,
+        help="Rechtestatus der Quelle",
+    )
     p.set_defaults(func=cmd_import)
 
     p = sub.add_parser("validate", help="Inhaltsdateien prüfen, ohne zu importieren")

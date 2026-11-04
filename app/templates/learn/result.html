@@ -7,6 +7,7 @@
     {% if is_correct %}<div class="verdict verdict-ok">Richtig!</div>{% else %}<div class="verdict verdict-wrong">Leider falsch.</div>{% endif %}
     {% if used_help %}<p class="muted small">Du hast die Sprachhilfe genutzt. Die Antwort wird trotzdem normal bewertet.</p>{% endif %}
   {% endif %}
+  {% include "learn/_source_tag.html" %}
   <p class="muted small">{{ question.external_id }}{% if question.objective %} · Ziel {{ question.objective.code }} {{ question.objective.title }}{% endif %}</p>
   <div data-question-form>
     {% with help=True, show_result=True %}{% include "learn/_question_body.html" %}{% endwith %}
@@ -21,7 +22,7 @@
     {% if review %}
       <a class="btn" href="javascript:history.back()">Zurück</a>
     {% else %}
-      <a class="btn btn-primary" href="/learn/{{ module.code }}{% if objective %}?objective={{ objective.code }}{% endif %}">Nächste Frage</a>
+      <a class="btn btn-primary" href="/learn/{{ module.code }}?{% if objective %}objective={{ objective.code }}&{% endif %}{% if pool and pool != 'all' %}pool={{ pool }}{% endif %}">Nächste Frage</a>
       <a class="btn" href="/module/{{ module.code }}">Modulübersicht</a>
     {% endif %}
   </p>

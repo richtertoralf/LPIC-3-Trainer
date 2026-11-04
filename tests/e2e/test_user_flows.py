@@ -186,3 +186,72 @@ def test_mobile_layout(page: Page, server, username, browser_errors, admin_crede
     page.click("form[data-question-form] button[type=submit]")
     expect(page.locator(".verdict")).to_be_visible()
     assert page.evaluate("document.documentElement.scrollWidth") <= viewport["width"]
+
+
+def test_supplementary_questions_enabled_by_supervisor(
+    page: Page, server, username, browser_errors, admin_credentials, tmp_path
+):
+    """Teacher imports a marked extra source and enables it; the learner sees the tag."""
+    import json
+    import time
+
+    base = server["base"]
+    source = f"ExamTopics Test {int(time.time())}"
+    doc = {
+        "schema_version": 1,
+        "kind": "questions",
+        "module": "305",
+        "supplementary": True,
+        "source": source,
+        "rights": "unverified",
+        "license": "Rechte nicht geklärt (Test)",
+        "questions": [
+            {
+                "id": f"e2e-extra-{int(time.time() * 1000)}",
+                "objective": "353.4",
+                "type": "single",
+                "question": "What is the purpose of the command vagrant init?",
+                "question_de": "Welchen Zweck hat vagrant init?",
+                "choices": [
+                    {"text": "It creates a Vagrantfile.", "correct": True},
+                    {"text": "It starts a box."},
+                ],
+                "explanation_de": "vagrant init erzeugt ein Vagrantfile.",
+            }
+        ],
+    }
+    path = tmp_path / "extra.json"
+    path.write_text(json.dumps(doc))
+    login(page, base, admin_credentials["username"], admin_credentials["password"])
+    page.goto(base + "/admin/import")
+    page.set_input_files("input[type=file]", str(path))
+    page.check("input[value=public]")
+    page.click("button:has-text('Importieren')")
+    expect(page.locator(".flash-success")).to_contain_text("1 neu")
+    expect(page.locator("table")).to_contain_text(f"Zusatz: {source}")
+    group = f"Zusatz {username}"
+    page.goto(base + "/admin/groups")
+    page.fill("input[name=name]", group)
+    page.select_option("select[name=join_mode]", "open")
+    page.click("button:has-text('Anlegen')")
+    page.goto(base + "/admin/extra")
+    expect(page.locator("table")).to_contain_text(source)
+    section = page.locator(f"section:has-text('Gruppe {group}')")
+    section.locator(f"label:has-text('{source}') input").check()
+    section.locator("button:has-text('Speichern')").click()
+    expect(page.locator(".flash-success")).to_contain_text("gespeichert")
+    page.click("button:has-text('Abmelden')")
+    register(page, base, username)
+    select_module(page, base, "305")
+    page.goto(base + "/groups")
+    page.locator(f"section:has-text('{group}') button").click()
+    page.goto(base + "/module/305")
+    expect(page.locator("h2", has_text="Zusatzfragen")).to_be_visible()
+    page.click("a:has-text('Nur Zusatzfragen üben')")
+    expect(page.locator(".source-tag")).to_contain_text("Zusatzfrage")
+    expect(page.locator(".source-tag")).to_contain_text(source)
+    expect(page.locator(".source-tag")).to_contain_text("nicht geklärt")
+    page.locator(".choice input").first.check()
+    page.click("form[data-question-form] button[type=submit]")
+    expect(page.locator(".verdict")).to_be_visible()
+    expect(page.locator(".source-tag")).to_contain_text("Zusatzfrage")

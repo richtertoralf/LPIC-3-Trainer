@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "300",
+  "supplementary": true,
+  "source": "ExamTopics 04.11.2026",
+  "rights": "unverified",
+  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 300-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freischaltung durch Betreuer sichtbar; nicht unter CC BY-SA 4.0.",
+  "author": "Quelle: ExamTopics (Übersetzung und Erklärung: LPIC-3 Trainer Projekt)",
+  "questions": [
+    {
+      "id": "300-examtopics-screenshot-01",
+      "objective": "303.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which of the following statements is true about raw printing with Samba?",
+      "question_de": "Welche der folgenden Aussagen trifft auf Raw Printing mit Samba zu?",
+      "choices": [
+        {"text": "Print jobs are submitted as vector files, including font files, which are rendered and printed by Samba.", "text_de": "Druckaufträge werden als Vektordateien einschließlich Schriftdateien gesendet und von Samba gerendert und gedruckt.", "correct": false},
+        {"text": "Printing jobs are always submitted to Samba in raw postscript.", "text_de": "Druckaufträge werden immer als unbearbeitetes PostScript an Samba übergeben.", "correct": false},
+        {"text": "Any printed file, e.g. an office document, is submitted to the printer without any further processing in exactly the same bit sequence as it is stored on disk.", "text_de": "Jede Datei, etwa ein Office-Dokument, wird unverändert mit genau derselben Bytefolge wie auf der Festplatte zum Drucker geschickt.", "correct": false},
+        {"text": "Samba converts printer-specific jobs to raw data to make them printable on an arbitrary printer.", "text_de": "Samba wandelt druckerspezifische Aufträge in Rohdaten um, damit beliebige Drucker sie drucken können.", "correct": false},
+        {"text": "Printing jobs are rendered on the client and passed on to the printer by Samba.", "text_de": "Druckaufträge werden auf dem Client aufbereitet und von Samba an den Drucker weitergereicht.", "correct": true}
+      ],
+      "explanation_de": "Bei Raw Printing bereitet der Windows-Client mit dem Druckertreiber die Druckdaten druckergerecht auf. Samba reicht den Datenstrom unverändert an CUPS beziehungsweise den Drucker weiter (CUPS-Queue im Raw-Modus). Eine beliebige Office-Datei ist kein gültiger Druckdatenstrom, deshalb ist Antwort C falsch.",
+      "terms": [
+        {"term": "raw printing", "de": "Rohdruck, unveränderte Weitergabe von Druckdaten"},
+        {"term": "rendered", "de": "aufbereitet, in ein druckbares Format umgesetzt"},
+        {"term": "passed on", "de": "weitergereicht"},
+        {"term": "submitted", "de": "übermittelt"}
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-02",
+      "objective": "303.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "The configuration of a Samba share contains the following line:\nforce directory mode = 0555\nIf a client creates a new directory with the permissions 0750, which permissions will the resulting directory have in the Samba server's file system?",
+      "question_de": "Eine Samba-Freigabe enthält die Einstellung force directory mode = 0555. Ein Client legt ein Verzeichnis mit den Rechten 0750 an. Welche Rechte hat es anschließend auf dem Samba-Server?",
+      "choices": [
+        {"text": "0755", "text_de": "0755", "correct": true},
+        {"text": "0750", "text_de": "0750", "correct": false},
+        {"text": "0200", "text_de": "0200", "correct": false},
+        {"text": "0555", "text_de": "0555", "correct": false},
+        {"text": "0777", "text_de": "0777", "correct": false}
+      ],
+      "explanation_de": "Samba begrenzt die vom Client gewünschten Rechte zuerst mit directory mask (Standard 0755) und setzt dann per bitweisem ODER die Bits aus force directory mode. 0750 AND 0755 = 0750, 0750 OR 0555 = 0755. Hinweis: Der Internet-Dump nennt 0555 als Lösung; nach der Samba-Dokumentation (smb.conf, Parameter force directory mode) ist 0755 das korrekte Ergebnis.",
+      "terms": [
+        {"term": "resulting", "de": "resultierend, sich ergebend"},
+        {"term": "permissions", "de": "Zugriffsrechte"},
+        {"term": "bitwise", "de": "bitweise"}
+      ]
+    }
+  ]
+}

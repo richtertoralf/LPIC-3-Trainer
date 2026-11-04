@@ -15,6 +15,8 @@ from app.models import (
     Attempt,
     Exam,
     GroupMember,
+    GroupSource,
+    ImportBatch,
     Lab,
     LabProgress,
     Module,
@@ -43,13 +45,46 @@ def supervisor_ids_for(db: Session, user: User) -> list[int]:
     return list(set(rows))
 
 
+def enabled_batch_ids(db: Session, user: User) -> list[int]:
+    """Supplementary import batches enabled for a group the user is an active member of."""
+    my_groups = select(GroupMember.group_id).where(
+        GroupMember.user_id == user.id, GroupMember.status == "active"
+    )
+    rows = db.execute(select(GroupSource.batch_id).where(GroupSource.group_id.in_(my_groups)))
+    return list({r for r in rows.scalars()})
+
+
 def visible_questions(db: Session, user: User):
-    """Select statement for active questions the user may see."""
+    """Select statement for active questions the user may see.
+
+    Supplementary pools are hidden until a supervisor enables them for one of the user's
+    groups. Administrators and the importer of a pool always see it.
+    """
     stmt = select(Question).where(Question.is_active.is_(True))
     if user.is_admin:
         return stmt
     owners = [user.id, *supervisor_ids_for(db, user)]
-    return stmt.where(or_(Question.visibility == "public", Question.created_by.in_(owners)))
+    stmt = stmt.where(or_(Question.visibility == "public", Question.created_by.in_(owners)))
+    enabled = enabled_batch_ids(db, user)
+    return stmt.where(
+        or_(
+            Question.supplementary.is_(False),
+            Question.created_by == user.id,
+            Question.import_batch_id.in_(enabled),
+        )
+    )
+
+
+def enabled_sources(db: Session, user: User, module: Module) -> list[ImportBatch]:
+    """Supplementary batches of a module the user may currently practise."""
+    stmt = select(ImportBatch).where(
+        ImportBatch.supplementary.is_(True), ImportBatch.module_code == module.code
+    )
+    if not user.is_admin:
+        stmt = stmt.where(
+            or_(ImportBatch.id.in_(enabled_batch_ids(db, user)), ImportBatch.imported_by == user.id)
+        )
+    return list(db.execute(stmt.order_by(ImportBatch.source)).scalars())
 
 
 def visible_labs(db: Session, user: User):
@@ -246,11 +281,20 @@ def pick_practice_question(
     module: Module,
     objective: Objective | None = None,
     exclude_id: int | None = None,
+    pool: str = "all",
 ) -> Question | None:
-    """Pick the next practice question: unanswered first, then wrong ones, then any."""
+    """Pick the next practice question: unanswered first, then wrong ones, then any.
+
+    ``pool`` restricts the selection to "core" (bundled and regular imports) or "extra"
+    (supplementary pools enabled for the user).
+    """
     stmt = visible_questions(db, user).where(Question.module_id == module.id)
     if objective is not None:
         stmt = stmt.where(Question.objective_id == objective.id)
+    if pool == "extra":
+        stmt = stmt.where(Question.supplementary.is_(True))
+    elif pool == "core":
+        stmt = stmt.where(Question.supplementary.is_(False))
     questions = list(db.execute(stmt).scalars())
     if exclude_id is not None and len(questions) > 1:
         questions = [q for q in questions if q.id != exclude_id]

@@ -52,7 +52,7 @@ LPIC3_DATA_DIR=./data .venv/bin/alembic revision --autogenerate -m "describe cha
 LPIC3_DATA_DIR=./data .venv/bin/alembic upgrade head
 ```
 
-- Migrationen in `migrations/versions/` mit sprechender Revision benennen (`0002_...`). SQLite-Änderungen an Spalten brauchen `batch_alter_table` (in `env.py` aktiviert).
+- Migrationen in `migrations/versions/` mit sprechender Revision benennen. Vorhanden: `0001_initial_schema`, `0002_supplementary_questions`. SQLite-Änderungen an Spalten brauchen `batch_alter_table` (in `env.py` aktiviert).
 - Die Anwendung führt beim Start `upgrade head` aus.
 
 ## Code

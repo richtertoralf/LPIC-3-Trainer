@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand (erste Entwicklungsversion, keine stabile Produktionsversion).
+Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand und Zusatzfragen (erste Entwicklungsversion, keine stabile Produktionsversion).
 
 ## Zusammenfassung
 
@@ -27,7 +27,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 - Prüfungsziele aller vier Module (300, 303, 305, 306) in Version 3.0 mit Themen, Zielen, Gewichten, deutschen Zusammenfassungen und Werkzeuglisten. Quelle: offizielle LPI-Prüfungsziele; Zusammenfassungen sind eigene Formulierungen.
 - 245 eigene Prüfungsfragen (300: 62, 303: 62, 305: 60, 306: 61) in zwei Dateien je Modul, jede mit deutscher Übersetzung von Frage und Antworten sowie deutscher Erklärung. Jedes Prüfungsziel hat mindestens eine Frage; die Verteilung folgt grob dem Gewicht der Ziele.
-- Glossar mit 216 Fachbegriffen (Englisch, Deutsch, teils Erklärung).
+- Glossar mit 271 Fachbegriffen (Englisch, Deutsch, teils Erklärung). Jede mitgelieferte Frage trifft mindestens einen Glossarbegriff (getestet).
 - 12 Laboraufgaben (3 je Modul) mit Umgebung, Schritten, Befehlen und Selbstkontrollfragen.
 - Lizenz der Inhalte: CC BY-SA 4.0 (`content/LICENSE.md`), getrennt vom MIT-lizenzierten Code.
 
@@ -52,6 +52,8 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 - Import über Weboberfläche (max. 5 MB) und `lpic3ctl import`, Sichtbarkeit privat/öffentlich, Importchargen mit Lizenz und Autor, Löschen von Chargen, Deaktivieren einzelner Fragen.
 - Private Fragen sind für Importierende, Administratoren und Mitglieder betreuter Gruppen sichtbar.
 - Importierte Texte werden immer escaped (getestet).
+- Zusatzfragen: Importdateien können mit `supplementary`, `source` und `rights` als Zusatzquelle gekennzeichnet werden (Weboberfläche, CLI `--supplementary`, oder Ablage unter `content/questions/extra/`). Sie bleiben für Lernende unsichtbar, bis ein Betreuer die Quelle unter *Verwaltung › Zusatzfragen* für eine Lerngruppe freischaltet. Jede Zusatzfrage ist mit Quelle und Rechtestatus markiert; Lernende können wahlweise nur Zusatzfragen oder nur den regulären Bestand üben. Migration `0002`.
+- Mitgelieferte Zusatzquellen unter `content/questions/extra/`: je zwei Fragen aus den öffentlich abrufbaren ExamTopics-Dumps zu den Prüfungen 305-300 und 300-300 (Herkunft per Websuche geprüft, Nutzungsrechte nicht geklärt, Fundstellen in `content/questions/extra/README.md`). Diese Dateien sind von der CC-BY-SA-Lizenz der übrigen Inhalte ausgenommen.
 
 ### Offline
 
@@ -74,8 +76,8 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 | Suite | Umfang | Ergebnis |
 |-------|--------|----------|
-| pytest Backend (`tests/`, ohne e2e) | 73 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen) | 73 bestanden |
-| Playwright (`tests/e2e/`, Chromium) | 9 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker | 9 bestanden |
+| pytest Backend (`tests/`, ohne e2e) | 80 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Zusatzfragen (Validierung, Import über Web und CLI, Freischaltung je Gruppe, Sichtbarkeit, Pool-Filter) | 80 bestanden |
+| Playwright (`tests/e2e/`, Chromium) | 10 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Zusatzfragen (Import, Freischaltung, Kennzeichnung) | 10 bestanden |
 | ruff check / ruff format | `app`, `tests`, `migrations` | ohne Befunde |
 
 JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertests erfasst; keine aufgetreten.
@@ -89,6 +91,7 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 - **Prüfungssimulation ohne Fortsetzung nach Browserschließen.** Die Antworten werden erst bei Abgabe gespeichert; die Zeit läuft serverseitig weiter.
 - **Keine E-Mail.** Passwort zurücksetzen erfolgt durch Administratoren (neues Passwort wird angezeigt).
 - **Offline.** Antworten ohne Verbindung gehen verloren; es gibt keine Warteschlange.
+- **Zusatzfragen mit ungeklärten Rechten.** Die mitgelieferten ExamTopics-Dateien verstoßen möglicherweise gegen Rechte des LPI oder Dritter. AGENTS.md untersagt das Veröffentlichen unberechtigt kopierter Exam-Dumps im Repository; die Aufnahme erfolgte auf ausdrückliche Anweisung des Auftraggebers mit Kennzeichnung und Freischaltungspflicht. Die Verantwortung für die Nutzung liegt beim freischaltenden Betreuer.
 - Prüfungsziele Version 3.0 vom Stand November 2026; LPI kündigt für 303 Änderungen an („Future Change Considerations“).
 
 ## Offene Aufgaben und nächste Schritte
@@ -98,4 +101,4 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 3. Fragenbestand weiter ausbauen (Ziel: mindestens 120 je Modul, damit Simulationen variieren), weitere Labs.
 4. Begriffserkennung um einfache Wortformen erweitern.
 5. Browsertests auch mit Firefox/WebKit laufen lassen.
-6. Datenmigration mit einer zweiten Alembic-Revision testen, sobald das Schema sich ändert.
+6. Migration `0002` ist die erste Schemaänderung; Upgrade- und Downgrade-Pfad wurden lokal mit Alembic geprüft, aber noch nicht auf einer produktiven Installation.

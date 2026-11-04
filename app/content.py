@@ -37,6 +37,9 @@ SCHEMA_VERSION = 1
 KINDS = ("objectives", "terms", "questions", "labs")
 QUESTION_TYPES = ("single", "multiple")
 VISIBILITIES = ("public", "private")
+# Rights status of an imported question pool: cleared (licence known), unknown, or
+# unverified (origin known, usage rights not cleared; only for supervisor-enabled pools).
+RIGHTS = ("cleared", "unknown", "unverified")
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$")
 CODE_PATTERN = re.compile(r"^\d{3}(\.\d)?$")
 MAX_TEXT = 4000
@@ -254,6 +257,12 @@ def validate_questions(data: dict) -> list[str]:
         _check_str(errors, data, key, "file", required=False, max_len=255)
     if data.get("visibility", "private") not in VISIBILITIES:
         errors.append("'visibility' must be public or private")
+    if not isinstance(data.get("supplementary", False), bool):
+        errors.append("'supplementary' must be true or false")
+    if data.get("supplementary") and not _is_str(data.get("source"), max_len=160):
+        errors.append("a supplementary file needs a non-empty 'source' label (max 160 chars)")
+    if data.get("rights", "unknown") not in RIGHTS:
+        errors.append(f"'rights' must be one of {', '.join(RIGHTS)}")
     questions = data.get("questions")
     if not isinstance(questions, list) or not questions:
         return errors + ["'questions' must be a non-empty list"]
@@ -468,6 +477,7 @@ def import_questions(
     visibility: str | None,
     bundled: bool,
     checksum: str = "",
+    **kwargs,
 ) -> ImportResult:
     result = ImportResult(kind="questions")
     module = db.execute(select(Module).where(Module.code == data["module"])).scalar_one_or_none()
@@ -485,6 +495,7 @@ def import_questions(
         ):
             raise ContentError([f"question {q['id']}: objective {code} belongs to another module"])
     vis = visibility or data.get("visibility", "private")
+    supplementary = bool(data.get("supplementary", False)) or bool(kwargs.get("supplementary"))
     batch = _batch(db, "questions", filename, bundled)
     batch.module_code = module.code
     batch.license = data.get("license", "")
@@ -492,6 +503,9 @@ def import_questions(
     batch.visibility = vis
     batch.imported_by = imported_by
     batch.checksum = checksum
+    batch.supplementary = supplementary
+    batch.source = (kwargs.get("source") or data.get("source") or "")[:160]
+    batch.rights = kwargs.get("rights") or data.get("rights", "unknown")
     db.flush()
     cache: dict[str, Term] = {}
     for q in data["questions"]:
@@ -519,6 +533,7 @@ def import_questions(
         question.difficulty = int(q.get("difficulty", 2))
         question.visibility = vis
         question.is_active = True
+        question.supplementary = supplementary
         question.import_batch_id = batch.id
         question.created_by = imported_by
         db.flush()
@@ -551,6 +566,7 @@ def import_labs(
     visibility: str | None,
     bundled: bool,
     checksum: str = "",
+    **kwargs,
 ) -> ImportResult:
     result = ImportResult(kind="labs")
     module = db.execute(select(Module).where(Module.code == data["module"])).scalar_one_or_none()
@@ -608,6 +624,7 @@ def import_document(
     imported_by: int | None = None,
     visibility: str | None = None,
     bundled: bool = False,
+    **kwargs,
 ) -> ImportResult:
     """Validate and import one content document. Raises ContentError when invalid."""
     errors = validate(data)
@@ -628,6 +645,7 @@ def import_document(
             visibility=visibility,
             bundled=bundled,
             checksum=checksum,
+            **kwargs,
         )
     return import_labs(
         db,
@@ -647,7 +665,7 @@ def import_path(db: Session, path: Path, **kwargs) -> ImportResult:
 
 def content_files(content_dir: Path) -> list[Path]:
     """Return bundled content files in import order (objectives, terms, questions, labs)."""
-    order = {"objectives": 0, "vocabulary": 1, "questions": 2, "labs": 3}
+    order = {"objectives": 0, "vocabulary": 1, "questions": 2, "questions/extra": 3, "labs": 4}
     files: list[tuple[int, Path]] = []
     for sub, rank in order.items():
         folder = content_dir / sub

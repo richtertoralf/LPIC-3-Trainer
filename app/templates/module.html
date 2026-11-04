@@ -35,6 +35,17 @@
   {% endif %}
 </section>
 
+{% if sources %}
+<section class="card">
+  <h2>Zusatzfragen <span class="tag tag-warn">freigeschaltet</span></h2>
+  <p>{{ extra_count }} zusätzliche Fragen aus gesondert gekennzeichneten Quellen. Sie erscheinen beim Üben und in Simulationen und sind bei jeder Frage als Zusatzfrage markiert.</p>
+  <ul>
+    {% for b in sources %}<li><strong>{{ b.source }}</strong>{% if b.rights == 'unverified' %} <span class="muted">(Nutzungsrechte nicht geklärt)</span>{% elif b.rights == 'cleared' %} <span class="muted">(Rechte geklärt)</span>{% endif %}{% if b.license %}<br><span class="muted small">{{ b.license }}</span>{% endif %}</li>{% endfor %}
+  </ul>
+  <p class="actions"><a class="btn btn-small" href="/learn/{{ module.code }}?pool=extra">Nur Zusatzfragen üben</a> <a class="btn btn-small" href="/learn/{{ module.code }}?pool=core">Ohne Zusatzfragen üben</a></p>
+</section>
+{% endif %}
+
 {% for topic in module.topics %}
 <section class="card">
   <h2>{{ topic.code }} · {{ topic.title }} <span class="muted">({{ topic.title_de }}, Gewicht {{ topic.weight }})</span></h2>

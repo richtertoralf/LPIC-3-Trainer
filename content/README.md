@@ -11,9 +11,10 @@ Die Inhalte stehen unter CC BY-SA 4.0, siehe [LICENSE.md](LICENSE.md). Der Progr
 | `objectives/` | Prüfungsziele je Modul (Themen, Ziele, Gewicht) | `objectives` |
 | `vocabulary/` | Glossar Fachenglisch (Begriff, Übersetzung, Erklärung) | `terms` |
 | `questions/`  | Prüfungsfragen je Modul                      | `questions`  |
+| `questions/extra/` | Zusatzfragen aus gesondert gekennzeichneten Quellen, siehe [questions/extra/README.md](questions/extra/README.md) | `questions` mit `supplementary: true` |
 | `labs/`       | Laboraufgaben je Modul                       | `labs`       |
 
-Die Importreihenfolge ist fest: Prüfungsziele, Glossar, Fragen, Labs.
+Die Importreihenfolge ist fest: Prüfungsziele, Glossar, Fragen, Zusatzfragen, Labs.
 
 ## Schema Version 1
 
@@ -65,6 +66,9 @@ Regeln:
 - `choices`: 2 bis 6 Einträge.
 - `visibility`: `public` oder `private`. Beim Import über die Weboberfläche gilt die dort gewählte Sichtbarkeit.
 - `terms`: fragenbezogene Fachbegriffe. Sie landen zusätzlich im Glossar.
+- `supplementary`: `true` kennzeichnet eine Zusatzquelle. Die Fragen sind für Lernende erst sichtbar, wenn ein Betreuer die Quelle für eine Lerngruppe freischaltet. Dann ist `source` Pflicht.
+- `source`: Quellenbezeichnung, z. B. `ExamTopics 04.11.2026` (max. 160 Zeichen). Wird bei jeder Zusatzfrage angezeigt.
+- `rights`: `cleared`, `unknown` (Standard) oder `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt).
 
 ### Glossar (`kind: terms`)
 
@@ -100,5 +104,6 @@ Befehle werden nur angezeigt, nie ausgeführt.
 
 - Prüfen: `lpic3ctl validate datei.json`
 - Importieren: `lpic3ctl import datei.json --visibility private` oder über die Weboberfläche unter Verwaltung › Import.
+- Zusatzfragen: `lpic3ctl import datei.json --supplementary --source "Quelle Datum" --rights unverified` oder in der Weboberfläche die Option „Als Zusatzfragen importieren“ mit Quellenbezeichnung und Rechtestatus. Die Felder in der Datei gelten, Angaben beim Import überschreiben sie.
 - Importierte Fragen sind standardmäßig privat. Nur Administratoren können sie öffentlich stellen.
 - Nutzungsrechte importierter Inhalte sind vom Importierenden zu beachten. Unerlaubt kopierte Prüfungsfragen dürfen nicht in dieses Repository aufgenommen werden.

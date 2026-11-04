@@ -15,7 +15,7 @@
   <tbody>
   {% for q in questions %}
   <tr class="{% if not q.is_active %}row-dim{% endif %}">
-    <td>{{ q.external_id }}</td>
+    <td>{{ q.external_id }}{% if q.supplementary %} <span class="tag tag-warn">Zusatz</span>{% endif %}</td>
     <td>{{ q.objective.code if q.objective else '–' }}</td>
     <td><a href="/question/{{ q.id }}">{{ q.text_en[:120] }}{% if q.text_en | length > 120 %}…{% endif %}</a></td>
     <td>{{ q.kind }}</td><td>{{ q.visibility }}</td><td>{% if q.is_active %}aktiv{% else %}inaktiv{% endif %}</td>

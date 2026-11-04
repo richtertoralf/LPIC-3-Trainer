@@ -26,6 +26,7 @@ from app.models import (
     Exam,
     Group,
     GroupMember,
+    GroupSource,
     ImportBatch,
     Lab,
     Module,
@@ -205,6 +206,9 @@ async def import_upload(
     request: Request,
     file: UploadFile = File(...),
     visibility: str = Form("private"),
+    supplementary: str = Form(""),
+    source: str = Form(""),
+    rights: str = Form("unknown"),
     user: User = Depends(require_supervisor),
     db: Session = Depends(get_db),
 ):
@@ -222,8 +226,20 @@ async def import_upload(
             raise ContentError(
                 ["Nur Administratoren dürfen Prüfungsziele oder Glossare importieren."]
             )
+        if rights not in ("cleared", "unknown", "unverified"):
+            raise ContentError(["Ungültiger Rechtestatus."])
+        is_supplementary = supplementary == "1" or bool(data.get("supplementary"))
+        if is_supplementary and not (source.strip() or data.get("source")):
+            raise ContentError(["Zusatzfragen brauchen eine Quellenbezeichnung."])
         result = import_document(
-            db, data, filename=filename, imported_by=user.id, visibility=visibility
+            db,
+            data,
+            filename=filename,
+            imported_by=user.id,
+            visibility=visibility,
+            supplementary=is_supplementary,
+            source=source.strip() or None,
+            rights=rights if rights != "unknown" else None,
         )
     except ContentError as exc:
         db.rollback()
@@ -475,6 +491,85 @@ def delete_group(group_id: int, user: User = Depends(require_admin), db: Session
     if group is not None:
         db.delete(group)
     return redirect("/admin/groups", "Gruppe gelöscht.")
+
+
+# --------------------------------------------------------- supplementary pools
+
+
+def _supervised_groups(db: Session, user: User) -> list[Group]:
+    rows = list(
+        db.execute(
+            select(Group).options(selectinload(Group.members)).order_by(Group.name)
+        ).scalars()
+    )
+    if user.is_admin:
+        return rows
+    return [
+        g for g in rows if any(m.user_id == user.id and m.role == "supervisor" for m in g.members)
+    ]
+
+
+@router.get("/extra")
+def extra_sources(
+    request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
+    """Supplementary question pools and the groups they are enabled for."""
+    batches = list(
+        db.execute(
+            select(ImportBatch)
+            .where(ImportBatch.supplementary.is_(True))
+            .order_by(ImportBatch.module_code, ImportBatch.source)
+        ).scalars()
+    )
+    groups = _supervised_groups(db, user)
+    enabled = {
+        (gs.group_id, gs.batch_id)
+        for gs in db.execute(
+            select(GroupSource).where(GroupSource.group_id.in_([g.id for g in groups]))
+        ).scalars()
+    }
+    counts = dict(
+        db.execute(
+            select(Question.import_batch_id, func.count(Question.id))
+            .where(Question.supplementary.is_(True))
+            .group_by(Question.import_batch_id)
+        ).all()
+    )
+    return render(
+        request,
+        "admin/extra.html",
+        {"batches": batches, "groups": groups, "enabled": enabled, "counts": counts},
+    )
+
+
+@router.post("/extra/{group_id}")
+async def save_extra_sources(
+    request: Request,
+    group_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
+    group = _group_for(db, user, group_id)
+    form = await request.form()
+    wanted: set[int] = set()
+    for raw in form.getlist("batch"):
+        try:
+            wanted.add(int(raw))
+        except ValueError:
+            continue
+    valid = set(
+        db.execute(select(ImportBatch.id).where(ImportBatch.supplementary.is_(True))).scalars()
+    )
+    wanted &= valid
+    current = {
+        gs.batch_id: gs
+        for gs in db.execute(select(GroupSource).where(GroupSource.group_id == group.id)).scalars()
+    }
+    for batch_id in wanted - set(current):
+        db.add(GroupSource(group_id=group.id, batch_id=batch_id, enabled_by=user.id))
+    for batch_id in set(current) - wanted:
+        db.delete(current[batch_id])
+    return redirect("/admin/extra", f"Zusatzfragen für {group.name} gespeichert.", "success")
 
 
 # ---------------------------------------------------------------- statistics

@@ -28,6 +28,10 @@ Nach *Antwort prüfen* siehst du die richtige Lösung, die deutsche Erklärung u
 
 Die Modulübersicht zeigt zu jedem Prüfungsziel eine deutsche Zusammenfassung und die wichtigsten Werkzeuge (aufklappbar).
 
+## Zusatzfragen
+
+Betreuer können für ihre Lerngruppe Zusatzfragen aus gesondert gekennzeichneten Quellen freischalten. Sie erscheinen dann beim Üben und in Simulationen und sind mit „Zusatzfrage“, der Quelle und dem Rechtestatus markiert. In der Modulübersicht siehst du die freigeschalteten Quellen und kannst mit *Nur Zusatzfragen üben* oder *Ohne Zusatzfragen üben* die Auswahl eingrenzen.
+
 ## Vokabeln
 
 *Vokabeln* listet gemerkte Begriffe. *Wiederholen* zeigt Karten: erst der englische Begriff, dann die deutsche Bedeutung; danach *Gewusst* oder *Nochmal*. Gelernte Begriffe lassen sich zurückholen. Das *Glossar* ist durchsuchbar (englisch und deutsch).
@@ -64,5 +68,6 @@ Einmal aufgerufene Seiten (Fragen, Ergebnisse, Labs, Vokabeln) bleiben im Browse
 - *Verwaltung › Gruppen*: Gruppe anlegen, Beitritte freigeben, Lernstand einsehen.
 - *Verwaltung › Import*: eigene Fragen als JSON hochladen (privat, sichtbar für die eigenen Gruppen). Format in `content/README.md`.
 - *Verwaltung › Fragen*: eigene Fragen deaktivieren oder aktivieren.
+- *Verwaltung › Zusatzfragen*: gekennzeichnete Quellen für eine Lerngruppe freischalten oder sperren.
 
 Details in `docs/administration.md`.

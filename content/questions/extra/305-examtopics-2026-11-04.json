@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "305",
+  "supplementary": true,
+  "source": "ExamTopics 04.11.2026",
+  "rights": "unverified",
+  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 305-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freischaltung durch Betreuer sichtbar; nicht unter CC BY-SA 4.0.",
+  "author": "Quelle: ExamTopics (Übersetzung und Erklärung: LPIC-3 Trainer Projekt)",
+  "questions": [
+    {
+      "id": "305-examtopics-screenshot-01",
+      "objective": "353.4",
+      "type": "single",
+      "question": "What is the purpose of the command vagrant init?",
+      "question_de": "Welchen Zweck hat der Befehl vagrant init?",
+      "choices": [
+        {
+          "text": "It executes a provisioning tool in a running box.",
+          "text_de": "Er führt ein Provisionierungswerkzeug in einer laufenden Box aus.",
+          "correct": false
+        },
+        {
+          "text": "It starts a Vagrant box.",
+          "text_de": "Er startet eine Vagrant-Box.",
+          "correct": false
+        },
+        {
+          "text": "It creates a Vagrant configuration file.",
+          "text_de": "Er erstellt eine Vagrant-Konfigurationsdatei.",
+          "correct": true
+        },
+        {
+          "text": "It installs Vagrant on a Linux host.",
+          "text_de": "Er installiert Vagrant auf einem Linux-Host.",
+          "correct": false
+        },
+        {
+          "text": "It downloads a Vagrant box.",
+          "text_de": "Er lädt eine Vagrant-Box herunter.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "C ist richtig: vagrant init erzeugt ein Vagrantfile im aktuellen Verzeichnis. Es startet keine VM und lädt nicht zwingend eine Box herunter; das übernimmt vagrant up.",
+      "terms": [
+        {
+          "term": "purpose",
+          "de": "Zweck"
+        },
+        {
+          "term": "configuration file",
+          "de": "Konfigurationsdatei"
+        },
+        {
+          "term": "provisioning",
+          "de": "automatisierte Bereitstellung und Einrichtung"
+        }
+      ]
+    },
+    {
+      "id": "305-examtopics-screenshot-02",
+      "objective": "351.2",
+      "type": "single",
+      "question": "In order to use the option dom0_mem to limit the amount of memory assigned to the Xen Domain-0, where must this option be specified?",
+      "question_de": "Wo muss die Option dom0_mem angegeben werden, um den Xen-Domain-0 zugewiesenen Arbeitsspeicher zu begrenzen?",
+      "choices": [
+        {
+          "text": "In the bootloader configuration, when Xen is booted.",
+          "text_de": "In der Bootloader-Konfiguration beim Start von Xen.",
+          "correct": true
+        },
+        {
+          "text": "In any of Xen’s global configuration files.",
+          "text_de": "In einer beliebigen globalen Xen-Konfigurationsdatei.",
+          "correct": false
+        },
+        {
+          "text": "In its .config file, when the Domain-0 kernel is built.",
+          "text_de": "In der .config-Datei beim Kompilieren des Domain-0-Kernels.",
+          "correct": false
+        },
+        {
+          "text": "In the configuration file /etc/xen/Domain-0.cfg, when Xen starts.",
+          "text_de": "In /etc/xen/Domain-0.cfg beim Start von Xen.",
+          "correct": false
+        },
+        {
+          "text": "In its Makefile, when Xen is built.",
+          "text_de": "Im Makefile beim Kompilieren von Xen.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "A ist richtig: dom0_mem ist ein Startparameter des Xen-Hypervisors und wird über die Bootloader-Konfiguration (z. B. die Xen-Zeile in GRUB) an Xen übergeben, etwa dom0_mem=2048M,max:2048M.",
+      "terms": [
+        {
+          "term": "in order to",
+          "de": "um ... zu"
+        },
+        {
+          "term": "amount",
+          "de": "Menge"
+        },
+        {
+          "term": "assigned",
+          "de": "zugewiesen"
+        },
+        {
+          "term": "specified",
+          "de": "angegeben"
+        }
+      ]
+    }
+  ]
+}

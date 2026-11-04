@@ -124,6 +124,23 @@ class GroupMember(Base):
     user: Mapped[User] = relationship()
 
 
+class GroupSource(Base):
+    """A supplementary import batch enabled for the members of a group by a supervisor."""
+
+    __tablename__ = "group_sources"
+    __table_args__ = (UniqueConstraint("group_id", "batch_id", name="uq_group_source"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
+    batch_id: Mapped[int] = mapped_column(
+        ForeignKey("import_batches.id", ondelete="CASCADE"), nullable=False
+    )
+    enabled_by: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    enabled_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+
+
 # ------------------------------------------------------------------- learning content
 
 
@@ -197,6 +214,10 @@ class ImportBatch(Base):
     imported_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     bundled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     checksum: Mapped[str] = mapped_column(String(64), nullable=False, default="")
+    # Supplementary question pools are hidden until a supervisor enables them for a group.
+    supplementary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    source: Mapped[str] = mapped_column(String(160), nullable=False, default="")
+    rights: Mapped[str] = mapped_column(String(32), nullable=False, default="unknown")
 
 
 class Question(Base):
@@ -218,6 +239,7 @@ class Question(Base):
     difficulty: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     visibility: Mapped[str] = mapped_column(String(16), nullable=False, default="public")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    supplementary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     import_batch_id: Mapped[int | None] = mapped_column(
         ForeignKey("import_batches.id", ondelete="SET NULL")
     )

@@ -36,6 +36,7 @@ def _question_context(db: Session, user: User, question: Question, with_help: bo
     statuses = user_term_status(db, user, [t.id for t in terms])
     return {
         "question": question,
+        "source": question.batch if question.supplementary and question.batch else None,
         "terms": [
             {
                 "id": t.id,
@@ -55,18 +56,21 @@ def practice(
     code: str,
     objective: str | None = None,
     skip: int | None = None,
+    pool: str = "all",
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     module = module_by_code(db, code)
     if module is None:
         raise HTTPException(404, "Modul nicht gefunden")
+    if pool not in ("all", "core", "extra"):
+        raise HTTPException(400, "Ungültiger Fragenpool")
     obj = _objective(db, objective)
-    question = pick_practice_question(db, user, module, obj, exclude_id=skip)
+    question = pick_practice_question(db, user, module, obj, exclude_id=skip, pool=pool)
     if question is None:
         return render(request, "learn/empty.html", {"module": module, "objective": obj})
     ctx = _question_context(db, user, question, with_help=True)
-    ctx.update({"module": module, "objective": obj, "mode": MODE_PRACTICE})
+    ctx.update({"module": module, "objective": obj, "mode": MODE_PRACTICE, "pool": pool})
     return render(request, "learn/question.html", ctx)
 
 
@@ -114,6 +118,7 @@ async def answer(
             "is_correct": is_correct,
             "used_help": used_help,
             "mode": MODE_PRACTICE,
+            "pool": form.get("pool") or "all",
         }
     )
     return render(request, "learn/result.html", ctx)

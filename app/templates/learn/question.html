@@ -3,16 +3,18 @@
 {% block content %}
 <nav class="breadcrumb"><a href="/module/{{ module.code }}">{{ module.code }} {{ module.title }}</a>{% if objective %} › {{ objective.code }} {{ objective.title }}{% endif %}</nav>
 <section class="card question-card">
+  {% include "learn/_source_tag.html" %}
   <p class="muted small">{{ question.external_id }}{% if question.objective %} · Ziel {{ question.objective.code }}{% endif %} · Schwierigkeit {{ question.difficulty }}/3</p>
   <form method="post" action="/learn/{{ module.code }}/answer" data-question-form>
     <input type="hidden" name="question_id" value="{{ question.id }}">
     <input type="hidden" name="objective" value="{{ objective.code if objective else '' }}">
     <input type="hidden" name="used_help" value="0" data-used-help>
+    <input type="hidden" name="pool" value="{{ pool or 'all' }}">
     {% with help=True, selected=[], show_result=False %}{% include "learn/_question_body.html" %}{% endwith %}
     {% include "learn/_help_panel.html" %}
     <p class="actions">
       <button class="btn btn-primary" type="submit">Antwort prüfen</button>
-      <a class="btn" href="/learn/{{ module.code }}?{% if objective %}objective={{ objective.code }}&{% endif %}skip={{ question.id }}">Überspringen</a>
+      <a class="btn" href="/learn/{{ module.code }}?{% if objective %}objective={{ objective.code }}&{% endif %}{% if pool and pool != 'all' %}pool={{ pool }}&{% endif %}skip={{ question.id }}">Überspringen</a>
     </p>
   </form>
 </section>

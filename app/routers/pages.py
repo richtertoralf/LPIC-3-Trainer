@@ -12,6 +12,7 @@ from app.deps import get_current_user, get_db, get_optional_user
 from app.models import Group, GroupMember, Lab, Question, User, UserModule, UserTerm
 from app.services import (
     all_modules,
+    enabled_sources,
     module_by_code,
     module_progress,
     user_module,
@@ -106,8 +107,27 @@ def module_overview(
     labs = list(
         db.execute(select(Lab).where(Lab.module_id == module.id).order_by(Lab.id)).scalars()
     )
+    sources = enabled_sources(db, user, module)
+    extra_count = 0
+    if sources:
+        extra_count = db.execute(
+            select(func.count()).select_from(
+                visible_questions(db, user)
+                .where(Question.module_id == module.id, Question.supplementary.is_(True))
+                .subquery()
+            )
+        ).scalar_one()
     return render(
-        request, "module.html", {"module": module, "progress": progress, "um": um, "labs": labs}
+        request,
+        "module.html",
+        {
+            "module": module,
+            "progress": progress,
+            "um": um,
+            "labs": labs,
+            "sources": sources,
+            "extra_count": extra_count,
+        },
     )
 
 
