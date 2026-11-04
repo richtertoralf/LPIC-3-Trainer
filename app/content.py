@@ -228,6 +228,7 @@ def validate_question(q: Any, index: int, seen_ids: set[str]) -> list[str]:
     _check_str(errors, q, "question", w)
     for key in ("question_de", "explanation_de", "explanation_en"):
         _check_str(errors, q, key, w, required=False)
+    _check_str(errors, q, "reference", w, required=False, max_len=255)
     choices = q.get("choices")
     if not isinstance(choices, list) or not 2 <= len(choices) <= 6:
         errors.append(f"{w}: 'choices' must be a list with 2 to 6 entries")
@@ -589,6 +590,7 @@ def import_questions(
         question.text_de = q.get("question_de", "").strip()
         question.explanation_de = q.get("explanation_de", "").strip()
         question.explanation_en = q.get("explanation_en", "").strip()
+        question.reference = q.get("reference", "").strip()[:255]
         question.difficulty = int(q.get("difficulty", 2))
         question.visibility = vis
         # "active": false in the file keeps a question out of practice and exams, for example

@@ -61,7 +61,9 @@ def test_upgrade_from_initial_schema_migrates_existing_data(tmp_path):
     links = dict(db.execute("SELECT external_id, import_batch_id FROM questions"))
     assert links == {"q1": 1, "q2": 2}
     assert db.execute("SELECT COUNT(*) FROM group_sources").fetchone()[0] == 0
-    assert db.execute("SELECT version_num FROM alembic_version").fetchone()[0] == "0004"
+    from app.migrate import head_revision
+
+    assert db.execute("SELECT version_num FROM alembic_version").fetchone()[0] == head_revision()
     db.close()
 
 

@@ -241,6 +241,8 @@ class Question(Base):
     text_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
     explanation_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
     explanation_en: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    # Optional documentation reference backing the correct answer (man page, project docs).
+    reference: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     difficulty: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     visibility: Mapped[str] = mapped_column(String(16), nullable=False, default="public")
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

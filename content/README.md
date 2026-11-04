@@ -72,6 +72,7 @@ Regeln:
 - `exam_version` (Pflicht): Prüfungsgeneration, auf die sich die Fragen beziehen, z. B. `3.0`.
 - `exam_code`: vollständige Prüfungsnummer, z. B. `305-300`; muss mit der Modulnummer beginnen. Ohne Angabe wird Modulnummer-300 gesetzt.
 - `source_url`: Original-URL der Quelle (http/https, optional).
+- je Frage `reference`: optionale fachliche Referenz (Manpage, Dokumentations-URL), wird unter der Erklärung angezeigt.
 - je Frage `active`: `false` nimmt die Frage aus Üben und Prüfungen heraus (z. B. unsichere Lösung); das Kennzeichen bleibt bei erneutem Import erhalten.
 - `rights`: `cleared` (Lizenz bekannt), `unknown` (Standard) oder `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt).
 - `terms`: fragenbezogene Fachbegriffe. Sie landen zusätzlich im Glossar.

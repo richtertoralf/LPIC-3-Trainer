@@ -1,0 +1,2355 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "306",
+  "supplementary": true,
+  "source": "LPIC-3 Trainer Projekt, Ergänzungspool 2026-11",
+  "source_url": "https://github.com/richtertoralf/LPIC-3-Trainer",
+  "exam_code": "306-300",
+  "exam_version": "3.0",
+  "rights": "cleared",
+  "license": "CC BY-SA 4.0. Eigene Fragen des Projekts nach den offiziellen LPI-Prüfungszielen 3.0; externe Fragensammlungen dienten nur der Themenfindung. Zusatzfragen: Freigabe durch Betreuer oder Administrator nötig.",
+  "author": "LPIC-3 Trainer Projekt",
+  "questions": [
+    {
+      "id": "306-erg-361.1-01",
+      "objective": "361.1",
+      "type": "single",
+      "question": "A company plans a two-node cluster for a database with shared storage. Which design decision is essential to avoid data corruption when the cluster interconnect fails?",
+      "question_de": "Ein Unternehmen plant einen Zwei-Knoten-Cluster für eine Datenbank mit gemeinsamem Speicher. Welche Entwurfsentscheidung ist wesentlich, um Datenbeschädigung bei Ausfall der Cluster-Verbindung zu vermeiden?",
+      "choices": [
+        {
+          "text": "A working fencing device (STONITH) so that the surviving node can cut the other node off from the shared storage before taking over.",
+          "text_de": "Ein funktionierendes Fencing-Gerät (STONITH), damit der überlebende Knoten den anderen vom gemeinsamen Speicher trennt, bevor er übernimmt.",
+          "correct": true
+        },
+        {
+          "text": "A load balancer in front of both nodes.",
+          "text_de": "Ein Lastverteiler vor beiden Knoten."
+        },
+        {
+          "text": "Mounting the shared storage read-write on both nodes permanently.",
+          "text_de": "Den gemeinsamen Speicher dauerhaft auf beiden Knoten beschreibbar einhängen."
+        },
+        {
+          "text": "Setting no-quorum-policy=ignore and nothing else.",
+          "text_de": "no-quorum-policy=ignore setzen und sonst nichts."
+        },
+        {
+          "text": "Using a shorter SLA.",
+          "text_de": "Ein kürzeres SLA verwenden."
+        }
+      ],
+      "explanation_de": "Bei getrennter Kommunikation weiß kein Knoten, ob der andere noch schreibt. Fencing stellt sicher, dass nur einer Zugriff hat; ohne Fencing führt Shared-Disk-Failover zu Split Brain und beschädigten Daten. Ein Zwei-Knoten-Cluster braucht zusätzlich qdevice oder two_node-Konfiguration.",
+      "reference": "Pacemaker-Dokumentation, Fencing",
+      "terms": [
+        {
+          "term": "interconnect",
+          "de": "Cluster-Verbindung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.1-02",
+      "objective": "361.1",
+      "type": "single",
+      "question": "Which cluster type stores no shared data between nodes and therefore relies on replication or independent data sets, scaling out by adding nodes?",
+      "question_de": "Welcher Clustertyp hält keine gemeinsamen Daten zwischen den Knoten und setzt deshalb auf Replikation oder unabhängige Datenbestände, skalierbar durch weitere Knoten?",
+      "choices": [
+        {
+          "text": "Shared-nothing cluster",
+          "text_de": "Shared-Nothing-Cluster",
+          "correct": true
+        },
+        {
+          "text": "Shared-disk cluster",
+          "text_de": "Shared-Disk-Cluster"
+        },
+        {
+          "text": "Active/passive failover cluster with SAN",
+          "text_de": "Aktiv/Passiv-Failover-Cluster mit SAN"
+        },
+        {
+          "text": "Single node with RAID",
+          "text_de": "Einzelknoten mit RAID"
+        },
+        {
+          "text": "Cold standby",
+          "text_de": "Cold Standby"
+        }
+      ],
+      "explanation_de": "Shared-Nothing-Architekturen (z. B. DRBD-Paare, GlusterFS, Ceph, Datenbankreplikation) vermeiden den gemeinsamen Speicher als Engpass und Fehlerquelle. Shared-Disk-Cluster teilen ein SAN und brauchen Cluster-Dateisysteme oder exklusiven Zugriff.",
+      "reference": "Prüfungsziel 361.1",
+      "terms": [
+        {
+          "term": "rely on",
+          "de": "sich stützen auf"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.1-03",
+      "objective": "361.1",
+      "type": "single",
+      "question": "A web shop stores shopping carts in the local memory of each application server behind a load balancer. After adding a second server, customers lose their carts randomly. Which HA design principle was violated?",
+      "question_de": "Ein Webshop speichert Warenkörbe im lokalen Speicher jedes Anwendungsservers hinter einem Lastverteiler. Nach dem Hinzufügen eines zweiten Servers verlieren Kunden zufällig ihre Warenkörbe. Welches HA-Entwurfsprinzip wurde verletzt?",
+      "choices": [
+        {
+          "text": "State handling: session state must be shared (external session store) or requests must be kept on one server (session persistence).",
+          "text_de": "Zustandsbehandlung: Sitzungszustand muss geteilt werden (externer Sitzungsspeicher) oder Anfragen müssen auf einem Server bleiben (Session-Persistenz).",
+          "correct": true
+        },
+        {
+          "text": "Quorum: the second server has no vote.",
+          "text_de": "Quorum: der zweite Server hat keine Stimme."
+        },
+        {
+          "text": "Fencing: the first server was not fenced.",
+          "text_de": "Fencing: der erste Server wurde nicht gefenct."
+        },
+        {
+          "text": "Redundancy: a third server is required.",
+          "text_de": "Redundanz: ein dritter Server ist nötig."
+        },
+        {
+          "text": "MTBF: the servers are too old.",
+          "text_de": "MTBF: die Server sind zu alt."
+        }
+      ],
+      "explanation_de": "Lastverteilte Cluster erfordern zustandslose Anwendungen oder einen gemeinsamen Sitzungsspeicher (Datenbank, Redis) beziehungsweise Sticky Sessions am Balancer. Quorum und Fencing betreffen Failover-Cluster.",
+      "reference": "Prüfungsziel 361.1, State handling, Session handling",
+      "terms": [
+        {
+          "term": "violated",
+          "de": "verletzt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.1-04",
+      "objective": "361.1",
+      "type": "single",
+      "question": "A disaster recovery plan defines RPO = 15 minutes and RTO = 2 hours. What do these values mean?",
+      "question_de": "Ein Notfallplan definiert RPO = 15 Minuten und RTO = 2 Stunden. Was bedeuten diese Werte?",
+      "choices": [
+        {
+          "text": "At most 15 minutes of data may be lost, and the service must be back within 2 hours after a disaster.",
+          "text_de": "Höchstens 15 Minuten Daten dürfen verloren gehen, und der Dienst muss innerhalb von 2 Stunden nach einem Ausfall wieder laufen.",
+          "correct": true
+        },
+        {
+          "text": "Backups run every 2 hours and are kept for 15 minutes.",
+          "text_de": "Sicherungen laufen alle 2 Stunden und werden 15 Minuten aufbewahrt."
+        },
+        {
+          "text": "The cluster may fail over at most once per 15 minutes and must stay up for 2 hours.",
+          "text_de": "Der Cluster darf höchstens einmal in 15 Minuten umschalten und muss 2 Stunden laufen."
+        },
+        {
+          "text": "Nodes are fenced after 15 minutes and rebooted after 2 hours.",
+          "text_de": "Knoten werden nach 15 Minuten gefenct und nach 2 Stunden neu gestartet."
+        },
+        {
+          "text": "The MTBF is 15 minutes and the MTTR is 2 hours.",
+          "text_de": "MTBF ist 15 Minuten und MTTR 2 Stunden."
+        }
+      ],
+      "explanation_de": "Recovery Point Objective ist der maximal tolerierte Datenverlust (bestimmt Replikations- bzw. Backup-Intervall), Recovery Time Objective die maximale Wiederanlaufzeit. Beide leiten sich aus dem SLA ab.",
+      "reference": "Prüfungsziel 361.1, Disaster Recovery",
+      "terms": [
+        {
+          "term": "disaster recovery",
+          "de": "Notfallwiederherstellung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.1-05",
+      "objective": "361.1",
+      "type": "single",
+      "question": "What is the difference between node-level fencing and resource-level fencing?",
+      "question_de": "Was ist der Unterschied zwischen Fencing auf Knotenebene und Fencing auf Ressourcenebene?",
+      "choices": [
+        {
+          "text": "Node-level fencing powers off or resets the whole node (e.g. IPMI, PDU); resource-level fencing only blocks the node's access to a specific resource, e.g. a SAN LUN via SCSI reservations or a switch port.",
+          "text_de": "Knoten-Fencing schaltet den ganzen Knoten ab oder setzt ihn zurück (z. B. IPMI, Steckdosenleiste); Ressourcen-Fencing sperrt nur den Zugriff des Knotens auf eine bestimmte Ressource, z. B. eine SAN-LUN per SCSI-Reservierung oder einen Switch-Port.",
+          "correct": true
+        },
+        {
+          "text": "Node-level fencing is done by the application, resource-level fencing by the kernel.",
+          "text_de": "Knoten-Fencing macht die Anwendung, Ressourcen-Fencing der Kernel."
+        },
+        {
+          "text": "Resource-level fencing is only available with DRBD.",
+          "text_de": "Ressourcen-Fencing gibt es nur mit DRBD."
+        },
+        {
+          "text": "They are synonyms.",
+          "text_de": "Es sind Synonyme."
+        },
+        {
+          "text": "Node-level fencing requires a quorum device.",
+          "text_de": "Knoten-Fencing erfordert ein Quorum-Gerät."
+        }
+      ],
+      "explanation_de": "Pacemaker unterstützt beides über STONITH-Agents: fence_ipmilan, fence_apc (Knoten), fence_scsi, fence_mpath, fence_brocade (Ressource/Storage). Ressourcen-Fencing lässt den Knoten laufen, verhindert aber Schreibzugriffe.",
+      "reference": "Pacemaker-Dokumentation, Fencing",
+      "terms": [
+        {
+          "term": "reservation",
+          "de": "Reservierung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.1-06",
+      "objective": "361.1",
+      "type": "single",
+      "question": "A service has an MTBF of 2000 hours and an MTTR of 4 hours. What is its approximate availability?",
+      "question_de": "Ein Dienst hat eine MTBF von 2000 Stunden und eine MTTR von 4 Stunden. Wie hoch ist seine Verfügbarkeit ungefähr?",
+      "choices": [
+        {
+          "text": "99.8 %",
+          "text_de": "99,8 %",
+          "correct": true
+        },
+        {
+          "text": "99.98 %",
+          "text_de": "99,98 %"
+        },
+        {
+          "text": "98 %",
+          "text_de": "98 %"
+        },
+        {
+          "text": "99.999 %",
+          "text_de": "99,999 %"
+        },
+        {
+          "text": "50 %",
+          "text_de": "50 %"
+        }
+      ],
+      "explanation_de": "Verfügbarkeit = MTBF / (MTBF + MTTR) = 2000 / 2004 ≈ 0,998, also 99,8 %. Kürzere Reparaturzeiten oder Redundanz, die Ausfälle maskiert, erhöhen den Wert.",
+      "reference": "Prüfungsziel 361.1, MTBF und MTTR",
+      "terms": [
+        {
+          "term": "approximate",
+          "de": "ungefähr"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-01",
+      "objective": "361.2",
+      "type": "single",
+      "question": "An LVS director uses NAT forwarding. Real servers answer clients, but the responses never arrive. What is missing on the real servers?",
+      "question_de": "Ein LVS-Director nutzt NAT-Weiterleitung. Die Real-Server antworten den Clients, aber die Antworten kommen nie an. Was fehlt auf den Real-Servern?",
+      "choices": [
+        {
+          "text": "Their default gateway must be the director, so that responses pass through it and get the virtual IP as source address.",
+          "text_de": "Ihr Standard-Gateway muss der Director sein, damit Antworten über ihn laufen und die virtuelle IP als Quelladresse erhalten.",
+          "correct": true
+        },
+        {
+          "text": "The virtual IP must be configured on a loopback alias with ARP disabled.",
+          "text_de": "Die virtuelle IP muss auf einem Loopback-Alias mit deaktiviertem ARP liegen."
+        },
+        {
+          "text": "An IPIP tunnel to the director.",
+          "text_de": "Ein IPIP-Tunnel zum Director."
+        },
+        {
+          "text": "keepalived must run on every real server.",
+          "text_de": "keepalived muss auf jedem Real-Server laufen."
+        },
+        {
+          "text": "ipvsadm -L must be executed once.",
+          "text_de": "ipvsadm -L muss einmal ausgeführt werden."
+        }
+      ],
+      "explanation_de": "Bei LVS-NAT schreibt der Director Ziel- und Rückadressen um; dafür müssen Antworten über ihn laufen. Loopback-VIP ohne ARP gehört zu Direct Routing, der IPIP-Tunnel zum Tunneling-Modus.",
+      "reference": "ipvsadm(8); LVS-HOWTO, NAT",
+      "terms": [
+        {
+          "de": "Standard-Gateway",
+          "term": "default gateway"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-02",
+      "objective": "361.2",
+      "type": "single",
+      "question": "Which IPVS scheduling algorithm sends new connections to the real server with the fewest active connections, taking server weights into account?",
+      "question_de": "Welcher IPVS-Scheduling-Algorithmus schickt neue Verbindungen an den Real-Server mit den wenigsten aktiven Verbindungen und berücksichtigt dabei Servergewichte?",
+      "choices": [
+        {
+          "text": "wlc (weighted least-connection)",
+          "text_de": "wlc (weighted least-connection)",
+          "correct": true
+        },
+        {
+          "text": "rr (round-robin)",
+          "text_de": "rr (Round-Robin)"
+        },
+        {
+          "text": "wrr (weighted round-robin)",
+          "text_de": "wrr (gewichtetes Round-Robin)"
+        },
+        {
+          "text": "sh (source hashing)",
+          "text_de": "sh (Quelladress-Hash)"
+        },
+        {
+          "text": "dh (destination hashing)",
+          "text_de": "dh (Zieladress-Hash)"
+        }
+      ],
+      "explanation_de": "lc und wlc berücksichtigen die aktuelle Last, rr und wrr verteilen reihum, sh und dh wählen anhand von Hashes (nützlich für Persistenz bzw. Caches). Gesetzt wird der Algorithmus mit ipvsadm -A … -s wlc.",
+      "reference": "ipvsadm(8), scheduling methods",
+      "terms": [
+        {
+          "term": "fewest",
+          "de": "die wenigsten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-03",
+      "objective": "361.2",
+      "type": "single",
+      "question": "Which keepalived configuration block defines a health check that removes a real server from the pool when its web page no longer contains the expected content?",
+      "question_de": "Welcher keepalived-Konfigurationsblock definiert eine Gesundheitsprüfung, die einen Real-Server aus dem Pool nimmt, wenn seine Webseite nicht mehr den erwarteten Inhalt liefert?",
+      "choices": [
+        {
+          "text": "real_server 10.0.0.11 80 {\n  HTTP_GET {\n    url { path /health digest <md5 from genhash> }\n    connect_timeout 3\n  }\n}",
+          "text_de": "real_server 10.0.0.11 80 {\n  HTTP_GET {\n    url { path /health digest <md5 aus genhash> }\n    connect_timeout 3\n  }\n}",
+          "correct": true
+        },
+        {
+          "text": "vrrp_instance VI_1 { track_script { chk_http } }",
+          "text_de": "vrrp_instance VI_1 { track_script { chk_http } }"
+        },
+        {
+          "text": "real_server 10.0.0.11 80 { TCP_CHECK { connect_port 80 } }",
+          "text_de": "real_server 10.0.0.11 80 { TCP_CHECK { connect_port 80 } }"
+        },
+        {
+          "text": "virtual_server 10.0.0.100 80 { lb_algo rr; lb_kind DR }",
+          "text_de": "virtual_server 10.0.0.100 80 { lb_algo rr; lb_kind DR }"
+        },
+        {
+          "text": "global_defs { notification_email { admin@example.org } }",
+          "text_de": "global_defs { notification_email { admin@example.org } }"
+        }
+      ],
+      "explanation_de": "HTTP_GET mit url/path und digest (oder status_code) prüft den Inhalt; TCP_CHECK prüft nur die Erreichbarkeit des Ports. track_script beeinflusst die VRRP-Priorität des Directors, nicht den Real-Server-Pool.",
+      "reference": "keepalived.conf(5), HTTP_GET",
+      "terms": [
+        {
+          "term": "expected content",
+          "de": "erwarteter Inhalt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-04",
+      "objective": "361.2",
+      "type": "single",
+      "question": "Two keepalived directors run in active/backup mode. When the master's web service dies but the host stays up, the VIP should move to the backup. Which keepalived feature implements this?",
+      "question_de": "Zwei keepalived-Directors laufen im Aktiv/Backup-Modus. Stirbt der Webdienst des Masters, während der Host weiterläuft, soll die VIP zum Backup wechseln. Welche keepalived-Funktion setzt das um?",
+      "choices": [
+        {
+          "text": "A vrrp_script that checks the service and a track_script entry with a weight that lowers the priority on failure",
+          "text_de": "Ein vrrp_script, das den Dienst prüft, und ein track_script-Eintrag mit einem Gewicht, das bei Fehlschlag die Priorität senkt",
+          "correct": true
+        },
+        {
+          "text": "nopreempt in the vrrp_instance",
+          "text_de": "nopreempt in der vrrp_instance"
+        },
+        {
+          "text": "A higher advert_int on the backup",
+          "text_de": "Ein höheres advert_int auf dem Backup"
+        },
+        {
+          "text": "virtual_router_id set to the same value on both",
+          "text_de": "virtual_router_id auf beiden gleich gesetzt"
+        },
+        {
+          "text": "lb_kind DR in the virtual_server",
+          "text_de": "lb_kind DR im virtual_server"
+        }
+      ],
+      "explanation_de": "VRRP bemerkt nur den Ausfall des Knotens. vrrp_script führt regelmäßig eine Prüfung aus; mit track_script und weight sinkt die Priorität des Masters unter die des Backups, das daraufhin übernimmt. nopreempt verhindert das Zurückwechseln.",
+      "reference": "keepalived.conf(5), vrrp_script",
+      "terms": [
+        {
+          "term": "stays up",
+          "de": "bleibt in Betrieb"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-05",
+      "objective": "361.2",
+      "type": "single",
+      "question": "With LVS direct routing, real servers receive packets for the VIP although the VIP is configured on their loopback interface. Which sysctl settings prevent the real servers from answering ARP requests for the VIP?",
+      "question_de": "Bei LVS Direct Routing erhalten Real-Server Pakete für die VIP, obwohl die VIP auf ihrer Loopback-Schnittstelle liegt. Welche sysctl-Einstellungen verhindern, dass die Real-Server ARP-Anfragen für die VIP beantworten?",
+      "choices": [
+        {
+          "text": "net.ipv4.conf.all.arp_ignore = 1 and net.ipv4.conf.all.arp_announce = 2",
+          "text_de": "net.ipv4.conf.all.arp_ignore = 1 und net.ipv4.conf.all.arp_announce = 2",
+          "correct": true
+        },
+        {
+          "text": "net.ipv4.ip_forward = 1",
+          "text_de": "net.ipv4.ip_forward = 1"
+        },
+        {
+          "text": "net.ipv4.conf.all.rp_filter = 0",
+          "text_de": "net.ipv4.conf.all.rp_filter = 0"
+        },
+        {
+          "text": "net.ipv4.conf.all.proxy_arp = 1",
+          "text_de": "net.ipv4.conf.all.proxy_arp = 1"
+        },
+        {
+          "text": "net.ipv4.vs.conntrack = 1",
+          "text_de": "net.ipv4.vs.conntrack = 1"
+        }
+      ],
+      "explanation_de": "Das ARP-Problem bei DR: Antworten mehrere Hosts auf ARP für die VIP, landen Pakete am Director vorbei. arp_ignore=1 antwortet nur auf Anfragen für Adressen der Empfangsschnittstelle, arp_announce=2 nutzt die beste lokale Quelladresse. Alternativ hilft arptables.",
+      "reference": "LVS-HOWTO, ARP problem; ip-sysctl Kernel-Dokumentation",
+      "terms": [
+        {
+          "term": "prevent",
+          "de": "verhindern"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-06",
+      "objective": "361.2",
+      "type": "single",
+      "question": "An HAProxy backend must keep each client on the same server for the duration of a shopping session using a cookie inserted by HAProxy. Which configuration does this?",
+      "question_de": "Ein HAProxy-Backend soll jeden Client für die Dauer einer Einkaufssitzung über ein von HAProxy eingefügtes Cookie auf demselben Server halten. Welche Konfiguration leistet das?",
+      "choices": [
+        {
+          "text": "backend shop\n  balance roundrobin\n  cookie SRV insert indirect nocache\n  server s1 10.0.0.11:80 check cookie s1\n  server s2 10.0.0.12:80 check cookie s2",
+          "text_de": "backend shop\n  balance roundrobin\n  cookie SRV insert indirect nocache\n  server s1 10.0.0.11:80 check cookie s1\n  server s2 10.0.0.12:80 check cookie s2",
+          "correct": true
+        },
+        {
+          "text": "backend shop\n  balance source\n  server s1 10.0.0.11:80 check\n  server s2 10.0.0.12:80 check",
+          "text_de": "backend shop\n  balance source\n  server s1 10.0.0.11:80 check\n  server s2 10.0.0.12:80 check"
+        },
+        {
+          "text": "frontend shop\n  bind *:80\n  default_backend shop\n  option httpchk",
+          "text_de": "frontend shop\n  bind *:80\n  default_backend shop\n  option httpchk"
+        },
+        {
+          "text": "backend shop\n  balance leastconn\n  option forwardfor",
+          "text_de": "backend shop\n  balance leastconn\n  option forwardfor"
+        },
+        {
+          "text": "backend shop\n  stick on src\n  mode tcp",
+          "text_de": "backend shop\n  stick on src\n  mode tcp"
+        }
+      ],
+      "explanation_de": "cookie <name> insert lässt HAProxy ein Cookie mit dem Serverkennzeichen setzen; indirect und nocache verhindern, dass es an den Server weitergereicht oder zwischengespeichert wird. balance source und stick on src binden an die Quell-IP, was hinter NAT ungenau ist.",
+      "reference": "HAProxy-Konfigurationshandbuch, cookie",
+      "terms": [
+        {
+          "term": "for the duration",
+          "de": "für die Dauer"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-07",
+      "objective": "361.2",
+      "type": "single",
+      "question": "HAProxy should mark a backend server as down only after three consecutive failed HTTP checks against /status expecting HTTP 200. Which lines configure this?",
+      "question_de": "HAProxy soll einen Backend-Server erst nach drei aufeinanderfolgenden fehlgeschlagenen HTTP-Prüfungen gegen /status mit erwartetem HTTP 200 als ausgefallen markieren. Welche Zeilen konfigurieren das?",
+      "choices": [
+        {
+          "text": "option httpchk GET /status\nhttp-check expect status 200\nserver s1 10.0.0.11:80 check inter 5s fall 3 rise 2",
+          "text_de": "option httpchk GET /status\nhttp-check expect status 200\nserver s1 10.0.0.11:80 check inter 5s fall 3 rise 2",
+          "correct": true
+        },
+        {
+          "text": "option tcp-check\nserver s1 10.0.0.11:80 check port 80 fall 1",
+          "text_de": "option tcp-check\nserver s1 10.0.0.11:80 check port 80 fall 1"
+        },
+        {
+          "text": "server s1 10.0.0.11:80 maxconn 3",
+          "text_de": "server s1 10.0.0.11:80 maxconn 3"
+        },
+        {
+          "text": "option redispatch\nretries 3",
+          "text_de": "option redispatch\nretries 3"
+        },
+        {
+          "text": "timeout check 3",
+          "text_de": "timeout check 3"
+        }
+      ],
+      "explanation_de": "option httpchk definiert die Prüfanfrage, http-check expect das erwartete Ergebnis, inter das Intervall, fall die Zahl der Fehlschläge bis DOWN, rise die Erfolge bis UP. retries und redispatch betreffen Verbindungsversuche einzelner Anfragen.",
+      "reference": "HAProxy-Konfigurationshandbuch, option httpchk, fall, rise",
+      "terms": [
+        {
+          "term": "consecutive",
+          "de": "aufeinanderfolgend"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.2-08",
+      "objective": "361.2",
+      "type": "single",
+      "question": "An LVS/IPVS setup with keepalived in active/backup should keep existing client connections alive when the VIP fails over to the backup director. Which component is responsible?",
+      "question_de": "Ein LVS/IPVS-Aufbau mit keepalived im Aktiv/Backup-Betrieb soll bestehende Client-Verbindungen erhalten, wenn die VIP zum Backup-Director wechselt. Welche Komponente ist dafür zuständig?",
+      "choices": [
+        {
+          "text": "The IPVS connection synchronization daemon (lvs_sync_daemon in keepalived or ipvsadm --start-daemon), which replicates the connection table to the backup",
+          "text_de": "Der IPVS-Verbindungssynchronisationsdienst (lvs_sync_daemon in keepalived oder ipvsadm --start-daemon), der die Verbindungstabelle zum Backup repliziert",
+          "correct": true
+        },
+        {
+          "text": "Sticky sessions via source hashing",
+          "text_de": "Sticky Sessions über Quelladress-Hash"
+        },
+        {
+          "text": "conntrackd on the real servers",
+          "text_de": "conntrackd auf den Real-Servern"
+        },
+        {
+          "text": "A longer persistence_timeout",
+          "text_de": "Ein längerer persistence_timeout"
+        },
+        {
+          "text": "VRRP advertisements",
+          "text_de": "VRRP-Advertisements"
+        }
+      ],
+      "explanation_de": "Der Sync-Daemon sendet die IPVS-Verbindungseinträge per Multicast an den Backup, so dass dieser nach der Übernahme bestehende Flows kennt. persistence_timeout bindet Clients an Real-Server, VRRP verschiebt nur die Adresse.",
+      "reference": "ipvsadm(8), --start-daemon; keepalived.conf(5), lvs_sync_daemon",
+      "terms": [
+        {
+          "term": "keep alive",
+          "de": "aufrechterhalten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-01",
+      "objective": "361.3",
+      "type": "single",
+      "question": "A Pacemaker resource of type ocf:heartbeat:Filesystem must only run on the node where the DRBD promotable clone is Master. Which constraints express this?",
+      "question_de": "Eine Pacemaker-Ressource vom Typ ocf:heartbeat:Filesystem darf nur auf dem Knoten laufen, auf dem der promotierbare DRBD-Klon Master ist. Welche Constraints drücken das aus?",
+      "choices": [
+        {
+          "text": "pcs constraint colocation add fs_data with master drbd_data-clone INFINITY\npcs constraint order promote drbd_data-clone then start fs_data",
+          "text_de": "pcs constraint colocation add fs_data with master drbd_data-clone INFINITY\npcs constraint order promote drbd_data-clone then start fs_data",
+          "correct": true
+        },
+        {
+          "text": "pcs constraint location fs_data prefers node1=INFINITY",
+          "text_de": "pcs constraint location fs_data prefers node1=INFINITY"
+        },
+        {
+          "text": "pcs resource group add storage drbd_data-clone fs_data",
+          "text_de": "pcs resource group add storage drbd_data-clone fs_data"
+        },
+        {
+          "text": "pcs constraint order fs_data then drbd_data-clone",
+          "text_de": "pcs constraint order fs_data then drbd_data-clone"
+        },
+        {
+          "text": "pcs resource meta fs_data target-role=Master",
+          "text_de": "pcs resource meta fs_data target-role=Master"
+        }
+      ],
+      "explanation_de": "Die Colocation bindet das Dateisystem an die Master-Rolle des Klons, die Order-Constraint sorgt dafür, dass erst promotiert und dann eingehängt wird. Klone können nicht in Gruppen aufgenommen werden; eine Location-Constraint auf node1 bricht den Failover.",
+      "reference": "Pacemaker Explained, Colocation with promotable resources",
+      "terms": [
+        {
+          "term": "promotable",
+          "de": "promotierbar (Master/Slave-Rolle)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-02",
+      "objective": "361.3",
+      "type": "single",
+      "question": "After a resource failed three times on node1, Pacemaker no longer tries to start it there even though the underlying problem is fixed. Which command returns the resource to normal operation?",
+      "question_de": "Nachdem eine Ressource dreimal auf node1 fehlgeschlagen ist, versucht Pacemaker sie dort nicht mehr zu starten, obwohl das Problem behoben ist. Welcher Befehl bringt die Ressource in den Normalbetrieb zurück?",
+      "choices": [
+        {
+          "text": "pcs resource cleanup <resource> (clears the failcount and failed operations)",
+          "text_de": "pcs resource cleanup <ressource> (setzt Fehlerzähler und fehlgeschlagene Operationen zurück)",
+          "correct": true
+        },
+        {
+          "text": "pcs resource enable <resource>",
+          "text_de": "pcs resource enable <ressource>"
+        },
+        {
+          "text": "pcs node unstandby node1",
+          "text_de": "pcs node unstandby node1"
+        },
+        {
+          "text": "pcs property set stonith-enabled=false",
+          "text_de": "pcs property set stonith-enabled=false"
+        },
+        {
+          "text": "crm_simulate -L",
+          "text_de": "crm_simulate -L"
+        }
+      ],
+      "explanation_de": "Mit migration-threshold wird eine Ressource nach N Fehlern vom Knoten verbannt (negativer Score). cleanup löscht die Fehlerhistorie und hebt das Verbot auf; alternativ läuft failure-timeout ab. enable gilt nur für deaktivierte Ressourcen.",
+      "reference": "pcs(8), resource cleanup; Pacemaker Explained, migration-threshold",
+      "terms": [
+        {
+          "term": "underlying problem",
+          "de": "zugrunde liegendes Problem"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-03",
+      "objective": "361.3",
+      "type": "single",
+      "question": "An administrator wants to test a configuration change without affecting the live cluster and apply it only if the simulated result is correct. Which tools support this workflow?",
+      "question_de": "Ein Administrator möchte eine Konfigurationsänderung testen, ohne den laufenden Cluster zu beeinflussen, und sie nur übernehmen, wenn das simulierte Ergebnis stimmt. Welche Werkzeuge unterstützen diesen Ablauf?",
+      "choices": [
+        {
+          "text": "crm_shadow to create a shadow CIB, crm_simulate to compute the resulting placement, then crm_shadow --commit",
+          "text_de": "crm_shadow für eine Schatten-CIB, crm_simulate zur Berechnung der resultierenden Platzierung, danach crm_shadow --commit",
+          "correct": true
+        },
+        {
+          "text": "pcs cluster stop --all, edit, pcs cluster start --all",
+          "text_de": "pcs cluster stop --all, bearbeiten, pcs cluster start --all"
+        },
+        {
+          "text": "cibadmin --replace on the live cluster",
+          "text_de": "cibadmin --replace auf dem laufenden Cluster"
+        },
+        {
+          "text": "crm_mon -r",
+          "text_de": "crm_mon -r"
+        },
+        {
+          "text": "corosync-cfgtool -R",
+          "text_de": "corosync-cfgtool -R"
+        }
+      ],
+      "explanation_de": "crm_shadow --create kopiert die CIB in einen Schattenbereich, in dem pcs/crm/cibadmin arbeiten; crm_simulate -S zeigt, was Pacemaker tun würde; --commit übernimmt. pcs cluster cib-push mit einer Dateikopie ist der pcs-Weg.",
+      "reference": "crm_shadow(8); crm_simulate(8)",
+      "terms": [
+        {
+          "term": "simulated",
+          "de": "simuliert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-04",
+      "objective": "361.3",
+      "type": "single",
+      "question": "Which corosync.conf settings are appropriate for a two-node cluster without a quorum device so that the surviving node keeps quorum after the other fails, while still avoiding simultaneous startup fencing?",
+      "question_de": "Welche corosync.conf-Einstellungen sind für einen Zwei-Knoten-Cluster ohne Quorum-Gerät geeignet, damit der überlebende Knoten nach Ausfall des anderen das Quorum behält und gleichzeitiges Fencing beim Start vermieden wird?",
+      "choices": [
+        {
+          "text": "quorum {\n  provider: corosync_votequorum\n  two_node: 1\n}\n(wait_for_all is implied by two_node)",
+          "text_de": "quorum {\n  provider: corosync_votequorum\n  two_node: 1\n}\n(wait_for_all wird durch two_node impliziert)",
+          "correct": true
+        },
+        {
+          "text": "quorum { expected_votes: 3 }",
+          "text_de": "quorum { expected_votes: 3 }"
+        },
+        {
+          "text": "totem { token: 0 }",
+          "text_de": "totem { token: 0 }"
+        },
+        {
+          "text": "quorum { provider: corosync_votequorum; auto_tie_breaker: 0; last_man_standing: 1 } only",
+          "text_de": "nur quorum { provider: corosync_votequorum; auto_tie_breaker: 0; last_man_standing: 1 }"
+        },
+        {
+          "text": "nodelist { node { ring0_addr: node1; quorum_votes: 2 } }",
+          "text_de": "nodelist { node { ring0_addr: node1; quorum_votes: 2 } }"
+        }
+      ],
+      "explanation_de": "two_node: 1 erlaubt Quorum mit einer Stimme von zwei und setzt wait_for_all, damit nach einem gemeinsamen Start beide Knoten gesehen werden müssen. Fencing bleibt Pflicht, sonst droht Split Brain. qdevice wäre die robustere Alternative.",
+      "reference": "votequorum(5)",
+      "terms": [
+        {
+          "term": "surviving",
+          "de": "überlebend"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-05",
+      "objective": "361.3",
+      "type": "single",
+      "question": "A Pacemaker resource should run on every node of the cluster at the same time, for example a cluster file system mount. Which resource type is used?",
+      "question_de": "Eine Pacemaker-Ressource soll gleichzeitig auf jedem Knoten des Clusters laufen, zum Beispiel ein Cluster-Dateisystem-Mount. Welcher Ressourcentyp wird verwendet?",
+      "choices": [
+        {
+          "text": "A clone (pcs resource clone <resource> or pcs resource create … clone)",
+          "text_de": "Ein Klon (pcs resource clone <ressource> oder pcs resource create … clone)",
+          "correct": true
+        },
+        {
+          "text": "A group",
+          "text_de": "Eine Gruppe"
+        },
+        {
+          "text": "A promotable clone with master-max=0",
+          "text_de": "Ein promotierbarer Klon mit master-max=0"
+        },
+        {
+          "text": "A resource with multiple location constraints",
+          "text_de": "Eine Ressource mit mehreren Location-Constraints"
+        },
+        {
+          "text": "A STONITH resource",
+          "text_de": "Eine STONITH-Ressource"
+        }
+      ],
+      "explanation_de": "Klone starten Instanzen einer Ressource auf mehreren Knoten (clone-max, clone-node-max); typisch für DLM, cluster-LVM und GFS2-Mounts. Gruppen bündeln Ressourcen auf einem Knoten; eine normale Ressource läuft genau einmal.",
+      "reference": "Pacemaker Explained, Clones",
+      "terms": [
+        {
+          "term": "at the same time",
+          "de": "gleichzeitig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-06",
+      "objective": "361.3",
+      "type": "single",
+      "question": "A node should be prevented from running any resources while hardware is replaced, but should automatically take resources back afterwards without re-adding it to the cluster. Which sequence is correct?",
+      "question_de": "Ein Knoten soll während eines Hardwaretauschs keine Ressourcen ausführen, danach aber automatisch wieder Ressourcen übernehmen, ohne neu in den Cluster aufgenommen zu werden. Welche Befehlsfolge ist richtig?",
+      "choices": [
+        {
+          "text": "pcs node standby node2; (maintenance); pcs node unstandby node2",
+          "text_de": "pcs node standby node2; (Wartung); pcs node unstandby node2",
+          "correct": true
+        },
+        {
+          "text": "pcs cluster node remove node2; pcs cluster node add node2",
+          "text_de": "pcs cluster node remove node2; pcs cluster node add node2"
+        },
+        {
+          "text": "pcs property set maintenance-mode=true; pcs property set maintenance-mode=false",
+          "text_de": "pcs property set maintenance-mode=true; pcs property set maintenance-mode=false"
+        },
+        {
+          "text": "stonith_admin --fence node2; stonith_admin --unfence node2",
+          "text_de": "stonith_admin --fence node2; stonith_admin --unfence node2"
+        },
+        {
+          "text": "pcs resource disable --all; pcs resource enable --all",
+          "text_de": "pcs resource disable --all; pcs resource enable --all"
+        }
+      ],
+      "explanation_de": "Standby verschiebt Ressourcen vom Knoten weg und lässt ihn Clustermitglied bleiben. maintenance-mode lässt Ressourcen laufen, überwacht sie aber nicht mehr (für Wartung ohne Umzug). Entfernen und Hinzufügen ist unnötig aufwendig.",
+      "reference": "pcs(8), node standby",
+      "terms": [
+        {
+          "term": "afterwards",
+          "de": "danach"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-07",
+      "objective": "361.3",
+      "type": "single",
+      "question": "Which pcs command configures IPMI-based fencing for node1 and node2, each with its own BMC address, in one stonith resource?",
+      "question_de": "Welcher pcs-Befehl konfiguriert IPMI-basiertes Fencing für node1 und node2 mit jeweils eigener BMC-Adresse in einer STONITH-Ressource?",
+      "choices": [
+        {
+          "text": "pcs stonith create fence_ipmi fence_ipmilan pcmk_host_map=\"node1:10.0.9.1;node2:10.0.9.2\" username=admin password=secret lanplus=1",
+          "text_de": "pcs stonith create fence_ipmi fence_ipmilan pcmk_host_map=\"node1:10.0.9.1;node2:10.0.9.2\" username=admin password=secret lanplus=1",
+          "correct": true
+        },
+        {
+          "text": "pcs resource create fence_ipmi ocf:heartbeat:IPaddr2 ip=10.0.9.1",
+          "text_de": "pcs resource create fence_ipmi ocf:heartbeat:IPaddr2 ip=10.0.9.1"
+        },
+        {
+          "text": "pcs property set stonith-action=ipmi",
+          "text_de": "pcs property set stonith-action=ipmi"
+        },
+        {
+          "text": "pcs stonith create fence_ipmi fence_sbd devices=/dev/sdc",
+          "text_de": "pcs stonith create fence_ipmi fence_sbd devices=/dev/sdc"
+        },
+        {
+          "text": "corosync-cmapctl -s fencing.ipmi str 10.0.9.1",
+          "text_de": "corosync-cmapctl -s fencing.ipmi str 10.0.9.1"
+        }
+      ],
+      "explanation_de": "fence_ipmilan spricht BMCs über IPMI an; pcmk_host_map ordnet Clusterknoten ihren BMC-Adressen zu. Alternativ eine Ressource je Knoten mit pcmk_host_list. stonith-action legt nur reboot oder off fest, fence_sbd nutzt eine Shared-Disk.",
+      "reference": "pcs(8), stonith create; fence_ipmilan(8)",
+      "terms": [
+        {
+          "term": "each with its own",
+          "de": "jeweils mit eigener"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-361.3-08",
+      "objective": "361.3",
+      "type": "single",
+      "question": "crm_mon shows a node as UNCLEAN (offline). What does this state mean and what does Pacemaker do next?",
+      "question_de": "crm_mon zeigt einen Knoten als UNCLEAN (offline). Was bedeutet dieser Zustand, und was tut Pacemaker als Nächstes?",
+      "choices": [
+        {
+          "text": "The cluster lost contact with the node and does not know the state of its resources; it must fence the node successfully before resources can be recovered elsewhere.",
+          "text_de": "Der Cluster hat den Kontakt zum Knoten verloren und kennt den Zustand seiner Ressourcen nicht; er muss den Knoten erfolgreich fencen, bevor Ressourcen anderswo wiederhergestellt werden.",
+          "correct": true
+        },
+        {
+          "text": "The node has pending configuration changes and must run pcs cluster sync.",
+          "text_de": "Der Knoten hat ausstehende Konfigurationsänderungen und braucht pcs cluster sync."
+        },
+        {
+          "text": "The node is in standby and resources were moved cleanly.",
+          "text_de": "Der Knoten ist im Standby und Ressourcen wurden sauber verschoben."
+        },
+        {
+          "text": "The node's clock is out of sync.",
+          "text_de": "Die Uhr des Knotens läuft falsch."
+        },
+        {
+          "text": "The node runs an old Pacemaker version.",
+          "text_de": "Der Knoten läuft mit einer alten Pacemaker-Version."
+        }
+      ],
+      "explanation_de": "UNCLEAN bedeutet unbekannter Ressourcenzustand. Ohne funktionierendes Fencing bleibt der Knoten UNCLEAN und die Ressourcen blockieren, weil ein Start anderswo Daten gefährden könnte. stonith_admin --history zeigt Fencing-Versuche.",
+      "reference": "Pacemaker Explained, Node status; crm_mon(8)",
+      "terms": [
+        {
+          "term": "recovered",
+          "de": "wiederhergestellt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-01",
+      "objective": "362.1",
+      "type": "single",
+      "question": "A DRBD resource shows the connection state StandAlone on both nodes and the disk states UpToDate/UpToDate. What has most likely happened, and what does drbdadm report in dmesg?",
+      "question_de": "Eine DRBD-Ressource zeigt auf beiden Knoten den Verbindungszustand StandAlone und die Plattenzustände UpToDate/UpToDate. Was ist am wahrscheinlichsten passiert, und was meldet DRBD in dmesg?",
+      "choices": [
+        {
+          "text": "A split brain was detected after a network interruption; both sides diverged and DRBD disconnected to protect the data (\"Split-Brain detected but unresolved, dropping connection!\").",
+          "text_de": "Nach einer Netzunterbrechung wurde ein Split Brain erkannt; beide Seiten haben unterschiedliche Daten, DRBD hat die Verbindung zum Schutz der Daten getrennt („Split-Brain detected but unresolved, dropping connection!“).",
+          "correct": true
+        },
+        {
+          "text": "The resource was never connected; drbdadm up is missing.",
+          "text_de": "Die Ressource wurde nie verbunden; drbdadm up fehlt."
+        },
+        {
+          "text": "The metadata is corrupt and must be recreated.",
+          "text_de": "Die Metadaten sind beschädigt und müssen neu erzeugt werden."
+        },
+        {
+          "text": "Both nodes are Secondary, which is normal.",
+          "text_de": "Beide Knoten sind Secondary, das ist normal."
+        },
+        {
+          "text": "Protocol A was used; switching to C fixes it.",
+          "text_de": "Protokoll A wurde verwendet; ein Wechsel zu C behebt es."
+        }
+      ],
+      "explanation_de": "Split Brain entsteht, wenn beide Seiten während der Trennung Primary waren oder wurden. DRBD erkennt es über die Generation-UUIDs und trennt sich; die Auflösung wählt einen Verlierer (connect --discard-my-data). Automatische Handler (after-sb-*) können das konfigurierbar übernehmen.",
+      "reference": "DRBD 9 User's Guide, Manual split brain recovery",
+      "terms": [
+        {
+          "term": "diverged",
+          "de": "auseinandergelaufen, unterschiedlich geworden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-02",
+      "objective": "362.1",
+      "type": "single",
+      "question": "To guarantee that Pacemaker never promotes DRBD on a node whose replica is outdated, which DRBD resource configuration is recommended together with the Pacemaker integration?",
+      "question_de": "Welche DRBD-Ressourcenkonfiguration wird zusammen mit der Pacemaker-Integration empfohlen, damit Pacemaker DRBD nie auf einem Knoten promotiert, dessen Replikat veraltet ist?",
+      "choices": [
+        {
+          "text": "handlers { fence-peer \"/usr/lib/drbd/crm-fence-peer.9.sh\"; unfence-peer \"/usr/lib/drbd/crm-unfence-peer.9.sh\"; } with net { fencing resource-only; } (or resource-and-stonith)",
+          "text_de": "handlers { fence-peer \"/usr/lib/drbd/crm-fence-peer.9.sh\"; unfence-peer \"/usr/lib/drbd/crm-unfence-peer.9.sh\"; } mit net { fencing resource-only; } (oder resource-and-stonith)",
+          "correct": true
+        },
+        {
+          "text": "net { allow-two-primaries yes; }",
+          "text_de": "net { allow-two-primaries yes; }"
+        },
+        {
+          "text": "disk { on-io-error pass_on; }",
+          "text_de": "disk { on-io-error pass_on; }"
+        },
+        {
+          "text": "startup { become-primary-on both; }",
+          "text_de": "startup { become-primary-on both; }"
+        },
+        {
+          "text": "net { protocol A; }",
+          "text_de": "net { protocol A; }"
+        }
+      ],
+      "explanation_de": "Der fence-peer-Handler setzt bei Verbindungsverlust eine Location-Constraint in der CIB, die die Promotion auf dem veralteten Knoten verbietet; unfence-peer entfernt sie nach der Resynchronisation. allow-two-primaries ist nur für Dual-Primary (GFS2/OCFS2) gedacht.",
+      "reference": "DRBD 9 User's Guide, Resource-level fencing using the Cluster Information Base",
+      "terms": [
+        {
+          "term": "outdated",
+          "de": "veraltet"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-03",
+      "objective": "362.1",
+      "type": "single",
+      "question": "A DRBD device must be extended after the backing LVM volumes were enlarged on both nodes. Which command makes DRBD use the new size online?",
+      "question_de": "Ein DRBD-Gerät muss vergrößert werden, nachdem die darunterliegenden LVM-Volumes auf beiden Knoten erweitert wurden. Welcher Befehl lässt DRBD die neue Größe im laufenden Betrieb nutzen?",
+      "choices": [
+        {
+          "text": "drbdadm resize r0 (on one node, with internal metadata and both nodes connected)",
+          "text_de": "drbdadm resize r0 (auf einem Knoten, bei internen Metadaten und verbundenen Knoten)",
+          "correct": true
+        },
+        {
+          "text": "drbdadm create-md r0 on both nodes",
+          "text_de": "drbdadm create-md r0 auf beiden Knoten"
+        },
+        {
+          "text": "drbdadm down r0 && drbdadm up r0",
+          "text_de": "drbdadm down r0 && drbdadm up r0"
+        },
+        {
+          "text": "resize2fs /dev/drbd0 alone",
+          "text_de": "resize2fs /dev/drbd0 allein"
+        },
+        {
+          "text": "drbdadm invalidate r0",
+          "text_de": "drbdadm invalidate r0"
+        }
+      ],
+      "explanation_de": "drbdadm resize meldet die neue Größe des Hintergrundgeräts und verschiebt interne Metadaten; danach wird das Dateisystem vergrößert (resize2fs oder xfs_growfs auf dem Primary). create-md würde die Metadaten überschreiben, invalidate erzwingt eine Vollsynchronisation.",
+      "reference": "DRBD 9 User's Guide, Growing resources online",
+      "terms": [
+        {
+          "term": "enlarged",
+          "de": "vergrößert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-04",
+      "objective": "362.1",
+      "type": "single",
+      "question": "Which DRBD 9 feature allows a resource to be replicated to three nodes so that the loss of any single node leaves two consistent copies?",
+      "question_de": "Welche DRBD-9-Funktion erlaubt es, eine Ressource auf drei Knoten zu replizieren, so dass beim Ausfall eines Knotens zwei konsistente Kopien verbleiben?",
+      "choices": [
+        {
+          "text": "Multi-node (mesh) replication with one connection per node pair defined in the resource (connection-mesh or explicit connection sections)",
+          "text_de": "Mehrknoten-Replikation (Mesh) mit einer Verbindung je Knotenpaar in der Ressource (connection-mesh oder explizite connection-Abschnitte)",
+          "correct": true
+        },
+        {
+          "text": "Stacking a second DRBD device on top of the first (DRBD 8 style) only",
+          "text_de": "Nur das Stapeln eines zweiten DRBD-Geräts über dem ersten (DRBD-8-Art)"
+        },
+        {
+          "text": "Protocol D",
+          "text_de": "Protokoll D"
+        },
+        {
+          "text": "LVM mirroring of /dev/drbd0",
+          "text_de": "LVM-Spiegelung von /dev/drbd0"
+        },
+        {
+          "text": "rsync between the Secondaries",
+          "text_de": "rsync zwischen den Secondaries"
+        }
+      ],
+      "explanation_de": "DRBD 9 verbindet bis zu 32 Knoten je Ressource; connection-mesh { hosts a b c; } erzeugt alle Verbindungen. Stacking war der DRBD-8-Weg für einen dritten Standort. LINSTOR automatisiert solche Konfigurationen.",
+      "reference": "DRBD 9 User's Guide, Multi-node replication",
+      "terms": [
+        {
+          "term": "consistent copies",
+          "de": "konsistente Kopien"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-05",
+      "objective": "362.1",
+      "type": "single",
+      "question": "After a node was down for a week, DRBD performs a full resynchronization instead of a quick one. Which configuration keeps the amount of data to resync small after a longer outage?",
+      "question_de": "Nachdem ein Knoten eine Woche ausgefallen war, führt DRBD eine vollständige statt einer schnellen Resynchronisation durch. Welche Konfiguration hält die zu synchronisierende Datenmenge nach einem längeren Ausfall klein?",
+      "choices": [
+        {
+          "text": "A sufficiently large activity log and the quick-sync bitmap, which DRBD maintains automatically; a full sync happens only when metadata was recreated or invalidated.",
+          "text_de": "Ein ausreichend großes Activity Log und die Quick-Sync-Bitmap, die DRBD automatisch führt; eine Vollsynchronisation passiert nur, wenn Metadaten neu erzeugt oder invalidiert wurden.",
+          "correct": true
+        },
+        {
+          "text": "Setting resync-rate to 0",
+          "text_de": "resync-rate auf 0 setzen"
+        },
+        {
+          "text": "Using protocol A",
+          "text_de": "Protokoll A verwenden"
+        },
+        {
+          "text": "Running drbdadm invalidate-remote weekly",
+          "text_de": "Wöchentlich drbdadm invalidate-remote ausführen"
+        },
+        {
+          "text": "Disabling the DRBD kernel module on the Secondary",
+          "text_de": "Das DRBD-Kernelmodul auf dem Secondary deaktivieren"
+        }
+      ],
+      "explanation_de": "DRBD markiert geänderte Blöcke in der Quick-Sync-Bitmap der Metadaten; nach Rückkehr des Peers werden nur diese übertragen. Eine Vollsynchronisation deutet auf neue Metadaten (create-md) oder ein invalidate hin, nicht auf die Dauer des Ausfalls.",
+      "reference": "DRBD 9 User's Guide, The quick-sync bitmap",
+      "terms": [
+        {
+          "term": "outage",
+          "de": "Ausfall"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.1-06",
+      "objective": "362.1",
+      "type": "single",
+      "question": "Which command permanently marks the local DRBD replica as inconsistent and forces a full resynchronization from the peer, for example after suspected silent data corruption on the local disk?",
+      "question_de": "Welcher Befehl markiert das lokale DRBD-Replikat dauerhaft als inkonsistent und erzwingt eine Vollsynchronisation vom Peer, etwa nach vermuteter stiller Datenbeschädigung auf der lokalen Platte?",
+      "choices": [
+        {
+          "text": "drbdadm invalidate r0",
+          "text_de": "drbdadm invalidate r0",
+          "correct": true
+        },
+        {
+          "text": "drbdadm invalidate-remote r0",
+          "text_de": "drbdadm invalidate-remote r0"
+        },
+        {
+          "text": "drbdadm verify r0",
+          "text_de": "drbdadm verify r0"
+        },
+        {
+          "text": "drbdadm detach r0",
+          "text_de": "drbdadm detach r0"
+        },
+        {
+          "text": "drbdadm outdate r0",
+          "text_de": "drbdadm outdate r0"
+        }
+      ],
+      "explanation_de": "invalidate verwirft die lokalen Daten und synchronisiert vom Peer; invalidate-remote wirkt umgekehrt. verify vergleicht beide Seiten blockweise (Ergebnis im Log, danach disconnect/connect zur Korrektur), outdate markiert nur als veraltet, detach trennt das Hintergerät.",
+      "reference": "drbdadm(8), invalidate",
+      "terms": [
+        {
+          "term": "silent data corruption",
+          "de": "stille Datenbeschädigung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.2-01",
+      "objective": "362.2",
+      "type": "single",
+      "question": "A new LUN was added to an iSCSI target. The initiator host still does not see it. Which command makes the host discover the new LUN without logging out?",
+      "question_de": "Einem iSCSI-Target wurde eine neue LUN hinzugefügt. Der Initiator-Host sieht sie noch nicht. Welcher Befehl lässt den Host die neue LUN erkennen, ohne sich abzumelden?",
+      "choices": [
+        {
+          "text": "iscsiadm -m session --rescan",
+          "text_de": "iscsiadm -m session --rescan",
+          "correct": true
+        },
+        {
+          "text": "iscsiadm -m node --logout",
+          "text_de": "iscsiadm -m node --logout"
+        },
+        {
+          "text": "multipath -F",
+          "text_de": "multipath -F"
+        },
+        {
+          "text": "partprobe /dev/sda",
+          "text_de": "partprobe /dev/sda"
+        },
+        {
+          "text": "systemctl restart iscsid",
+          "text_de": "systemctl restart iscsid"
+        }
+      ],
+      "explanation_de": "Der Rescan einer Sitzung fragt die LUN-Liste des Targets neu ab (entspricht echo - - - > /sys/class/scsi_host/hostN/scan). Logout würde bestehende Geräte entfernen, multipath -F leert die Multipath-Tabelle, partprobe liest nur Partitionstabellen.",
+      "reference": "iscsiadm(8), --rescan",
+      "terms": [
+        {
+          "term": "discover",
+          "de": "erkennen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.2-02",
+      "objective": "362.2",
+      "type": "single",
+      "question": "multipath -ll shows a LUN with two paths, one marked \"failed faulty\". The storage administrator confirms the path is back. Which setting lets multipathd re-enable the path automatically?",
+      "question_de": "multipath -ll zeigt eine LUN mit zwei Pfaden, einer als „failed faulty“ markiert. Der Storage-Administrator bestätigt, dass der Pfad wieder funktioniert. Welche Einstellung lässt multipathd den Pfad automatisch wieder aktivieren?",
+      "choices": [
+        {
+          "text": "A path checker (e.g. path_checker tur) with polling_interval in /etc/multipath.conf; multipathd reinstates paths that pass the check",
+          "text_de": "Ein Pfadprüfer (z. B. path_checker tur) mit polling_interval in /etc/multipath.conf; multipathd reaktiviert Pfade, die die Prüfung bestehen",
+          "correct": true
+        },
+        {
+          "text": "failback immediate on the initiator's HBA firmware",
+          "text_de": "failback immediate in der HBA-Firmware des Initiators"
+        },
+        {
+          "text": "kpartx -a on the device",
+          "text_de": "kpartx -a auf dem Gerät"
+        },
+        {
+          "text": "blacklist { wwid * } in multipath.conf",
+          "text_de": "blacklist { wwid * } in multipath.conf"
+        },
+        {
+          "text": "iscsiadm -m node -o update -n node.startup -v automatic",
+          "text_de": "iscsiadm -m node -o update -n node.startup -v automatic"
+        }
+      ],
+      "explanation_de": "multipathd prüft Pfade regelmäßig mit dem konfigurierten Checker und nimmt sie wieder auf; failback regelt, ob danach zur bevorzugten Pfadgruppe zurückgewechselt wird. kpartx legt Partitionen an, die Blacklist würde alle Geräte ausschließen.",
+      "reference": "multipath.conf(5), path_checker, failback",
+      "terms": [
+        {
+          "term": "re-enable",
+          "de": "wieder aktivieren"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.2-03",
+      "objective": "362.2",
+      "type": "single",
+      "question": "A volume group on shared SAN storage must be activated on several cluster nodes at once for a GFS2 file system. Which LVM setup is required with Pacemaker?",
+      "question_de": "Eine Volume Group auf gemeinsamem SAN-Speicher muss für ein GFS2-Dateisystem auf mehreren Clusterknoten gleichzeitig aktiviert werden. Welche LVM-Einrichtung ist mit Pacemaker nötig?",
+      "choices": [
+        {
+          "text": "Shared VG with lvmlockd and the dlm (vgcreate --shared, ocf:pacemaker:controld and ocf:heartbeat:lvmlockd clones, LVM-activate with activation_mode=shared)",
+          "text_de": "Gemeinsame VG mit lvmlockd und dem DLM (vgcreate --shared, Klone von ocf:pacemaker:controld und ocf:heartbeat:lvmlockd, LVM-activate mit activation_mode=shared)",
+          "correct": true
+        },
+        {
+          "text": "A normal VG activated with vgchange -ay on every node manually",
+          "text_de": "Eine normale VG, auf jedem Knoten manuell mit vgchange -ay aktiviert"
+        },
+        {
+          "text": "An exclusive VG with system ID set to one node",
+          "text_de": "Eine exklusive VG mit System-ID eines Knotens"
+        },
+        {
+          "text": "DRBD in single-primary mode below the VG",
+          "text_de": "DRBD im Single-Primary-Modus unter der VG"
+        },
+        {
+          "text": "LVM thin pools, which are cluster-aware by default",
+          "text_de": "LVM-Thin-Pools, die standardmäßig clusterfähig sind"
+        }
+      ],
+      "explanation_de": "Gleichzeitige Aktivierung braucht clusterweite Sperren: früher clvmd, heute lvmlockd mit dlm (lock_type dlm). Ohne Sperren würden parallele Metadatenänderungen die VG beschädigen. Exklusive Aktivierung passt zu Failover-Dateisystemen wie ext4/XFS.",
+      "reference": "lvmlockd(8); Red Hat Dokumentation, GFS2 file systems in a cluster",
+      "terms": [
+        {
+          "term": "at once",
+          "de": "gleichzeitig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.3-01",
+      "objective": "362.3",
+      "type": "single",
+      "question": "A GFS2 file system is mounted on three nodes. One node hangs after a fencing operation and the other nodes block on file system access for a while. Which cluster component must complete its work before the file system continues?",
+      "question_de": "Ein GFS2-Dateisystem ist auf drei Knoten eingehängt. Nach einer Fencing-Operation hängt ein Knoten, und die anderen Knoten blockieren eine Weile beim Dateisystemzugriff. Welche Clusterkomponente muss ihre Arbeit abschließen, bevor das Dateisystem weiterläuft?",
+      "choices": [
+        {
+          "text": "The DLM must confirm the fencing and recover the locks of the failed node; GFS2 then replays that node's journal.",
+          "text_de": "Der DLM muss das Fencing bestätigen und die Sperren des ausgefallenen Knotens wiederherstellen; danach spielt GFS2 dessen Journal zurück.",
+          "correct": true
+        },
+        {
+          "text": "corosync must elect a new ring leader.",
+          "text_de": "corosync muss einen neuen Ring-Leader wählen."
+        },
+        {
+          "text": "fsck.gfs2 must run on all nodes.",
+          "text_de": "fsck.gfs2 muss auf allen Knoten laufen."
+        },
+        {
+          "text": "The quorum must be recalculated by Pacemaker's PEngine.",
+          "text_de": "Das Quorum muss von der PEngine neu berechnet werden."
+        },
+        {
+          "text": "gfs2_grow must adjust the journal size.",
+          "text_de": "gfs2_grow muss die Journalgröße anpassen."
+        }
+      ],
+      "explanation_de": "GFS2 setzt auf den DLM; Sperren eines ausgefallenen Knotens dürfen erst nach erfolgreichem Fencing freigegeben werden. Danach wird das Journal des Knotens von einem anderen Knoten zurückgespielt. Ohne Fencing bleibt der Zugriff blockiert.",
+      "reference": "Red Hat Dokumentation, GFS2 overview",
+      "terms": [
+        {
+          "term": "replay",
+          "de": "zurückspielen (Journal)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.3-02",
+      "objective": "362.3",
+      "type": "single",
+      "question": "Which command creates an OCFS2 file system for a cluster with up to four nodes, using a 4 KB block size and the label data?",
+      "question_de": "Welcher Befehl erzeugt ein OCFS2-Dateisystem für einen Cluster mit bis zu vier Knoten, 4-KB-Blockgröße und dem Label data?",
+      "choices": [
+        {
+          "text": "mkfs.ocfs2 -b 4K -N 4 -L data /dev/mapper/san-data",
+          "text_de": "mkfs.ocfs2 -b 4K -N 4 -L data /dev/mapper/san-data",
+          "correct": true
+        },
+        {
+          "text": "mkfs.ocfs2 -j 4 -t data /dev/mapper/san-data",
+          "text_de": "mkfs.ocfs2 -j 4 -t data /dev/mapper/san-data"
+        },
+        {
+          "text": "mkfs.gfs2 -N 4 -L data /dev/mapper/san-data",
+          "text_de": "mkfs.gfs2 -N 4 -L data /dev/mapper/san-data"
+        },
+        {
+          "text": "tunefs.ocfs2 -N 4 -L data /dev/mapper/san-data",
+          "text_de": "tunefs.ocfs2 -N 4 -L data /dev/mapper/san-data"
+        },
+        {
+          "text": "mkfs.ocfs2 --cluster-size 4 --nodes data /dev/mapper/san-data",
+          "text_de": "mkfs.ocfs2 --cluster-size 4 --nodes data /dev/mapper/san-data"
+        }
+      ],
+      "explanation_de": "-N legt die Zahl der Node-Slots fest (später mit tunefs.ocfs2 -N erhöhbar), -b die Blockgröße, -C die Clustergröße, -L das Label. Bei GFS2 heißt der Parameter für Journale -j, bei OCFS2 entspricht die Slot-Zahl den Knoten.",
+      "reference": "mkfs.ocfs2(8)",
+      "terms": [
+        {
+          "term": "label",
+          "de": "Bezeichnung, Label"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.3-03",
+      "objective": "362.3",
+      "type": "single",
+      "question": "A GFS2 file system on a cluster LV must be enlarged online after lvextend. Which command grows the file system?",
+      "question_de": "Ein GFS2-Dateisystem auf einem Cluster-LV muss nach lvextend im laufenden Betrieb vergrößert werden. Welcher Befehl vergrößert das Dateisystem?",
+      "choices": [
+        {
+          "text": "gfs2_grow /mnt/gfs2 (on one node where it is mounted)",
+          "text_de": "gfs2_grow /mnt/gfs2 (auf einem Knoten, auf dem es eingehängt ist)",
+          "correct": true
+        },
+        {
+          "text": "resize2fs /dev/vg/lv",
+          "text_de": "resize2fs /dev/vg/lv"
+        },
+        {
+          "text": "gfs2_jadd -j 1 /mnt/gfs2",
+          "text_de": "gfs2_jadd -j 1 /mnt/gfs2"
+        },
+        {
+          "text": "fsck.gfs2 -y /dev/vg/lv",
+          "text_de": "fsck.gfs2 -y /dev/vg/lv"
+        },
+        {
+          "text": "tunegfs2 -s /dev/vg/lv",
+          "text_de": "tunegfs2 -s /dev/vg/lv"
+        }
+      ],
+      "explanation_de": "gfs2_grow erweitert ein eingehängtes GFS2 auf die neue Gerätegröße; es darf nur auf einem Knoten laufen. gfs2_jadd fügt Journale hinzu, fsck.gfs2 braucht ein überall ausgehängtes Dateisystem, resize2fs ist für ext-Dateisysteme.",
+      "reference": "gfs2_grow(8)",
+      "terms": [
+        {
+          "term": "enlarged",
+          "de": "vergrößert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-362.3-04",
+      "objective": "362.3",
+      "type": "single",
+      "question": "Which statement about using GFS2 as a cluster file system is correct?",
+      "question_de": "Welche Aussage über die Nutzung von GFS2 als Cluster-Dateisystem ist richtig?",
+      "choices": [
+        {
+          "text": "Every node that mounts the file system needs its own journal, and the file system must be mounted only within a Pacemaker/corosync cluster with working fencing and the DLM.",
+          "text_de": "Jeder Knoten, der das Dateisystem einhängt, braucht ein eigenes Journal, und das Dateisystem darf nur innerhalb eines Pacemaker/corosync-Clusters mit funktionierendem Fencing und dem DLM eingehängt werden.",
+          "correct": true
+        },
+        {
+          "text": "GFS2 can be mounted on several standalone hosts via NFS without a cluster.",
+          "text_de": "GFS2 kann ohne Cluster auf mehreren eigenständigen Hosts über NFS eingehängt werden."
+        },
+        {
+          "text": "GFS2 replicates data between nodes like DRBD.",
+          "text_de": "GFS2 repliziert Daten zwischen Knoten wie DRBD."
+        },
+        {
+          "text": "GFS2 does not support POSIX locks.",
+          "text_de": "GFS2 unterstützt keine POSIX-Sperren."
+        },
+        {
+          "text": "GFS2 journals are optional.",
+          "text_de": "GFS2-Journale sind optional."
+        }
+      ],
+      "explanation_de": "GFS2 ist ein Shared-Disk-Dateisystem: alle Knoten greifen auf dasselbe Blockgerät zu, die Koordination übernimmt der DLM. Es repliziert nichts; dafür sorgt der Speicher (SAN, DRBD Dual-Primary). Das Lock-Protokoll lock_nolock erlaubt nur Einzelbetrieb.",
+      "reference": "gfs2(5)",
+      "terms": [
+        {
+          "term": "own journal",
+          "de": "eigenes Journal"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.1-01",
+      "objective": "363.1",
+      "type": "single",
+      "question": "A GlusterFS volume should tolerate the loss of one of three servers while using only two copies of the data and avoiding split brain. Which volume layout is appropriate?",
+      "question_de": "Ein GlusterFS-Volume soll den Ausfall eines von drei Servern verkraften, dabei nur zwei Datenkopien halten und Split Brain vermeiden. Welches Volume-Layout ist geeignet?",
+      "choices": [
+        {
+          "text": "gluster volume create gv0 replica 3 arbiter 1 srv1:/b srv2:/b srv3:/b",
+          "text_de": "gluster volume create gv0 replica 3 arbiter 1 srv1:/b srv2:/b srv3:/b",
+          "correct": true
+        },
+        {
+          "text": "gluster volume create gv0 replica 2 srv1:/b srv2:/b",
+          "text_de": "gluster volume create gv0 replica 2 srv1:/b srv2:/b"
+        },
+        {
+          "text": "gluster volume create gv0 srv1:/b srv2:/b srv3:/b",
+          "text_de": "gluster volume create gv0 srv1:/b srv2:/b srv3:/b"
+        },
+        {
+          "text": "gluster volume create gv0 stripe 3 srv1:/b srv2:/b srv3:/b",
+          "text_de": "gluster volume create gv0 stripe 3 srv1:/b srv2:/b srv3:/b"
+        },
+        {
+          "text": "gluster volume create gv0 disperse 3 redundancy 2 srv1:/b srv2:/b srv3:/b",
+          "text_de": "gluster volume create gv0 disperse 3 redundancy 2 srv1:/b srv2:/b srv3:/b"
+        }
+      ],
+      "explanation_de": "Der Arbiter-Brick speichert nur Metadaten und liefert die dritte Stimme für das Quorum, so dass zwei Datenkopien genügen. Ein reines replica 2 ist anfällig für Split Brain, ein verteiltes Volume ohne Replikation verliert Dateien bei Ausfall.",
+      "reference": "Gluster-Dokumentation, Arbiter volumes",
+      "terms": [
+        {
+          "term": "tolerate",
+          "de": "verkraften"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.1-02",
+      "objective": "363.1",
+      "type": "single",
+      "question": "After a brick was offline for an hour, some files on a replicated GlusterFS volume are reported as needing heal. Which command shows these files and which triggers the heal?",
+      "question_de": "Nachdem ein Brick eine Stunde offline war, werden einige Dateien eines replizierten GlusterFS-Volumes als heilungsbedürftig gemeldet. Welcher Befehl zeigt diese Dateien, und welcher stößt die Heilung an?",
+      "choices": [
+        {
+          "text": "gluster volume heal gv0 info; gluster volume heal gv0",
+          "text_de": "gluster volume heal gv0 info; gluster volume heal gv0",
+          "correct": true
+        },
+        {
+          "text": "gluster volume status gv0 detail; gluster volume rebalance gv0 start",
+          "text_de": "gluster volume status gv0 detail; gluster volume rebalance gv0 start"
+        },
+        {
+          "text": "gluster peer status; gluster volume sync",
+          "text_de": "gluster peer status; gluster volume sync"
+        },
+        {
+          "text": "gluster volume info gv0; gluster volume reset gv0",
+          "text_de": "gluster volume info gv0; gluster volume reset gv0"
+        },
+        {
+          "text": "ls -la /b; rsync -a srv1:/b/ /b/",
+          "text_de": "ls -la /b; rsync -a srv1:/b/ /b/"
+        }
+      ],
+      "explanation_de": "Der Self-Heal-Daemon gleicht Replikate ab; heal info listet ausstehende Einträge, heal <vol> startet den Abgleich (full für eine vollständige Prüfung). rebalance verteilt nach Brick-Änderungen, direktes Schreiben in Bricks ist verboten.",
+      "reference": "gluster(8), volume heal",
+      "terms": [
+        {
+          "term": "trigger",
+          "de": "auslösen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.1-03",
+      "objective": "363.1",
+      "type": "single",
+      "question": "A GlusterFS client mounts the volume with mount -t glusterfs srv1:/gv0 /mnt. If srv1 goes down later, what happens to the mount?",
+      "question_de": "Ein GlusterFS-Client hängt das Volume mit mount -t glusterfs srv1:/gv0 /mnt ein. Was passiert mit dem Mount, wenn srv1 später ausfällt?",
+      "choices": [
+        {
+          "text": "The mount keeps working, because the native client talks to all bricks directly; srv1 was only needed to fetch the volume file at mount time.",
+          "text_de": "Der Mount funktioniert weiter, weil der native Client direkt mit allen Bricks spricht; srv1 wurde nur beim Einhängen zum Abruf der Volume-Datei gebraucht.",
+          "correct": true
+        },
+        {
+          "text": "The mount fails immediately because srv1 was the NFS server.",
+          "text_de": "Der Mount scheitert sofort, weil srv1 der NFS-Server war."
+        },
+        {
+          "text": "The client switches to read-only mode.",
+          "text_de": "Der Client wechselt in den Nur-Lese-Modus."
+        },
+        {
+          "text": "The mount must be repeated with srv2.",
+          "text_de": "Der Mount muss mit srv2 wiederholt werden."
+        },
+        {
+          "text": "All data on the client is lost.",
+          "text_de": "Alle Daten auf dem Client gehen verloren."
+        }
+      ],
+      "explanation_de": "Der FUSE-Client lädt beim Mount die Volume-Datei und verbindet sich danach mit allen Bricks. Für den Mount-Zeitpunkt selbst hilft die Option backup-volfile-servers=srv2:srv3. Nur Zugriffe über NFS wären vom genannten Server abhängig.",
+      "reference": "Gluster-Dokumentation, Setting up clients, backup-volfile-servers",
+      "terms": [
+        {
+          "term": "fetch",
+          "de": "abrufen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.1-04",
+      "objective": "363.1",
+      "type": "single",
+      "question": "A GlusterFS volume must grow by adding bricks on a new server. For a replica 2 volume, which rule applies when adding bricks?",
+      "question_de": "Ein GlusterFS-Volume soll durch Bricks auf einem neuen Server wachsen. Welche Regel gilt beim Hinzufügen von Bricks zu einem replica-2-Volume?",
+      "choices": [
+        {
+          "text": "Bricks must be added in multiples of the replica count (here pairs), and gluster volume rebalance distributes existing data afterwards.",
+          "text_de": "Bricks müssen in Vielfachen der Replikatzahl hinzugefügt werden (hier paarweise), und gluster volume rebalance verteilt anschließend vorhandene Daten.",
+          "correct": true
+        },
+        {
+          "text": "Any single brick can be added; Gluster converts the volume to distribute-only.",
+          "text_de": "Jeder einzelne Brick kann hinzugefügt werden; Gluster wandelt das Volume in reine Verteilung um."
+        },
+        {
+          "text": "Bricks can only be added after stopping the volume.",
+          "text_de": "Bricks können nur nach Stoppen des Volumes hinzugefügt werden."
+        },
+        {
+          "text": "The new server must have the same hostname as a failed one.",
+          "text_de": "Der neue Server muss denselben Hostnamen wie ein ausgefallener haben."
+        },
+        {
+          "text": "Adding bricks requires recreating the volume.",
+          "text_de": "Das Hinzufügen von Bricks erfordert das Neuanlegen des Volumes."
+        }
+      ],
+      "explanation_de": "Replizierte Volumes bestehen aus Replikat-Sets; add-brick braucht so viele Bricks wie die Replikatzahl (bei distributed-replicated je Set). Danach bringt rebalance (fix-layout und Datenmigration) die bestehenden Dateien auf die neuen Bricks; das Volume bleibt online.",
+      "reference": "gluster(8), volume add-brick, rebalance",
+      "terms": [
+        {
+          "term": "multiples",
+          "de": "Vielfache"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.1-05",
+      "objective": "363.1",
+      "type": "single",
+      "question": "Which command shows for each brick of a GlusterFS volume whether its process is online, its port and the number of open file descriptors?",
+      "question_de": "Welcher Befehl zeigt für jeden Brick eines GlusterFS-Volumes, ob sein Prozess online ist, seinen Port und die Anzahl offener Dateideskriptoren?",
+      "choices": [
+        {
+          "text": "gluster volume status gv0 detail",
+          "text_de": "gluster volume status gv0 detail",
+          "correct": true
+        },
+        {
+          "text": "gluster volume info gv0",
+          "text_de": "gluster volume info gv0"
+        },
+        {
+          "text": "gluster peer status",
+          "text_de": "gluster peer status"
+        },
+        {
+          "text": "gluster volume profile gv0 info",
+          "text_de": "gluster volume profile gv0 info"
+        },
+        {
+          "text": "gluster pool list",
+          "text_de": "gluster pool list"
+        }
+      ],
+      "explanation_de": "volume status zeigt Prozesse, Ports und Online-Zustand je Brick; detail ergänzt Dateideskriptoren, Inodes und freien Platz. volume info zeigt die Konfiguration, peer status und pool list die Knoten, profile Latenzstatistiken.",
+      "reference": "gluster(8), volume status",
+      "terms": [
+        {
+          "term": "file descriptor",
+          "de": "Dateideskriptor"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-01",
+      "objective": "363.2",
+      "type": "single",
+      "question": "A Ceph cluster has five monitors. How many monitors must be up for the cluster to keep working, and why?",
+      "question_de": "Ein Ceph-Cluster hat fünf Monitore. Wie viele Monitore müssen laufen, damit der Cluster weiterarbeitet, und warum?",
+      "choices": [
+        {
+          "text": "At least three, because the monitors need a majority (quorum) to agree on the cluster maps via Paxos.",
+          "text_de": "Mindestens drei, weil die Monitore eine Mehrheit (Quorum) brauchen, um sich per Paxos über die Cluster-Maps zu einigen.",
+          "correct": true
+        },
+        {
+          "text": "One, because any monitor can serve the maps alone.",
+          "text_de": "Einer, weil jeder Monitor die Maps allein liefern kann."
+        },
+        {
+          "text": "All five, because the maps are striped across them.",
+          "text_de": "Alle fünf, weil die Maps über sie verteilt sind."
+        },
+        {
+          "text": "Two, because two copies are enough for replication.",
+          "text_de": "Zwei, weil zwei Kopien für die Replikation reichen."
+        },
+        {
+          "text": "Four, because one is always a standby.",
+          "text_de": "Vier, weil einer immer Standby ist."
+        }
+      ],
+      "explanation_de": "MONs bilden ein Paxos-Quorum; bei fünf dürfen zwei ausfallen. Deshalb werden ungerade Zahlen (3 oder 5) empfohlen. Ohne Quorum sind keine Map-Änderungen und damit kein Client-I/O möglich. ceph quorum_status zeigt den Zustand.",
+      "reference": "Ceph-Dokumentation, Monitor config reference",
+      "terms": [
+        {
+          "term": "majority",
+          "de": "Mehrheit"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-02",
+      "objective": "363.2",
+      "type": "single",
+      "question": "A new disk /dev/sdd was added to a Ceph node. Which command prepares and activates it as a BlueStore OSD with ceph-volume?",
+      "question_de": "Einem Ceph-Knoten wurde die Platte /dev/sdd hinzugefügt. Welcher Befehl bereitet sie mit ceph-volume als BlueStore-OSD vor und aktiviert sie?",
+      "choices": [
+        {
+          "text": "ceph-volume lvm create --data /dev/sdd",
+          "text_de": "ceph-volume lvm create --data /dev/sdd",
+          "correct": true
+        },
+        {
+          "text": "ceph osd create /dev/sdd",
+          "text_de": "ceph osd create /dev/sdd"
+        },
+        {
+          "text": "mkfs.xfs /dev/sdd && ceph-osd --mkfs",
+          "text_de": "mkfs.xfs /dev/sdd && ceph-osd --mkfs"
+        },
+        {
+          "text": "ceph-bluestore-tool prime-osd-dir /dev/sdd",
+          "text_de": "ceph-bluestore-tool prime-osd-dir /dev/sdd"
+        },
+        {
+          "text": "rados mkosd /dev/sdd",
+          "text_de": "rados mkosd /dev/sdd"
+        }
+      ],
+      "explanation_de": "ceph-volume lvm create fasst prepare (LVM-Volume anlegen, OSD-ID und Schlüssel registrieren) und activate (systemd-Unit starten) zusammen; --block.db kann ein schnelles Gerät für die Metadaten angeben. ceph osd create legt nur eine ID an, XFS war das FileStore-Verfahren.",
+      "reference": "ceph-volume(8), lvm create",
+      "terms": [
+        {
+          "term": "prepare",
+          "de": "vorbereiten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-03",
+      "objective": "363.2",
+      "type": "single",
+      "question": "Which CRUSH rule property ensures that the three replicas of a pool are stored in three different racks rather than merely on three different hosts?",
+      "question_de": "Welche Eigenschaft einer CRUSH-Regel stellt sicher, dass die drei Replikate eines Pools in drei verschiedenen Racks liegen statt nur auf drei verschiedenen Hosts?",
+      "choices": [
+        {
+          "text": "The failure domain of the rule's chooseleaf step set to rack (step chooseleaf firstn 0 type rack), with hosts placed under rack buckets in the CRUSH map",
+          "text_de": "Die Fehlerdomäne des chooseleaf-Schritts auf rack gesetzt (step chooseleaf firstn 0 type rack), wobei die Hosts in der CRUSH-Map unter Rack-Buckets liegen",
+          "correct": true
+        },
+        {
+          "text": "pool size = 3",
+          "text_de": "pool size = 3"
+        },
+        {
+          "text": "pg_num = 3",
+          "text_de": "pg_num = 3"
+        },
+        {
+          "text": "osd_pool_default_min_size = 3",
+          "text_de": "osd_pool_default_min_size = 3"
+        },
+        {
+          "text": "The rack name in the pool name",
+          "text_de": "Der Rack-Name im Pool-Namen"
+        }
+      ],
+      "explanation_de": "CRUSH-Regeln wählen Replikatziele anhand der Hierarchie; der Typ im chooseleaf-Schritt ist die Fehlerdomäne. ceph osd crush add-bucket rack1 rack und crush move ordnen Hosts Racks zu; ceph osd crush rule create-replicated erzeugt die Regel. size legt nur die Anzahl fest.",
+      "reference": "Ceph-Dokumentation, CRUSH maps",
+      "terms": [
+        {
+          "term": "rather than",
+          "de": "statt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-04",
+      "objective": "363.2",
+      "type": "single",
+      "question": "Which commands create a 20 GB RBD image, take a snapshot and roll the image back to the snapshot?",
+      "question_de": "Welche Befehle erzeugen ein 20-GB-RBD-Image, erstellen einen Snapshot und setzen das Image auf den Snapshot zurück?",
+      "choices": [
+        {
+          "text": "rbd create -p vms --size 20480 vm1; rbd snap create vms/vm1@clean; rbd snap rollback vms/vm1@clean",
+          "text_de": "rbd create -p vms --size 20480 vm1; rbd snap create vms/vm1@clean; rbd snap rollback vms/vm1@clean",
+          "correct": true
+        },
+        {
+          "text": "rbd create vms/vm1 20G; rbd snapshot vms/vm1 clean; rbd restore vms/vm1 clean",
+          "text_de": "rbd create vms/vm1 20G; rbd snapshot vms/vm1 clean; rbd restore vms/vm1 clean"
+        },
+        {
+          "text": "ceph osd pool create vm1 20G; ceph snap vm1; ceph rollback vm1",
+          "text_de": "ceph osd pool create vm1 20G; ceph snap vm1; ceph rollback vm1"
+        },
+        {
+          "text": "rados put vms vm1 20G; rados snap vm1; rados rollback vm1",
+          "text_de": "rados put vms vm1 20G; rados snap vm1; rados rollback vm1"
+        },
+        {
+          "text": "rbd map vms/vm1; lvcreate -s; lvconvert --merge",
+          "text_de": "rbd map vms/vm1; lvcreate -s; lvconvert --merge"
+        }
+      ],
+      "explanation_de": "rbd snap create, ls, rollback, rm und protect/clone verwalten Snapshots je Image; die Größe wird in MiB angegeben. Ein Rollback überschreibt den aktuellen Inhalt, Klone aus geschützten Snapshots sind oft schneller. rados arbeitet mit Objekten.",
+      "reference": "rbd(8), snap",
+      "terms": [
+        {
+          "term": "roll back",
+          "de": "zurücksetzen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-05",
+      "objective": "363.2",
+      "type": "single",
+      "question": "To use CephFS, which objects must exist in addition to running MDS daemons?",
+      "question_de": "Welche Objekte müssen zusätzlich zu laufenden MDS-Diensten existieren, um CephFS zu nutzen?",
+      "choices": [
+        {
+          "text": "A metadata pool and a data pool combined into a file system with ceph fs new <name> <metadata-pool> <data-pool> (or ceph fs volume create)",
+          "text_de": "Ein Metadaten-Pool und ein Daten-Pool, die mit ceph fs new <name> <metadata-pool> <data-pool> (oder ceph fs volume create) zu einem Dateisystem verbunden werden",
+          "correct": true
+        },
+        {
+          "text": "An RBD image formatted with ext4",
+          "text_de": "Ein mit ext4 formatiertes RBD-Image"
+        },
+        {
+          "text": "A RADOS gateway with an S3 bucket",
+          "text_de": "Ein RADOS-Gateway mit einem S3-Bucket"
+        },
+        {
+          "text": "A second monitor quorum",
+          "text_de": "Ein zweites Monitor-Quorum"
+        },
+        {
+          "text": "An NFS export of the OSD directories",
+          "text_de": "Ein NFS-Export der OSD-Verzeichnisse"
+        }
+      ],
+      "explanation_de": "CephFS braucht zwei Pools (Metadaten, Daten) und mindestens einen aktiven MDS; Clients hängen mit mount -t ceph oder ceph-fuse ein. RBD und RGW sind andere Zugriffsarten auf RADOS.",
+      "reference": "Ceph-Dokumentation, Create a Ceph file system",
+      "terms": [
+        {
+          "term": "in addition to",
+          "de": "zusätzlich zu"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-06",
+      "objective": "363.2",
+      "type": "single",
+      "question": "After a disk failure, the OSD osd.7 is down and out. The disk was replaced. Which steps remove the old OSD cleanly before adding the new one?",
+      "question_de": "Nach einem Plattenausfall ist osd.7 down und out. Die Platte wurde ersetzt. Welche Schritte entfernen das alte OSD sauber, bevor das neue hinzugefügt wird?",
+      "choices": [
+        {
+          "text": "ceph osd purge 7 --yes-i-really-mean-it (or ceph osd crush remove osd.7; ceph auth del osd.7; ceph osd rm 7), then ceph-volume lvm create on the new disk",
+          "text_de": "ceph osd purge 7 --yes-i-really-mean-it (oder ceph osd crush remove osd.7; ceph auth del osd.7; ceph osd rm 7), danach ceph-volume lvm create auf der neuen Platte",
+          "correct": true
+        },
+        {
+          "text": "ceph osd set noout and wait",
+          "text_de": "ceph osd set noout und warten"
+        },
+        {
+          "text": "ceph osd reweight 7 1.0",
+          "text_de": "ceph osd reweight 7 1.0"
+        },
+        {
+          "text": "ceph osd pool delete osd.7",
+          "text_de": "ceph osd pool delete osd.7"
+        },
+        {
+          "text": "ceph mon remove osd.7",
+          "text_de": "ceph mon remove osd.7"
+        }
+      ],
+      "explanation_de": "purge entfernt CRUSH-Eintrag, Auth-Schlüssel und OSD-ID in einem Schritt. noout verhindert nur das automatische Auslagern während kurzer Wartungen, reweight ändert die Gewichtung. Alternativ kann ceph-volume das neue OSD mit der alten ID (--osd-id) anlegen.",
+      "reference": "Ceph-Dokumentation, Removing OSDs",
+      "terms": [
+        {
+          "term": "cleanly",
+          "de": "sauber, vollständig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-07",
+      "objective": "363.2",
+      "type": "single",
+      "question": "A Ceph pool with size 3 and min_size 2 loses two OSDs that hold copies of the same placement group. What happens to I/O on that PG?",
+      "question_de": "Ein Ceph-Pool mit size 3 und min_size 2 verliert zwei OSDs, die Kopien derselben Placement Group halten. Was passiert mit dem I/O auf dieser PG?",
+      "choices": [
+        {
+          "text": "I/O to the PG is blocked until at least min_size copies are available again, to avoid writes with insufficient redundancy.",
+          "text_de": "I/O auf die PG wird blockiert, bis wieder mindestens min_size Kopien verfügbar sind, um Schreibvorgänge mit zu geringer Redundanz zu vermeiden.",
+          "correct": true
+        },
+        {
+          "text": "I/O continues on the single remaining copy without restrictions.",
+          "text_de": "I/O läuft auf der einzigen verbleibenden Kopie uneingeschränkt weiter."
+        },
+        {
+          "text": "The PG is deleted and recreated empty.",
+          "text_de": "Die PG wird gelöscht und leer neu angelegt."
+        },
+        {
+          "text": "The pool switches to erasure coding automatically.",
+          "text_de": "Der Pool wechselt automatisch auf Erasure Coding."
+        },
+        {
+          "text": "The monitors stop the whole cluster.",
+          "text_de": "Die Monitore stoppen den gesamten Cluster."
+        }
+      ],
+      "explanation_de": "min_size legt fest, wie viele Kopien für I/O mindestens aktiv sein müssen. Mit nur einer Kopie bleibt die PG inaktiv (undersized, inactive), bis Recovery oder Rückkehr der OSDs die Zahl erreicht. Ein Herabsetzen von min_size ist riskant.",
+      "reference": "Ceph-Dokumentation, Pool values, min_size",
+      "terms": [
+        {
+          "term": "insufficient",
+          "de": "unzureichend"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-363.2-08",
+      "objective": "363.2",
+      "type": "single",
+      "question": "Which tool decompiles the current CRUSH map into an editable text file and compiles it back after changes?",
+      "question_de": "Welches Werkzeug dekompiliert die aktuelle CRUSH-Map in eine bearbeitbare Textdatei und übersetzt sie nach Änderungen wieder zurück?",
+      "choices": [
+        {
+          "text": "crushtool (ceph osd getcrushmap -o map.bin; crushtool -d map.bin -o map.txt; crushtool -c map.txt -o map.new; ceph osd setcrushmap -i map.new)",
+          "text_de": "crushtool (ceph osd getcrushmap -o map.bin; crushtool -d map.bin -o map.txt; crushtool -c map.txt -o map.new; ceph osd setcrushmap -i map.new)",
+          "correct": true
+        },
+        {
+          "text": "ceph-authtool",
+          "text_de": "ceph-authtool"
+        },
+        {
+          "text": "ceph-bluestore-tool",
+          "text_de": "ceph-bluestore-tool"
+        },
+        {
+          "text": "rados",
+          "text_de": "rados"
+        },
+        {
+          "text": "ceph-deploy",
+          "text_de": "ceph-deploy"
+        }
+      ],
+      "explanation_de": "crushtool kompiliert und dekompiliert CRUSH-Maps und kann Regeln testen (--test --show-mappings). ceph-authtool verwaltet Schlüsselringe, ceph-bluestore-tool OSD-Speicher, rados Objekte, ceph-deploy war ein Installationswerkzeug.",
+      "reference": "crushtool(8)",
+      "terms": [
+        {
+          "term": "editable",
+          "de": "bearbeitbar"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.1-01",
+      "objective": "364.1",
+      "type": "single",
+      "question": "A server must shut down cleanly when its APC UPS reports less than five minutes of remaining runtime. Which component and setting implement this?",
+      "question_de": "Ein Server soll sauber herunterfahren, wenn seine APC-USV weniger als fünf Minuten Restlaufzeit meldet. Welche Komponente und Einstellung setzen das um?",
+      "choices": [
+        {
+          "text": "apcupsd with MINUTES 5 in /etc/apcupsd/apcupsd.conf (and the UPS cable or USB/network connection configured)",
+          "text_de": "apcupsd mit MINUTES 5 in /etc/apcupsd/apcupsd.conf (und konfigurierter USV-Verbindung per Kabel, USB oder Netz)",
+          "correct": true
+        },
+        {
+          "text": "smartd with -s L/../../7/03",
+          "text_de": "smartd mit -s L/../../7/03"
+        },
+        {
+          "text": "monit with a check on /var/log/ups.log",
+          "text_de": "monit mit einer Prüfung auf /var/log/ups.log"
+        },
+        {
+          "text": "systemd-shutdownd with a timer",
+          "text_de": "systemd-shutdownd mit einem Timer"
+        },
+        {
+          "text": "apctest -shutdown 5",
+          "text_de": "apctest -shutdown 5"
+        }
+      ],
+      "explanation_de": "apcupsd überwacht die USV; BATTERYLEVEL, MINUTES und TIMEOUT definieren, wann heruntergefahren wird. apctest dient dem Test und der Kalibrierung. smartd überwacht Platten, monit Prozesse und Ressourcen.",
+      "reference": "apcupsd.conf(5)",
+      "terms": [
+        {
+          "term": "remaining runtime",
+          "de": "Restlaufzeit"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.1-02",
+      "objective": "364.1",
+      "type": "single",
+      "question": "monit should restart the nginx service when it uses more than 80 % CPU for five consecutive cycles or when port 80 stops answering. Which configuration is correct?",
+      "question_de": "monit soll den Dienst nginx neu starten, wenn er fünf Zyklen in Folge mehr als 80 % CPU nutzt oder Port 80 nicht mehr antwortet. Welche Konfiguration ist richtig?",
+      "choices": [
+        {
+          "text": "check process nginx with pidfile /run/nginx.pid\n  start program = \"/bin/systemctl start nginx\"\n  stop program = \"/bin/systemctl stop nginx\"\n  if cpu > 80% for 5 cycles then restart\n  if failed port 80 protocol http then restart",
+          "text_de": "check process nginx with pidfile /run/nginx.pid\n  start program = \"/bin/systemctl start nginx\"\n  stop program = \"/bin/systemctl stop nginx\"\n  if cpu > 80% for 5 cycles then restart\n  if failed port 80 protocol http then restart",
+          "correct": true
+        },
+        {
+          "text": "check host nginx with address 127.0.0.1\n  if cpu > 80% then alert",
+          "text_de": "check host nginx with address 127.0.0.1\n  if cpu > 80% then alert"
+        },
+        {
+          "text": "check system nginx\n  if loadavg (1min) > 80 then restart",
+          "text_de": "check system nginx\n  if loadavg (1min) > 80 then restart"
+        },
+        {
+          "text": "check file nginx with path /usr/sbin/nginx\n  if changed checksum then restart",
+          "text_de": "check file nginx with path /usr/sbin/nginx\n  if changed checksum then restart"
+        },
+        {
+          "text": "check program nginx with path /bin/true\n  if status != 0 then restart",
+          "text_de": "check program nginx with path /bin/true\n  if status != 0 then restart"
+        }
+      ],
+      "explanation_de": "check process überwacht einen Prozess über PID-Datei oder Matching; Bedingungen wie cpu, memory, failed port mit Protokolltest lösen Aktionen (restart, alert, exec) aus. check system gilt für den Host, check file für Dateien.",
+      "reference": "monit(1), Service checks",
+      "terms": [
+        {
+          "term": "consecutive cycles",
+          "de": "aufeinanderfolgende Zyklen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.2-01",
+      "objective": "364.2",
+      "type": "single",
+      "question": "A RAID 1 array /dev/md0 with two disks should be converted into a RAID 5 array with three disks without losing data. Which command sequence is correct?",
+      "question_de": "Ein RAID-1-Array /dev/md0 mit zwei Platten soll ohne Datenverlust in ein RAID-5-Array mit drei Platten umgewandelt werden. Welche Befehlsfolge ist richtig?",
+      "choices": [
+        {
+          "text": "mdadm --grow /dev/md0 --level=5 (becomes a degraded two-disk RAID 5); mdadm /dev/md0 --add /dev/sdd; mdadm --grow /dev/md0 --raid-devices=3",
+          "text_de": "mdadm --grow /dev/md0 --level=5 (wird ein degradiertes RAID 5 mit zwei Platten); mdadm /dev/md0 --add /dev/sdd; mdadm --grow /dev/md0 --raid-devices=3",
+          "correct": true
+        },
+        {
+          "text": "mdadm --stop /dev/md0; mdadm --create /dev/md0 --level=5 --raid-devices=3 /dev/sdb /dev/sdc /dev/sdd",
+          "text_de": "mdadm --stop /dev/md0; mdadm --create /dev/md0 --level=5 --raid-devices=3 /dev/sdb /dev/sdc /dev/sdd"
+        },
+        {
+          "text": "mdadm --assemble --level=5 /dev/md0 /dev/sdd",
+          "text_de": "mdadm --assemble --level=5 /dev/md0 /dev/sdd"
+        },
+        {
+          "text": "mdadm /dev/md0 --add /dev/sdd --level=5",
+          "text_de": "mdadm /dev/md0 --add /dev/sdd --level=5"
+        },
+        {
+          "text": "echo raid5 > /sys/block/md0/md/level",
+          "text_de": "echo raid5 > /sys/block/md0/md/level"
+        }
+      ],
+      "explanation_de": "mdadm --grow kann den Level ändern (RAID 1 → RAID 5 mit zwei Geräten entspricht einem Spiegel) und danach mit zusätzlicher Platte die Gerätezahl erhöhen; das Reshape läuft im Betrieb, /proc/mdstat zeigt den Fortschritt. --create würde die Daten zerstören.",
+      "reference": "mdadm(8), GROW MODE",
+      "terms": [
+        {
+          "term": "convert",
+          "de": "umwandeln"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.2-02",
+      "objective": "364.2",
+      "type": "single",
+      "question": "Which mdadm.conf setting and daemon ensure that an administrator is notified by e-mail when a disk in any software RAID array fails?",
+      "question_de": "Welche mdadm.conf-Einstellung und welcher Dienst sorgen dafür, dass ein Administrator per E-Mail benachrichtigt wird, wenn eine Platte in einem Software-RAID-Array ausfällt?",
+      "choices": [
+        {
+          "text": "MAILADDR admin@example.org in /etc/mdadm/mdadm.conf and the mdmonitor service (mdadm --monitor --scan)",
+          "text_de": "MAILADDR admin@example.org in /etc/mdadm/mdadm.conf und der Dienst mdmonitor (mdadm --monitor --scan)",
+          "correct": true
+        },
+        {
+          "text": "ARRAY /dev/md0 level=raid1 num-devices=2",
+          "text_de": "ARRAY /dev/md0 level=raid1 num-devices=2"
+        },
+        {
+          "text": "smartd with -m admin@example.org",
+          "text_de": "smartd mit -m admin@example.org"
+        },
+        {
+          "text": "A cron job running cat /proc/mdstat",
+          "text_de": "Ein Cron-Job, der cat /proc/mdstat ausführt"
+        },
+        {
+          "text": "AUTO +all in mdadm.conf",
+          "text_de": "AUTO +all in mdadm.conf"
+        }
+      ],
+      "explanation_de": "mdadm --monitor beobachtet Arrays und meldet Ereignisse (Fail, DegradedArray, SpareActive) per Mail an MAILADDR oder an ein PROGRAM. smartd überwacht Platten-SMART-Werte, nicht den RAID-Zustand.",
+      "reference": "mdadm(8), MONITOR MODE; mdadm.conf(5)",
+      "terms": [
+        {
+          "term": "notified",
+          "de": "benachrichtigt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.3-01",
+      "objective": "364.3",
+      "type": "single",
+      "question": "A logical volume should be created across two physical volumes so that reads and writes are distributed over both disks for performance. Which command does this?",
+      "question_de": "Ein logisches Volume soll über zwei Physical Volumes angelegt werden, so dass Lese- und Schreibzugriffe zur Leistungssteigerung auf beide Platten verteilt werden. Welcher Befehl leistet das?",
+      "choices": [
+        {
+          "text": "lvcreate -L 100G -i 2 -I 64 -n fast vg0",
+          "text_de": "lvcreate -L 100G -i 2 -I 64 -n fast vg0",
+          "correct": true
+        },
+        {
+          "text": "lvcreate -L 100G -m 1 -n fast vg0",
+          "text_de": "lvcreate -L 100G -m 1 -n fast vg0"
+        },
+        {
+          "text": "lvcreate -L 100G -n fast vg0 /dev/sdb /dev/sdc",
+          "text_de": "lvcreate -L 100G -n fast vg0 /dev/sdb /dev/sdc"
+        },
+        {
+          "text": "lvcreate --type raid1 -L 100G -n fast vg0",
+          "text_de": "lvcreate --type raid1 -L 100G -n fast vg0"
+        },
+        {
+          "text": "vgcreate -s 64 vg0 /dev/sdb /dev/sdc",
+          "text_de": "vgcreate -s 64 vg0 /dev/sdb /dev/sdc"
+        }
+      ],
+      "explanation_de": "-i (stripes) und -I (Stripe-Größe in KB) erzeugen ein gestreiftes Volume. Ohne -i verteilt LVM linear (erst PV 1, dann PV 2). -m 1 und --type raid1 spiegeln, was Redundanz statt Durchsatz bringt.",
+      "reference": "lvcreate(8), --stripes",
+      "terms": [
+        {
+          "term": "distributed",
+          "de": "verteilt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.3-02",
+      "objective": "364.3",
+      "type": "single",
+      "question": "A thin pool is 95 % full and the thin volumes keep growing. Which configuration lets LVM extend the pool automatically from free space in the volume group?",
+      "question_de": "Ein Thin-Pool ist zu 95 % belegt und die Thin-Volumes wachsen weiter. Welche Konfiguration lässt LVM den Pool automatisch aus freiem Platz der Volume Group erweitern?",
+      "choices": [
+        {
+          "text": "thin_pool_autoextend_threshold = 80 and thin_pool_autoextend_percent = 20 in the activation section of /etc/lvm/lvm.conf (with dmeventd running)",
+          "text_de": "thin_pool_autoextend_threshold = 80 und thin_pool_autoextend_percent = 20 im Abschnitt activation von /etc/lvm/lvm.conf (bei laufendem dmeventd)",
+          "correct": true
+        },
+        {
+          "text": "lvextend --use-policies on every thin volume",
+          "text_de": "lvextend --use-policies auf jedes Thin-Volume"
+        },
+        {
+          "text": "vgchange --thin-autogrow vg0",
+          "text_de": "vgchange --thin-autogrow vg0"
+        },
+        {
+          "text": "lvconvert --thinpool vg0/pool --autoextend",
+          "text_de": "lvconvert --thinpool vg0/pool --autoextend"
+        },
+        {
+          "text": "Setting snapshot_autoextend_threshold = 80",
+          "text_de": "snapshot_autoextend_threshold = 80 setzen"
+        }
+      ],
+      "explanation_de": "dmeventd überwacht Thin-Pools; überschreitet die Belegung den Schwellwert, erweitert LVM den Pool um den angegebenen Prozentsatz, solange die VG Platz hat. Ein voller Pool führt zu I/O-Fehlern in allen Thin-Volumes. snapshot_autoextend gilt für klassische Snapshots.",
+      "reference": "lvm.conf(5); lvmthin(7)",
+      "terms": [
+        {
+          "term": "keep growing",
+          "de": "wachsen weiter"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.3-03",
+      "objective": "364.3",
+      "type": "single",
+      "question": "A classic (thick) LVM snapshot of a 50 GB volume was created with 2 GB of snapshot space. After a large data load, lvs shows the snapshot as invalid. Why, and how can this be avoided?",
+      "question_de": "Ein klassischer (Thick-)LVM-Snapshot eines 50-GB-Volumes wurde mit 2 GB Snapshot-Platz angelegt. Nach einer großen Datenladung zeigt lvs den Snapshot als ungültig. Warum, und wie lässt sich das vermeiden?",
+      "choices": [
+        {
+          "text": "The copy-on-write area filled up because more than 2 GB of the origin changed; allocate more space, enable snapshot_autoextend in lvm.conf, or use thin snapshots.",
+          "text_de": "Der Copy-on-Write-Bereich ist voll, weil sich mehr als 2 GB des Ursprungs geändert haben; mehr Platz zuweisen, snapshot_autoextend in lvm.conf aktivieren oder Thin-Snapshots verwenden.",
+          "correct": true
+        },
+        {
+          "text": "Snapshots expire after 24 hours by default.",
+          "text_de": "Snapshots laufen standardmäßig nach 24 Stunden ab."
+        },
+        {
+          "text": "The origin volume was mounted read-only.",
+          "text_de": "Das Ursprungs-Volume war schreibgeschützt eingehängt."
+        },
+        {
+          "text": "The snapshot must be the same size as the origin, always.",
+          "text_de": "Der Snapshot muss immer so groß sein wie der Ursprung."
+        },
+        {
+          "text": "lvconvert --merge was run accidentally.",
+          "text_de": "lvconvert --merge wurde versehentlich ausgeführt."
+        }
+      ],
+      "explanation_de": "Thick-Snapshots speichern die alten Blöcke geänderter Bereiche; ist der Platz erschöpft, wird der Snapshot ungültig und muss entfernt werden. lvs zeigt Data% zur Überwachung. Thin-Snapshots teilen sich den Pool und wachsen flexibel.",
+      "reference": "lvmthin(7); lvcreate(8), --snapshot",
+      "terms": [
+        {
+          "term": "invalid",
+          "de": "ungültig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.4-01",
+      "objective": "364.4",
+      "type": "single",
+      "question": "Which bonding option makes the bond detect link failures of its slaves every 100 ms using the MII status, and why is it important?",
+      "question_de": "Welche Bonding-Option lässt den Bond Verbindungsausfälle seiner Slaves alle 100 ms über den MII-Status erkennen, und warum ist das wichtig?",
+      "choices": [
+        {
+          "text": "miimon=100; without link monitoring the bond never notices a failed slave and keeps sending traffic into the dead link.",
+          "text_de": "miimon=100; ohne Link-Überwachung bemerkt der Bond einen ausgefallenen Slave nicht und sendet weiter in die tote Leitung.",
+          "correct": true
+        },
+        {
+          "text": "updelay=100; it delays the failover by 100 ms.",
+          "text_de": "updelay=100; es verzögert den Failover um 100 ms."
+        },
+        {
+          "text": "lacp_rate=fast; it enables MII polling.",
+          "text_de": "lacp_rate=fast; es aktiviert MII-Polling."
+        },
+        {
+          "text": "xmit_hash_policy=layer3+4; it detects failures by hashing.",
+          "text_de": "xmit_hash_policy=layer3+4; es erkennt Ausfälle per Hashing."
+        },
+        {
+          "text": "primary=eth0; it monitors eth0 only.",
+          "text_de": "primary=eth0; es überwacht nur eth0."
+        }
+      ],
+      "explanation_de": "miimon (oder alternativ arp_interval/arp_ip_target) ist die Grundlage jeder Ausfallerkennung im Bond. updelay/downdelay entprellen Zustandswechsel, lacp_rate betrifft LACP-Pakete, xmit_hash_policy die Verteilung, primary den bevorzugten Slave bei active-backup.",
+      "reference": "Kernel-Dokumentation networking/bonding",
+      "terms": [
+        {
+          "term": "link failure",
+          "de": "Verbindungsausfall"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.4-02",
+      "objective": "364.4",
+      "type": "single",
+      "question": "On a Debian system using ifupdown, which /etc/network/interfaces stanza defines an active-backup bond of eth0 and eth1 with a static address?",
+      "question_de": "Welcher Abschnitt in /etc/network/interfaces definiert auf einem Debian-System mit ifupdown einen active-backup-Bond aus eth0 und eth1 mit statischer Adresse?",
+      "choices": [
+        {
+          "text": "auto bond0\niface bond0 inet static\n    address 192.168.10.5/24\n    bond-slaves eth0 eth1\n    bond-mode active-backup\n    bond-miimon 100\n    bond-primary eth0",
+          "text_de": "auto bond0\niface bond0 inet static\n    address 192.168.10.5/24\n    bond-slaves eth0 eth1\n    bond-mode active-backup\n    bond-miimon 100\n    bond-primary eth0",
+          "correct": true
+        },
+        {
+          "text": "auto eth0\niface eth0 inet static\n    bond bond0 active-backup",
+          "text_de": "auto eth0\niface eth0 inet static\n    bond bond0 active-backup"
+        },
+        {
+          "text": "BONDING_OPTS=\"mode=active-backup miimon=100\" in /etc/network/interfaces",
+          "text_de": "BONDING_OPTS=\"mode=active-backup miimon=100\" in /etc/network/interfaces"
+        },
+        {
+          "text": "[NetDev] Name=bond0 Kind=bond in /etc/network/interfaces",
+          "text_de": "[NetDev] Name=bond0 Kind=bond in /etc/network/interfaces"
+        },
+        {
+          "text": "nmcli con add type bond ifname bond0 mode active-backup written into interfaces",
+          "text_de": "nmcli con add type bond ifname bond0 mode active-backup in interfaces eingetragen"
+        }
+      ],
+      "explanation_de": "ifupdown nutzt die bond-*-Optionen des Pakets ifenslave im Bond-Abschnitt. BONDING_OPTS gehört zu Red-Hat-ifcfg-Dateien, [NetDev] zu systemd-networkd, nmcli zu NetworkManager.",
+      "reference": "interfaces(5); ifenslave-Dokumentation",
+      "terms": [
+        {
+          "term": "stanza",
+          "de": "Abschnitt (Konfigurationsblock)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.4-03",
+      "objective": "364.4",
+      "type": "single",
+      "question": "A server is connected to two switches with a bond in mode 802.3ad. The bond shows both slaves up but throughput never exceeds one link and some flows fail. What is the most likely cause?",
+      "question_de": "Ein Server ist mit einem Bond im Modus 802.3ad an zwei Switches angeschlossen. Der Bond zeigt beide Slaves als up, der Durchsatz übersteigt aber nie eine Leitung und manche Flows scheitern. Was ist die wahrscheinlichste Ursache?",
+      "choices": [
+        {
+          "text": "The two switches do not form a single logical switch (no MLAG/stack), so LACP cannot aggregate across them; use one switch or a stacked pair, or switch to active-backup.",
+          "text_de": "Die beiden Switches bilden keinen gemeinsamen logischen Switch (kein MLAG/Stack), deshalb kann LACP nicht über beide aggregieren; einen Switch oder ein gestacktes Paar nutzen oder auf active-backup wechseln.",
+          "correct": true
+        },
+        {
+          "text": "miimon is set too high.",
+          "text_de": "miimon ist zu hoch eingestellt."
+        },
+        {
+          "text": "The MTU of the bond is 1500.",
+          "text_de": "Die MTU des Bonds ist 1500."
+        },
+        {
+          "text": "VLAN tagging is enabled on the bond.",
+          "text_de": "VLAN-Tagging ist auf dem Bond aktiviert."
+        },
+        {
+          "text": "The bond lacks an IPv6 address.",
+          "text_de": "Dem Bond fehlt eine IPv6-Adresse."
+        }
+      ],
+      "explanation_de": "802.3ad verhandelt eine LAG mit einem Partner; zwei unabhängige Switches haben verschiedene System-IDs, so dass nur ein Aggregator aktiv wird oder Pakete falsch laufen. Für Switch-Redundanz ohne MLAG ist active-backup der sichere Modus.",
+      "reference": "Kernel-Dokumentation networking/bonding, 802.3ad",
+      "terms": [
+        {
+          "term": "exceed",
+          "de": "überschreiten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.4-04",
+      "objective": "364.4",
+      "type": "single",
+      "question": "A server needs access to VLAN 10 and VLAN 20 over one bonded uplink with persistent configuration via systemd-networkd. Which files are required?",
+      "question_de": "Ein Server braucht Zugriff auf VLAN 10 und VLAN 20 über einen gebündelten Uplink mit dauerhafter Konfiguration per systemd-networkd. Welche Dateien sind erforderlich?",
+      "choices": [
+        {
+          "text": "bond0.netdev, .network files binding the slaves to bond0, vlan10.netdev and vlan20.netdev with [VLAN] Id=, a bond0.network listing VLAN=vlan10 and VLAN=vlan20, and .network files with addresses for vlan10 and vlan20",
+          "text_de": "bond0.netdev, .network-Dateien, die die Slaves an bond0 binden, vlan10.netdev und vlan20.netdev mit [VLAN] Id=, eine bond0.network mit VLAN=vlan10 und VLAN=vlan20 sowie .network-Dateien mit Adressen für vlan10 und vlan20",
+          "correct": true
+        },
+        {
+          "text": "One bond0.network with Address= lines for both VLANs",
+          "text_de": "Eine bond0.network mit Address=-Zeilen für beide VLANs"
+        },
+        {
+          "text": "/etc/vlans with 10 and 20 and a reboot",
+          "text_de": "/etc/vlans mit 10 und 20 und ein Neustart"
+        },
+        {
+          "text": "vconfig add bond0 10 in /etc/rc.local",
+          "text_de": "vconfig add bond0 10 in /etc/rc.local"
+        },
+        {
+          "text": "ifcfg-bond0.10 and ifcfg-bond0.20 in /etc/systemd/network/",
+          "text_de": "ifcfg-bond0.10 und ifcfg-bond0.20 in /etc/systemd/network/"
+        }
+      ],
+      "explanation_de": "networkd beschreibt virtuelle Geräte in .netdev (Kind=bond, Kind=vlan) und deren Zuordnung in .network: der Elternlink nennt die VLANs mit VLAN=, jedes VLAN-Gerät erhält seine Adresse in einer eigenen .network. vconfig ist veraltet, ifcfg gehört zu den Red-Hat-Skripten.",
+      "reference": "systemd.netdev(5); systemd.network(5)",
+      "terms": [
+        {
+          "term": "uplink",
+          "de": "Uplink, Anbindung nach oben"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "306-erg-364.4-05",
+      "objective": "364.4",
+      "type": "single",
+      "question": "A site has two internet uplinks via different providers and wants its public prefix to remain reachable if either provider fails. Which routing protocol and prerequisite does this require?",
+      "question_de": "Ein Standort hat zwei Internetanbindungen über verschiedene Provider und möchte, dass sein öffentliches Präfix erreichbar bleibt, wenn einer der Provider ausfällt. Welches Routingprotokoll und welche Voraussetzung sind dafür nötig?",
+      "choices": [
+        {
+          "text": "BGP sessions with both providers, announcing a provider-independent prefix with an own AS number (e.g. with FRR/bird on the edge routers)",
+          "text_de": "BGP-Sitzungen mit beiden Providern und Ankündigung eines providerunabhängigen Präfixes mit eigener AS-Nummer (z. B. mit FRR/bird auf den Edge-Routern)",
+          "correct": true
+        },
+        {
+          "text": "VRRP between the two provider routers",
+          "text_de": "VRRP zwischen den beiden Provider-Routern"
+        },
+        {
+          "text": "OSPF with the providers",
+          "text_de": "OSPF mit den Providern"
+        },
+        {
+          "text": "A bonding interface in mode balance-rr across both uplinks",
+          "text_de": "Ein Bonding-Interface im Modus balance-rr über beide Uplinks"
+        },
+        {
+          "text": "RSTP on the border switches",
+          "text_de": "RSTP auf den Grenz-Switches"
+        }
+      ],
+      "explanation_de": "Nur BGP tauscht Erreichbarkeit zwischen autonomen Systemen aus; mit PI-Adressraum und eigener ASN wird das Präfix über beide Provider angekündigt. VRRP und RSTP wirken im lokalen Netz, OSPF ist ein Interior Gateway Protocol, Bonding setzt einen gemeinsamen Partner voraus.",
+      "reference": "Prüfungsziel 364.4, BGP; FRRouting-Dokumentation",
+      "terms": [
+        {
+          "term": "prefix",
+          "de": "Präfix, Adressbereich"
+        }
+      ],
+      "difficulty": 2
+    }
+  ]
+}

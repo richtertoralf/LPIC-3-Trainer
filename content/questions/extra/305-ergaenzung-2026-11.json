@@ -1,0 +1,1965 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "305",
+  "supplementary": true,
+  "source": "LPIC-3 Trainer Projekt, Ergänzungspool 2026-11",
+  "source_url": "https://github.com/richtertoralf/LPIC-3-Trainer",
+  "exam_code": "305-300",
+  "exam_version": "3.0",
+  "rights": "cleared",
+  "license": "CC BY-SA 4.0. Eigene Fragen des Projekts nach den offiziellen LPI-Prüfungszielen 3.0; externe Fragensammlungen dienten nur der Themenfindung. Zusatzfragen: Freigabe durch Betreuer oder Administrator nötig.",
+  "author": "LPIC-3 Trainer Projekt",
+  "questions": [
+    {
+      "id": "305-erg-351.1-01",
+      "objective": "351.1",
+      "type": "single",
+      "question": "A KVM host runs a guest that itself should run KVM virtual machines (nested virtualization). Which host-side setting is required before starting the guest?",
+      "question_de": "Ein KVM-Host betreibt einen Gast, der selbst KVM-VMs ausführen soll (verschachtelte Virtualisierung). Welche Einstellung ist auf dem Host vor dem Start des Gastes erforderlich?",
+      "choices": [
+        {
+          "text": "Load the kvm_intel or kvm_amd module with the option nested=1 and pass the virtualization CPU flags to the guest (e.g. host-passthrough).",
+          "text_de": "Das Modul kvm_intel oder kvm_amd mit der Option nested=1 laden und dem Gast die Virtualisierungs-CPU-Flags durchreichen (z. B. host-passthrough).",
+          "correct": true
+        },
+        {
+          "text": "Enable kernel.randomize_va_space = 2 on the host.",
+          "text_de": "kernel.randomize_va_space = 2 auf dem Host aktivieren."
+        },
+        {
+          "text": "Start the guest with -accel tcg.",
+          "text_de": "Den Gast mit -accel tcg starten."
+        },
+        {
+          "text": "Install Xen inside the guest; KVM cannot be nested.",
+          "text_de": "Xen im Gast installieren; KVM lässt sich nicht verschachteln."
+        },
+        {
+          "text": "Give the guest more than four vCPUs.",
+          "text_de": "Dem Gast mehr als vier vCPUs geben."
+        }
+      ],
+      "explanation_de": "Nested Virtualization braucht nested=1 (sichtbar unter /sys/module/kvm_intel/parameters/nested) und ein CPU-Modell, das vmx/svm an den Gast weitergibt. TCG ist reine Emulation ohne KVM.",
+      "reference": "Kernel-Dokumentation virt/kvm/nested-vmx",
+      "terms": [
+        {
+          "term": "nested",
+          "de": "verschachtelt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.1-02",
+      "objective": "351.1",
+      "type": "single",
+      "question": "A host with 32 GB RAM runs eight VMs with 8 GB each. Which mechanism allows this memory overcommitment to work in practice with KVM?",
+      "question_de": "Ein Host mit 32 GB RAM betreibt acht VMs mit je 8 GB. Welcher Mechanismus lässt diese Speicherüberbuchung mit KVM in der Praxis funktionieren?",
+      "choices": [
+        {
+          "text": "Memory ballooning (virtio-balloon) and kernel same-page merging (KSM) reclaim and share memory the guests do not actively use.",
+          "text_de": "Memory Ballooning (virtio-balloon) und Kernel Same-page Merging (KSM) gewinnen Speicher zurück und teilen Seiten, die Gäste nicht aktiv nutzen.",
+          "correct": true
+        },
+        {
+          "text": "Each guest is paused when it exceeds its share.",
+          "text_de": "Jeder Gast wird pausiert, sobald er seinen Anteil überschreitet."
+        },
+        {
+          "text": "The guests must use paravirtualized kernels that allocate no memory.",
+          "text_de": "Die Gäste müssen paravirtualisierte Kernel verwenden, die keinen Speicher belegen."
+        },
+        {
+          "text": "KVM compresses guest memory in the CPU cache.",
+          "text_de": "KVM komprimiert den Gastspeicher im CPU-Cache."
+        },
+        {
+          "text": "It cannot work; libvirt refuses to start the ninth VM.",
+          "text_de": "Es kann nicht funktionieren; libvirt verweigert den Start."
+        }
+      ],
+      "explanation_de": "Der Balloon-Treiber gibt Speicher des Gastes an den Host zurück (virsh setmem), KSM führt identische Seiten zusammen. Überbuchung birgt Risiken: bei echter Vollauslastung lagert der Host aus oder der OOM-Killer greift.",
+      "reference": "libvirt-Dokumentation, memory balloon; ksm(8)",
+      "terms": [
+        {
+          "term": "overcommitment",
+          "de": "Überbuchung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.1-03",
+      "objective": "351.1",
+      "type": "single",
+      "question": "What distinguishes a VM clone from a VM template in a virtualization environment?",
+      "question_de": "Was unterscheidet einen VM-Klon von einer VM-Vorlage in einer Virtualisierungsumgebung?",
+      "choices": [
+        {
+          "text": "A clone is an independent, runnable copy of a VM; a template is a prepared, usually generalized image from which new VMs are created but which is not started itself.",
+          "text_de": "Ein Klon ist eine eigenständige, lauffähige Kopie einer VM; eine Vorlage ist ein vorbereitetes, meist generalisiertes Abbild, aus dem neue VMs erzeugt werden, das aber selbst nicht gestartet wird.",
+          "correct": true
+        },
+        {
+          "text": "A clone shares its disk with the original VM forever; a template is a full copy.",
+          "text_de": "Ein Klon teilt sich die Platte dauerhaft mit dem Original; eine Vorlage ist eine Vollkopie."
+        },
+        {
+          "text": "Templates can only be created with Vagrant.",
+          "text_de": "Vorlagen lassen sich nur mit Vagrant erzeugen."
+        },
+        {
+          "text": "A template keeps the original MAC address and host name; a clone must be sysprep'd.",
+          "text_de": "Eine Vorlage behält MAC-Adresse und Hostnamen; ein Klon muss mit sysprep bereinigt werden."
+        },
+        {
+          "text": "There is no difference.",
+          "text_de": "Es gibt keinen Unterschied."
+        }
+      ],
+      "explanation_de": "Vorlagen werden vor der Nutzung generalisiert (virt-sysprep: Host-SSH-Schlüssel, machine-id, Logs entfernen), damit Instanzen eindeutig sind. Klone (virt-clone) erhalten neue MAC-Adressen und UUIDs, sind aber sofort nutzbar.",
+      "reference": "virt-clone(1); virt-sysprep(1)",
+      "terms": [
+        {
+          "term": "generalized",
+          "de": "generalisiert, von instanzspezifischen Daten bereinigt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.1-04",
+      "objective": "351.1",
+      "type": "single",
+      "question": "A VMware virtual machine should be moved to a KVM host managed by libvirt, including conversion of the disk and driver adjustments in the guest. Which tool is designed for this?",
+      "question_de": "Eine VMware-VM soll auf einen von libvirt verwalteten KVM-Host verschoben werden, einschließlich Konvertierung der Platte und Treiberanpassung im Gast. Welches Werkzeug ist dafür gedacht?",
+      "choices": [
+        {
+          "text": "virt-v2v",
+          "text_de": "virt-v2v",
+          "correct": true
+        },
+        {
+          "text": "virt-p2v",
+          "text_de": "virt-p2v"
+        },
+        {
+          "text": "qemu-img convert alone",
+          "text_de": "qemu-img convert allein"
+        },
+        {
+          "text": "virt-clone",
+          "text_de": "virt-clone"
+        },
+        {
+          "text": "vagrant package",
+          "text_de": "vagrant package"
+        }
+      ],
+      "explanation_de": "virt-v2v konvertiert Gäste anderer Hypervisoren (VMware, Xen, OVA) nach KVM: Platte umwandeln, VirtIO-Treiber einrichten, libvirt-Definition anlegen. virt-p2v erfasst physische Rechner, qemu-img konvertiert nur das Image ohne Gastanpassung.",
+      "reference": "virt-v2v(1)",
+      "terms": [
+        {
+          "term": "adjustment",
+          "de": "Anpassung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.1-05",
+      "objective": "351.1",
+      "type": "single",
+      "question": "Which type of snapshot can be taken from a running VM so that the exact state including memory can be resumed later?",
+      "question_de": "Welche Art von Snapshot kann von einer laufenden VM erstellt werden, so dass der exakte Zustand einschließlich Speicher später fortgesetzt werden kann?",
+      "choices": [
+        {
+          "text": "A system checkpoint (internal snapshot with memory state), e.g. virsh snapshot-create-as without --disk-only",
+          "text_de": "Ein Systemprüfpunkt (interner Snapshot mit Speicherzustand), z. B. virsh snapshot-create-as ohne --disk-only",
+          "correct": true
+        },
+        {
+          "text": "A disk-only external snapshot",
+          "text_de": "Ein reiner Platten-Snapshot (external, disk-only)"
+        },
+        {
+          "text": "An LVM snapshot of the host's root file system",
+          "text_de": "Ein LVM-Snapshot des Root-Dateisystems des Hosts"
+        },
+        {
+          "text": "A copy of the XML definition",
+          "text_de": "Eine Kopie der XML-Definition"
+        },
+        {
+          "text": "A tar archive of /var/lib/libvirt/images",
+          "text_de": "Ein tar-Archiv von /var/lib/libvirt/images"
+        }
+      ],
+      "explanation_de": "Nur Snapshots mit Speicherzustand erlauben das Fortsetzen an exakt derselben Stelle; interne qcow2-Snapshots speichern Platte und RAM im Image. Disk-only-Snapshots entsprechen einem Stromausfall, die VM startet danach neu.",
+      "reference": "virsh(1), snapshot-create-as",
+      "terms": [
+        {
+          "term": "resume",
+          "de": "fortsetzen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.2-01",
+      "objective": "351.2",
+      "type": "single",
+      "question": "A Xen PV guest has 1 GB of memory and should receive 2 GB without a reboot. Which command and which prerequisite are required?",
+      "question_de": "Ein Xen-PV-Gast hat 1 GB Speicher und soll ohne Neustart 2 GB erhalten. Welcher Befehl und welche Voraussetzung sind nötig?",
+      "choices": [
+        {
+          "text": "xl mem-set vm1 2048; the guest configuration must define maxmem = 2048 or more",
+          "text_de": "xl mem-set vm1 2048; die Gastkonfiguration muss maxmem = 2048 oder mehr definieren",
+          "correct": true
+        },
+        {
+          "text": "xl config-update vm1 memory=2048",
+          "text_de": "xl config-update vm1 memory=2048"
+        },
+        {
+          "text": "xl mem-max vm1 2048 alone is sufficient",
+          "text_de": "xl mem-max vm1 2048 allein reicht"
+        },
+        {
+          "text": "Edit /etc/xen/vm1.cfg and run xl reload vm1",
+          "text_de": "/etc/xen/vm1.cfg bearbeiten und xl reload vm1 ausführen"
+        },
+        {
+          "text": "xentop -m 2048 vm1",
+          "text_de": "xentop -m 2048 vm1"
+        }
+      ],
+      "explanation_de": "Ballooning erlaubt Änderungen zwischen dem aktuellen Wert und maxmem; xl mem-set setzt den Zielwert, xl mem-max hebt die Obergrenze einer laufenden Domäne an, nutzt aber noch keinen Speicher. Die Konfigurationsdatei wirkt erst beim nächsten xl create.",
+      "reference": "xl(1), mem-set",
+      "terms": [
+        {
+          "term": "prerequisite",
+          "de": "Voraussetzung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.2-02",
+      "objective": "351.2",
+      "type": "single",
+      "question": "Which line in a Xen guest configuration attaches the guest to the Dom0 bridge xenbr0 with a fixed MAC address?",
+      "question_de": "Welche Zeile in einer Xen-Gastkonfiguration verbindet den Gast mit der Dom0-Brücke xenbr0 und einer festen MAC-Adresse?",
+      "choices": [
+        {
+          "text": "vif = ['mac=00:16:3e:11:22:33,bridge=xenbr0']",
+          "text_de": "vif = ['mac=00:16:3e:11:22:33,bridge=xenbr0']",
+          "correct": true
+        },
+        {
+          "text": "network = 'xenbr0 00:16:3e:11:22:33'",
+          "text_de": "network = 'xenbr0 00:16:3e:11:22:33'"
+        },
+        {
+          "text": "nic = { bridge: xenbr0, mac: 00:16:3e:11:22:33 }",
+          "text_de": "nic = { bridge: xenbr0, mac: 00:16:3e:11:22:33 }"
+        },
+        {
+          "text": "disk = ['vif:xenbr0']",
+          "text_de": "disk = ['vif:xenbr0']"
+        },
+        {
+          "text": "bridge = 'xenbr0'; mac = '00:16:3e:11:22:33'",
+          "text_de": "bridge = 'xenbr0'; mac = '00:16:3e:11:22:33'"
+        }
+      ],
+      "explanation_de": "vif ist eine Liste virtueller Netzwerkschnittstellen; Schlüssel sind mac, bridge, ip, model (bei HVM) und script. Der Präfix 00:16:3e ist der Xen-OUI. disk beschreibt Blockgeräte.",
+      "reference": "xl-network-configuration(5)",
+      "terms": [
+        {
+          "term": "attach",
+          "de": "anbinden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.2-03",
+      "objective": "351.2",
+      "type": "single",
+      "question": "A Xen host must be rebooted for a kernel update. Which command preserves the full state of the guest db1 to disk so it can continue afterwards without a guest reboot?",
+      "question_de": "Ein Xen-Host muss für ein Kernel-Update neu gestartet werden. Welcher Befehl sichert den vollständigen Zustand des Gastes db1 auf Platte, damit er danach ohne Neustart des Gastes weiterläuft?",
+      "choices": [
+        {
+          "text": "xl save db1 /var/lib/xen/save/db1.sav, later xl restore /var/lib/xen/save/db1.sav",
+          "text_de": "xl save db1 /var/lib/xen/save/db1.sav, später xl restore /var/lib/xen/save/db1.sav",
+          "correct": true
+        },
+        {
+          "text": "xl pause db1",
+          "text_de": "xl pause db1"
+        },
+        {
+          "text": "xl shutdown db1 -w",
+          "text_de": "xl shutdown db1 -w"
+        },
+        {
+          "text": "xl snapshot db1",
+          "text_de": "xl snapshot db1"
+        },
+        {
+          "text": "xl migrate db1 localhost",
+          "text_de": "xl migrate db1 localhost"
+        }
+      ],
+      "explanation_de": "xl save schreibt Speicher und Zustand der Domäne in eine Datei und beendet sie; xl restore setzt sie fort. pause hält nur an, shutdown beendet das Gastsystem, migrate braucht einen zweiten Host. Ein xl snapshot-Befehl existiert nicht.",
+      "reference": "xl(1), save/restore",
+      "terms": [
+        {
+          "term": "preserve",
+          "de": "bewahren, sichern"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.3-01",
+      "objective": "351.3",
+      "type": "single",
+      "question": "qemu-system-x86_64 prints \"Could not access KVM kernel module: Permission denied\" for a normal user, although /dev/kvm exists. What is the usual fix?",
+      "question_de": "qemu-system-x86_64 meldet für einen normalen Benutzer „Could not access KVM kernel module: Permission denied“, obwohl /dev/kvm existiert. Was ist die übliche Lösung?",
+      "choices": [
+        {
+          "text": "Add the user to the group kvm (owner group of /dev/kvm) and log in again.",
+          "text_de": "Den Benutzer in die Gruppe kvm (Besitzergruppe von /dev/kvm) aufnehmen und neu anmelden.",
+          "correct": true
+        },
+        {
+          "text": "Load the module with modprobe kvm nested=1.",
+          "text_de": "Das Modul mit modprobe kvm nested=1 laden."
+        },
+        {
+          "text": "Enable VT-x in the BIOS.",
+          "text_de": "VT-x im BIOS aktivieren."
+        },
+        {
+          "text": "Start QEMU with -enable-kvm as root only; there is no other way.",
+          "text_de": "QEMU nur als root mit -enable-kvm starten; einen anderen Weg gibt es nicht."
+        },
+        {
+          "text": "Run chmod 777 /dev/kvm permanently.",
+          "text_de": "chmod 777 /dev/kvm dauerhaft setzen."
+        }
+      ],
+      "explanation_de": "udev setzt /dev/kvm auf root:kvm 0660; Mitglieder der Gruppe kvm dürfen beschleunigte VMs starten. Fehlt /dev/kvm ganz, sind Modul oder BIOS-Einstellung die Ursache. Weltweite Schreibrechte sind unnötig.",
+      "reference": "kvm(8); udev-Regeln der Distribution",
+      "terms": [
+        {
+          "term": "usual fix",
+          "de": "übliche Lösung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.3-02",
+      "objective": "351.3",
+      "type": "single",
+      "question": "A QEMU guest should be connected to the existing host bridge br0 via a tap device so that it gets an address from the LAN's DHCP server. Which command-line options are correct?",
+      "question_de": "Ein QEMU-Gast soll über ein tap-Gerät mit der vorhandenen Host-Brücke br0 verbunden werden, damit er eine Adresse vom DHCP-Server des LAN erhält. Welche Kommandozeilenoptionen sind richtig?",
+      "choices": [
+        {
+          "text": "-netdev bridge,id=net0,br=br0 -device virtio-net-pci,netdev=net0",
+          "text_de": "-netdev bridge,id=net0,br=br0 -device virtio-net-pci,netdev=net0",
+          "correct": true
+        },
+        {
+          "text": "-netdev user,id=net0 -device e1000,netdev=net0",
+          "text_de": "-netdev user,id=net0 -device e1000,netdev=net0"
+        },
+        {
+          "text": "-net nic -net bridge=br0",
+          "text_de": "-net nic -net bridge=br0"
+        },
+        {
+          "text": "-nic model=virtio,mac=br0",
+          "text_de": "-nic model=virtio,mac=br0"
+        },
+        {
+          "text": "-netdev socket,id=net0,listen=br0",
+          "text_de": "-netdev socket,id=net0,listen=br0"
+        }
+      ],
+      "explanation_de": "-netdev bridge nutzt den Helper qemu-bridge-helper (Brücke muss in /etc/qemu/bridge.conf erlaubt sein) und legt ein tap-Gerät in der Brücke an. user-Netzwerk ist NAT ohne LAN-Sichtbarkeit, socket verbindet QEMU-Instanzen untereinander.",
+      "reference": "qemu(1), -netdev bridge",
+      "terms": [
+        {
+          "term": "existing",
+          "de": "vorhanden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.3-03",
+      "objective": "351.3",
+      "type": "single",
+      "question": "A running QEMU instance was started with -monitor unix:/tmp/vm1.mon,server,nowait. Which command adds a second virtual disk /srv/data.qcow2 without stopping the guest?",
+      "question_de": "Eine laufende QEMU-Instanz wurde mit -monitor unix:/tmp/vm1.mon,server,nowait gestartet. Welcher Befehl fügt ohne Stopp des Gastes eine zweite virtuelle Platte /srv/data.qcow2 hinzu?",
+      "choices": [
+        {
+          "text": "Connect with socat - UNIX-CONNECT:/tmp/vm1.mon and issue drive_add 0 file=/srv/data.qcow2,if=none,id=d1 followed by device_add virtio-blk-pci,drive=d1",
+          "text_de": "Mit socat - UNIX-CONNECT:/tmp/vm1.mon verbinden und drive_add 0 file=/srv/data.qcow2,if=none,id=d1 gefolgt von device_add virtio-blk-pci,drive=d1 eingeben",
+          "correct": true
+        },
+        {
+          "text": "qemu-img attach /srv/data.qcow2 vm1",
+          "text_de": "qemu-img attach /srv/data.qcow2 vm1"
+        },
+        {
+          "text": "Restart QEMU with an additional -drive option",
+          "text_de": "QEMU mit einer zusätzlichen -drive-Option neu starten"
+        },
+        {
+          "text": "virsh attach-disk vm1 /srv/data.qcow2 vdb",
+          "text_de": "virsh attach-disk vm1 /srv/data.qcow2 vdb"
+        },
+        {
+          "text": "echo /srv/data.qcow2 > /tmp/vm1.mon",
+          "text_de": "echo /srv/data.qcow2 > /tmp/vm1.mon"
+        }
+      ],
+      "explanation_de": "Der QEMU-Monitor (HMP) erlaubt Hotplug: drive_add definiert das Backend, device_add das Gastgerät. virsh funktioniert nur bei libvirt-verwalteten Domänen; qemu-img kennt kein attach.",
+      "reference": "QEMU-Dokumentation, Monitor commands",
+      "terms": [
+        {
+          "term": "without stopping",
+          "de": "ohne anzuhalten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.3-04",
+      "objective": "351.3",
+      "type": "single",
+      "question": "For a quick test, a QEMU guest should boot from an image but must not change the image file. Which option provides this?",
+      "question_de": "Für einen schnellen Test soll ein QEMU-Gast von einem Image booten, die Imagedatei aber nicht verändern. Welche Option leistet das?",
+      "choices": [
+        {
+          "text": "-snapshot",
+          "text_de": "-snapshot",
+          "correct": true
+        },
+        {
+          "text": "-drive file=disk.qcow2,readonly=on",
+          "text_de": "-drive file=disk.qcow2,readonly=on"
+        },
+        {
+          "text": "-loadvm clean",
+          "text_de": "-loadvm clean"
+        },
+        {
+          "text": "-S",
+          "text_de": "-S"
+        },
+        {
+          "text": "-nodefaults",
+          "text_de": "-nodefaults"
+        }
+      ],
+      "explanation_de": "-snapshot schreibt alle Änderungen in temporäre Dateien, das Image bleibt unverändert; mit dem Monitorbefehl commit könnten sie übernommen werden. readonly=on lässt den Gast nicht schreiben und bricht meist den Boot, -S startet angehalten, -loadvm lädt einen Snapshot.",
+      "reference": "qemu(1), -snapshot",
+      "terms": [
+        {
+          "term": "quick test",
+          "de": "schneller Test"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-01",
+      "objective": "351.4",
+      "type": "single",
+      "question": "A new directory-based storage pool should be created under /srv/vmimages and started automatically at boot. Which virsh sequence is correct?",
+      "question_de": "Ein neuer verzeichnisbasierter Speicherpool soll unter /srv/vmimages angelegt werden und beim Booten automatisch starten. Welche virsh-Befehlsfolge ist richtig?",
+      "choices": [
+        {
+          "text": "virsh pool-define-as vmimages dir --target /srv/vmimages; virsh pool-build vmimages; virsh pool-start vmimages; virsh pool-autostart vmimages",
+          "text_de": "virsh pool-define-as vmimages dir --target /srv/vmimages; virsh pool-build vmimages; virsh pool-start vmimages; virsh pool-autostart vmimages",
+          "correct": true
+        },
+        {
+          "text": "virsh pool-create-as vmimages dir --target /srv/vmimages",
+          "text_de": "virsh pool-create-as vmimages dir --target /srv/vmimages"
+        },
+        {
+          "text": "virsh vol-create-as default vmimages 10G",
+          "text_de": "virsh vol-create-as default vmimages 10G"
+        },
+        {
+          "text": "mkdir /srv/vmimages; virsh pool-refresh default",
+          "text_de": "mkdir /srv/vmimages; virsh pool-refresh default"
+        },
+        {
+          "text": "virsh pool-start /srv/vmimages --persistent",
+          "text_de": "virsh pool-start /srv/vmimages --persistent"
+        }
+      ],
+      "explanation_de": "pool-define-as erzeugt eine dauerhafte Definition, pool-build legt das Verzeichnis an, pool-start aktiviert, pool-autostart sorgt für den Start beim Booten. pool-create-as erzeugt nur einen transienten Pool, der nach einem Neustart fehlt.",
+      "reference": "virsh(1), pool-define-as",
+      "terms": [
+        {
+          "term": "automatically at boot",
+          "de": "automatisch beim Systemstart"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-02",
+      "objective": "351.4",
+      "type": "single",
+      "question": "A libvirt NAT network \"lab\" should hand out addresses 192.168.77.100-150 to guests via DHCP and resolve guest names in the domain lab.test. Which XML snippet is correct?",
+      "question_de": "Ein libvirt-NAT-Netz „lab“ soll Gästen per DHCP die Adressen 192.168.77.100-150 zuteilen und Gastnamen in der Domäne lab.test auflösen. Welcher XML-Ausschnitt ist richtig?",
+      "choices": [
+        {
+          "text": "<network><name>lab</name><forward mode='nat'/><bridge name='virbr7'/><domain name='lab.test' localOnly='yes'/><ip address='192.168.77.1' netmask='255.255.255.0'><dhcp><range start='192.168.77.100' end='192.168.77.150'/></dhcp></ip></network>",
+          "text_de": "<network><name>lab</name><forward mode='nat'/><bridge name='virbr7'/><domain name='lab.test' localOnly='yes'/><ip address='192.168.77.1' netmask='255.255.255.0'><dhcp><range start='192.168.77.100' end='192.168.77.150'/></dhcp></ip></network>",
+          "correct": true
+        },
+        {
+          "text": "<network><name>lab</name><forward mode='bridge'/><dhcp range='192.168.77.100-150'/></network>",
+          "text_de": "<network><name>lab</name><forward mode='bridge'/><dhcp range='192.168.77.100-150'/></network>"
+        },
+        {
+          "text": "<network><name>lab</name><ip address='192.168.77.1'/><dnsmasq range='192.168.77.100,192.168.77.150'/></network>",
+          "text_de": "<network><name>lab</name><ip address='192.168.77.1'/><dnsmasq range='192.168.77.100,192.168.77.150'/></network>"
+        },
+        {
+          "text": "<network><name>lab</name><forward mode='nat'/><domain>lab.test</domain><dhcp start='100' end='150'/></network>",
+          "text_de": "<network><name>lab</name><forward mode='nat'/><domain>lab.test</domain><dhcp start='100' end='150'/></network>"
+        },
+        {
+          "text": "<interface type='network'><source network='lab'/><dhcp/></interface>",
+          "text_de": "<interface type='network'><source network='lab'/><dhcp/></interface>"
+        }
+      ],
+      "explanation_de": "libvirt startet für solche Netze eine dnsmasq-Instanz; DHCP-Bereich und DNS-Domäne stehen in <ip><dhcp><range> und <domain>. Definiert wird mit virsh net-define lab.xml, net-start und net-autostart. <interface> gehört in die Domänen-XML.",
+      "reference": "libvirt-Dokumentation, Network XML format",
+      "terms": [
+        {
+          "term": "hand out",
+          "de": "zuteilen, verteilen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-03",
+      "objective": "351.4",
+      "type": "single",
+      "question": "A running domain should receive two additional vCPUs immediately and keep them after the next reboot of the domain. Which command is correct, given the domain was defined with a maximum of 8 vCPUs and currently has 2?",
+      "question_de": "Eine laufende Domäne soll sofort zwei zusätzliche vCPUs erhalten und sie nach dem nächsten Neustart der Domäne behalten. Welcher Befehl ist richtig, wenn die Domäne mit maximal 8 vCPUs definiert wurde und derzeit 2 hat?",
+      "choices": [
+        {
+          "text": "virsh setvcpus vm1 4 --live --config",
+          "text_de": "virsh setvcpus vm1 4 --live --config",
+          "correct": true
+        },
+        {
+          "text": "virsh setvcpus vm1 4 --maximum",
+          "text_de": "virsh setvcpus vm1 4 --maximum"
+        },
+        {
+          "text": "virsh vcpupin vm1 4",
+          "text_de": "virsh vcpupin vm1 4"
+        },
+        {
+          "text": "virsh setvcpus vm1 +2",
+          "text_de": "virsh setvcpus vm1 +2"
+        },
+        {
+          "text": "virsh edit vm1 and change <vcpu> while running",
+          "text_de": "virsh edit vm1 und <vcpu> im laufenden Betrieb ändern"
+        }
+      ],
+      "explanation_de": "setvcpus setzt die aktuelle Anzahl bis zum definierten Maximum; --live wirkt sofort (Hotplug), --config dauerhaft. --maximum ändert nur die Obergrenze für den nächsten Start, vcpupin bindet vCPUs an Host-CPUs. virsh edit wirkt erst nach dem Neustart.",
+      "reference": "virsh(1), setvcpus",
+      "terms": [
+        {
+          "term": "immediately",
+          "de": "sofort"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-04",
+      "objective": "351.4",
+      "type": "single",
+      "question": "Before a risky change, the administrator wants an external disk snapshot of a running domain so that the original qcow2 stays untouched and the VM continues writing to a new overlay. Which command does this?",
+      "question_de": "Vor einer riskanten Änderung möchte der Administrator einen externen Platten-Snapshot einer laufenden Domäne, so dass die ursprüngliche qcow2-Datei unangetastet bleibt und die VM in ein neues Overlay weiterschreibt. Welcher Befehl leistet das?",
+      "choices": [
+        {
+          "text": "virsh snapshot-create-as vm1 pre-change --disk-only --atomic",
+          "text_de": "virsh snapshot-create-as vm1 pre-change --disk-only --atomic",
+          "correct": true
+        },
+        {
+          "text": "virsh snapshot-create-as vm1 pre-change --memspec file=/tmp/mem",
+          "text_de": "virsh snapshot-create-as vm1 pre-change --memspec file=/tmp/mem"
+        },
+        {
+          "text": "qemu-img snapshot -c pre-change /var/lib/libvirt/images/vm1.qcow2",
+          "text_de": "qemu-img snapshot -c pre-change /var/lib/libvirt/images/vm1.qcow2"
+        },
+        {
+          "text": "virsh save vm1 /tmp/pre-change.sav",
+          "text_de": "virsh save vm1 /tmp/pre-change.sav"
+        },
+        {
+          "text": "cp /var/lib/libvirt/images/vm1.qcow2 /backup/",
+          "text_de": "cp /var/lib/libvirt/images/vm1.qcow2 /backup/"
+        }
+      ],
+      "explanation_de": "--disk-only erzeugt externe Snapshots: das bisherige Image wird Backing File, die Domäne schreibt in eine neue Datei. qemu-img snapshot darf nicht auf ein von einer laufenden VM genutztes Image angewendet werden; cp im Betrieb ist inkonsistent. Zum Zusammenführen dient virsh blockcommit.",
+      "reference": "virsh(1), snapshot-create-as --disk-only",
+      "terms": [
+        {
+          "term": "untouched",
+          "de": "unangetastet"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-05",
+      "objective": "351.4",
+      "type": "single",
+      "question": "libvirt refuses to start a domain with the message that the disk image is locked by another process. Which libvirt component is responsible, and what is its purpose?",
+      "question_de": "libvirt verweigert den Start einer Domäne mit der Meldung, das Disk-Image sei von einem anderen Prozess gesperrt. Welche libvirt-Komponente ist dafür verantwortlich, und welchen Zweck hat sie?",
+      "choices": [
+        {
+          "text": "virtlockd; it holds locks on disk images so that the same image cannot be opened writable by two domains or hosts at once.",
+          "text_de": "virtlockd; er hält Sperren auf Disk-Images, damit dasselbe Image nicht von zwei Domänen oder Hosts gleichzeitig beschreibbar geöffnet wird.",
+          "correct": true
+        },
+        {
+          "text": "virtlogd; it writes the console logs of domains.",
+          "text_de": "virtlogd; er schreibt die Konsolenprotokolle der Domänen."
+        },
+        {
+          "text": "libvirt-guests; it suspends domains at shutdown.",
+          "text_de": "libvirt-guests; er pausiert Domänen beim Herunterfahren."
+        },
+        {
+          "text": "dnsmasq; it manages the DHCP leases of virtual networks.",
+          "text_de": "dnsmasq; er verwaltet die DHCP-Leases virtueller Netze."
+        },
+        {
+          "text": "virt-manager; it caches image metadata.",
+          "text_de": "virt-manager; er speichert Image-Metadaten zwischen."
+        }
+      ],
+      "explanation_de": "virtlockd verhindert Datenverlust durch doppeltes Öffnen, auch über Hosts hinweg bei gemeinsamem Speicher (lock_manager = \"lockd\" in qemu.conf). virtlogd protokolliert Konsolenausgaben, libvirt-guests behandelt Domänen beim Host-Shutdown.",
+      "reference": "virtlockd(8)",
+      "terms": [
+        {
+          "term": "locked",
+          "de": "gesperrt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-06",
+      "objective": "351.4",
+      "type": "single",
+      "question": "Which command shows the IP addresses of a running domain as reported by the QEMU guest agent, even when the domain uses a bridged interface without libvirt DHCP?",
+      "question_de": "Welcher Befehl zeigt die IP-Adressen einer laufenden Domäne, wie sie der QEMU Guest Agent meldet, auch wenn die Domäne eine gebrückte Schnittstelle ohne libvirt-DHCP nutzt?",
+      "choices": [
+        {
+          "text": "virsh domifaddr vm1 --source agent",
+          "text_de": "virsh domifaddr vm1 --source agent",
+          "correct": true
+        },
+        {
+          "text": "virsh net-dhcp-leases default",
+          "text_de": "virsh net-dhcp-leases default"
+        },
+        {
+          "text": "virsh domiflist vm1",
+          "text_de": "virsh domiflist vm1"
+        },
+        {
+          "text": "virsh domifstat vm1 vnet0",
+          "text_de": "virsh domifstat vm1 vnet0"
+        },
+        {
+          "text": "arp -a | grep vm1",
+          "text_de": "arp -a | grep vm1"
+        }
+      ],
+      "explanation_de": "domifaddr fragt standardmäßig die DHCP-Leases von libvirt ab (--source lease); mit --source agent liefert der Guest Agent die Adressen aller Schnittstellen, --source arp nutzt die ARP-Tabelle des Hosts. domiflist zeigt nur MAC und Quelle, domifstat Zähler.",
+      "reference": "virsh(1), domifaddr",
+      "terms": [
+        {
+          "term": "reported by",
+          "de": "gemeldet von"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.4-07",
+      "objective": "351.4",
+      "type": "single",
+      "question": "A live migration between two KVM hosts fails with \"unsupported configuration: CPU feature not found\". What is the usual cause and remedy?",
+      "question_de": "Eine Live-Migration zwischen zwei KVM-Hosts scheitert mit „unsupported configuration: CPU feature not found“. Was ist die übliche Ursache und Abhilfe?",
+      "choices": [
+        {
+          "text": "The domain uses host-passthrough or a CPU model the target host cannot provide; define a common CPU model (e.g. a named model from virsh cpu-models or a baseline from virsh cpu-baseline) in the domain XML.",
+          "text_de": "Die Domäne nutzt host-passthrough oder ein CPU-Modell, das der Zielhost nicht bietet; ein gemeinsames CPU-Modell (benanntes Modell aus virsh cpu-models oder Basislinie aus virsh cpu-baseline) in der Domänen-XML festlegen.",
+          "correct": true
+        },
+        {
+          "text": "The target host has a different libvirt version; downgrade it.",
+          "text_de": "Der Zielhost hat eine andere libvirt-Version; diese zurückstufen."
+        },
+        {
+          "text": "Live migration requires identical host names.",
+          "text_de": "Live-Migration erfordert identische Hostnamen."
+        },
+        {
+          "text": "The disk image must be converted to raw first.",
+          "text_de": "Das Disk-Image muss zuerst nach raw konvertiert werden."
+        },
+        {
+          "text": "Memory ballooning must be disabled.",
+          "text_de": "Memory Ballooning muss deaktiviert werden."
+        }
+      ],
+      "explanation_de": "Bei der Migration muss die Ziel-CPU alle Merkmale bereitstellen, die der Gast sieht. host-passthrough ist nur zwischen identischen CPUs migrierbar; ein benanntes Modell oder eine mit cpu-baseline berechnete gemeinsame Menge löst das.",
+      "reference": "libvirt-Dokumentation, CPU model and topology",
+      "terms": [
+        {
+          "term": "remedy",
+          "de": "Abhilfe"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.5-01",
+      "objective": "351.5",
+      "type": "single",
+      "question": "Ten test VMs should be created from one base image base.qcow2 without copying the full image each time, so that only changes are stored per VM. Which command creates the image for the first VM?",
+      "question_de": "Zehn Test-VMs sollen aus einem Basis-Image base.qcow2 erzeugt werden, ohne das Image jedes Mal vollständig zu kopieren, so dass je VM nur Änderungen gespeichert werden. Welcher Befehl erzeugt das Image für die erste VM?",
+      "choices": [
+        {
+          "text": "qemu-img create -f qcow2 -b base.qcow2 -F qcow2 vm01.qcow2",
+          "text_de": "qemu-img create -f qcow2 -b base.qcow2 -F qcow2 vm01.qcow2",
+          "correct": true
+        },
+        {
+          "text": "qemu-img convert -O qcow2 base.qcow2 vm01.qcow2",
+          "text_de": "qemu-img convert -O qcow2 base.qcow2 vm01.qcow2"
+        },
+        {
+          "text": "cp --reflink=always base.qcow2 vm01.qcow2",
+          "text_de": "cp --reflink=always base.qcow2 vm01.qcow2"
+        },
+        {
+          "text": "qemu-img snapshot -c vm01 base.qcow2",
+          "text_de": "qemu-img snapshot -c vm01 base.qcow2"
+        },
+        {
+          "text": "ln -s base.qcow2 vm01.qcow2",
+          "text_de": "ln -s base.qcow2 vm01.qcow2"
+        }
+      ],
+      "explanation_de": "Ein Overlay mit Backing File (-b, Format mit -F) speichert nur geänderte Blöcke; das Basis-Image darf danach nicht mehr verändert werden. convert kopiert vollständig, interne Snapshots liegen im selben Image, ein Symlink würde die Basis verändern.",
+      "reference": "qemu-img(1), create -b",
+      "terms": [
+        {
+          "term": "base image",
+          "de": "Basis-Image"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.5-02",
+      "objective": "351.5",
+      "type": "single",
+      "question": "A qcow2 image is suspected to be corrupt after a host crash. Which command checks the image structure and can repair simple inconsistencies?",
+      "question_de": "Ein qcow2-Image ist nach einem Host-Absturz möglicherweise beschädigt. Welcher Befehl prüft die Imagestruktur und kann einfache Inkonsistenzen reparieren?",
+      "choices": [
+        {
+          "text": "qemu-img check -r leaks disk.qcow2",
+          "text_de": "qemu-img check -r leaks disk.qcow2",
+          "correct": true
+        },
+        {
+          "text": "fsck.qcow2 disk.qcow2",
+          "text_de": "fsck.qcow2 disk.qcow2"
+        },
+        {
+          "text": "qemu-img info --repair disk.qcow2",
+          "text_de": "qemu-img info --repair disk.qcow2"
+        },
+        {
+          "text": "virt-rescue --fix disk.qcow2",
+          "text_de": "virt-rescue --fix disk.qcow2"
+        },
+        {
+          "text": "qemu-img rebase -u disk.qcow2",
+          "text_de": "qemu-img rebase -u disk.qcow2"
+        }
+      ],
+      "explanation_de": "qemu-img check prüft Referenzzähler und Cluster-Zuordnung; -r leaks oder -r all repariert. info zeigt nur Metadaten, rebase ändert das Backing File, virt-rescue öffnet eine Rettungsshell für das Gastdateisystem, nicht für das Imageformat.",
+      "reference": "qemu-img(1), check",
+      "terms": [
+        {
+          "term": "corrupt",
+          "de": "beschädigt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-351.5-03",
+      "objective": "351.5",
+      "type": "single",
+      "question": "An administrator needs to edit /etc/fstab inside a stopped VM's disk image with a normal text editor. Which tool mounts the guest file system on the host for this?",
+      "question_de": "Ein Administrator muss /etc/fstab im Disk-Image einer gestoppten VM mit einem normalen Texteditor bearbeiten. Welches Werkzeug hängt das Gastdateisystem dafür auf dem Host ein?",
+      "choices": [
+        {
+          "text": "guestmount -a vm1.qcow2 -i --rw /mnt/guest, afterwards guestunmount /mnt/guest",
+          "text_de": "guestmount -a vm1.qcow2 -i --rw /mnt/guest, danach guestunmount /mnt/guest",
+          "correct": true
+        },
+        {
+          "text": "mount -t qcow2 vm1.qcow2 /mnt/guest",
+          "text_de": "mount -t qcow2 vm1.qcow2 /mnt/guest"
+        },
+        {
+          "text": "virt-cat -a vm1.qcow2 /etc/fstab",
+          "text_de": "virt-cat -a vm1.qcow2 /etc/fstab"
+        },
+        {
+          "text": "qemu-img mount vm1.qcow2 /mnt/guest",
+          "text_de": "qemu-img mount vm1.qcow2 /mnt/guest"
+        },
+        {
+          "text": "virt-df -a vm1.qcow2",
+          "text_de": "virt-df -a vm1.qcow2"
+        }
+      ],
+      "explanation_de": "guestmount nutzt libguestfs und FUSE; -i erkennt das Betriebssystem und hängt alle Dateisysteme ein. Alternativ bearbeitet virt-edit einzelne Dateien direkt. mount kennt qcow2 nicht (nur über qemu-nbd), virt-cat liest nur.",
+      "reference": "guestmount(1)",
+      "terms": [
+        {
+          "term": "stopped",
+          "de": "gestoppt, ausgeschaltet"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-01",
+      "objective": "352.1",
+      "type": "single",
+      "question": "Inside a container, ps shows PID 1 for the application, but on the host the same process has PID 48213. Which kernel feature causes this?",
+      "question_de": "In einem Container zeigt ps die PID 1 für die Anwendung, auf dem Host hat derselbe Prozess aber die PID 48213. Welche Kernelfunktion verursacht das?",
+      "choices": [
+        {
+          "text": "The PID namespace: processes get their own PID numbering per namespace; /proc/<pid>/status on the host shows both in NSpid.",
+          "text_de": "Der PID-Namensraum: Prozesse erhalten je Namensraum eine eigene PID-Nummerierung; /proc/<pid>/status zeigt auf dem Host beide unter NSpid.",
+          "correct": true
+        },
+        {
+          "text": "The cgroup pids controller renumbers processes.",
+          "text_de": "Der cgroup-Controller pids nummeriert Prozesse neu."
+        },
+        {
+          "text": "seccomp hides the real PID from the container.",
+          "text_de": "seccomp verbirgt die echte PID vor dem Container."
+        },
+        {
+          "text": "The container runs under a different kernel.",
+          "text_de": "Der Container läuft unter einem anderen Kernel."
+        },
+        {
+          "text": "chroot changes the process table.",
+          "text_de": "chroot ändert die Prozesstabelle."
+        }
+      ],
+      "explanation_de": "Jeder PID-Namensraum hat eigene Nummern; der erste Prozess ist dort PID 1 und übernimmt init-Pflichten (Zombies ernten, Signale). Der Host sieht die globale PID. cgroups zählen nur, seccomp filtert Syscalls.",
+      "reference": "pid_namespaces(7)",
+      "terms": [
+        {
+          "term": "numbering",
+          "de": "Nummerierung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-02",
+      "objective": "352.1",
+      "type": "single",
+      "question": "A container must be able to bind to port 80 as a non-root user but must not get any other root privilege. Which capability is sufficient?",
+      "question_de": "Ein Container soll als Nicht-Root-Benutzer Port 80 belegen können, aber kein weiteres Root-Privileg erhalten. Welche Capability genügt?",
+      "choices": [
+        {
+          "text": "CAP_NET_BIND_SERVICE",
+          "text_de": "CAP_NET_BIND_SERVICE",
+          "correct": true
+        },
+        {
+          "text": "CAP_NET_ADMIN",
+          "text_de": "CAP_NET_ADMIN"
+        },
+        {
+          "text": "CAP_SYS_ADMIN",
+          "text_de": "CAP_SYS_ADMIN"
+        },
+        {
+          "text": "CAP_NET_RAW",
+          "text_de": "CAP_NET_RAW"
+        },
+        {
+          "text": "CAP_SETUID",
+          "text_de": "CAP_SETUID"
+        }
+      ],
+      "explanation_de": "CAP_NET_BIND_SERVICE erlaubt das Binden privilegierter Ports unter 1024. NET_ADMIN konfiguriert Netzwerk, NET_RAW erlaubt Raw-Sockets (ping), SYS_ADMIN ist nahezu Root. Docker: --cap-drop ALL --cap-add NET_BIND_SERVICE.",
+      "reference": "capabilities(7)",
+      "terms": [
+        {
+          "term": "sufficient",
+          "de": "ausreichend"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-03",
+      "objective": "352.1",
+      "type": "single",
+      "question": "Which statement describes the relationship between Docker, containerd and runc correctly?",
+      "question_de": "Welche Aussage beschreibt das Verhältnis zwischen Docker, containerd und runc richtig?",
+      "choices": [
+        {
+          "text": "dockerd provides the API and image handling, delegates container lifecycle to containerd, which starts each container through the OCI runtime runc.",
+          "text_de": "dockerd stellt API und Image-Verwaltung bereit, delegiert den Container-Lebenszyklus an containerd, das jeden Container über die OCI-Laufzeit runc startet.",
+          "correct": true
+        },
+        {
+          "text": "runc is a daemon that downloads images; containerd builds them; dockerd runs them.",
+          "text_de": "runc ist ein Daemon, der Images lädt; containerd baut sie; dockerd führt sie aus."
+        },
+        {
+          "text": "containerd replaces the Linux kernel namespaces.",
+          "text_de": "containerd ersetzt die Kernel-Namensräume."
+        },
+        {
+          "text": "Docker cannot run without Kubernetes.",
+          "text_de": "Docker läuft nicht ohne Kubernetes."
+        },
+        {
+          "text": "runc is only used by Podman, not by Docker.",
+          "text_de": "runc wird nur von Podman genutzt, nicht von Docker."
+        }
+      ],
+      "explanation_de": "Die Schichten: Docker-CLI → dockerd → containerd (Images, Snapshots, Lifecycle, auch von Kubernetes über CRI genutzt) → containerd-shim → runc (erzeugt Namespaces/cgroups nach OCI-Bundle). crun ist eine Alternative zu runc.",
+      "reference": "containerd-Dokumentation; OCI runtime-spec",
+      "terms": [
+        {
+          "term": "delegate",
+          "de": "delegieren, weitergeben"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-04",
+      "objective": "352.1",
+      "type": "single",
+      "question": "Which command shows the capabilities a running container process actually holds, so that an administrator can verify that CAP_SYS_ADMIN was dropped?",
+      "question_de": "Welcher Befehl zeigt die Capabilities, die ein laufender Containerprozess tatsächlich besitzt, damit ein Administrator prüfen kann, dass CAP_SYS_ADMIN entfernt wurde?",
+      "choices": [
+        {
+          "text": "grep Cap /proc/<pid>/status and decode with capsh --decode=<hex>",
+          "text_de": "grep Cap /proc/<pid>/status und Dekodierung mit capsh --decode=<hex>",
+          "correct": true
+        },
+        {
+          "text": "getcap /proc/<pid>/exe",
+          "text_de": "getcap /proc/<pid>/exe"
+        },
+        {
+          "text": "ls -l /proc/<pid>/ns",
+          "text_de": "ls -l /proc/<pid>/ns"
+        },
+        {
+          "text": "cat /sys/fs/cgroup/<container>/cgroup.procs",
+          "text_de": "cat /sys/fs/cgroup/<container>/cgroup.procs"
+        },
+        {
+          "text": "docker inspect --format '{{.State.Pid}}' <container>",
+          "text_de": "docker inspect --format '{{.State.Pid}}' <container>"
+        }
+      ],
+      "explanation_de": "/proc/<pid>/status enthält CapInh, CapPrm, CapEff und CapBnd als Bitmasken; capsh --decode übersetzt sie in Namen. getcap zeigt Datei-Capabilities, /proc/<pid>/ns die Namensräume. docker inspect liefert nur die PID als Ausgangspunkt.",
+      "reference": "capsh(1); proc(5)",
+      "terms": [
+        {
+          "term": "dropped",
+          "de": "entfernt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-05",
+      "objective": "352.1",
+      "type": "single",
+      "question": "On a host with cgroup v2, which file limits the number of processes a container's cgroup may contain, protecting the host against fork bombs?",
+      "question_de": "Welche Datei begrenzt auf einem Host mit cgroup v2 die Anzahl der Prozesse, die die cgroup eines Containers enthalten darf, und schützt den Host so gegen Fork-Bomben?",
+      "choices": [
+        {
+          "text": "pids.max in the container's cgroup directory",
+          "text_de": "pids.max im cgroup-Verzeichnis des Containers",
+          "correct": true
+        },
+        {
+          "text": "cpu.max",
+          "text_de": "cpu.max"
+        },
+        {
+          "text": "memory.high",
+          "text_de": "memory.high"
+        },
+        {
+          "text": "/proc/sys/kernel/pid_max",
+          "text_de": "/proc/sys/kernel/pid_max"
+        },
+        {
+          "text": "cgroup.subtree_control",
+          "text_de": "cgroup.subtree_control"
+        }
+      ],
+      "explanation_de": "Der pids-Controller begrenzt die Prozesszahl je cgroup (pids.max, pids.current). Docker setzt ihn mit --pids-limit, systemd mit TasksMax. pid_max ist die systemweite Obergrenze, subtree_control aktiviert Controller für Kind-cgroups.",
+      "reference": "cgroups(7), pids controller",
+      "terms": [
+        {
+          "term": "fork bomb",
+          "de": "Fork-Bombe, Prozessflut"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.1-06",
+      "objective": "352.1",
+      "type": "single",
+      "question": "Which tool builds OCI images from a shell script step by step without a Dockerfile and without a running daemon?",
+      "question_de": "Welches Werkzeug baut OCI-Images aus einem Shell-Skript Schritt für Schritt ohne Dockerfile und ohne laufenden Daemon?",
+      "choices": [
+        {
+          "text": "buildah",
+          "text_de": "buildah",
+          "correct": true
+        },
+        {
+          "text": "skopeo",
+          "text_de": "skopeo"
+        },
+        {
+          "text": "runc",
+          "text_de": "runc"
+        },
+        {
+          "text": "ctr",
+          "text_de": "ctr"
+        },
+        {
+          "text": "packer",
+          "text_de": "packer"
+        }
+      ],
+      "explanation_de": "buildah from, run, copy, config und commit erlauben skriptgesteuerte Builds (buildah bud verarbeitet auch Dockerfiles). skopeo kopiert und inspiziert Images, ctr ist das Debug-CLI von containerd, runc führt Container aus, Packer baut VM-Images.",
+      "reference": "buildah(1)",
+      "terms": [
+        {
+          "term": "step by step",
+          "de": "Schritt für Schritt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.2-01",
+      "objective": "352.2",
+      "type": "single",
+      "question": "A freshly installed LXD must be initialized with a storage pool on the directory backend and a NAT bridge, non-interactively. Which command does this?",
+      "question_de": "Ein frisch installiertes LXD soll nicht interaktiv mit einem Speicherpool auf dem Verzeichnis-Backend und einer NAT-Brücke initialisiert werden. Welcher Befehl leistet das?",
+      "choices": [
+        {
+          "text": "lxd init --auto --storage-backend dir",
+          "text_de": "lxd init --auto --storage-backend dir",
+          "correct": true
+        },
+        {
+          "text": "lxc init --storage dir --network lxdbr0",
+          "text_de": "lxc init --storage dir --network lxdbr0"
+        },
+        {
+          "text": "lxd storage create default dir",
+          "text_de": "lxd storage create default dir"
+        },
+        {
+          "text": "lxc launch images:alpine/3.19 init --auto",
+          "text_de": "lxc launch images:alpine/3.19 init --auto"
+        },
+        {
+          "text": "systemctl start lxd --init",
+          "text_de": "systemctl start lxd --init"
+        }
+      ],
+      "explanation_de": "lxd init richtet Speicherpool, Netzwerk (lxdbr0 mit NAT) und das Profil default ein; --auto nutzt Standardwerte, --preseed liest YAML. lxc ist das Client-Kommando für Container, lxc init legt einen Container ohne Start an.",
+      "reference": "lxd init --help",
+      "terms": [
+        {
+          "term": "non-interactively",
+          "de": "ohne Rückfragen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.2-02",
+      "objective": "352.2",
+      "type": "single",
+      "question": "A web server inside the LXD container web listens on port 80. It must be reachable from the LAN on the host's address port 8080. Which LXD mechanism implements this without changing the host firewall by hand?",
+      "question_de": "Ein Webserver im LXD-Container web lauscht auf Port 80. Er soll aus dem LAN über die Hostadresse auf Port 8080 erreichbar sein. Welcher LXD-Mechanismus setzt das um, ohne die Host-Firewall von Hand zu ändern?",
+      "choices": [
+        {
+          "text": "A proxy device: lxc config device add web http proxy listen=tcp:0.0.0.0:8080 connect=tcp:127.0.0.1:80",
+          "text_de": "Ein Proxy-Gerät: lxc config device add web http proxy listen=tcp:0.0.0.0:8080 connect=tcp:127.0.0.1:80",
+          "correct": true
+        },
+        {
+          "text": "lxc config set web boot.autostart true",
+          "text_de": "lxc config set web boot.autostart true"
+        },
+        {
+          "text": "lxc network set lxdbr0 ipv4.nat false",
+          "text_de": "lxc network set lxdbr0 ipv4.nat false"
+        },
+        {
+          "text": "lxc publish web --port 8080",
+          "text_de": "lxc publish web --port 8080"
+        },
+        {
+          "text": "lxc exec web -- ip addr add 192.168.1.50/24 dev eth0",
+          "text_de": "lxc exec web -- ip addr add 192.168.1.50/24 dev eth0"
+        }
+      ],
+      "explanation_de": "Proxy-Geräte leiten Ports vom Host in den Container (TCP, UDP, Unix-Sockets). Alternativ kann der Container per macvlan oder Bridge direkt ins LAN. boot.autostart und NAT-Einstellungen leiten keine Ports weiter.",
+      "reference": "LXD-Dokumentation, proxy devices",
+      "terms": [
+        {
+          "term": "by hand",
+          "de": "von Hand, manuell"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.2-03",
+      "objective": "352.2",
+      "type": "single",
+      "question": "A directory /srv/share of the host should be visible inside the LXD container app at /data with read-write access, and the container's UID 1000 should map to the host's UID 1000 for this share. Which command adds the device?",
+      "question_de": "Das Hostverzeichnis /srv/share soll im LXD-Container app unter /data mit Schreibzugriff sichtbar sein, wobei die UID 1000 des Containers für diese Freigabe der Host-UID 1000 entsprechen soll. Welcher Befehl fügt das Gerät hinzu?",
+      "choices": [
+        {
+          "text": "lxc config device add app share disk source=/srv/share path=/data shift=true",
+          "text_de": "lxc config device add app share disk source=/srv/share path=/data shift=true",
+          "correct": true
+        },
+        {
+          "text": "lxc file push -r /srv/share app/data",
+          "text_de": "lxc file push -r /srv/share app/data"
+        },
+        {
+          "text": "lxc config set app raw.lxc 'lxc.mount.entry = /srv/share data none bind 0 0'",
+          "text_de": "lxc config set app raw.lxc 'lxc.mount.entry = /srv/share data none bind 0 0'"
+        },
+        {
+          "text": "lxc storage volume attach default share app /data",
+          "text_de": "lxc storage volume attach default share app /data"
+        },
+        {
+          "text": "lxc config device add app share nic source=/srv/share",
+          "text_de": "lxc config device add app share nic source=/srv/share"
+        }
+      ],
+      "explanation_de": "Disk-Geräte mit source und path hängen Hostpfade ein; shift=true (oder raw.idmap) verschiebt die Besitzer-IDs passend zum unprivilegierten Container. file push kopiert nur, storage volume attach gilt für LXD-Volumes, nic ist ein Netzwerkgerät.",
+      "reference": "LXD-Dokumentation, disk devices",
+      "terms": [
+        {
+          "term": "map",
+          "de": "zuordnen, abbilden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.2-04",
+      "objective": "352.2",
+      "type": "single",
+      "question": "Before a change, a snapshot of the LXD container db should be taken and restored later if needed. Which commands are correct?",
+      "question_de": "Vor einer Änderung soll ein Snapshot des LXD-Containers db erstellt und bei Bedarf später zurückgespielt werden. Welche Befehle sind richtig?",
+      "choices": [
+        {
+          "text": "lxc snapshot db before-change; lxc restore db before-change",
+          "text_de": "lxc snapshot db before-change; lxc restore db before-change",
+          "correct": true
+        },
+        {
+          "text": "lxc copy db before-change; lxc move before-change db",
+          "text_de": "lxc copy db before-change; lxc move before-change db"
+        },
+        {
+          "text": "lxc publish db --alias before-change; lxc launch before-change db",
+          "text_de": "lxc publish db --alias before-change; lxc launch before-change db"
+        },
+        {
+          "text": "lxc export db before-change.tar.gz; lxc import before-change.tar.gz db",
+          "text_de": "lxc export db before-change.tar.gz; lxc import before-change.tar.gz db"
+        },
+        {
+          "text": "lxc config set db snapshots.schedule '@hourly'",
+          "text_de": "lxc config set db snapshots.schedule '@hourly'"
+        }
+      ],
+      "explanation_de": "lxc snapshot erzeugt einen Snapshot (lxc info db listet sie), lxc restore spielt ihn zurück; lxc delete db/before-change entfernt ihn. export/import sichern in eine Datei, publish erzeugt ein Image, snapshots.schedule automatisiert nur die Erstellung.",
+      "reference": "lxc snapshot --help",
+      "terms": [
+        {
+          "term": "if needed",
+          "de": "bei Bedarf"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.2-05",
+      "objective": "352.2",
+      "type": "single",
+      "question": "What is the main security difference between a privileged and an unprivileged LXC/LXD container?",
+      "question_de": "Was ist der wesentliche Sicherheitsunterschied zwischen einem privilegierten und einem unprivilegierten LXC/LXD-Container?",
+      "choices": [
+        {
+          "text": "In an unprivileged container root is mapped to an unprivileged host UID via user namespaces, so a container escape yields no root rights on the host.",
+          "text_de": "In einem unprivilegierten Container wird root über User-Namensräume auf eine unprivilegierte Host-UID abgebildet; ein Ausbruch liefert keine Root-Rechte auf dem Host.",
+          "correct": true
+        },
+        {
+          "text": "Unprivileged containers cannot use the network.",
+          "text_de": "Unprivilegierte Container können kein Netzwerk nutzen."
+        },
+        {
+          "text": "Privileged containers run under a separate kernel.",
+          "text_de": "Privilegierte Container laufen unter einem eigenen Kernel."
+        },
+        {
+          "text": "Unprivileged containers have no cgroup limits.",
+          "text_de": "Unprivilegierte Container haben keine cgroup-Limits."
+        },
+        {
+          "text": "There is no difference; both are isolated by seccomp only.",
+          "text_de": "Es gibt keinen Unterschied; beide isoliert nur seccomp."
+        }
+      ],
+      "explanation_de": "LXD startet Container standardmäßig unprivilegiert (security.privileged=false) mit ID-Mapping aus /etc/subuid und /etc/subgid. Privilegierte Container haben echten Root (UID 0 = Host-UID 0) und sind nur durch Capabilities, AppArmor und seccomp begrenzt.",
+      "reference": "LXD-Dokumentation, Security",
+      "terms": [
+        {
+          "term": "escape",
+          "de": "Ausbruch"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-01",
+      "objective": "352.3",
+      "type": "single",
+      "question": "A Dockerfile for a Go application should produce a small final image that contains only the compiled binary. Which technique achieves this?",
+      "question_de": "Ein Dockerfile für eine Go-Anwendung soll ein kleines Endimage erzeugen, das nur das kompilierte Programm enthält. Welche Technik erreicht das?",
+      "choices": [
+        {
+          "text": "A multi-stage build: FROM golang AS build … then FROM scratch or alpine with COPY --from=build /app/binary /binary",
+          "text_de": "Ein Multi-Stage-Build: FROM golang AS build … danach FROM scratch oder alpine mit COPY --from=build /app/binary /binary",
+          "correct": true
+        },
+        {
+          "text": "Running docker image prune after the build",
+          "text_de": "docker image prune nach dem Build ausführen"
+        },
+        {
+          "text": "Using VOLUME for the Go toolchain",
+          "text_de": "VOLUME für die Go-Toolchain verwenden"
+        },
+        {
+          "text": "Setting ENTRYPOINT to the compiler",
+          "text_de": "ENTRYPOINT auf den Compiler setzen"
+        },
+        {
+          "text": "Adding .dockerignore with the binary",
+          "text_de": "Eine .dockerignore mit dem Programm anlegen"
+        }
+      ],
+      "explanation_de": "Multi-Stage-Builds trennen Build- und Laufzeitumgebung: nur die mit COPY --from übernommenen Artefakte landen im Endimage, Compiler und Quellen bleiben zurück. .dockerignore reduziert nur den Build-Kontext.",
+      "reference": "Docker-Dokumentation, Multi-stage builds",
+      "terms": [
+        {
+          "term": "compiled",
+          "de": "kompiliert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-02",
+      "objective": "352.3",
+      "type": "single",
+      "question": "A container must be restarted automatically after crashes and after a reboot of the Docker host, but must stay stopped when an administrator stops it manually. Which option implements this?",
+      "question_de": "Ein Container soll nach Abstürzen und nach einem Neustart des Docker-Hosts automatisch neu gestartet werden, aber gestoppt bleiben, wenn ein Administrator ihn von Hand stoppt. Welche Option setzt das um?",
+      "choices": [
+        {
+          "text": "docker run --restart unless-stopped …",
+          "text_de": "docker run --restart unless-stopped …",
+          "correct": true
+        },
+        {
+          "text": "docker run --restart always …",
+          "text_de": "docker run --restart always …"
+        },
+        {
+          "text": "docker run --restart on-failure:3 …",
+          "text_de": "docker run --restart on-failure:3 …"
+        },
+        {
+          "text": "docker run --rm …",
+          "text_de": "docker run --rm …"
+        },
+        {
+          "text": "docker update --autostart …",
+          "text_de": "docker update --autostart …"
+        }
+      ],
+      "explanation_de": "unless-stopped startet nach Absturz und Host-Neustart, aber nicht nach einem manuellen docker stop. always würde auch nach manuellem Stopp beim Daemon-Start wieder starten, on-failure nur bei Fehlercode und nicht nach Host-Neustart. --rm löscht den Container beim Beenden.",
+      "reference": "docker run --restart",
+      "terms": [
+        {
+          "term": "crash",
+          "de": "Absturz"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-03",
+      "objective": "352.3",
+      "type": "single",
+      "question": "All containers on a host should send their logs to the local journald instead of JSON files, and new containers should get a memory limit by default. Which file is configured?",
+      "question_de": "Alle Container eines Hosts sollen ihre Logs an das lokale journald statt in JSON-Dateien senden, und neue Container sollen standardmäßig ein Speicherlimit erhalten. Welche Datei wird konfiguriert?",
+      "choices": [
+        {
+          "text": "/etc/docker/daemon.json, e.g. {\"log-driver\": \"journald\", \"default-ulimits\": {…}}",
+          "text_de": "/etc/docker/daemon.json, z. B. {\"log-driver\": \"journald\", \"default-ulimits\": {…}}",
+          "correct": true
+        },
+        {
+          "text": "/var/lib/docker/containers/config.json",
+          "text_de": "/var/lib/docker/containers/config.json"
+        },
+        {
+          "text": "~/.docker/config.json",
+          "text_de": "~/.docker/config.json"
+        },
+        {
+          "text": "/etc/default/docker only",
+          "text_de": "nur /etc/default/docker"
+        },
+        {
+          "text": "The Dockerfile of every image",
+          "text_de": "Das Dockerfile jedes Images"
+        }
+      ],
+      "explanation_de": "daemon.json konfiguriert dockerd: log-driver und log-opts, storage-driver, default-ulimits, insecure-registries, data-root. ~/.docker/config.json ist die Client-Konfiguration; /etc/default/docker wird von systemd-Installationen meist ignoriert.",
+      "reference": "dockerd-Dokumentation, daemon.json",
+      "terms": [
+        {
+          "term": "by default",
+          "de": "standardmäßig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-04",
+      "objective": "352.3",
+      "type": "single",
+      "question": "Two containers in the same user-defined bridge network should reach each other by name. Container api cannot resolve db. Which check is most useful?",
+      "question_de": "Zwei Container im selben benutzerdefinierten Bridge-Netz sollen sich über den Namen erreichen. Der Container api kann db nicht auflösen. Welche Prüfung ist am sinnvollsten?",
+      "choices": [
+        {
+          "text": "docker network inspect <network> to verify that both containers are attached to that network (not to the default bridge, which has no name resolution).",
+          "text_de": "docker network inspect <netz>, um zu prüfen, dass beide Container an dieses Netz angeschlossen sind (nicht an die Standard-Bridge, die keine Namensauflösung bietet).",
+          "correct": true
+        },
+        {
+          "text": "Add db to /etc/hosts of the host system.",
+          "text_de": "db in /etc/hosts des Hostsystems eintragen."
+        },
+        {
+          "text": "Publish port 5432 of db with -p.",
+          "text_de": "Port 5432 von db mit -p veröffentlichen."
+        },
+        {
+          "text": "Restart the Docker daemon.",
+          "text_de": "Den Docker-Daemon neu starten."
+        },
+        {
+          "text": "Use --link db:db on api.",
+          "text_de": "--link db:db bei api verwenden."
+        }
+      ],
+      "explanation_de": "Benutzerdefinierte Netze bieten eingebettetes DNS für Containernamen und Aliase; die Standard-Bridge docker0 nicht (nur das veraltete --link). Port-Veröffentlichung betrifft den Zugriff vom Host, nicht zwischen Containern.",
+      "reference": "Docker-Dokumentation, Networking overview",
+      "terms": [
+        {
+          "term": "resolve",
+          "de": "auflösen (Namen)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-05",
+      "objective": "352.3",
+      "type": "single",
+      "question": "A private registry runs on registry.lab:5000 with a certificate from an internal CA. docker push fails with \"x509: certificate signed by unknown authority\". Which fix keeps TLS verification intact?",
+      "question_de": "Eine private Registry läuft auf registry.lab:5000 mit einem Zertifikat einer internen CA. docker push scheitert mit „x509: certificate signed by unknown authority“. Welche Lösung erhält die TLS-Prüfung?",
+      "choices": [
+        {
+          "text": "Place the CA certificate as /etc/docker/certs.d/registry.lab:5000/ca.crt on each Docker host.",
+          "text_de": "Das CA-Zertifikat als /etc/docker/certs.d/registry.lab:5000/ca.crt auf jedem Docker-Host ablegen.",
+          "correct": true
+        },
+        {
+          "text": "Add registry.lab:5000 to insecure-registries in daemon.json.",
+          "text_de": "registry.lab:5000 unter insecure-registries in daemon.json eintragen."
+        },
+        {
+          "text": "Run the registry with REGISTRY_HTTP_TLS off.",
+          "text_de": "Die Registry mit abgeschaltetem REGISTRY_HTTP_TLS betreiben."
+        },
+        {
+          "text": "Use docker login --insecure.",
+          "text_de": "docker login --insecure verwenden."
+        },
+        {
+          "text": "Tag the image with http:// prefix.",
+          "text_de": "Das Image mit dem Präfix http:// taggen."
+        }
+      ],
+      "explanation_de": "Docker vertraut zusätzlichen CAs je Registry über certs.d/<host:port>/ca.crt (alternativ systemweiter CA-Speicher). insecure-registries schaltet die Prüfung ab und erlaubt HTTP, was gerade vermieden werden soll.",
+      "reference": "Docker-Dokumentation, Verify repository client with certificates",
+      "terms": [
+        {
+          "term": "intact",
+          "de": "unversehrt, erhalten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-06",
+      "objective": "352.3",
+      "type": "single",
+      "question": "A container writes temporary data to /tmp. The data must not persist and should not bloat the writable layer; it should live in memory. Which option provides this?",
+      "question_de": "Ein Container schreibt temporäre Daten nach /tmp. Die Daten sollen nicht erhalten bleiben und die beschreibbare Schicht nicht aufblähen, sondern im Speicher liegen. Welche Option leistet das?",
+      "choices": [
+        {
+          "text": "docker run --tmpfs /tmp:rw,size=256m …",
+          "text_de": "docker run --tmpfs /tmp:rw,size=256m …",
+          "correct": true
+        },
+        {
+          "text": "docker run -v /tmp:/tmp …",
+          "text_de": "docker run -v /tmp:/tmp …"
+        },
+        {
+          "text": "docker run --read-only …",
+          "text_de": "docker run --read-only …"
+        },
+        {
+          "text": "docker volume create tmp && docker run -v tmp:/tmp …",
+          "text_de": "docker volume create tmp && docker run -v tmp:/tmp …"
+        },
+        {
+          "text": "docker run --storage-opt size=256m …",
+          "text_de": "docker run --storage-opt size=256m …"
+        }
+      ],
+      "explanation_de": "--tmpfs hängt ein tmpfs im Container ein, das mit dem Container verschwindet. Ein Bind-Mount von /tmp des Hosts oder ein benanntes Volume bleibt erhalten; --read-only schützt nur das Root-Dateisystem und wird oft mit --tmpfs kombiniert.",
+      "reference": "docker run --tmpfs",
+      "terms": [
+        {
+          "term": "bloat",
+          "de": "aufblähen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.3-07",
+      "objective": "352.3",
+      "type": "single",
+      "question": "Which command shows the layers of the image nginx:alpine with the Dockerfile instruction that created each layer and its size?",
+      "question_de": "Welcher Befehl zeigt die Schichten des Images nginx:alpine mit der Dockerfile-Anweisung, die jede Schicht erzeugt hat, und ihrer Größe?",
+      "choices": [
+        {
+          "text": "docker history nginx:alpine",
+          "text_de": "docker history nginx:alpine",
+          "correct": true
+        },
+        {
+          "text": "docker inspect nginx:alpine",
+          "text_de": "docker inspect nginx:alpine"
+        },
+        {
+          "text": "docker image ls nginx:alpine",
+          "text_de": "docker image ls nginx:alpine"
+        },
+        {
+          "text": "docker diff nginx:alpine",
+          "text_de": "docker diff nginx:alpine"
+        },
+        {
+          "text": "docker save nginx:alpine | tar t",
+          "text_de": "docker save nginx:alpine | tar t"
+        }
+      ],
+      "explanation_de": "docker history listet die Schichten mit erzeugender Anweisung, Größe und Alter. inspect liefert Metadaten als JSON, image ls die Gesamtgröße, diff die Dateiänderungen eines Containers gegenüber seinem Image, save exportiert ein Archiv.",
+      "reference": "docker history",
+      "terms": [
+        {
+          "term": "layer",
+          "de": "Schicht"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.4-01",
+      "objective": "352.4",
+      "type": "single",
+      "question": "In a docker-compose.yml, the web service must start only after the database container is healthy, not merely started. Which configuration expresses this?",
+      "question_de": "In einer docker-compose.yml soll der Dienst web erst starten, wenn der Datenbankcontainer gesund ist, nicht nur gestartet. Welche Konfiguration drückt das aus?",
+      "choices": [
+        {
+          "text": "A healthcheck on db and depends_on with condition: service_healthy on web",
+          "text_de": "Ein healthcheck bei db und depends_on mit condition: service_healthy bei web",
+          "correct": true
+        },
+        {
+          "text": "links: [db] on web",
+          "text_de": "links: [db] bei web"
+        },
+        {
+          "text": "restart: always on both services",
+          "text_de": "restart: always bei beiden Diensten"
+        },
+        {
+          "text": "network_mode: service:db on web",
+          "text_de": "network_mode: service:db bei web"
+        },
+        {
+          "text": "depends_on: [db] alone",
+          "text_de": "depends_on: [db] allein"
+        }
+      ],
+      "explanation_de": "depends_on ohne Bedingung wartet nur auf den Start des Containers. Mit einem healthcheck (test, interval, retries) und condition: service_healthy wartet Compose, bis die Prüfung erfolgreich ist. links ist veraltet.",
+      "reference": "Compose-Spezifikation, depends_on",
+      "terms": [
+        {
+          "term": "merely",
+          "de": "lediglich, nur"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-352.4-02",
+      "objective": "352.4",
+      "type": "single",
+      "question": "Which Kubernetes object ensures that a specified number of identical pod replicas is running and replaces pods that fail?",
+      "question_de": "Welches Kubernetes-Objekt stellt sicher, dass eine festgelegte Zahl identischer Pod-Replikate läuft, und ersetzt ausgefallene Pods?",
+      "choices": [
+        {
+          "text": "Deployment (via a ReplicaSet)",
+          "text_de": "Deployment (über ein ReplicaSet)",
+          "correct": true
+        },
+        {
+          "text": "Service",
+          "text_de": "Service"
+        },
+        {
+          "text": "ConfigMap",
+          "text_de": "ConfigMap"
+        },
+        {
+          "text": "Ingress",
+          "text_de": "Ingress"
+        },
+        {
+          "text": "Namespace",
+          "text_de": "Namespace"
+        }
+      ],
+      "explanation_de": "Ein Deployment beschreibt den Sollzustand (Image, Replikate) und verwaltet ReplicaSets, die die Pods erzeugen und ersetzen. Services bieten stabile Adressen und Lastverteilung, ConfigMaps Konfiguration, Ingress HTTP-Routing, Namespaces Trennung.",
+      "reference": "Kubernetes-Dokumentation, Deployments",
+      "terms": [
+        {
+          "term": "replica",
+          "de": "Replikat"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.1-01",
+      "objective": "353.1",
+      "type": "single",
+      "question": "Which OpenStack component provides the compute service that schedules and runs virtual machine instances on hypervisor hosts?",
+      "question_de": "Welche OpenStack-Komponente stellt den Compute-Dienst bereit, der VM-Instanzen auf Hypervisor-Hosts einplant und ausführt?",
+      "choices": [
+        {
+          "text": "Nova",
+          "text_de": "Nova",
+          "correct": true
+        },
+        {
+          "text": "Neutron",
+          "text_de": "Neutron"
+        },
+        {
+          "text": "Cinder",
+          "text_de": "Cinder"
+        },
+        {
+          "text": "Glance",
+          "text_de": "Glance"
+        },
+        {
+          "text": "Keystone",
+          "text_de": "Keystone"
+        }
+      ],
+      "explanation_de": "Nova verwaltet Instanzen, Neutron das Netzwerk, Cinder Blockspeicher, Glance Images, Keystone Identität, Swift Objektspeicher, Horizon das Dashboard.",
+      "reference": "OpenStack-Dokumentation, Nova",
+      "terms": [
+        {
+          "term": "schedule",
+          "de": "einplanen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.1-02",
+      "objective": "353.1",
+      "type": "single",
+      "question": "A Terraform configuration was changed to add a second VM. Which command shows what Terraform would create, change or destroy without applying anything?",
+      "question_de": "Eine Terraform-Konfiguration wurde um eine zweite VM erweitert. Welcher Befehl zeigt, was Terraform anlegen, ändern oder löschen würde, ohne etwas umzusetzen?",
+      "choices": [
+        {
+          "text": "terraform plan",
+          "text_de": "terraform plan",
+          "correct": true
+        },
+        {
+          "text": "terraform apply -auto-approve",
+          "text_de": "terraform apply -auto-approve"
+        },
+        {
+          "text": "terraform init",
+          "text_de": "terraform init"
+        },
+        {
+          "text": "terraform state list",
+          "text_de": "terraform state list"
+        },
+        {
+          "text": "terraform validate",
+          "text_de": "terraform validate"
+        }
+      ],
+      "explanation_de": "plan vergleicht Konfiguration, State und reale Ressourcen und zeigt die Änderungen; apply setzt sie um; init lädt Provider; validate prüft nur die Syntax; state list zeigt verwaltete Ressourcen.",
+      "reference": "Terraform-CLI-Dokumentation, plan",
+      "terms": [
+        {
+          "term": "without applying",
+          "de": "ohne umzusetzen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.2-01",
+      "objective": "353.2",
+      "type": "single",
+      "question": "A Packer template should build the same base image for QEMU and for an LXD container. Which template structure supports this in one run?",
+      "question_de": "Ein Packer-Template soll dasselbe Basis-Image für QEMU und als LXD-Container-Image bauen. Welche Template-Struktur unterstützt das in einem Lauf?",
+      "choices": [
+        {
+          "text": "Two source blocks (qemu and lxd) referenced by one build block with shared provisioners",
+          "text_de": "Zwei source-Blöcke (qemu und lxd), die ein build-Block mit gemeinsamen Provisionern referenziert",
+          "correct": true
+        },
+        {
+          "text": "Two separate variables files passed with -var-file",
+          "text_de": "Zwei getrennte Variablendateien, übergeben mit -var-file"
+        },
+        {
+          "text": "A post-processor that converts the QEMU image to a container",
+          "text_de": "Ein Post-Processor, der das QEMU-Image in einen Container umwandelt"
+        },
+        {
+          "text": "The builder type \"multi\"",
+          "text_de": "Der Builder-Typ „multi“"
+        },
+        {
+          "text": "Running packer build twice with different -only values is the only way",
+          "text_de": "packer build zweimal mit verschiedenen -only-Werten ist der einzige Weg"
+        }
+      ],
+      "explanation_de": "In HCL-Templates definieren source-Blöcke Builder; ein build-Block kann mehrere Quellen nennen, die Provisioner gelten für alle. packer build baut sie parallel; -only oder -except wählen gezielt aus.",
+      "reference": "Packer-Dokumentation, build block",
+      "terms": [
+        {
+          "term": "shared",
+          "de": "gemeinsam genutzt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.2-02",
+      "objective": "353.2",
+      "type": "single",
+      "question": "A Packer build with the qemu builder stops at the OS installer's keyboard prompts. Which template feature automates the installer input?",
+      "question_de": "Ein Packer-Build mit dem qemu-Builder bleibt an den Tastatureingaben des OS-Installers stehen. Welche Template-Funktion automatisiert die Installereingaben?",
+      "choices": [
+        {
+          "text": "boot_command together with an unattended configuration (preseed/kickstart/autoinstall) served by Packer's http_directory",
+          "text_de": "boot_command zusammen mit einer unbeaufsichtigten Konfiguration (preseed/kickstart/autoinstall), die Packer über http_directory bereitstellt",
+          "correct": true
+        },
+        {
+          "text": "A shell provisioner that types the answers",
+          "text_de": "Ein Shell-Provisioner, der die Antworten tippt"
+        },
+        {
+          "text": "The vagrant post-processor",
+          "text_de": "Der vagrant-Post-Processor"
+        },
+        {
+          "text": "ssh_wait_timeout set to 0",
+          "text_de": "ssh_wait_timeout auf 0 setzen"
+        },
+        {
+          "text": "headless = false",
+          "text_de": "headless = false"
+        }
+      ],
+      "explanation_de": "boot_command sendet Tastendrücke an die VM-Konsole, typischerweise um dem Installer eine Preseed-/Kickstart-URL (http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg) mitzugeben. Provisioner laufen erst nach erfolgreicher SSH-Verbindung.",
+      "reference": "Packer-Dokumentation, QEMU builder boot_command",
+      "terms": [
+        {
+          "term": "unattended",
+          "de": "unbeaufsichtigt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.3-01",
+      "objective": "353.3",
+      "type": "single",
+      "question": "A cloud image was customized and should be turned back into a clean template so that cloud-init runs again as on first boot on every new instance. Which command is appropriate?",
+      "question_de": "Ein Cloud-Image wurde angepasst und soll wieder zu einer sauberen Vorlage werden, damit cloud-init auf jeder neuen Instanz erneut wie beim ersten Start läuft. Welcher Befehl ist geeignet?",
+      "choices": [
+        {
+          "text": "cloud-init clean --logs (inside the image) or virt-sysprep on the image file",
+          "text_de": "cloud-init clean --logs (im Image) oder virt-sysprep auf die Imagedatei",
+          "correct": true
+        },
+        {
+          "text": "rm -rf /etc/cloud",
+          "text_de": "rm -rf /etc/cloud"
+        },
+        {
+          "text": "cloud-init init --local",
+          "text_de": "cloud-init init --local"
+        },
+        {
+          "text": "systemctl disable cloud-init",
+          "text_de": "systemctl disable cloud-init"
+        },
+        {
+          "text": "touch /etc/cloud/cloud-init.disabled",
+          "text_de": "touch /etc/cloud/cloud-init.disabled"
+        }
+      ],
+      "explanation_de": "cloud-init clean löscht /var/lib/cloud/instances und Semaphore, so dass die Instanz beim nächsten Start als neu gilt; virt-sysprep entfernt zusätzlich SSH-Hostschlüssel, machine-id und Logs. /etc/cloud enthält die Konfiguration, cloud-init.disabled schaltet cloud-init ab.",
+      "reference": "cloud-init clean --help; virt-sysprep(1)",
+      "terms": [
+        {
+          "term": "template",
+          "de": "Vorlage"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.3-02",
+      "objective": "353.3",
+      "type": "single",
+      "question": "A cloud-config should format an attached volume /dev/vdb with ext4 and mount it at /data on every boot. Which user-data is correct?",
+      "question_de": "Eine cloud-config soll ein angeschlossenes Volume /dev/vdb mit ext4 formatieren und bei jedem Start unter /data einhängen. Welche user-data ist richtig?",
+      "choices": [
+        {
+          "text": "#cloud-config\nfs_setup:\n  - device: /dev/vdb\n    filesystem: ext4\n    label: data\nmounts:\n  - [ /dev/vdb, /data, ext4, \"defaults,nofail\", \"0\", \"2\" ]",
+          "text_de": "#cloud-config\nfs_setup:\n  - device: /dev/vdb\n    filesystem: ext4\n    label: data\nmounts:\n  - [ /dev/vdb, /data, ext4, \"defaults,nofail\", \"0\", \"2\" ]",
+          "correct": true
+        },
+        {
+          "text": "#cloud-config\nruncmd:\n  - mount /dev/vdb /data",
+          "text_de": "#cloud-config\nruncmd:\n  - mount /dev/vdb /data"
+        },
+        {
+          "text": "#cloud-config\ndisk_setup:\n  /dev/vdb: ext4 /data",
+          "text_de": "#cloud-config\ndisk_setup:\n  /dev/vdb: ext4 /data"
+        },
+        {
+          "text": "#!/bin/sh\nmkfs.ext4 /dev/vdb",
+          "text_de": "#!/bin/sh\nmkfs.ext4 /dev/vdb"
+        },
+        {
+          "text": "#cloud-config\nvolumes:\n  - /dev/vdb:/data",
+          "text_de": "#cloud-config\nvolumes:\n  - /dev/vdb:/data"
+        }
+      ],
+      "explanation_de": "Die Module disk_setup (Partitionen), fs_setup (Dateisysteme) und mounts (fstab-Einträge) sind dafür vorgesehen. runcmd ohne fstab-Eintrag mountet nur einmal, ein reines mkfs-Skript formatiert bei jedem Lauf ohne Prüfung. volumes gibt es in cloud-config nicht.",
+      "reference": "cloud-init-Dokumentation, Module disk_setup und mounts",
+      "terms": [
+        {
+          "term": "attached",
+          "de": "angeschlossen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.4-01",
+      "objective": "353.4",
+      "type": "single",
+      "question": "A Vagrantfile should give the VM a fixed IP in a private host-only network and share the project directory with NFS for better performance. Which configuration lines are correct?",
+      "question_de": "Ein Vagrantfile soll der VM eine feste IP in einem privaten Host-only-Netz geben und das Projektverzeichnis für bessere Leistung per NFS teilen. Welche Konfigurationszeilen sind richtig?",
+      "choices": [
+        {
+          "text": "config.vm.network \"private_network\", ip: \"192.168.56.10\"\nconfig.vm.synced_folder \".\", \"/vagrant\", type: \"nfs\"",
+          "text_de": "config.vm.network \"private_network\", ip: \"192.168.56.10\"\nconfig.vm.synced_folder \".\", \"/vagrant\", type: \"nfs\"",
+          "correct": true
+        },
+        {
+          "text": "config.vm.network \"public_network\", ip: \"192.168.56.10\"\nconfig.vm.share \".\", \"/vagrant\", nfs: true",
+          "text_de": "config.vm.network \"public_network\", ip: \"192.168.56.10\"\nconfig.vm.share \".\", \"/vagrant\", nfs: true"
+        },
+        {
+          "text": "config.vm.ip = \"192.168.56.10\"\nconfig.vm.nfs = \"/vagrant\"",
+          "text_de": "config.vm.ip = \"192.168.56.10\"\nconfig.vm.nfs = \"/vagrant\""
+        },
+        {
+          "text": "config.vm.network \"forwarded_port\", guest: 2049, host: 2049",
+          "text_de": "config.vm.network \"forwarded_port\", guest: 2049, host: 2049"
+        },
+        {
+          "text": "config.vm.provision \"nfs\", path: \".\"",
+          "text_de": "config.vm.provision \"nfs\", path: \".\""
+        }
+      ],
+      "explanation_de": "private_network erzeugt ein Host-only-Netz (nötig für NFS-Shares), synced_folder mit type: \"nfs\" nutzt den NFS-Server des Hosts. public_network brückt ins LAN, forwarded_port leitet einzelne Ports.",
+      "reference": "Vagrant-Dokumentation, Synced Folders NFS",
+      "terms": [
+        {
+          "term": "host-only",
+          "de": "nur zwischen Host und VM"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-erg-353.4-02",
+      "objective": "353.4",
+      "type": "single",
+      "question": "After changing the provisioning script in a Vagrantfile, which command re-runs the provisioners on an already running VM without destroying it?",
+      "question_de": "Nach einer Änderung am Provisionierungsskript im Vagrantfile: Welcher Befehl führt die Provisioner auf einer bereits laufenden VM erneut aus, ohne sie zu zerstören?",
+      "choices": [
+        {
+          "text": "vagrant provision",
+          "text_de": "vagrant provision",
+          "correct": true
+        },
+        {
+          "text": "vagrant reload",
+          "text_de": "vagrant reload"
+        },
+        {
+          "text": "vagrant up",
+          "text_de": "vagrant up"
+        },
+        {
+          "text": "vagrant destroy && vagrant up",
+          "text_de": "vagrant destroy && vagrant up"
+        },
+        {
+          "text": "vagrant ssh -c 'sh /vagrant/setup.sh'",
+          "text_de": "vagrant ssh -c 'sh /vagrant/setup.sh'"
+        }
+      ],
+      "explanation_de": "vagrant provision führt nur die Provisioner aus; vagrant reload --provision startet die VM neu und provisioniert; vagrant up provisioniert standardmäßig nur beim ersten Start. destroy löscht die VM, ssh umgeht Vagrants Provisioner-Logik.",
+      "reference": "vagrant provision --help",
+      "terms": [
+        {
+          "term": "re-run",
+          "de": "erneut ausführen"
+        }
+      ],
+      "difficulty": 2
+    }
+  ]
+}

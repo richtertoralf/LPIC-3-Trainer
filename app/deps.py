@@ -8,14 +8,18 @@ from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.db import get_session_factory
+from app.db import begin_write, get_session_factory
 from app.models import ROLE_ADMIN, AppSetting, User
 from app.security import SESSION_COOKIE, resolve_session
 
 
-def get_db() -> Iterator[Session]:
+def get_db(request: Request) -> Iterator[Session]:
+    """Request-scoped database session. State-changing requests start a write transaction
+    right away so that concurrent writers queue on SQLite's busy timeout."""
     db = get_session_factory()()
     try:
+        if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            begin_write(db)
         yield db
         db.commit()
     except Exception:

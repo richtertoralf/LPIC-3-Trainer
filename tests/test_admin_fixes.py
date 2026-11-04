@@ -132,7 +132,9 @@ def test_provenance_fields_stored_and_displayed(client, admin):
         extra = (
             db.execute(
                 select(ImportBatch).where(
-                    ImportBatch.supplementary.is_(True), ImportBatch.bundled.is_(True)
+                    ImportBatch.supplementary.is_(True),
+                    ImportBatch.bundled.is_(True),
+                    ImportBatch.rights == "unverified",
                 )
             )
             .scalars()

@@ -36,3 +36,9 @@ Die mitgelieferten Lerninhalte unter `content/` stehen unter CC BY-SA 4.0. **Dat
 - Fachliche Anmerkung: Bei „Which options can be used to limit access to a Samba share“ (`300-examtopics-screenshot-08`) beschränkt `write list` nicht den Zugriff, sondern erweitert Schreibrechte. Die Dump-Lösung ist nicht belegt; die Frage ist mit `"active": false` **inaktiv** und als unsicher gekennzeichnet.
 - Abweichung: Für die Frage zu `force directory mode = 0555` nennt der Dump 0555 als Lösung. Nach der Samba-Dokumentation ergibt sich 0755 (directory mask, dann bitweises ODER mit force directory mode). Die Datei markiert 0755 als richtig und erklärt die Abweichung.
 - Deutsche Übersetzungen, Erklärungen und Begriffslisten sind eigene Arbeit des Projekts.
+
+### `300-ergaenzung-2026-11.json`, `303-ergaenzung-2026-11.json`, `305-ergaenzung-2026-11.json`, `306-ergaenzung-2026-11.json`
+
+- Quelle: eigene Fragen des Projekts (Ergänzungspool 2026-11), erstellt nach den offiziellen LPI-Prüfungszielen 3.0; externe Fragensammlungen dienten nur der Themenfindung (siehe `docs/zusatzfragen-bericht.md`).
+- Rechte: geklärt, CC BY-SA 4.0 wie die Projektfragen. Trotzdem Zusatzfragen: unveröffentlicht, bis ein Betreuer oder Administrator sie freigibt.
+- Umfang: 300: 51, 303: 60, 305: 50, 306: 60 Fragen mit Referenz je Frage (Manpage oder Projektdokumentation).

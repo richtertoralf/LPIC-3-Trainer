@@ -356,7 +356,17 @@ def grade(question: Question, selected: set[int]) -> bool:
 # ----------------------------------------------------------------------- terms
 
 
-_WORD_RE = re.compile(r"[A-Za-z][A-Za-z0-9_./-]*")
+_PATTERN_CACHE: dict[str, re.Pattern[str]] = {}
+
+
+def _term_pattern(term: str) -> re.Pattern[str]:
+    """Compiled whole-word pattern for a glossary term (cached; compiling 270 patterns
+    per request was the main cost of the practice page)."""
+    pattern = _PATTERN_CACHE.get(term)
+    if pattern is None:
+        pattern = re.compile(r"(?<![a-z0-9])" + re.escape(term) + r"(?![a-z0-9])")
+        _PATTERN_CACHE[term] = pattern
+    return pattern
 
 
 def terms_for_question(db: Session, question: Question) -> list[Term]:
@@ -367,8 +377,7 @@ def terms_for_question(db: Session, question: Question) -> list[Term]:
     for term in all_terms:
         if term.id in linked:
             continue
-        pattern = r"(?<![a-z0-9])" + re.escape(term.term) + r"(?![a-z0-9])"
-        if re.search(pattern, text):
+        if _term_pattern(term.term).search(text):
             linked[term.id] = term
     return sorted(linked.values(), key=lambda t: -len(t.term))
 

@@ -21,7 +21,7 @@ def _configure_sqlite(dbapi_connection, _record) -> None:
     cursor.execute("PRAGMA journal_mode=WAL")
     cursor.execute("PRAGMA synchronous=NORMAL")
     cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.execute("PRAGMA busy_timeout=5000")
+    cursor.execute("PRAGMA busy_timeout=15000")
     cursor.close()
 
 
@@ -57,11 +57,23 @@ def reset_engine() -> None:
     _session_factory = None
 
 
+def begin_write(session: Session) -> None:
+    """Start the SQLite transaction as a write transaction (BEGIN IMMEDIATE).
+
+    pysqlite opens deferred transactions. A request that reads first and writes later
+    would have to upgrade its lock; if another writer committed meanwhile, SQLite fails
+    immediately with "database is locked" without honouring busy_timeout. Taking the
+    write lock up front makes concurrent writers queue correctly instead.
+    """
+    session.execute(text("BEGIN IMMEDIATE"))
+
+
 @contextmanager
 def session_scope() -> Iterator[Session]:
-    """Provide a transactional scope for a short unit of work."""
+    """Provide a transactional scope for a short unit of work (writes allowed)."""
     session = get_session_factory()()
     try:
+        begin_write(session)
         yield session
         session.commit()
     except Exception:

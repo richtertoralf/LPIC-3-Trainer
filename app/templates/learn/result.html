@@ -17,6 +17,7 @@
     <h2>Erklärung</h2>
     {% if question.explanation_de %}{{ question.explanation_de | nl2p }}{% else %}<p class="muted">Keine Erklärung hinterlegt.</p>{% endif %}
     {% if question.explanation_en %}<details><summary>Explanation (English)</summary>{{ question.explanation_en | nl2p }}</details>{% endif %}
+    {% if question.reference %}<p class="muted small">Referenz: {% if question.reference.startswith('http') %}<a href="{{ question.reference }}" rel="noopener nofollow" target="_blank">{{ question.reference }}</a>{% else %}{{ question.reference }}{% endif %}</p>{% endif %}
   </div>
   <p class="actions">
     {% if review %}

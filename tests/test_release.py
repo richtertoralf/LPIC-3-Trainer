@@ -235,7 +235,10 @@ def test_bundled_core_pool_is_released_and_extra_sources_are_not(client, admin):
             .all()
         )
         assert len(extra) == len(EXTRA_FILES) and all(not b.released for b in extra)
-        assert all(b.rights == "unverified" and b.source and b.exam_version for b in extra)
+        assert all(
+            b.rights in ("unverified", "cleared") and b.source and b.exam_version for b in extra
+        )
+        assert any(b.rights == "unverified" for b in extra)
         core_q = (
             db.execute(select(Question).where(Question.import_batch_id == core[0].id))
             .scalars()

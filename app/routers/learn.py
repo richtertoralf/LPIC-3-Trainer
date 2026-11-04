@@ -107,6 +107,7 @@ async def answer(
     used_help = form.get("used_help") == "1"
     is_correct = grade(question, selected)
     record_attempt(db, user, question, is_correct, used_help, MODE_PRACTICE)
+    db.commit()  # release the write lock before the (read-only) rendering work
     obj_code = form.get("objective") or None
     obj = _objective(db, obj_code) if obj_code else None
     ctx = _question_context(db, user, question, with_help=True)

@@ -1,0 +1,2351 @@
+{
+  "schema_version": 1,
+  "kind": "questions",
+  "module": "303",
+  "supplementary": true,
+  "source": "LPIC-3 Trainer Projekt, Ergänzungspool 2026-11",
+  "source_url": "https://github.com/richtertoralf/LPIC-3-Trainer",
+  "exam_code": "303-300",
+  "exam_version": "3.0",
+  "rights": "cleared",
+  "license": "CC BY-SA 4.0. Eigene Fragen des Projekts nach den offiziellen LPI-Prüfungszielen 3.0; externe Fragensammlungen dienten nur der Themenfindung. Zusatzfragen: Freigabe durch Betreuer oder Administrator nötig.",
+  "author": "LPIC-3 Trainer Projekt",
+  "questions": [
+    {
+      "id": "303-erg-331.1-01",
+      "objective": "331.1",
+      "type": "single",
+      "question": "A company runs a root CA and an issuing CA. The issuing CA must be able to sign end-entity certificates but must not be able to create further sub-CAs. Which basicConstraints value in the issuing CA's certificate enforces this?",
+      "question_de": "Ein Unternehmen betreibt eine Root-CA und eine ausstellende CA. Die ausstellende CA darf Endzertifikate signieren, aber keine weiteren Unter-CAs anlegen. Welcher basicConstraints-Wert im Zertifikat der ausstellenden CA erzwingt das?",
+      "choices": [
+        {
+          "text": "CA:TRUE, pathlen:0",
+          "text_de": "CA:TRUE, pathlen:0",
+          "correct": true
+        },
+        {
+          "text": "CA:TRUE, pathlen:1",
+          "text_de": "CA:TRUE, pathlen:1"
+        },
+        {
+          "text": "CA:FALSE",
+          "text_de": "CA:FALSE"
+        },
+        {
+          "text": "CA:TRUE without pathlen",
+          "text_de": "CA:TRUE ohne pathlen"
+        },
+        {
+          "text": "keyUsage = keyCertSign only",
+          "text_de": "nur keyUsage = keyCertSign"
+        }
+      ],
+      "explanation_de": "pathlen gibt an, wie viele CA-Zertifikate unterhalb noch folgen dürfen; 0 erlaubt nur Endzertifikate. CA:FALSE könnte gar nichts signieren, ohne pathlen wäre die Tiefe unbegrenzt. keyUsage allein begrenzt die Kettentiefe nicht.",
+      "reference": "x509v3_config(5), basicConstraints",
+      "terms": [
+        {
+          "term": "end-entity certificate",
+          "de": "Endzertifikat (kein CA-Zertifikat)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.1-02",
+      "objective": "331.1",
+      "type": "single",
+      "question": "Which command verifies that server.crt chains correctly to the root CA when the intermediate certificate is stored in intermediate.crt?",
+      "question_de": "Welcher Befehl prüft, dass server.crt korrekt bis zur Root-CA verkettet ist, wenn das Zwischenzertifikat in intermediate.crt liegt?",
+      "choices": [
+        {
+          "text": "openssl verify -CAfile root.crt -untrusted intermediate.crt server.crt",
+          "text_de": "openssl verify -CAfile root.crt -untrusted intermediate.crt server.crt",
+          "correct": true
+        },
+        {
+          "text": "openssl verify -CAfile intermediate.crt server.crt",
+          "text_de": "openssl verify -CAfile intermediate.crt server.crt"
+        },
+        {
+          "text": "openssl x509 -in server.crt -CAfile root.crt -verify",
+          "text_de": "openssl x509 -in server.crt -CAfile root.crt -verify"
+        },
+        {
+          "text": "openssl verify -chain root.crt intermediate.crt server.crt",
+          "text_de": "openssl verify -chain root.crt intermediate.crt server.crt"
+        },
+        {
+          "text": "cat root.crt intermediate.crt | openssl verify server.crt",
+          "text_de": "cat root.crt intermediate.crt | openssl verify server.crt"
+        }
+      ],
+      "explanation_de": "-CAfile nennt die vertrauenswürdigen Anker, -untrusted liefert Zwischenzertifikate, die zum Kettenaufbau genutzt, aber nicht als Anker behandelt werden. Nur das Zwischenzertifikat als CAfile anzugeben würde ihm Vertrauen schenken, ohne es gegen die Root zu prüfen.",
+      "reference": "openssl-verify(1)",
+      "terms": [
+        {
+          "term": "intermediate certificate",
+          "de": "Zwischenzertifikat"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.1-03",
+      "objective": "331.1",
+      "type": "single",
+      "question": "A web server needs its certificate and private key in a single password-protected file for import into a Windows system. Which command creates it?",
+      "question_de": "Ein Webserver benötigt Zertifikat und privaten Schlüssel in einer einzelnen passwortgeschützten Datei für den Import in ein Windows-System. Welcher Befehl erzeugt sie?",
+      "choices": [
+        {
+          "text": "openssl pkcs12 -export -in server.crt -inkey server.key -certfile chain.crt -out server.p12",
+          "text_de": "openssl pkcs12 -export -in server.crt -inkey server.key -certfile chain.crt -out server.p12",
+          "correct": true
+        },
+        {
+          "text": "openssl x509 -in server.crt -inkey server.key -outform DER -out server.p12",
+          "text_de": "openssl x509 -in server.crt -inkey server.key -outform DER -out server.p12"
+        },
+        {
+          "text": "openssl pkcs8 -topk8 -in server.key -out server.p12",
+          "text_de": "openssl pkcs8 -topk8 -in server.key -out server.p12"
+        },
+        {
+          "text": "cat server.key server.crt > server.p12",
+          "text_de": "cat server.key server.crt > server.p12"
+        },
+        {
+          "text": "openssl crl2pkcs7 -certfile server.crt -out server.p12",
+          "text_de": "openssl crl2pkcs7 -certfile server.crt -out server.p12"
+        }
+      ],
+      "explanation_de": "PKCS#12 (.p12/.pfx) bündelt Schlüssel, Zertifikat und Kette verschlüsselt. pkcs8 wandelt nur Schlüsselformate, PKCS#7 enthält keine privaten Schlüssel, eine zusammengefügte PEM-Datei ist nicht passwortgeschützt.",
+      "reference": "openssl-pkcs12(1)",
+      "terms": [
+        {
+          "term": "password-protected",
+          "de": "passwortgeschützt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.1-04",
+      "objective": "331.1",
+      "type": "single",
+      "question": "What does Certificate Transparency add to the X.509 PKI?",
+      "question_de": "Was fügt Certificate Transparency der X.509-PKI hinzu?",
+      "choices": [
+        {
+          "text": "Public, append-only logs of issued certificates so that mis-issued certificates for a domain can be detected by its owner.",
+          "text_de": "Öffentliche, nur anfügbare Protokolle ausgestellter Zertifikate, so dass fehlerhaft ausgestellte Zertifikate für eine Domain vom Inhaber erkannt werden können.",
+          "correct": true
+        },
+        {
+          "text": "Encryption of the certificate contents so that only the subject can read them.",
+          "text_de": "Verschlüsselung der Zertifikatsinhalte, so dass nur der Inhaber sie lesen kann."
+        },
+        {
+          "text": "A replacement for CRLs that stores revocation information in DNS.",
+          "text_de": "Einen Ersatz für CRLs, der Sperrinformationen im DNS ablegt."
+        },
+        {
+          "text": "Automatic renewal of certificates before they expire.",
+          "text_de": "Automatische Erneuerung von Zertifikaten vor Ablauf."
+        },
+        {
+          "text": "A requirement that all CAs use the same root key.",
+          "text_de": "Die Vorgabe, dass alle CAs denselben Root-Schlüssel verwenden."
+        }
+      ],
+      "explanation_de": "CT-Logs (RFC 6962) protokollieren Zertifikate öffentlich; CAs liefern Signed Certificate Timestamps mit, Browser verlangen sie. Domaininhaber können Logs überwachen. Sperrung bleibt bei CRL/OCSP, Erneuerung bei ACME.",
+      "reference": "RFC 6962",
+      "terms": [
+        {
+          "term": "append-only",
+          "de": "nur anfügbar, nicht veränderbar"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.1-05",
+      "objective": "331.1",
+      "type": "single",
+      "question": "certbot should obtain a certificate for www.example.org on a server where no web server is running yet. Which authenticator is appropriate?",
+      "question_de": "certbot soll ein Zertifikat für www.example.org auf einem Server beziehen, auf dem noch kein Webserver läuft. Welcher Authenticator ist geeignet?",
+      "choices": [
+        {
+          "text": "certbot certonly --standalone -d www.example.org",
+          "text_de": "certbot certonly --standalone -d www.example.org",
+          "correct": true
+        },
+        {
+          "text": "certbot certonly --apache -d www.example.org",
+          "text_de": "certbot certonly --apache -d www.example.org"
+        },
+        {
+          "text": "certbot certonly --webroot -w /var/www/html -d www.example.org",
+          "text_de": "certbot certonly --webroot -w /var/www/html -d www.example.org"
+        },
+        {
+          "text": "certbot renew --force-renewal",
+          "text_de": "certbot renew --force-renewal"
+        },
+        {
+          "text": "certbot register --agree-tos",
+          "text_de": "certbot register --agree-tos"
+        }
+      ],
+      "explanation_de": "--standalone startet einen eigenen Webserver auf Port 80 für die HTTP-01-Challenge; --webroot und --apache setzen einen laufenden Webserver voraus. Alternativ wäre die DNS-01-Challenge möglich. renew erneuert bestehende Zertifikate, register legt nur das ACME-Konto an.",
+      "reference": "certbot-Dokumentation, Authenticators",
+      "terms": [
+        {
+          "term": "obtain",
+          "de": "beziehen, erhalten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.2-01",
+      "objective": "331.2",
+      "type": "single",
+      "question": "A security scan reports that an Apache server still accepts TLS 1.0 and TLS 1.1. Which directive restricts the server to TLS 1.2 and TLS 1.3?",
+      "question_de": "Ein Sicherheitsscan meldet, dass ein Apache-Server noch TLS 1.0 und TLS 1.1 akzeptiert. Welche Direktive beschränkt den Server auf TLS 1.2 und TLS 1.3?",
+      "choices": [
+        {
+          "text": "SSLProtocol -all +TLSv1.2 +TLSv1.3",
+          "text_de": "SSLProtocol -all +TLSv1.2 +TLSv1.3",
+          "correct": true
+        },
+        {
+          "text": "SSLProtocol all -SSLv3",
+          "text_de": "SSLProtocol all -SSLv3"
+        },
+        {
+          "text": "SSLCipherSuite HIGH:!TLSv1:!TLSv1.1",
+          "text_de": "SSLCipherSuite HIGH:!TLSv1:!TLSv1.1"
+        },
+        {
+          "text": "SSLEngine TLSv1.2",
+          "text_de": "SSLEngine TLSv1.2"
+        },
+        {
+          "text": "SSLHonorCipherOrder on",
+          "text_de": "SSLHonorCipherOrder on"
+        }
+      ],
+      "explanation_de": "SSLProtocol wählt Protokollversionen; -all +TLSv1.2 +TLSv1.3 erlaubt nur diese. SSLCipherSuite wählt Cipher, nicht Versionen; SSLHonorCipherOrder lässt den Server die Reihenfolge bestimmen.",
+      "reference": "mod_ssl-Dokumentation, SSLProtocol",
+      "terms": [
+        {
+          "term": "restrict",
+          "de": "beschränken"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.2-02",
+      "objective": "331.2",
+      "type": "single",
+      "question": "Browsers show the error \"certificate chain incomplete\" for an Apache HTTPS site, although the server certificate is valid. What is the most likely configuration mistake?",
+      "question_de": "Browser melden für eine Apache-HTTPS-Seite „Zertifikatskette unvollständig“, obwohl das Serverzertifikat gültig ist. Welcher Konfigurationsfehler ist am wahrscheinlichsten?",
+      "choices": [
+        {
+          "text": "The intermediate CA certificate is not delivered: SSLCertificateChainFile is missing, or the intermediate was not appended to the file given in SSLCertificateFile.",
+          "text_de": "Das Zwischenzertifikat wird nicht ausgeliefert: SSLCertificateChainFile fehlt oder das Zwischenzertifikat wurde nicht an die Datei aus SSLCertificateFile angehängt.",
+          "correct": true
+        },
+        {
+          "text": "SSLVerifyClient is set to require.",
+          "text_de": "SSLVerifyClient steht auf require."
+        },
+        {
+          "text": "The private key is not encrypted.",
+          "text_de": "Der private Schlüssel ist nicht verschlüsselt."
+        },
+        {
+          "text": "SSLUseStapling is off.",
+          "text_de": "SSLUseStapling ist aus."
+        },
+        {
+          "text": "The server name does not match the SNI name.",
+          "text_de": "Der Servername passt nicht zum SNI-Namen."
+        }
+      ],
+      "explanation_de": "Clients brauchen die Zwischenzertifikate, um die Kette bis zu einem vertrauten Anker zu bilden. Seit Apache 2.4.8 können sie in SSLCertificateFile angehängt werden, sonst über SSLCertificateChainFile. openssl s_client -showcerts zeigt, was der Server liefert.",
+      "reference": "mod_ssl-Dokumentation, SSLCertificateChainFile",
+      "terms": [
+        {
+          "term": "incomplete",
+          "de": "unvollständig"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.2-03",
+      "objective": "331.2",
+      "type": "single",
+      "question": "Which openssl command tests whether a server offers the cipher suite ECDHE-RSA-AES128-GCM-SHA256 with TLS 1.2?",
+      "question_de": "Welcher openssl-Befehl prüft, ob ein Server die Cipher Suite ECDHE-RSA-AES128-GCM-SHA256 mit TLS 1.2 anbietet?",
+      "choices": [
+        {
+          "text": "openssl s_client -connect host:443 -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256",
+          "text_de": "openssl s_client -connect host:443 -tls1_2 -cipher ECDHE-RSA-AES128-GCM-SHA256",
+          "correct": true
+        },
+        {
+          "text": "openssl ciphers -v ECDHE-RSA-AES128-GCM-SHA256",
+          "text_de": "openssl ciphers -v ECDHE-RSA-AES128-GCM-SHA256"
+        },
+        {
+          "text": "openssl s_server -cipher ECDHE-RSA-AES128-GCM-SHA256 -connect host:443",
+          "text_de": "openssl s_server -cipher ECDHE-RSA-AES128-GCM-SHA256 -connect host:443"
+        },
+        {
+          "text": "openssl verify -cipher ECDHE-RSA-AES128-GCM-SHA256 host:443",
+          "text_de": "openssl verify -cipher ECDHE-RSA-AES128-GCM-SHA256 host:443"
+        },
+        {
+          "text": "openssl speed ecdhe-rsa-aes128-gcm-sha256",
+          "text_de": "openssl speed ecdhe-rsa-aes128-gcm-sha256"
+        }
+      ],
+      "explanation_de": "s_client mit -cipher bietet nur die genannte Suite an; kommt der Handshake zustande, unterstützt der Server sie. openssl ciphers zeigt nur die lokal verfügbaren Suiten, s_server ist die Serverseite, speed misst Durchsatz.",
+      "reference": "openssl-s_client(1)",
+      "terms": [
+        {
+          "term": "offer",
+          "de": "anbieten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.2-04",
+      "objective": "331.2",
+      "type": "single",
+      "question": "An application should identify users by the subject DN of their client certificate instead of a password. Which mod_ssl directive makes the DN available to the application, for example as environment variable or header?",
+      "question_de": "Eine Anwendung soll Benutzer anhand des Subject-DN ihres Client-Zertifikats statt per Passwort identifizieren. Welche mod_ssl-Direktive stellt den DN der Anwendung bereit, etwa als Umgebungsvariable oder Header?",
+      "choices": [
+        {
+          "text": "SSLOptions +StdEnvVars (exports SSL_CLIENT_S_DN and related variables)",
+          "text_de": "SSLOptions +StdEnvVars (exportiert SSL_CLIENT_S_DN und verwandte Variablen)",
+          "correct": true
+        },
+        {
+          "text": "SSLRequireSSL",
+          "text_de": "SSLRequireSSL"
+        },
+        {
+          "text": "SSLVerifyDepth 0",
+          "text_de": "SSLVerifyDepth 0"
+        },
+        {
+          "text": "SSLCARevocationCheck leaf",
+          "text_de": "SSLCARevocationCheck leaf"
+        },
+        {
+          "text": "SSLSessionCache dbm:/var/cache/ssl",
+          "text_de": "SSLSessionCache dbm:/var/cache/ssl"
+        }
+      ],
+      "explanation_de": "Mit SSLVerifyClient require und SSLOptions +StdEnvVars stehen SSL_CLIENT_S_DN, SSL_CLIENT_CERT usw. als Umgebungsvariablen bereit; SSLUserName SSL_CLIENT_S_DN setzt zusätzlich REMOTE_USER. VerifyDepth begrenzt die Kettentiefe, RevocationCheck prüft Sperrlisten.",
+      "reference": "mod_ssl-Dokumentation, SSLOptions",
+      "terms": [
+        {
+          "term": "environment variable",
+          "de": "Umgebungsvariable"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.3-01",
+      "objective": "331.3",
+      "type": "single",
+      "question": "A LUKS2 volume should open at boot using a key sealed in the TPM2 chip, without a passphrase prompt. Which command binds the volume accordingly?",
+      "question_de": "Ein LUKS2-Volume soll beim Start mit einem im TPM2-Chip versiegelten Schlüssel ohne Passphrase-Abfrage geöffnet werden. Welcher Befehl bindet das Volume entsprechend?",
+      "choices": [
+        {
+          "text": "clevis luks bind -d /dev/sda3 tpm2 '{\"pcr_ids\":\"7\"}'",
+          "text_de": "clevis luks bind -d /dev/sda3 tpm2 '{\"pcr_ids\":\"7\"}'",
+          "correct": true
+        },
+        {
+          "text": "cryptsetup luksAddKey /dev/sda3 --tpm2",
+          "text_de": "cryptsetup luksAddKey /dev/sda3 --tpm2"
+        },
+        {
+          "text": "tpm2_create --luks /dev/sda3",
+          "text_de": "tpm2_create --luks /dev/sda3"
+        },
+        {
+          "text": "clevis luks bind -d /dev/sda3 tang '{\"url\":\"tpm2\"}'",
+          "text_de": "clevis luks bind -d /dev/sda3 tang '{\"url\":\"tpm2\"}'"
+        },
+        {
+          "text": "echo tpm2 >> /etc/crypttab",
+          "text_de": "echo tpm2 >> /etc/crypttab"
+        }
+      ],
+      "explanation_de": "Clevis bindet LUKS-Volumes an Pins: tpm2 (lokal, optional an PCR-Werte gebunden), tang (Netzwerk) oder sss (Kombination). Die Entschlüsselung beim Start übernimmt clevis-luks-askpass bzw. der Dracut-Hook. cryptsetup allein kennt kein TPM-Binding (systemd-cryptenroll wäre eine Alternative).",
+      "reference": "clevis-luks-bind(1)",
+      "terms": [
+        {
+          "term": "sealed",
+          "de": "versiegelt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.3-02",
+      "objective": "331.3",
+      "type": "single",
+      "question": "Which statement about eCryptfs is correct?",
+      "question_de": "Welche Aussage über eCryptfs ist richtig?",
+      "choices": [
+        {
+          "text": "It is a stacked file system that encrypts file contents and optionally file names on top of an existing file system; metadata is stored in each file header.",
+          "text_de": "Es ist ein gestapeltes Dateisystem, das Dateiinhalte und optional Dateinamen über einem vorhandenen Dateisystem verschlüsselt; Metadaten liegen im Kopf jeder Datei.",
+          "correct": true
+        },
+        {
+          "text": "It encrypts whole block devices and requires a LUKS header.",
+          "text_de": "Es verschlüsselt ganze Blockgeräte und benötigt einen LUKS-Header."
+        },
+        {
+          "text": "It can only be used for home directories created by ecryptfs-setup-private.",
+          "text_de": "Es kann nur für Home-Verzeichnisse verwendet werden, die ecryptfs-setup-private angelegt hat."
+        },
+        {
+          "text": "It requires a TPM chip.",
+          "text_de": "Es benötigt einen TPM-Chip."
+        },
+        {
+          "text": "It stores all keys in /etc/crypttab.",
+          "text_de": "Es speichert alle Schlüssel in /etc/crypttab."
+        }
+      ],
+      "explanation_de": "eCryptfs arbeitet auf Dateiebene (mount -t ecryptfs lower upper), jede Datei trägt ihre Krypto-Metadaten; so lassen sich verschlüsselte Dateien einzeln sichern oder kopieren. Blockgeräteverschlüsselung ist dm-crypt/LUKS.",
+      "reference": "ecryptfs(7)",
+      "terms": [
+        {
+          "term": "stacked file system",
+          "de": "gestapeltes Dateisystem"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.3-03",
+      "objective": "331.3",
+      "type": "single",
+      "question": "Which command shows the cipher, key size and used key slots of an existing LUKS device without opening it?",
+      "question_de": "Welcher Befehl zeigt Cipher, Schlüssellänge und belegte Schlüsselplätze eines vorhandenen LUKS-Geräts, ohne es zu öffnen?",
+      "choices": [
+        {
+          "text": "cryptsetup luksDump /dev/sdb1",
+          "text_de": "cryptsetup luksDump /dev/sdb1",
+          "correct": true
+        },
+        {
+          "text": "cryptsetup status /dev/sdb1",
+          "text_de": "cryptsetup status /dev/sdb1"
+        },
+        {
+          "text": "cryptsetup isLuks -v /dev/sdb1",
+          "text_de": "cryptsetup isLuks -v /dev/sdb1"
+        },
+        {
+          "text": "dmsetup table /dev/sdb1",
+          "text_de": "dmsetup table /dev/sdb1"
+        },
+        {
+          "text": "blkid -p /dev/sdb1",
+          "text_de": "blkid -p /dev/sdb1"
+        }
+      ],
+      "explanation_de": "luksDump liest den Header: Version, Cipher, Hash, Schlüsselplätze und bei LUKS2 Token. status zeigt Informationen zu einem bereits geöffneten Mapping, isLuks prüft nur den Typ, blkid zeigt den Dateisystemtyp crypto_LUKS.",
+      "reference": "cryptsetup(8), luksDump",
+      "terms": [
+        {
+          "term": "key slot",
+          "de": "Schlüsselplatz"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.4-01",
+      "objective": "331.4",
+      "type": "single",
+      "question": "A BIND 9 server should act as a validating recursive resolver. Which named.conf option enables DNSSEC validation with the built-in root trust anchor?",
+      "question_de": "Ein BIND-9-Server soll als validierender rekursiver Resolver arbeiten. Welche named.conf-Option aktiviert die DNSSEC-Validierung mit dem eingebauten Root-Vertrauensanker?",
+      "choices": [
+        {
+          "text": "dnssec-validation auto;",
+          "text_de": "dnssec-validation auto;",
+          "correct": true
+        },
+        {
+          "text": "dnssec-enable yes;",
+          "text_de": "dnssec-enable yes;"
+        },
+        {
+          "text": "auto-dnssec maintain;",
+          "text_de": "auto-dnssec maintain;"
+        },
+        {
+          "text": "recursion yes; dnssec-lookaside auto;",
+          "text_de": "recursion yes; dnssec-lookaside auto;"
+        },
+        {
+          "text": "trust-anchors { . initial-key \"root\"; };",
+          "text_de": "trust-anchors { . initial-key \"root\"; };"
+        }
+      ],
+      "explanation_de": "dnssec-validation auto nutzt den mitgelieferten Root-Schlüssel und RFC 5011 zur Aktualisierung. auto-dnssec gehört zum Signieren eigener Zonen, dnssec-lookaside ist abgeschafft, trust-anchors braucht den vollständigen Schlüssel.",
+      "reference": "BIND 9 ARM, dnssec-validation",
+      "terms": [
+        {
+          "term": "trust anchor",
+          "de": "Vertrauensanker"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.4-02",
+      "objective": "331.4",
+      "type": "single",
+      "question": "Which command verifies from a client that the DNSSEC chain of trust for www.example.org is valid, independent of the local resolver's validation?",
+      "question_de": "Welcher Befehl prüft von einem Client aus, dass die DNSSEC-Vertrauenskette für www.example.org gültig ist, unabhängig von der Validierung des lokalen Resolvers?",
+      "choices": [
+        {
+          "text": "delv @9.9.9.9 www.example.org A",
+          "text_de": "delv @9.9.9.9 www.example.org A",
+          "correct": true
+        },
+        {
+          "text": "dig +short www.example.org A",
+          "text_de": "dig +short www.example.org A"
+        },
+        {
+          "text": "dig +dnssec www.example.org A | grep RRSIG",
+          "text_de": "dig +dnssec www.example.org A | grep RRSIG"
+        },
+        {
+          "text": "host -t DNSKEY www.example.org",
+          "text_de": "host -t DNSKEY www.example.org"
+        },
+        {
+          "text": "rndc validation status",
+          "text_de": "rndc validation status"
+        }
+      ],
+      "explanation_de": "delv validiert selbst mit dem eingebauten Root-Anker und meldet \"fully validated\" oder Fehler. dig +dnssec zeigt nur, ob Signaturen vorhanden sind und ob der Resolver das AD-Flag setzt; es prüft die Kette nicht selbst.",
+      "reference": "delv(1)",
+      "terms": [
+        {
+          "term": "chain of trust",
+          "de": "Vertrauenskette"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.4-03",
+      "objective": "331.4",
+      "type": "single",
+      "question": "A signed zone uses NSEC records. An administrator notices that anyone can enumerate all host names of the zone. Which change prevents this zone walking?",
+      "question_de": "Eine signierte Zone verwendet NSEC-Einträge. Ein Administrator stellt fest, dass jeder alle Hostnamen der Zone aufzählen kann. Welche Änderung verhindert dieses Zone Walking?",
+      "choices": [
+        {
+          "text": "Switch the zone to NSEC3 with a salt and opt-out as appropriate (dnssec-signzone -3 <salt> or dnssec-policy with nsec3param).",
+          "text_de": "Die Zone auf NSEC3 mit Salt umstellen (dnssec-signzone -3 <salt> oder dnssec-policy mit nsec3param).",
+          "correct": true
+        },
+        {
+          "text": "Disable AXFR transfers with allow-transfer { none; }.",
+          "text_de": "AXFR-Transfers mit allow-transfer { none; } abschalten."
+        },
+        {
+          "text": "Remove the DS record from the parent zone.",
+          "text_de": "Den DS-Eintrag aus der Elternzone entfernen."
+        },
+        {
+          "text": "Shorten the TTL of the NSEC records.",
+          "text_de": "Die TTL der NSEC-Einträge verkürzen."
+        },
+        {
+          "text": "Sign the zone with a larger ZSK.",
+          "text_de": "Die Zone mit einem größeren ZSK signieren."
+        }
+      ],
+      "explanation_de": "NSEC verkettet existierende Namen im Klartext und erlaubt so das Aufzählen. NSEC3 verwendet gehashte Namen, so dass die Nichtexistenz bewiesen wird, ohne Namen preiszugeben. allow-transfer verhindert nur Zonentransfers, nicht das Walking über NSEC.",
+      "reference": "RFC 5155; dnssec-signzone(8)",
+      "terms": [
+        {
+          "term": "enumerate",
+          "de": "aufzählen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.4-04",
+      "objective": "331.4",
+      "type": "single",
+      "question": "Dynamic DNS updates from a DHCP server to a BIND zone must be authenticated. Which mechanism is designed for this?",
+      "question_de": "Dynamische DNS-Updates von einem DHCP-Server an eine BIND-Zone müssen authentifiziert werden. Welcher Mechanismus ist dafür vorgesehen?",
+      "choices": [
+        {
+          "text": "TSIG with a shared key (tsig-keygen) referenced in update-policy or allow-update",
+          "text_de": "TSIG mit einem gemeinsamen Schlüssel (tsig-keygen), referenziert in update-policy oder allow-update",
+          "correct": true
+        },
+        {
+          "text": "DNSSEC signing of the update messages with the ZSK",
+          "text_de": "DNSSEC-Signierung der Update-Nachrichten mit dem ZSK"
+        },
+        {
+          "text": "A CAA record naming the DHCP server",
+          "text_de": "Ein CAA-Eintrag, der den DHCP-Server nennt"
+        },
+        {
+          "text": "DNS over TLS between DHCP server and BIND",
+          "text_de": "DNS über TLS zwischen DHCP-Server und BIND"
+        },
+        {
+          "text": "allow-update { any; } restricted by iptables",
+          "text_de": "allow-update { any; } beschränkt durch iptables"
+        }
+      ],
+      "explanation_de": "TSIG (RFC 8945) signiert Transaktionen mit einem symmetrischen Schlüssel; nsupdate -k und ISC DHCP/Kea nutzen ihn. DNSSEC schützt Zonendaten, nicht Update-Transaktionen. IP-basierte Freigaben sind fälschbar.",
+      "reference": "BIND 9 ARM, TSIG; tsig-keygen(8)",
+      "terms": [
+        {
+          "term": "shared key",
+          "de": "gemeinsamer (symmetrischer) Schlüssel"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-331.4-05",
+      "objective": "331.4",
+      "type": "single",
+      "question": "A mail server publishes a TLSA record for _25._tcp.mail.example.org. What must additionally be true for DANE verification by sending servers to succeed?",
+      "question_de": "Ein Mailserver veröffentlicht einen TLSA-Eintrag für _25._tcp.mail.example.org. Was muss zusätzlich erfüllt sein, damit die DANE-Prüfung durch sendende Server gelingt?",
+      "choices": [
+        {
+          "text": "The zone example.org must be DNSSEC-signed with a valid chain to the root, and the TLSA data must match the certificate or key presented by the mail server.",
+          "text_de": "Die Zone example.org muss DNSSEC-signiert mit gültiger Kette zur Root sein, und die TLSA-Daten müssen zum vom Mailserver präsentierten Zertifikat oder Schlüssel passen.",
+          "correct": true
+        },
+        {
+          "text": "The certificate must be issued by a public CA listed in the CAA record.",
+          "text_de": "Das Zertifikat muss von einer öffentlichen CA stammen, die im CAA-Eintrag steht."
+        },
+        {
+          "text": "The mail server must offer TLS 1.3 only.",
+          "text_de": "Der Mailserver darf nur TLS 1.3 anbieten."
+        },
+        {
+          "text": "The TLSA record must be published in the parent zone org.",
+          "text_de": "Der TLSA-Eintrag muss in der Elternzone org veröffentlicht sein."
+        },
+        {
+          "text": "OCSP stapling must be enabled on the mail server.",
+          "text_de": "OCSP Stapling muss auf dem Mailserver aktiv sein."
+        }
+      ],
+      "explanation_de": "DANE vertraut dem TLSA-Eintrag nur, wenn er DNSSEC-validiert ist. Der Eintrag beschreibt mit Nutzung, Selektor und Matching-Typ, welches Zertifikat oder welcher Schlüssel erwartet wird; bei DANE-EE ist keine CA nötig. Ein neues Zertifikat erfordert einen passenden TLSA-Eintrag.",
+      "reference": "RFC 6698, RFC 7672",
+      "terms": [
+        {
+          "term": "succeed",
+          "de": "gelingen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.1-01",
+      "objective": "332.1",
+      "type": "single",
+      "question": "Anyone with console access can edit the GRUB 2 kernel command line and boot into single-user mode. Which measure prevents editing boot entries while still allowing normal boots without a password?",
+      "question_de": "Jeder mit Konsolenzugang kann die GRUB-2-Kernelkommandozeile bearbeiten und in den Single-User-Modus booten. Welche Maßnahme verhindert das Bearbeiten von Booteinträgen, erlaubt normale Startvorgänge aber weiterhin ohne Passwort?",
+      "choices": [
+        {
+          "text": "Set a GRUB superuser with a password hash from grub-mkpasswd-pbkdf2 and mark the normal menu entries with --unrestricted.",
+          "text_de": "Einen GRUB-Superuser mit Passwort-Hash aus grub-mkpasswd-pbkdf2 setzen und die normalen Menüeinträge mit --unrestricted kennzeichnen.",
+          "correct": true
+        },
+        {
+          "text": "Set GRUB_TIMEOUT=0 in /etc/default/grub.",
+          "text_de": "GRUB_TIMEOUT=0 in /etc/default/grub setzen."
+        },
+        {
+          "text": "Remove the recovery entries with GRUB_DISABLE_RECOVERY=true only.",
+          "text_de": "Nur die Recovery-Einträge mit GRUB_DISABLE_RECOVERY=true entfernen."
+        },
+        {
+          "text": "Set a BIOS password; GRUB cannot be protected.",
+          "text_de": "Ein BIOS-Passwort setzen; GRUB lässt sich nicht schützen."
+        },
+        {
+          "text": "Make /boot/grub/grub.cfg immutable with chattr +i.",
+          "text_de": "/boot/grub/grub.cfg mit chattr +i unveränderlich machen."
+        }
+      ],
+      "explanation_de": "GRUB 2 kennt Superuser und Passwörter (set superusers, password_pbkdf2 in /etc/grub.d/40_custom); Einträge mit --unrestricted booten ohne Passwort, das Bearbeiten erfordert das Passwort. Timeout 0 lässt sich mit Shift umgehen, chattr schützt nur die Datei auf der Platte.",
+      "reference": "GRUB-Handbuch, Abschnitt Security",
+      "terms": [
+        {
+          "term": "console access",
+          "de": "Konsolenzugang"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.1-02",
+      "objective": "332.1",
+      "type": "single",
+      "question": "A service unit must not be able to execute any system call that is not needed by a typical network service, for example mount or reboot. Which systemd option implements this with a predefined group?",
+      "question_de": "Eine Service-Unit darf keinen Systemaufruf ausführen, den ein typischer Netzwerkdienst nicht braucht, zum Beispiel mount oder reboot. Welche systemd-Option setzt das mit einer vordefinierten Gruppe um?",
+      "choices": [
+        {
+          "text": "SystemCallFilter=@system-service",
+          "text_de": "SystemCallFilter=@system-service",
+          "correct": true
+        },
+        {
+          "text": "CapabilityBoundingSet=~CAP_SYS_ADMIN",
+          "text_de": "CapabilityBoundingSet=~CAP_SYS_ADMIN"
+        },
+        {
+          "text": "ProtectKernelModules=true",
+          "text_de": "ProtectKernelModules=true"
+        },
+        {
+          "text": "RestrictAddressFamilies=AF_INET",
+          "text_de": "RestrictAddressFamilies=AF_INET"
+        },
+        {
+          "text": "LockPersonality=true",
+          "text_de": "LockPersonality=true"
+        }
+      ],
+      "explanation_de": "SystemCallFilter nutzt seccomp; vordefinierte Gruppen wie @system-service, @mount oder @reboot (mit ~ zum Ausschließen) erleichtern die Konfiguration. Capabilities, Adressfamilien und Modul-Schutz sind andere Härtungsschichten. systemd-analyze security bewertet eine Unit.",
+      "reference": "systemd.exec(5), SystemCallFilter",
+      "terms": [
+        {
+          "term": "predefined",
+          "de": "vordefiniert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.1-03",
+      "objective": "332.1",
+      "type": "single",
+      "question": "Which command shows whether the running kernel has mitigations for Spectre and Meltdown enabled and which ones?",
+      "question_de": "Welcher Befehl zeigt, ob der laufende Kernel Abwehrmaßnahmen gegen Spectre und Meltdown aktiviert hat und welche?",
+      "choices": [
+        {
+          "text": "grep . /sys/devices/system/cpu/vulnerabilities/*",
+          "text_de": "grep . /sys/devices/system/cpu/vulnerabilities/*",
+          "correct": true
+        },
+        {
+          "text": "sysctl kernel.spectre",
+          "text_de": "sysctl kernel.spectre"
+        },
+        {
+          "text": "lscpu | grep -i meltdown",
+          "text_de": "lscpu | grep -i meltdown"
+        },
+        {
+          "text": "dmesg | grep -i aslr",
+          "text_de": "dmesg | grep -i aslr"
+        },
+        {
+          "text": "cat /proc/cpuinfo | grep vmx",
+          "text_de": "cat /proc/cpuinfo | grep vmx"
+        }
+      ],
+      "explanation_de": "Der Kernel exportiert je Schwachstelle (meltdown, spectre_v1, spectre_v2, mds ...) den Status unter /sys/devices/system/cpu/vulnerabilities/, etwa \"Mitigation: PTI\". lscpu zeigt in neueren Versionen eine Zusammenfassung, aber nicht alle Details; sysctl kennt keinen solchen Schlüssel.",
+      "reference": "Kernel-Dokumentation admin-guide/hw-vuln",
+      "terms": [
+        {
+          "term": "mitigation",
+          "de": "Abwehrmaßnahme"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.1-04",
+      "objective": "332.1",
+      "type": "single",
+      "question": "An SSH server should accept host certificates signed by an internal CA so that clients no longer see \"host key unknown\" warnings. Which sshd_config and ssh-keygen combination is required?",
+      "question_de": "Ein SSH-Server soll Hostzertifikate einer internen CA ausliefern, damit Clients keine „host key unknown“-Warnungen mehr sehen. Welche Kombination aus sshd_config und ssh-keygen ist nötig?",
+      "choices": [
+        {
+          "text": "ssh-keygen -s host_ca -I srv1 -h -n srv1.example.org /etc/ssh/ssh_host_ed25519_key.pub; HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub; clients get @cert-authority in known_hosts",
+          "text_de": "ssh-keygen -s host_ca -I srv1 -h -n srv1.example.org /etc/ssh/ssh_host_ed25519_key.pub; HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub; Clients erhalten @cert-authority in known_hosts",
+          "correct": true
+        },
+        {
+          "text": "ssh-keygen -s host_ca -I srv1 /etc/ssh/ssh_host_ed25519_key.pub; TrustedUserCAKeys /etc/ssh/host_ca.pub",
+          "text_de": "ssh-keygen -s host_ca -I srv1 /etc/ssh/ssh_host_ed25519_key.pub; TrustedUserCAKeys /etc/ssh/host_ca.pub"
+        },
+        {
+          "text": "openssl x509 -req on the host key; HostCertificate /etc/ssh/host.crt",
+          "text_de": "openssl x509 -req auf den Hostschlüssel; HostCertificate /etc/ssh/host.crt"
+        },
+        {
+          "text": "Copy the CA private key to every server as HostKey",
+          "text_de": "Den privaten CA-Schlüssel als HostKey auf jeden Server kopieren"
+        },
+        {
+          "text": "Set StrictHostKeyChecking no on all clients",
+          "text_de": "StrictHostKeyChecking no auf allen Clients setzen"
+        }
+      ],
+      "explanation_de": "Hostzertifikate werden mit ssh-keygen -s <CA> -h (host) und Prinzipalen (-n) signiert; sshd liefert sie über HostCertificate aus. Clients vertrauen der CA über eine @cert-authority-Zeile. TrustedUserCAKeys gilt für Benutzerzertifikate, OpenSSL-Zertifikate kennt OpenSSH nicht.",
+      "reference": "ssh-keygen(1), CERTIFICATES; sshd_config(5)",
+      "terms": [
+        {
+          "term": "warning",
+          "de": "Warnung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.1-05",
+      "objective": "332.1",
+      "type": "multiple",
+      "question": "Which measures reduce the attack surface of a server by disabling unneeded functionality? (Choose two.)",
+      "question_de": "Welche Maßnahmen verringern die Angriffsfläche eines Servers, indem sie nicht benötigte Funktionen abschalten? (Zwei Antworten.)",
+      "choices": [
+        {
+          "text": "systemctl mask the unneeded service so that it cannot be started even as a dependency",
+          "text_de": "Den nicht benötigten Dienst mit systemctl mask so sperren, dass er auch als Abhängigkeit nicht startet",
+          "correct": true
+        },
+        {
+          "text": "Blacklisting unused kernel modules in /etc/modprobe.d/ (install <module> /bin/false)",
+          "text_de": "Nicht genutzte Kernelmodule in /etc/modprobe.d/ sperren (install <modul> /bin/false)",
+          "correct": true
+        },
+        {
+          "text": "Setting kernel.randomize_va_space = 0",
+          "text_de": "kernel.randomize_va_space = 0 setzen"
+        },
+        {
+          "text": "Running all services as root to avoid permission problems",
+          "text_de": "Alle Dienste als root betreiben, um Rechteprobleme zu vermeiden"
+        },
+        {
+          "text": "Enabling PermitRootLogin yes to simplify administration",
+          "text_de": "PermitRootLogin yes aktivieren, um die Verwaltung zu vereinfachen"
+        }
+      ],
+      "explanation_de": "Maskieren verhindert jeden Start einer Unit, Modul-Blacklists verhindern das Laden ungenutzter Treiber wie usb-storage oder dccp. ASLR abzuschalten und Root-Rechte auszuweiten vergrößern die Angriffsfläche.",
+      "reference": "systemctl(1), mask; modprobe.d(5)",
+      "terms": [
+        {
+          "term": "attack surface",
+          "de": "Angriffsfläche"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.2-01",
+      "objective": "332.2",
+      "type": "single",
+      "question": "Which command produces a summary report of all failed authentication events recorded by auditd during the last day?",
+      "question_de": "Welcher Befehl erzeugt einen zusammenfassenden Bericht aller fehlgeschlagenen Authentifizierungsereignisse, die auditd am letzten Tag aufgezeichnet hat?",
+      "choices": [
+        {
+          "text": "aureport -au --failed -ts yesterday",
+          "text_de": "aureport -au --failed -ts yesterday",
+          "correct": true
+        },
+        {
+          "text": "ausearch -m USER_LOGIN -sv no --raw",
+          "text_de": "ausearch -m USER_LOGIN -sv no --raw"
+        },
+        {
+          "text": "auditctl -l | grep auth",
+          "text_de": "auditctl -l | grep auth"
+        },
+        {
+          "text": "journalctl _COMM=auditd --since yesterday",
+          "text_de": "journalctl _COMM=auditd --since yesterday"
+        },
+        {
+          "text": "aulast --failed",
+          "text_de": "aulast --failed"
+        }
+      ],
+      "explanation_de": "aureport erstellt Berichte: -au Authentifizierung, -l Logins, -x ausgeführte Programme, --failed nur Fehlschläge, -ts/-te Zeitraum. ausearch liefert einzelne Ereignisse, auditctl zeigt Regeln, aulast listet Logins wie last.",
+      "reference": "aureport(8)",
+      "terms": [
+        {
+          "term": "summary report",
+          "de": "zusammenfassender Bericht"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.2-02",
+      "objective": "332.2",
+      "type": "single",
+      "question": "The audit log partition fills up. auditd should rotate the log automatically and keep eight files of at most 50 MB each. Which auditd.conf settings do this?",
+      "question_de": "Die Partition mit dem Audit-Log läuft voll. auditd soll das Log automatisch rotieren und acht Dateien von höchstens 50 MB behalten. Welche auditd.conf-Einstellungen leisten das?",
+      "choices": [
+        {
+          "text": "max_log_file = 50\nnum_logs = 8\nmax_log_file_action = ROTATE",
+          "text_de": "max_log_file = 50\nnum_logs = 8\nmax_log_file_action = ROTATE",
+          "correct": true
+        },
+        {
+          "text": "max_log_file = 50\nmax_log_file_action = KEEP_LOGS",
+          "text_de": "max_log_file = 50\nmax_log_file_action = KEEP_LOGS"
+        },
+        {
+          "text": "space_left = 50\nspace_left_action = ROTATE",
+          "text_de": "space_left = 50\nspace_left_action = ROTATE"
+        },
+        {
+          "text": "log_format = ENRICHED\nflush = INCREMENTAL_ASYNC",
+          "text_de": "log_format = ENRICHED\nflush = INCREMENTAL_ASYNC"
+        },
+        {
+          "text": "logrotate /etc/logrotate.d/audit with rotate 8",
+          "text_de": "logrotate /etc/logrotate.d/audit mit rotate 8"
+        }
+      ],
+      "explanation_de": "max_log_file (MB), num_logs und max_log_file_action = ROTATE steuern die interne Rotation von auditd. KEEP_LOGS rotiert ohne Begrenzung der Anzahl, space_left_action reagiert auf knappen Plattenplatz (z. B. SYSLOG, SUSPEND, HALT). logrotate darf audit.log nicht einfach verschieben.",
+      "reference": "auditd.conf(5)",
+      "terms": [
+        {
+          "term": "rotate",
+          "de": "rotieren, umlaufend ersetzen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.2-03",
+      "objective": "332.2",
+      "type": "single",
+      "question": "All commands typed by root in interactive shells must be recorded by the audit system. Which component provides this?",
+      "question_de": "Alle von root in interaktiven Shells eingegebenen Befehle müssen vom Audit-System aufgezeichnet werden. Welche Komponente leistet das?",
+      "choices": [
+        {
+          "text": "pam_tty_audit.so with enable=root in the PAM session stack; review with aureport --tty",
+          "text_de": "pam_tty_audit.so mit enable=root im PAM-session-Stack; Auswertung mit aureport --tty",
+          "correct": true
+        },
+        {
+          "text": "auditctl -w /bin/bash -p x",
+          "text_de": "auditctl -w /bin/bash -p x"
+        },
+        {
+          "text": "HISTFILE=/var/log/audit/root_history in /root/.bashrc",
+          "text_de": "HISTFILE=/var/log/audit/root_history in /root/.bashrc"
+        },
+        {
+          "text": "script -a /var/log/root.typescript in /etc/profile",
+          "text_de": "script -a /var/log/root.typescript in /etc/profile"
+        },
+        {
+          "text": "auditctl -a always,exit -S write -F uid=0",
+          "text_de": "auditctl -a always,exit -S write -F uid=0"
+        }
+      ],
+      "explanation_de": "pam_tty_audit protokolliert Tastatureingaben einer TTY-Sitzung als TTY-Ereignisse im Audit-Log. Ein Watch auf bash erfasst nur den Start, Shell-History ist manipulierbar, ein Syscall-Filter auf write erzeugt enorme Datenmengen.",
+      "reference": "pam_tty_audit(8)",
+      "terms": [
+        {
+          "term": "recorded",
+          "de": "aufgezeichnet"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.2-04",
+      "objective": "332.2",
+      "type": "single",
+      "question": "An AIDE configuration should check all files under /etc for changed content and permissions but ignore the frequently changing files under /etc/mtab and /etc/resolv.conf. Which aide.conf rules express this?",
+      "question_de": "Eine AIDE-Konfiguration soll alle Dateien unter /etc auf geänderten Inhalt und geänderte Rechte prüfen, die häufig wechselnden Dateien /etc/mtab und /etc/resolv.conf aber ignorieren. Welche aide.conf-Regeln drücken das aus?",
+      "choices": [
+        {
+          "text": "/etc  p+u+g+sha256\n!/etc/mtab$\n!/etc/resolv.conf$",
+          "text_de": "/etc  p+u+g+sha256\n!/etc/mtab$\n!/etc/resolv.conf$",
+          "correct": true
+        },
+        {
+          "text": "/etc  R\n-/etc/mtab\n-/etc/resolv.conf",
+          "text_de": "/etc  R\n-/etc/mtab\n-/etc/resolv.conf"
+        },
+        {
+          "text": "@@define ETC /etc\nexclude /etc/mtab /etc/resolv.conf",
+          "text_de": "@@define ETC /etc\nexclude /etc/mtab /etc/resolv.conf"
+        },
+        {
+          "text": "/etc  sha256 except mtab,resolv.conf",
+          "text_de": "/etc  sha256 except mtab,resolv.conf"
+        },
+        {
+          "text": "=/etc  p+u+g\n!/etc/*",
+          "text_de": "=/etc  p+u+g\n!/etc/*"
+        }
+      ],
+      "explanation_de": "AIDE-Regeln bestehen aus einem Pfad-Regex und einer Attributgruppe (p Rechte, u/g Besitzer, sha256 Prüfsumme, vordefiniert z. B. R). Ein führendes ! schließt Pfade aus, = prüft nur das Verzeichnis selbst ohne Rekursion.",
+      "reference": "aide.conf(5)",
+      "terms": [
+        {
+          "term": "frequently changing",
+          "de": "häufig wechselnd"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.2-05",
+      "objective": "332.2",
+      "type": "single",
+      "question": "On a Debian system, which command checks the installed files of all packages against the checksums recorded at installation time?",
+      "question_de": "Welcher Befehl prüft auf einem Debian-System die installierten Dateien aller Pakete gegen die bei der Installation gespeicherten Prüfsummen?",
+      "choices": [
+        {
+          "text": "dpkg --verify",
+          "text_de": "dpkg --verify",
+          "correct": true
+        },
+        {
+          "text": "apt-get check",
+          "text_de": "apt-get check"
+        },
+        {
+          "text": "apt-get --reinstall --dry-run install '*'",
+          "text_de": "apt-get --reinstall --dry-run install '*'"
+        },
+        {
+          "text": "dpkg -C",
+          "text_de": "dpkg -C"
+        },
+        {
+          "text": "apt list --installed --verify",
+          "text_de": "apt list --installed --verify"
+        }
+      ],
+      "explanation_de": "dpkg --verify (-V) vergleicht MD5-Summen der Paketdateien mit den .md5sums-Listen; das Paket debsums bietet dasselbe mit mehr Optionen. apt-get check prüft Abhängigkeiten, dpkg -C sucht halb installierte Pakete.",
+      "reference": "dpkg(1), --verify",
+      "terms": [
+        {
+          "term": "checksum",
+          "de": "Prüfsumme"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.3-01",
+      "objective": "332.3",
+      "type": "single",
+      "question": "A batch job started from a shell should be limited to 20 % of one CPU and 1 GB of memory without creating a permanent unit file. Which command achieves this?",
+      "question_de": "Ein aus einer Shell gestarteter Batch-Job soll auf 20 % einer CPU und 1 GB Speicher begrenzt werden, ohne eine dauerhafte Unit-Datei anzulegen. Welcher Befehl erreicht das?",
+      "choices": [
+        {
+          "text": "systemd-run --scope -p CPUQuota=20% -p MemoryMax=1G ./batch.sh",
+          "text_de": "systemd-run --scope -p CPUQuota=20% -p MemoryMax=1G ./batch.sh",
+          "correct": true
+        },
+        {
+          "text": "nice -n 19 ionice -c 3 ./batch.sh",
+          "text_de": "nice -n 19 ionice -c 3 ./batch.sh"
+        },
+        {
+          "text": "ulimit -t 20 -m 1048576; ./batch.sh",
+          "text_de": "ulimit -t 20 -m 1048576; ./batch.sh"
+        },
+        {
+          "text": "cgcreate -g cpu,memory:/batch && ./batch.sh",
+          "text_de": "cgcreate -g cpu,memory:/batch && ./batch.sh"
+        },
+        {
+          "text": "systemctl set-property batch.sh CPUQuota=20%",
+          "text_de": "systemctl set-property batch.sh CPUQuota=20%"
+        }
+      ],
+      "explanation_de": "systemd-run erzeugt eine transiente Scope- oder Service-Unit mit Ressourceneigenschaften über cgroups. nice/ionice setzen nur Prioritäten, ulimit begrenzt keine CPU-Quote, cgcreate allein ordnet den Prozess nicht zu.",
+      "reference": "systemd-run(1); systemd.resource-control(5)",
+      "terms": [
+        {
+          "term": "permanent",
+          "de": "dauerhaft"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.3-02",
+      "objective": "332.3",
+      "type": "single",
+      "question": "On a system with cgroup v2, which file shows the cgroup of the process with PID 1234?",
+      "question_de": "Welche Datei zeigt auf einem System mit cgroup v2 die cgroup des Prozesses mit der PID 1234?",
+      "choices": [
+        {
+          "text": "/proc/1234/cgroup",
+          "text_de": "/proc/1234/cgroup",
+          "correct": true
+        },
+        {
+          "text": "/sys/fs/cgroup/1234/cgroup.procs",
+          "text_de": "/sys/fs/cgroup/1234/cgroup.procs"
+        },
+        {
+          "text": "/proc/cgroups",
+          "text_de": "/proc/cgroups"
+        },
+        {
+          "text": "/proc/1234/status",
+          "text_de": "/proc/1234/status"
+        },
+        {
+          "text": "/sys/fs/cgroup/cgroup.controllers",
+          "text_de": "/sys/fs/cgroup/cgroup.controllers"
+        }
+      ],
+      "explanation_de": "/proc/<pid>/cgroup enthält bei v2 eine Zeile 0::/pfad relativ zu /sys/fs/cgroup. /proc/cgroups listet Controller, cgroup.controllers die im Wurzelverzeichnis verfügbaren, cgroup.procs eines Verzeichnisses die darin enthaltenen PIDs.",
+      "reference": "cgroups(7)",
+      "terms": [],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-332.3-03",
+      "objective": "332.3",
+      "type": "single",
+      "question": "All processes of the user carol together must never use more than 2 GB of memory, regardless of how many sessions she opens. Which approach implements this with systemd?",
+      "question_de": "Alle Prozesse der Benutzerin carol zusammen dürfen nie mehr als 2 GB Speicher belegen, unabhängig von der Zahl ihrer Sitzungen. Welcher Ansatz setzt das mit systemd um?",
+      "choices": [
+        {
+          "text": "A drop-in for the user slice: systemctl set-property user-1001.slice MemoryMax=2G",
+          "text_de": "Ein Drop-in für das Benutzer-Slice: systemctl set-property user-1001.slice MemoryMax=2G",
+          "correct": true
+        },
+        {
+          "text": "carol hard as 2097152 in /etc/security/limits.conf",
+          "text_de": "carol hard as 2097152 in /etc/security/limits.conf"
+        },
+        {
+          "text": "MemoryMax=2G in /etc/systemd/system.conf",
+          "text_de": "MemoryMax=2G in /etc/systemd/system.conf"
+        },
+        {
+          "text": "ulimit -v 2097152 in carol's .bashrc",
+          "text_de": "ulimit -v 2097152 in carols .bashrc"
+        },
+        {
+          "text": "echo 2G > /sys/fs/cgroup/memory.max",
+          "text_de": "echo 2G > /sys/fs/cgroup/memory.max"
+        }
+      ],
+      "explanation_de": "Alle Sitzungen eines Benutzers laufen unter user-<uid>.slice; Eigenschaften des Slice gelten für die Summe aller Prozesse. ulimit und limits.conf wirken je Prozess, system.conf kennt nur Standardwerte, memory.max in der Wurzel ist nicht beschreibbar.",
+      "reference": "systemd.slice(5); systemd.resource-control(5)",
+      "terms": [
+        {
+          "term": "regardless of",
+          "de": "unabhängig von"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.1-01",
+      "objective": "333.1",
+      "type": "single",
+      "question": "getfacl shows for a file:\nuser::rw-\nuser:lisa:rw-\ngroup::r--\nmask::r--\nother::---\nWhat can lisa actually do with the file?",
+      "question_de": "getfacl zeigt für eine Datei:\nuser::rw-\nuser:lisa:rw-\ngroup::r--\nmask::r--\nother::---\nWas kann lisa tatsächlich mit der Datei tun?",
+      "choices": [
+        {
+          "text": "Read only, because the mask limits named users and groups to r--",
+          "text_de": "Nur lesen, weil die Maske benannte Benutzer und Gruppen auf r-- begrenzt",
+          "correct": true
+        },
+        {
+          "text": "Read and write, because her named entry grants rw-",
+          "text_de": "Lesen und schreiben, weil ihr benannter Eintrag rw- gewährt"
+        },
+        {
+          "text": "Nothing, because other has no rights",
+          "text_de": "Nichts, weil other keine Rechte hat"
+        },
+        {
+          "text": "Read, write and execute after chmod g+x",
+          "text_de": "Lesen, schreiben und ausführen nach chmod g+x"
+        },
+        {
+          "text": "Read and write only if she is also the owner",
+          "text_de": "Lesen und schreiben nur, wenn sie auch Besitzerin ist"
+        }
+      ],
+      "explanation_de": "Die Maske begrenzt die effektiven Rechte aller benannten Benutzer, benannten Gruppen und der besitzenden Gruppe. getfacl zeigt das als #effective:r--. Ein chmod auf die Gruppenrechte setzt die Maske neu; setfacl -m m::rw würde das Schreiben erlauben.",
+      "reference": "acl(5), MASK",
+      "terms": [
+        {
+          "term": "actually",
+          "de": "tatsächlich"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.1-02",
+      "objective": "333.1",
+      "type": "single",
+      "question": "Which command stores the value \"confidential\" in the user namespace extended attribute \"classification\" of the file plan.pdf, and which command reads it back?",
+      "question_de": "Welcher Befehl speichert den Wert „confidential“ im erweiterten Attribut „classification“ des Benutzer-Namensraums der Datei plan.pdf, und welcher liest ihn wieder aus?",
+      "choices": [
+        {
+          "text": "setfattr -n user.classification -v confidential plan.pdf; getfattr -n user.classification plan.pdf",
+          "text_de": "setfattr -n user.classification -v confidential plan.pdf; getfattr -n user.classification plan.pdf",
+          "correct": true
+        },
+        {
+          "text": "setfacl -m classification:confidential plan.pdf; getfacl plan.pdf",
+          "text_de": "setfacl -m classification:confidential plan.pdf; getfacl plan.pdf"
+        },
+        {
+          "text": "chattr +classification=confidential plan.pdf; lsattr plan.pdf",
+          "text_de": "chattr +classification=confidential plan.pdf; lsattr plan.pdf"
+        },
+        {
+          "text": "setfattr -n security.classification -v confidential plan.pdf; getfattr -d plan.pdf",
+          "text_de": "setfattr -n security.classification -v confidential plan.pdf; getfattr -d plan.pdf"
+        },
+        {
+          "text": "xattr -w classification confidential plan.pdf",
+          "text_de": "xattr -w classification confidential plan.pdf"
+        }
+      ],
+      "explanation_de": "Erweiterte Attribute haben Namensräume: user (frei nutzbar), trusted (nur CAP_SYS_ADMIN), security (SELinux, Capabilities) und system (ACLs). getfattr -d zeigt standardmäßig nur user-Attribute; -m - zeigt alle.",
+      "reference": "xattr(7); setfattr(1)",
+      "terms": [
+        {
+          "term": "namespace",
+          "de": "Namensraum"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.1-03",
+      "objective": "333.1",
+      "type": "single",
+      "question": "A log file must be appendable by the logging daemon but must not be truncated, deleted or renamed, not even by root, until an administrator removes the protection. Which command sets this?",
+      "question_de": "Eine Protokolldatei muss vom Logdienst erweiterbar sein, darf aber weder gekürzt, gelöscht noch umbenannt werden, auch nicht von root, bis ein Administrator den Schutz aufhebt. Welcher Befehl setzt das?",
+      "choices": [
+        {
+          "text": "chattr +a /var/log/secure.log",
+          "text_de": "chattr +a /var/log/secure.log",
+          "correct": true
+        },
+        {
+          "text": "chattr +i /var/log/secure.log",
+          "text_de": "chattr +i /var/log/secure.log"
+        },
+        {
+          "text": "chmod 0200 /var/log/secure.log",
+          "text_de": "chmod 0200 /var/log/secure.log"
+        },
+        {
+          "text": "setfacl -m u:root:w /var/log/secure.log",
+          "text_de": "setfacl -m u:root:w /var/log/secure.log"
+        },
+        {
+          "text": "chmod +t /var/log/secure.log",
+          "text_de": "chmod +t /var/log/secure.log"
+        }
+      ],
+      "explanation_de": "Das Attribut a (append only) erlaubt nur anhängendes Schreiben; i (immutable) verbietet jede Änderung, auch das Anhängen. Beide Attribute kann nur ein Prozess mit CAP_LINUX_IMMUTABLE setzen oder entfernen; normale Rechte oder ACLs gelten für root nicht.",
+      "reference": "chattr(1)",
+      "terms": [
+        {
+          "term": "truncate",
+          "de": "kürzen, abschneiden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.2-01",
+      "objective": "333.2",
+      "type": "single",
+      "question": "An SSH daemon should listen on port 2222 on a SELinux enforcing system. Starting it fails with a permission denial on bind. Which command fixes this correctly?",
+      "question_de": "Ein SSH-Dienst soll auf einem SELinux-System im Enforcing-Modus auf Port 2222 lauschen. Der Start scheitert mit einer Verweigerung beim bind. Welcher Befehl behebt das korrekt?",
+      "choices": [
+        {
+          "text": "semanage port -a -t ssh_port_t -p tcp 2222",
+          "text_de": "semanage port -a -t ssh_port_t -p tcp 2222",
+          "correct": true
+        },
+        {
+          "text": "setsebool -P ssh_any_port on",
+          "text_de": "setsebool -P ssh_any_port on"
+        },
+        {
+          "text": "chcon -t ssh_port_t 2222",
+          "text_de": "chcon -t ssh_port_t 2222"
+        },
+        {
+          "text": "semanage fcontext -a -t sshd_t /usr/sbin/sshd",
+          "text_de": "semanage fcontext -a -t sshd_t /usr/sbin/sshd"
+        },
+        {
+          "text": "setenforce 0",
+          "text_de": "setenforce 0"
+        }
+      ],
+      "explanation_de": "Netzwerkports tragen SELinux-Typen; semanage port -l zeigt sie, -a fügt einen Port zum Typ hinzu, den die Policy sshd erlaubt. Ein Boolean ssh_any_port existiert nicht, chcon wirkt nur auf Dateien, setenforce 0 schaltet den Schutz ab.",
+      "reference": "semanage-port(8)",
+      "terms": [
+        {
+          "term": "denial",
+          "de": "Verweigerung"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.2-02",
+      "objective": "333.2",
+      "type": "single",
+      "question": "A custom daemon causes many SELinux denials during testing. The administrator wants only this daemon's domain to run unconfined-like while the rest of the system stays enforcing. Which command does this?",
+      "question_de": "Ein eigener Dienst verursacht beim Testen viele SELinux-Verweigerungen. Der Administrator möchte nur die Domäne dieses Dienstes ungehindert laufen lassen, während das übrige System im Enforcing-Modus bleibt. Welcher Befehl leistet das?",
+      "choices": [
+        {
+          "text": "semanage permissive -a mydaemon_t",
+          "text_de": "semanage permissive -a mydaemon_t",
+          "correct": true
+        },
+        {
+          "text": "setenforce permissive",
+          "text_de": "setenforce permissive"
+        },
+        {
+          "text": "setsebool -P mydaemon_disable_trans on",
+          "text_de": "setsebool -P mydaemon_disable_trans on"
+        },
+        {
+          "text": "chcon -t unconfined_t /usr/sbin/mydaemon",
+          "text_de": "chcon -t unconfined_t /usr/sbin/mydaemon"
+        },
+        {
+          "text": "SELINUX=permissive in /etc/selinux/config",
+          "text_de": "SELINUX=permissive in /etc/selinux/config"
+        }
+      ],
+      "explanation_de": "Permissive Domains werden protokolliert, aber nicht blockiert; semanage permissive -l listet sie, -d entfernt sie. setenforce und /etc/selinux/config wirken systemweit. Die Denials können anschließend mit audit2allow in ein Policy-Modul überführt werden.",
+      "reference": "semanage-permissive(8)",
+      "terms": [
+        {
+          "term": "custom",
+          "de": "eigen, selbst entwickelt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.2-03",
+      "objective": "333.2",
+      "type": "single",
+      "question": "Which sequence creates and installs a local SELinux policy module from the denials of the last hour?",
+      "question_de": "Welche Befehlsfolge erzeugt und installiert ein lokales SELinux-Policy-Modul aus den Verweigerungen der letzten Stunde?",
+      "choices": [
+        {
+          "text": "ausearch -m AVC -ts recent | audit2allow -M mylocal && semodule -i mylocal.pp",
+          "text_de": "ausearch -m AVC -ts recent | audit2allow -M mylocal && semodule -i mylocal.pp",
+          "correct": true
+        },
+        {
+          "text": "audit2why -a > mylocal.te && semodule -i mylocal.te",
+          "text_de": "audit2why -a > mylocal.te && semodule -i mylocal.te"
+        },
+        {
+          "text": "sealert -a /var/log/audit/audit.log && semodule -r mylocal",
+          "text_de": "sealert -a /var/log/audit/audit.log && semodule -r mylocal"
+        },
+        {
+          "text": "checkpolicy -M mylocal.te && load_policy",
+          "text_de": "checkpolicy -M mylocal.te && load_policy"
+        },
+        {
+          "text": "semanage module -a /var/log/audit/audit.log",
+          "text_de": "semanage module -a /var/log/audit/audit.log"
+        }
+      ],
+      "explanation_de": "audit2allow -M erzeugt aus AVC-Meldungen die Dateien .te und .pp; semodule -i lädt das Paket. audit2why erklärt nur, sealert analysiert, checkpolicy übersetzt Monolithen. Erzeugte Regeln sollten vor dem Laden gelesen werden.",
+      "reference": "audit2allow(1); semodule(8)",
+      "terms": [
+        {
+          "term": "sequence",
+          "de": "Abfolge"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.2-04",
+      "objective": "333.2",
+      "type": "single",
+      "question": "Which SELinux user should be assigned to Linux administrators who may log in interactively and switch to the sysadm role with sudo, but are otherwise confined?",
+      "question_de": "Welcher SELinux-Benutzer sollte Linux-Administratoren zugewiesen werden, die sich interaktiv anmelden und per sudo in die Rolle sysadm wechseln dürfen, sonst aber eingeschränkt sind?",
+      "choices": [
+        {
+          "text": "staff_u",
+          "text_de": "staff_u",
+          "correct": true
+        },
+        {
+          "text": "unconfined_u",
+          "text_de": "unconfined_u"
+        },
+        {
+          "text": "user_u",
+          "text_de": "user_u"
+        },
+        {
+          "text": "guest_u",
+          "text_de": "guest_u"
+        },
+        {
+          "text": "system_u",
+          "text_de": "system_u"
+        }
+      ],
+      "explanation_de": "staff_u hat die Rollen staff_r und sysadm_r und kann mit sudo/newrole in sysadm_r wechseln; user_u hat keinen Rollenwechsel, guest_u ist stark eingeschränkt, unconfined_u ist unbeschränkt, system_u ist für Dienste. Zuordnung mit semanage login -a -s staff_u <user>.",
+      "reference": "semanage-login(8); selinux_users",
+      "terms": [
+        {
+          "term": "confined",
+          "de": "eingeschränkt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-333.2-05",
+      "objective": "333.2",
+      "type": "single",
+      "question": "On an Ubuntu server with AppArmor, the profile for /usr/sbin/mysqld blocks access to a new data directory. Which command switches only this profile to complain mode for troubleshooting?",
+      "question_de": "Auf einem Ubuntu-Server mit AppArmor blockiert das Profil für /usr/sbin/mysqld den Zugriff auf ein neues Datenverzeichnis. Welcher Befehl schaltet nur dieses Profil zur Fehlersuche in den Complain-Modus?",
+      "choices": [
+        {
+          "text": "aa-complain /etc/apparmor.d/usr.sbin.mysqld",
+          "text_de": "aa-complain /etc/apparmor.d/usr.sbin.mysqld",
+          "correct": true
+        },
+        {
+          "text": "aa-enforce /etc/apparmor.d/usr.sbin.mysqld",
+          "text_de": "aa-enforce /etc/apparmor.d/usr.sbin.mysqld"
+        },
+        {
+          "text": "systemctl stop apparmor",
+          "text_de": "systemctl stop apparmor"
+        },
+        {
+          "text": "setenforce 0",
+          "text_de": "setenforce 0"
+        },
+        {
+          "text": "aa-disable usr.sbin.mysqld --all",
+          "text_de": "aa-disable usr.sbin.mysqld --all"
+        }
+      ],
+      "explanation_de": "aa-complain setzt ein Profil in den Beschwerdemodus (Verstöße werden protokolliert, nicht blockiert), aa-enforce zurück; aa-status zeigt den Zustand, aa-logprof hilft beim Erweitern. Den Dienst zu stoppen entfernt den Schutz für alle Profile.",
+      "reference": "aa-complain(8)",
+      "terms": [
+        {
+          "term": "troubleshooting",
+          "de": "Fehlersuche"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.1-01",
+      "objective": "334.1",
+      "type": "single",
+      "question": "A wireless access point should authenticate users against a FreeRADIUS server. Which file on the RADIUS server defines the access point as a client with its shared secret?",
+      "question_de": "Ein WLAN-Access-Point soll Benutzer gegen einen FreeRADIUS-Server authentifizieren. Welche Datei auf dem RADIUS-Server definiert den Access Point als Client mit seinem gemeinsamen Geheimnis?",
+      "choices": [
+        {
+          "text": "/etc/raddb/clients.conf (or /etc/freeradius/3.0/clients.conf)",
+          "text_de": "/etc/raddb/clients.conf (bzw. /etc/freeradius/3.0/clients.conf)",
+          "correct": true
+        },
+        {
+          "text": "/etc/raddb/users",
+          "text_de": "/etc/raddb/users"
+        },
+        {
+          "text": "/etc/raddb/radiusd.conf",
+          "text_de": "/etc/raddb/radiusd.conf"
+        },
+        {
+          "text": "/etc/raddb/mods-enabled/eap",
+          "text_de": "/etc/raddb/mods-enabled/eap"
+        },
+        {
+          "text": "/etc/raddb/sites-enabled/default",
+          "text_de": "/etc/raddb/sites-enabled/default"
+        }
+      ],
+      "explanation_de": "clients.conf enthält je NAS (Access Point, Switch) einen client-Block mit ipaddr und secret. users (bzw. mods-config/files/authorize) definiert Benutzer, radiusd.conf globale Einstellungen, mods-enabled/eap die EAP-Methoden.",
+      "reference": "clients.conf(5)",
+      "terms": [
+        {
+          "term": "shared secret",
+          "de": "gemeinsames Geheimnis"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.1-02",
+      "objective": "334.1",
+      "type": "single",
+      "question": "RADIUS authentication fails for a new access point. Which command runs FreeRADIUS in the foreground with full debug output to see why requests are rejected?",
+      "question_de": "Die RADIUS-Authentifizierung schlägt für einen neuen Access Point fehl. Welcher Befehl startet FreeRADIUS im Vordergrund mit vollständiger Debug-Ausgabe, um zu sehen, warum Anfragen abgelehnt werden?",
+      "choices": [
+        {
+          "text": "radiusd -X",
+          "text_de": "radiusd -X",
+          "correct": true
+        },
+        {
+          "text": "radtest -x",
+          "text_de": "radtest -x"
+        },
+        {
+          "text": "radmin -e debug",
+          "text_de": "radmin -e debug"
+        },
+        {
+          "text": "radclient -x auth",
+          "text_de": "radclient -x auth"
+        },
+        {
+          "text": "systemctl status radiusd -l",
+          "text_de": "systemctl status radiusd -l"
+        }
+      ],
+      "explanation_de": "radiusd -X (bzw. freeradius -X) läuft im Vordergrund mit Debug-Stufe und zeigt jede Anfrage samt Modulentscheidungen; der Dienst muss vorher gestoppt sein. radmin steuert einen laufenden Server, radtest und radclient senden Testanfragen.",
+      "reference": "radiusd(8)",
+      "terms": [
+        {
+          "term": "foreground",
+          "de": "Vordergrund"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.1-03",
+      "objective": "334.1",
+      "type": "single",
+      "question": "In Wireshark, an analyst wants to see the complete HTTP conversation between a client and a server reassembled in one window. Which function does this?",
+      "question_de": "In Wireshark möchte ein Analyst die vollständige HTTP-Unterhaltung zwischen Client und Server zusammengesetzt in einem Fenster sehen. Welche Funktion leistet das?",
+      "choices": [
+        {
+          "text": "Analyze › Follow › TCP Stream",
+          "text_de": "Analyze › Follow › TCP Stream",
+          "correct": true
+        },
+        {
+          "text": "Statistics › Protocol Hierarchy",
+          "text_de": "Statistics › Protocol Hierarchy"
+        },
+        {
+          "text": "Capture › Options › Promiscuous mode",
+          "text_de": "Capture › Options › Promiscuous mode"
+        },
+        {
+          "text": "Statistics › Conversations",
+          "text_de": "Statistics › Conversations"
+        },
+        {
+          "text": "Edit › Find Packet",
+          "text_de": "Edit › Find Packet"
+        }
+      ],
+      "explanation_de": "Follow TCP Stream setzt die Nutzdaten beider Richtungen zusammen und setzt gleichzeitig einen Anzeigefilter (tcp.stream eq N). Conversations und Protocol Hierarchy sind Statistiken, Promiscuous Mode betrifft die Aufzeichnung.",
+      "reference": "Wireshark-Benutzerhandbuch, Following Protocol Streams",
+      "terms": [
+        {
+          "term": "reassembled",
+          "de": "zusammengesetzt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.1-04",
+      "objective": "334.1",
+      "type": "single",
+      "question": "IPv6 hosts in an office network suddenly receive a wrong default gateway. Which tool detects unauthorized router advertisements and reports them?",
+      "question_de": "IPv6-Hosts in einem Büronetz erhalten plötzlich ein falsches Standard-Gateway. Welches Werkzeug erkennt unerlaubte Router Advertisements und meldet sie?",
+      "choices": [
+        {
+          "text": "ndpmon",
+          "text_de": "ndpmon",
+          "correct": true
+        },
+        {
+          "text": "arpwatch",
+          "text_de": "arpwatch"
+        },
+        {
+          "text": "radvd",
+          "text_de": "radvd"
+        },
+        {
+          "text": "dhcpd",
+          "text_de": "dhcpd"
+        },
+        {
+          "text": "kismet",
+          "text_de": "kismet"
+        }
+      ],
+      "explanation_de": "NDPMon überwacht Neighbor Discovery und meldet neue oder gefälschte Router und Präfixe. arpwatch überwacht IPv4-ARP, radvd sendet RAs selbst, Kismet analysiert WLAN. Gegenmaßnahme am Switch ist RA Guard.",
+      "reference": "ndpmon(8)",
+      "terms": [
+        {
+          "term": "unauthorized",
+          "de": "unerlaubt, nicht autorisiert"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.2-01",
+      "objective": "334.2",
+      "type": "single",
+      "question": "Which Snort rule generates an alert for any TCP connection attempt from outside to port 23 of the home network?",
+      "question_de": "Welche Snort-Regel erzeugt einen Alarm für jeden TCP-Verbindungsversuch von außen auf Port 23 des Heimnetzes?",
+      "choices": [
+        {
+          "text": "alert tcp $EXTERNAL_NET any -> $HOME_NET 23 (msg:\"Telnet attempt\"; flags:S; sid:1000001; rev:1;)",
+          "text_de": "alert tcp $EXTERNAL_NET any -> $HOME_NET 23 (msg:\"Telnet attempt\"; flags:S; sid:1000001; rev:1;)",
+          "correct": true
+        },
+        {
+          "text": "log tcp any 23 -> any any (msg:\"Telnet\";)",
+          "text_de": "log tcp any 23 -> any any (msg:\"Telnet\";)"
+        },
+        {
+          "text": "drop tcp $HOME_NET 23 -> $EXTERNAL_NET any (sid:1000001;)",
+          "text_de": "drop tcp $HOME_NET 23 -> $EXTERNAL_NET any (sid:1000001;)"
+        },
+        {
+          "text": "alert telnet any any -> $HOME_NET any (msg:\"Telnet\";)",
+          "text_de": "alert telnet any any -> $HOME_NET any (msg:\"Telnet\";)"
+        },
+        {
+          "text": "alert tcp any any <> any 23",
+          "text_de": "alert tcp any any <> any 23"
+        }
+      ],
+      "explanation_de": "Eine Regel besteht aus Aktion, Protokoll, Quelle, Richtung, Ziel und Optionen; flags:S erfasst SYN-Pakete, sid muss eindeutig sein (lokale Regeln ab 1000000). telnet ist kein Snort-Protokoll, Regel B hat Quelle und Ziel vertauscht, Regel E ohne Optionen ist unvollständig.",
+      "reference": "Snort-Handbuch, Writing Snort Rules",
+      "terms": [
+        {
+          "term": "attempt",
+          "de": "Versuch"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.2-02",
+      "objective": "334.2",
+      "type": "single",
+      "question": "Which tool keeps a Snort installation's rule sets up to date by downloading and merging community and subscriber rules?",
+      "question_de": "Welches Werkzeug hält die Regelsätze einer Snort-Installation aktuell, indem es Community- und Abonnementregeln herunterlädt und zusammenführt?",
+      "choices": [
+        {
+          "text": "pulledpork.pl",
+          "text_de": "pulledpork.pl",
+          "correct": true
+        },
+        {
+          "text": "snort-stat",
+          "text_de": "snort-stat"
+        },
+        {
+          "text": "openvas-nvt-sync",
+          "text_de": "openvas-nvt-sync"
+        },
+        {
+          "text": "snort -T",
+          "text_de": "snort -T"
+        },
+        {
+          "text": "u2spewfoo",
+          "text_de": "u2spewfoo"
+        }
+      ],
+      "explanation_de": "PulledPork lädt Regeln (Oinkcode für Abonnements), aktualisiert sid-msg.map und deaktiviert Regeln nach Konfiguration. snort-stat wertet Alarme aus, openvas-nvt-sync aktualisiert OpenVAS-Tests, snort -T prüft die Konfiguration, u2spewfoo liest unified2-Dateien.",
+      "reference": "PulledPork-Dokumentation",
+      "terms": [
+        {
+          "term": "up to date",
+          "de": "aktuell"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.2-03",
+      "objective": "334.2",
+      "type": "single",
+      "question": "An OpenVAS scan of a web server reports no vulnerabilities although the server runs a very old Apache version. Which maintenance step was most likely skipped?",
+      "question_de": "Ein OpenVAS-Scan eines Webservers meldet keine Schwachstellen, obwohl der Server ein sehr altes Apache läuft. Welcher Wartungsschritt wurde am wahrscheinlichsten ausgelassen?",
+      "choices": [
+        {
+          "text": "Updating the vulnerability test feed (greenbone-feed-sync / openvas-nvt-sync) before scanning",
+          "text_de": "Die Aktualisierung des Schwachstellentest-Feeds (greenbone-feed-sync / openvas-nvt-sync) vor dem Scan",
+          "correct": true
+        },
+        {
+          "text": "Creating the server certificate with openvas-mkcert",
+          "text_de": "Das Erzeugen des Serverzertifikats mit openvas-mkcert"
+        },
+        {
+          "text": "Adding a user with openvas-adduser",
+          "text_de": "Das Anlegen eines Benutzers mit openvas-adduser"
+        },
+        {
+          "text": "Enabling snort on the scanned host",
+          "text_de": "Das Aktivieren von snort auf dem gescannten Host"
+        },
+        {
+          "text": "Running the scan as root",
+          "text_de": "Das Ausführen des Scans als root"
+        }
+      ],
+      "explanation_de": "OpenVAS erkennt nur, was seine NVTs (NASL-Skripte) kennen; ohne aktuellen Feed fehlen neue Tests. Zertifikat und Benutzer sind Voraussetzungen für den Betrieb, nicht für die Erkennungsqualität; Snort ist ein NIDS.",
+      "reference": "Greenbone-Dokumentation, Feed-Synchronisation",
+      "terms": [
+        {
+          "term": "skipped",
+          "de": "ausgelassen"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.2-04",
+      "objective": "334.2",
+      "type": "single",
+      "question": "Which tool shows live which hosts and protocols generate the most traffic on a network interface, with a web interface?",
+      "question_de": "Welches Werkzeug zeigt live mit Weboberfläche, welche Hosts und Protokolle auf einer Netzwerkschnittstelle den meisten Verkehr erzeugen?",
+      "choices": [
+        {
+          "text": "ntopng (ntop)",
+          "text_de": "ntopng (ntop)",
+          "correct": true
+        },
+        {
+          "text": "tcpdump -w",
+          "text_de": "tcpdump -w"
+        },
+        {
+          "text": "snort -v",
+          "text_de": "snort -v"
+        },
+        {
+          "text": "aureport -n",
+          "text_de": "aureport -n"
+        },
+        {
+          "text": "ipset list",
+          "text_de": "ipset list"
+        }
+      ],
+      "explanation_de": "ntop/ntopng analysiert Flows und zeigt Top-Talker, Protokolle und Verlauf im Browser. tcpdump schreibt Rohdaten, snort -v zeigt Pakete im Terminal, aureport wertet Audit-Logs aus.",
+      "reference": "ntopng-Dokumentation",
+      "terms": [
+        {
+          "term": "live",
+          "de": "in Echtzeit"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.3-01",
+      "objective": "334.3",
+      "type": "single",
+      "question": "A firewall protects a DMZ (eth1, 192.0.2.0/24) and an internal LAN (eth2). Web servers in the DMZ must be reachable from the internet (eth0) on port 443, but must not initiate connections into the LAN. Which FORWARD rules implement this?",
+      "question_de": "Eine Firewall schützt eine DMZ (eth1, 192.0.2.0/24) und ein internes LAN (eth2). Webserver in der DMZ müssen aus dem Internet (eth0) auf Port 443 erreichbar sein, dürfen aber keine Verbindungen ins LAN aufbauen. Welche FORWARD-Regeln setzen das um?",
+      "choices": [
+        {
+          "text": "iptables -P FORWARD DROP\niptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\niptables -A FORWARD -i eth0 -o eth1 -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT\niptables -A FORWARD -i eth2 -o eth1 -j ACCEPT",
+          "text_de": "iptables -P FORWARD DROP\niptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT\niptables -A FORWARD -i eth0 -o eth1 -p tcp --dport 443 -m conntrack --ctstate NEW -j ACCEPT\niptables -A FORWARD -i eth2 -o eth1 -j ACCEPT",
+          "correct": true
+        },
+        {
+          "text": "iptables -P FORWARD ACCEPT\niptables -A FORWARD -i eth1 -o eth2 -j DROP",
+          "text_de": "iptables -P FORWARD ACCEPT\niptables -A FORWARD -i eth1 -o eth2 -j DROP"
+        },
+        {
+          "text": "iptables -A INPUT -i eth0 -p tcp --dport 443 -j ACCEPT\niptables -A INPUT -i eth1 -o eth2 -j DROP",
+          "text_de": "iptables -A INPUT -i eth0 -p tcp --dport 443 -j ACCEPT\niptables -A INPUT -i eth1 -o eth2 -j DROP"
+        },
+        {
+          "text": "iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j ACCEPT",
+          "text_de": "iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j ACCEPT"
+        },
+        {
+          "text": "iptables -P FORWARD DROP\niptables -A FORWARD -i eth1 -j ACCEPT",
+          "text_de": "iptables -P FORWARD DROP\niptables -A FORWARD -i eth1 -j ACCEPT"
+        }
+      ],
+      "explanation_de": "Standard-Deny in FORWARD, Antworten per conntrack, neue Verbindungen nur Internet→DMZ:443 und LAN→DMZ. Da keine Regel eth1→eth2 für NEW erlaubt, kann die DMZ keine Verbindungen ins LAN aufbauen. Antwort B lässt alles außer DMZ→LAN durch, auch Internet→LAN; INPUT betrifft nur die Firewall selbst.",
+      "reference": "iptables(8); iptables-extensions(8), conntrack",
+      "terms": [
+        {
+          "term": "initiate",
+          "de": "aufbauen, initiieren"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.3-02",
+      "objective": "334.3",
+      "type": "single",
+      "question": "On an IPv6 firewall, an administrator copied the IPv4 rule set to ip6tables with a DROP policy. Afterwards hosts lose their default route and cannot resolve neighbours. What is missing?",
+      "question_de": "Auf einer IPv6-Firewall hat ein Administrator den IPv4-Regelsatz mit DROP-Richtlinie nach ip6tables übernommen. Danach verlieren Hosts ihre Standardroute und können Nachbarn nicht auflösen. Was fehlt?",
+      "choices": [
+        {
+          "text": "Rules that accept ICMPv6, at least Neighbor Discovery (types 133-137) and the error and echo messages",
+          "text_de": "Regeln, die ICMPv6 erlauben, mindestens Neighbor Discovery (Typen 133-137) sowie Fehler- und Echo-Nachrichten",
+          "correct": true
+        },
+        {
+          "text": "A MASQUERADE rule in the nat table",
+          "text_de": "Eine MASQUERADE-Regel in der nat-Tabelle"
+        },
+        {
+          "text": "The module nf_conntrack_ipv4",
+          "text_de": "Das Modul nf_conntrack_ipv4"
+        },
+        {
+          "text": "An ACCEPT rule for UDP port 67",
+          "text_de": "Eine ACCEPT-Regel für UDP-Port 67"
+        },
+        {
+          "text": "Enabling net.ipv4.ip_forward",
+          "text_de": "Das Aktivieren von net.ipv4.ip_forward"
+        }
+      ],
+      "explanation_de": "IPv6 ist auf ICMPv6 angewiesen: Router Advertisement, Neighbor Solicitation/Advertisement, Path-MTU-Discovery (Packet Too Big). Wer ICMPv6 pauschal verwirft, bricht die Grundfunktionen. NAT und DHCPv4-Ports gehören zu IPv4.",
+      "reference": "RFC 4890",
+      "terms": [
+        {
+          "term": "neighbour",
+          "de": "Nachbar (Link-Layer-Adressauflösung)"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.3-03",
+      "objective": "334.3",
+      "type": "single",
+      "question": "A firewall should reject connection attempts to closed ports in a way that lets legitimate clients fail fast instead of waiting for a timeout, while attackers gain no extra information compared to DROP. Which target and option fit best for TCP?",
+      "question_de": "Eine Firewall soll Verbindungsversuche auf geschlossene Ports so abweisen, dass legitime Clients schnell scheitern statt auf ein Timeout zu warten, Angreifer aber gegenüber DROP keine zusätzlichen Informationen erhalten. Welches Target mit welcher Option passt für TCP am besten?",
+      "choices": [
+        {
+          "text": "-j REJECT --reject-with tcp-reset",
+          "text_de": "-j REJECT --reject-with tcp-reset",
+          "correct": true
+        },
+        {
+          "text": "-j DROP",
+          "text_de": "-j DROP"
+        },
+        {
+          "text": "-j REJECT --reject-with icmp-host-prohibited",
+          "text_de": "-j REJECT --reject-with icmp-host-prohibited"
+        },
+        {
+          "text": "-j LOG --log-level 4",
+          "text_de": "-j LOG --log-level 4"
+        },
+        {
+          "text": "-j RETURN",
+          "text_de": "-j RETURN"
+        }
+      ],
+      "explanation_de": "Ein TCP-RST entspricht dem Verhalten eines geschlossenen Ports ohne Firewall; Clients erhalten sofort \"connection refused\". DROP verursacht Timeouts, icmp-host-prohibited verrät eine Firewall. LOG und RETURN beenden die Verarbeitung nicht.",
+      "reference": "iptables-extensions(8), REJECT",
+      "terms": [
+        {
+          "term": "fail fast",
+          "de": "schnell scheitern"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.3-04",
+      "objective": "334.3",
+      "type": "single",
+      "question": "Hosts that try to connect to SSH more than five times within a minute should be blocked for ten minutes. Which combination implements this with ipset?",
+      "question_de": "Hosts, die innerhalb einer Minute mehr als fünfmal eine SSH-Verbindung aufbauen, sollen zehn Minuten gesperrt werden. Welche Kombination setzt das mit ipset um?",
+      "choices": [
+        {
+          "text": "ipset create ssh_block hash:ip timeout 600\niptables -A INPUT -p tcp --dport 22 -m set --match-set ssh_block src -j DROP\niptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set\niptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SET --add-set ssh_block src",
+          "text_de": "ipset create ssh_block hash:ip timeout 600\niptables -A INPUT -p tcp --dport 22 -m set --match-set ssh_block src -j DROP\niptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --set\niptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m recent --update --seconds 60 --hitcount 6 -j SET --add-set ssh_block src",
+          "correct": true
+        },
+        {
+          "text": "ipset create ssh_block list:set\niptables -A INPUT -p tcp --dport 22 -j SET --add-set ssh_block src",
+          "text_de": "ipset create ssh_block list:set\niptables -A INPUT -p tcp --dport 22 -j SET --add-set ssh_block src"
+        },
+        {
+          "text": "iptables -A INPUT -p tcp --dport 22 -m limit --limit 5/min -j DROP",
+          "text_de": "iptables -A INPUT -p tcp --dport 22 -m limit --limit 5/min -j DROP"
+        },
+        {
+          "text": "ipset create ssh_block hash:net\niptables -A INPUT -m set --match-set ssh_block dst -j ACCEPT",
+          "text_de": "ipset create ssh_block hash:net\niptables -A INPUT -m set --match-set ssh_block dst -j ACCEPT"
+        },
+        {
+          "text": "iptables -A INPUT -p tcp --dport 22 -m recent --name ssh --rcheck --seconds 600 -j ACCEPT",
+          "text_de": "iptables -A INPUT -p tcp --dport 22 -m recent --name ssh --rcheck --seconds 600 -j ACCEPT"
+        }
+      ],
+      "explanation_de": "Das recent-Modul zählt neue Verbindungen je Quelle; ab dem sechsten Versuch in 60 s trägt das SET-Target die Adresse in das ipset ein, dessen timeout die Sperre nach 600 s automatisch aufhebt. Die Sperrregel steht davor. limit allein begrenzt nur die Rate ohne Sperre.",
+      "reference": "ipset(8); iptables-extensions(8), recent und SET",
+      "terms": [
+        {
+          "term": "blocked",
+          "de": "gesperrt"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.3-05",
+      "objective": "334.3",
+      "type": "single",
+      "question": "After a reboot all iptables rules are gone. Which approach makes the rule set persistent on a Debian-based system?",
+      "question_de": "Nach einem Neustart sind alle iptables-Regeln verschwunden. Welcher Ansatz macht den Regelsatz auf einem Debian-System dauerhaft?",
+      "choices": [
+        {
+          "text": "Install iptables-persistent and save the rules with iptables-save > /etc/iptables/rules.v4 (and rules.v6); netfilter-persistent restores them at boot",
+          "text_de": "iptables-persistent installieren und die Regeln mit iptables-save > /etc/iptables/rules.v4 (und rules.v6) sichern; netfilter-persistent lädt sie beim Start",
+          "correct": true
+        },
+        {
+          "text": "Add iptables -A commands to /etc/sysctl.conf",
+          "text_de": "iptables -A-Befehle in /etc/sysctl.conf eintragen"
+        },
+        {
+          "text": "Run iptables-restore once; the kernel stores rules in /proc/net/ip_tables_names",
+          "text_de": "iptables-restore einmal ausführen; der Kernel speichert Regeln in /proc/net/ip_tables_names"
+        },
+        {
+          "text": "Set net.netfilter.nf_conntrack_persistent = 1",
+          "text_de": "net.netfilter.nf_conntrack_persistent = 1 setzen"
+        },
+        {
+          "text": "Copy /var/lib/iptables/active to /etc",
+          "text_de": "/var/lib/iptables/active nach /etc kopieren"
+        }
+      ],
+      "explanation_de": "Regeln leben nur im Kernelspeicher. iptables-save erzeugt ein Textformat, das iptables-restore beim Start einliest; Debian nutzt dafür netfilter-persistent, Red Hat iptables-services mit /etc/sysconfig/iptables, nftables /etc/nftables.conf.",
+      "reference": "iptables-save(8); iptables-restore(8)",
+      "terms": [
+        {
+          "term": "persistent",
+          "de": "dauerhaft"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.4-01",
+      "objective": "334.4",
+      "type": "single",
+      "question": "An OpenVPN server configuration contains:\n  tls-crypt ta.key\nWhat does this line provide compared to a configuration without it?",
+      "question_de": "Eine OpenVPN-Serverkonfiguration enthält:\n  tls-crypt ta.key\nWas bietet diese Zeile gegenüber einer Konfiguration ohne sie?",
+      "choices": [
+        {
+          "text": "All control channel packets are authenticated and encrypted with a pre-shared key, so unauthenticated clients cannot even start a TLS handshake and port scans do not reveal the server.",
+          "text_de": "Alle Steuerkanalpakete werden mit einem vorab geteilten Schlüssel authentifiziert und verschlüsselt; nicht authentifizierte Clients können nicht einmal einen TLS-Handshake beginnen, und Portscans erkennen den Server nicht.",
+          "correct": true
+        },
+        {
+          "text": "The data channel uses ta.key instead of the negotiated session key.",
+          "text_de": "Der Datenkanal nutzt ta.key statt des ausgehandelten Sitzungsschlüssels."
+        },
+        {
+          "text": "Clients authenticate with ta.key instead of certificates.",
+          "text_de": "Clients authentifizieren sich mit ta.key statt mit Zertifikaten."
+        },
+        {
+          "text": "The server listens on TCP instead of UDP.",
+          "text_de": "Der Server lauscht auf TCP statt UDP."
+        },
+        {
+          "text": "Compression is enabled for the tunnel.",
+          "text_de": "Kompression für den Tunnel wird aktiviert."
+        }
+      ],
+      "explanation_de": "tls-crypt (Nachfolger von tls-auth) schützt den Steuerkanal mit einem statischen Schlüssel (openvpn --genkey tls-crypt ta.key), der auf Server und Clients liegt. Zertifikate bleiben für die eigentliche Authentifizierung nötig; der Datenkanal verwendet die ausgehandelten Schlüssel.",
+      "reference": "openvpn(8), --tls-crypt",
+      "terms": [
+        {
+          "term": "reveal",
+          "de": "preisgeben"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.4-02",
+      "objective": "334.4",
+      "type": "single",
+      "question": "OpenVPN clients connect successfully but cannot reach the server's LAN 10.10.0.0/24. The server uses tun mode. Which two things are typically required? (Choose the best answer.)",
+      "question_de": "OpenVPN-Clients verbinden sich erfolgreich, erreichen aber das LAN 10.10.0.0/24 des Servers nicht. Der Server nutzt den tun-Modus. Was ist typischerweise erforderlich? (Beste Antwort.)",
+      "choices": [
+        {
+          "text": "push \"route 10.10.0.0 255.255.255.0\" in server.conf, IP forwarding on the server and a return route or NAT for the VPN subnet on the LAN side",
+          "text_de": "push \"route 10.10.0.0 255.255.255.0\" in server.conf, IP-Forwarding auf dem Server sowie eine Rückroute oder NAT für das VPN-Subnetz auf der LAN-Seite",
+          "correct": true
+        },
+        {
+          "text": "Switching the server to tap mode and bridging it with the LAN interface",
+          "text_de": "Den Server auf tap-Modus umstellen und mit der LAN-Schnittstelle brücken"
+        },
+        {
+          "text": "Adding client-to-client to server.conf",
+          "text_de": "client-to-client in server.conf eintragen"
+        },
+        {
+          "text": "Changing proto udp to proto tcp",
+          "text_de": "proto udp auf proto tcp ändern"
+        },
+        {
+          "text": "Increasing the keepalive values",
+          "text_de": "Die keepalive-Werte erhöhen"
+        }
+      ],
+      "explanation_de": "Clients brauchen eine Route zum LAN (push route), der Server muss weiterleiten (net.ipv4.ip_forward) und die LAN-Hosts brauchen einen Rückweg zum VPN-Netz (Route auf dem Gateway oder MASQUERADE auf dem VPN-Server). client-to-client betrifft nur Verkehr zwischen Clients.",
+      "reference": "openvpn(8), --push, --route",
+      "terms": [
+        {
+          "term": "return route",
+          "de": "Rückroute"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.4-03",
+      "objective": "334.4",
+      "type": "single",
+      "question": "A WireGuard client behind a NAT router loses connectivity after a few minutes of inactivity, although the server is reachable. Which setting in the client's [Peer] section fixes this?",
+      "question_de": "Ein WireGuard-Client hinter einem NAT-Router verliert nach einigen Minuten Inaktivität die Verbindung, obwohl der Server erreichbar ist. Welche Einstellung im [Peer]-Abschnitt des Clients behebt das?",
+      "choices": [
+        {
+          "text": "PersistentKeepalive = 25",
+          "text_de": "PersistentKeepalive = 25",
+          "correct": true
+        },
+        {
+          "text": "AllowedIPs = 0.0.0.0/0",
+          "text_de": "AllowedIPs = 0.0.0.0/0"
+        },
+        {
+          "text": "ListenPort = 51820",
+          "text_de": "ListenPort = 51820"
+        },
+        {
+          "text": "MTU = 1420",
+          "text_de": "MTU = 1420"
+        },
+        {
+          "text": "Endpoint = 0.0.0.0:0",
+          "text_de": "Endpoint = 0.0.0.0:0"
+        }
+      ],
+      "explanation_de": "WireGuard sendet nur bei Bedarf; die NAT-Zuordnung des Routers läuft bei Stille ab und der Server kann den Client nicht mehr erreichen. PersistentKeepalive hält die Zuordnung mit periodischen Paketen offen. AllowedIPs regelt Routing, ListenPort den lokalen Port.",
+      "reference": "wg(8), PersistentKeepalive",
+      "terms": [
+        {
+          "term": "inactivity",
+          "de": "Inaktivität"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-334.4-04",
+      "objective": "334.4",
+      "type": "single",
+      "question": "After editing /etc/swanctl/swanctl.conf, which command makes strongSwan load the new connection definitions and which one shows the established security associations?",
+      "question_de": "Nach dem Bearbeiten von /etc/swanctl/swanctl.conf: Welcher Befehl lässt strongSwan die neuen Verbindungsdefinitionen laden, und welcher zeigt die aufgebauten Security Associations?",
+      "choices": [
+        {
+          "text": "swanctl --load-all; swanctl --list-sas",
+          "text_de": "swanctl --load-all; swanctl --list-sas",
+          "correct": true
+        },
+        {
+          "text": "ipsec reload; ipsec statusall",
+          "text_de": "ipsec reload; ipsec statusall"
+        },
+        {
+          "text": "systemctl restart strongswan; swanctl --list-conns",
+          "text_de": "systemctl restart strongswan; swanctl --list-conns"
+        },
+        {
+          "text": "swanctl --initiate; swanctl --stats",
+          "text_de": "swanctl --initiate; swanctl --stats"
+        },
+        {
+          "text": "charon-cmd --reload; charon-cmd --list",
+          "text_de": "charon-cmd --reload; charon-cmd --list"
+        }
+      ],
+      "explanation_de": "swanctl ist die Schnittstelle zum charon-Daemon über VICI: --load-all lädt Verbindungen, Secrets und Pools; --list-conns zeigt Definitionen, --list-sas aktive IKE- und Child-SAs; --initiate baut eine SA auf. ipsec gehört zur veralteten stroke-Schnittstelle.",
+      "reference": "swanctl(8)",
+      "terms": [
+        {
+          "term": "established",
+          "de": "aufgebaut"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-335.1-01",
+      "objective": "335.1",
+      "type": "single",
+      "question": "A web application changes the user's e-mail address when a logged-in user opens a link on a third-party page that triggers a POST to the application. Which vulnerability is this, and which measure prevents it?",
+      "question_de": "Eine Webanwendung ändert die E-Mail-Adresse eines angemeldeten Benutzers, wenn er auf einer fremden Seite einen Link öffnet, der einen POST an die Anwendung auslöst. Welche Schwachstelle liegt vor, und welche Maßnahme verhindert sie?",
+      "choices": [
+        {
+          "text": "Cross-site request forgery; mitigated by anti-CSRF tokens and SameSite cookies",
+          "text_de": "Cross-Site Request Forgery; abgewehrt durch Anti-CSRF-Tokens und SameSite-Cookies",
+          "correct": true
+        },
+        {
+          "text": "Cross-site scripting; mitigated by output encoding",
+          "text_de": "Cross-Site Scripting; abgewehrt durch Ausgabekodierung"
+        },
+        {
+          "text": "SQL injection; mitigated by prepared statements",
+          "text_de": "SQL-Injection; abgewehrt durch Prepared Statements"
+        },
+        {
+          "text": "Session fixation; mitigated by longer session IDs",
+          "text_de": "Session Fixation; abgewehrt durch längere Sitzungs-IDs"
+        },
+        {
+          "text": "Buffer overflow; mitigated by ASLR",
+          "text_de": "Pufferüberlauf; abgewehrt durch ASLR"
+        }
+      ],
+      "explanation_de": "Bei CSRF nutzt der Angreifer die bestehende Sitzung des Opfers, weil der Browser Cookies automatisch mitsendet. Tokens, die der Angreifer nicht kennt, und SameSite-Cookies verhindern das. XSS schleust Skripte in Seiten ein, Injection manipuliert Abfragen.",
+      "reference": "OWASP, Cross-Site Request Forgery",
+      "terms": [
+        {
+          "term": "third-party",
+          "de": "fremd, von Dritten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-335.1-02",
+      "objective": "335.1",
+      "type": "single",
+      "question": "What is the purpose of a honeypot in a security architecture?",
+      "question_de": "Welchen Zweck hat ein Honeypot in einer Sicherheitsarchitektur?",
+      "choices": [
+        {
+          "text": "A deliberately exposed, monitored system without production value that attracts attackers so that their methods can be observed and attacks detected early.",
+          "text_de": "Ein absichtlich exponiertes, überwachtes System ohne produktiven Wert, das Angreifer anlockt, damit ihre Methoden beobachtet und Angriffe früh erkannt werden.",
+          "correct": true
+        },
+        {
+          "text": "A proxy that filters malicious requests before they reach the web server.",
+          "text_de": "Ein Proxy, der bösartige Anfragen vor dem Webserver herausfiltert."
+        },
+        {
+          "text": "A backup server that takes over when the firewall fails.",
+          "text_de": "Ein Ersatzserver, der bei Ausfall der Firewall übernimmt."
+        },
+        {
+          "text": "A password vault for administrators.",
+          "text_de": "Ein Passworttresor für Administratoren."
+        },
+        {
+          "text": "A certificate authority for internal services.",
+          "text_de": "Eine Zertifizierungsstelle für interne Dienste."
+        }
+      ],
+      "explanation_de": "Jeder Zugriff auf einen Honeypot ist verdächtig, weil er keinen legitimen Zweck hat; das liefert Frühwarnung und Erkenntnisse über Angreifer. Er muss isoliert sein, damit er nicht als Sprungbrett dient.",
+      "reference": "Prüfungsziel 335.1, Honeypots",
+      "terms": [
+        {
+          "term": "deliberately",
+          "de": "absichtlich"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-335.2-01",
+      "objective": "335.2",
+      "type": "single",
+      "question": "nmap reports every host of a subnet as \"down\" although the hosts are running; the firewall blocks ICMP echo. Which option makes nmap scan the ports anyway?",
+      "question_de": "nmap meldet jeden Host eines Subnetzes als „down“, obwohl die Hosts laufen; die Firewall blockiert ICMP-Echo. Welche Option lässt nmap die Ports trotzdem scannen?",
+      "choices": [
+        {
+          "text": "-Pn",
+          "text_de": "-Pn",
+          "correct": true
+        },
+        {
+          "text": "-sn",
+          "text_de": "-sn"
+        },
+        {
+          "text": "-PE",
+          "text_de": "-PE"
+        },
+        {
+          "text": "-n",
+          "text_de": "-n"
+        },
+        {
+          "text": "-sL",
+          "text_de": "-sL"
+        }
+      ],
+      "explanation_de": "-Pn überspringt die Host-Erkennung und behandelt alle Ziele als online. -sn macht nur Host-Erkennung, -PE verwendet gerade ICMP-Echo, -n unterdrückt DNS, -sL listet Ziele ohne Scan.",
+      "reference": "nmap(1), Host Discovery",
+      "terms": [
+        {
+          "term": "anyway",
+          "de": "trotzdem"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-335.2-02",
+      "objective": "335.2",
+      "type": "single",
+      "question": "In the Metasploit Framework, which module type is used to scan a network for hosts with a specific service version before choosing an exploit?",
+      "question_de": "Welcher Modultyp wird im Metasploit Framework verwendet, um ein Netz nach Hosts mit einer bestimmten Dienstversion zu durchsuchen, bevor ein Exploit gewählt wird?",
+      "choices": [
+        {
+          "text": "auxiliary (scanner modules)",
+          "text_de": "auxiliary (Scanner-Module)",
+          "correct": true
+        },
+        {
+          "text": "exploit",
+          "text_de": "exploit"
+        },
+        {
+          "text": "payload",
+          "text_de": "payload"
+        },
+        {
+          "text": "encoder",
+          "text_de": "encoder"
+        },
+        {
+          "text": "post",
+          "text_de": "post"
+        }
+      ],
+      "explanation_de": "Metasploit kennt exploits, payloads (Code nach erfolgreichem Exploit, z. B. Meterpreter), auxiliary (Scanner, Fuzzer, DoS), encoders, nops und post (Aktionen nach dem Zugriff). Versionsscans laufen als auxiliary/scanner.",
+      "reference": "Metasploit-Dokumentation, Module types",
+      "terms": [
+        {
+          "term": "before choosing",
+          "de": "vor der Auswahl"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "303-erg-335.2-03",
+      "objective": "335.2",
+      "type": "single",
+      "question": "Which sequence correctly describes the phases of a penetration test?",
+      "question_de": "Welche Abfolge beschreibt die Phasen eines Penetrationstests korrekt?",
+      "choices": [
+        {
+          "text": "Agreement and scoping, reconnaissance, scanning and enumeration, exploitation, post-exploitation, reporting",
+          "text_de": "Beauftragung und Abgrenzung, Aufklärung, Scannen und Enumeration, Ausnutzung, Post-Exploitation, Bericht",
+          "correct": true
+        },
+        {
+          "text": "Exploitation, reporting, scanning, agreement",
+          "text_de": "Ausnutzung, Bericht, Scannen, Beauftragung"
+        },
+        {
+          "text": "Reporting, reconnaissance, exploitation, cleanup",
+          "text_de": "Bericht, Aufklärung, Ausnutzung, Aufräumen"
+        },
+        {
+          "text": "Scanning, agreement, exploitation, reconnaissance",
+          "text_de": "Scannen, Beauftragung, Ausnutzung, Aufklärung"
+        },
+        {
+          "text": "Reconnaissance, reporting, exploitation, scanning",
+          "text_de": "Aufklärung, Bericht, Ausnutzung, Scannen"
+        }
+      ],
+      "explanation_de": "Ohne schriftliche Beauftragung und Abgrenzung darf nichts beginnen. Danach folgen Informationsbeschaffung, Scannen und Enumeration, kontrollierte Ausnutzung, Post-Exploitation (Rechteausweitung, Nachweis) und der Bericht mit Empfehlungen.",
+      "reference": "Prüfungsziel 335.2, Penetration testing phases",
+      "terms": [
+        {
+          "term": "scoping",
+          "de": "Abgrenzung des Umfangs"
+        }
+      ],
+      "difficulty": 2
+    }
+  ]
+}

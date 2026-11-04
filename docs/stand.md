@@ -53,6 +53,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 - Private Fragen sind für Importierende, Administratoren und Mitglieder betreuter Gruppen sichtbar.
 - Importierte Texte werden immer escaped (getestet).
 - Rollen und Freigabe: Nur Administratoren und Betreuer importieren Fragen; Lernende können nichts importieren, anlegen, ändern oder freigeben. Jeder Import braucht Quelle und Prüfungsgeneration (`source`, `exam_version`) sowie einen Rechtestatus und bleibt unveröffentlicht. Betreuer geben eigene Importe unter *Verwaltung › Freigaben* für eigene Gruppen frei, Administratoren systemweit oder für beliebige Gruppen. Lernende sehen den freigegebenen Grundbestand und die Freigaben ihrer Gruppen; freigegebene Importe sind bei jeder Frage als Zusatzfrage mit Quelle, Prüfungsgeneration und Rechtestatus markiert, mit Pool-Filter beim Üben. Die mitgelieferten Projektfragen bilden den bereits freigegebenen Grundbestand. Migrationen `0002` und `0003`.
+- Ergänzungspools unter `content/questions/extra/<modul>-ergaenzung-2026-11.json`: 221 eigene Zusatzfragen (300: 51, 303: 60, 305: 50, 306: 60) mit Referenz je Frage, unveröffentlicht bis zur Freigabe; Bericht in `docs/zusatzfragen-bericht.md`. Damit je Modul mindestens 60 Zusatzfragen.
 - Mitgelieferte Zusatzquellen unter `content/questions/extra/`: je zehn Fragen aus den öffentlich abrufbaren ExamTopics-Dumps zu den Prüfungen 305-300 und 300-300, bereitgestellt vom Auftraggeber mit deutscher Sprachhilfe (Herkunft per Websuche geprüft, Nutzungsrechte nicht geklärt, Fundstellen in `content/questions/extra/README.md`). Diese Dateien sind von der CC-BY-SA-Lizenz der übrigen Inhalte ausgenommen.
 
 ### Offline
@@ -61,6 +62,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 ### Installation und Betrieb
 
+- Nach 0.0.2: Schreibtransaktionen beginnen mit BEGIN IMMEDIATE, Busy-Timeout 15 s, Begriffsmuster werden gecacht (Nebenläufigkeitstest war mit größerem Fragenbestand instabil); Ergänzungspools mit 221 Zusatzfragen, Migration 0005 (Feld `reference`).
 - Version 0.0.2: Restore verweigert die Ausführung bei laufendem, nicht über systemd verwaltetem Server, sichert vorher, prüft danach die Integrität und wartet auf den Health-Check; CLI legt das Datenverzeichnis selbst an; Administratoren legen Benutzer in der Weboberfläche an; Betreuer sehen nur eigene Mitglieder und Importe; Importchargen tragen Prüfungsnummer und Original-URL; Dublettenwarnung beim Import; `active: false` je Frage; SQLite-Fremdschlüssel sind während Migrationen aus (Migration 0004, Upgrade-Test mit Bestandsdaten).
 
 - `lpic3ctl` mit allen in AGENTS.md vorgesehenen Befehlen plus `rollback`, `serve`, `migrate`, `content-sync`, `import`, `validate`, `user`.
@@ -98,6 +100,8 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 - Prüfungsziele Version 3.0 vom Stand November 2026; LPI kündigt für 303 Änderungen an („Future Change Considerations“).
 
 ## Offene Aufgaben und nächste Schritte
+
+Didaktische Festlegungen zu den Laboraufgaben und der Abgleich mit dem Stand stehen in `docs/lab-konzept.md` (nächste LAB-Überarbeitung: Einrichtungsanleitung, Erfolgskriterien, Dozentenhinweise, LAB-Status je Gruppe).
 
 1. Installation und Upgrade auf einem frischen Debian 12 oder Ubuntu 24.04 mit systemd durchführen und Ergebnis dokumentieren.
 2. Docker-Image bauen und Compose-Betrieb prüfen.

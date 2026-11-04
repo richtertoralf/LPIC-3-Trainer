@@ -103,7 +103,7 @@ Alle Einstellungen kommen aus Umgebungsvariablen mit Präfix `LPIC3_` (siehe `do
 ## Entscheidungen
 
 - **Serverseitiges Rendering statt Frontend-Framework**: einfacher, wartbar, funktioniert ohne Build-Pipeline.
-- **SQLite mit WAL**: ein Prozess, kurze Schreibtransaktionen, `busy_timeout` 5 s. Für Lerngruppen ausreichend. Backups über die SQLite-Backup-API.
+- **SQLite mit WAL**: ein Prozess, kurze Schreibtransaktionen, `busy_timeout` 15 s. Zustandsändernde Anfragen (POST) und `session_scope` beginnen mit `BEGIN IMMEDIATE`, damit gleichzeitige Schreiber am Busy-Timeout warten, statt beim Aufstufen einer gelesenen Transaktion sofort mit „database is locked“ zu scheitern; die Antwortauswertung gibt die Schreibsperre vor dem Rendern frei. Für Lerngruppen ausreichend. Backups über die SQLite-Backup-API.
 - **Editierbare Installation** (`pip install -e`): Programmdateien bleiben unter `/opt/lpic3-trainer/app`, dadurch findet die Anwendung `content/`, `migrations/` und `alembic.ini`.
 - **Sprachhilfe im Browser**: Markierung und Übersetzung passieren im Browser aus mitgelieferten Daten. Es gibt keine externe Übersetzung und keine KI.
 - **Keine Lernanalyse**: nur Zähler je Ziel, Hilfequote und Ergebnisse.
