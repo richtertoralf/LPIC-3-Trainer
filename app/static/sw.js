@@ -1,5 +1,5 @@
 /* Service worker: static assets cache-first, visited pages network-first with cache fallback. */
-var VERSION = "lpic3-v1";
+var VERSION = "lpic3-v2";
 var STATIC = ["/static/app.css", "/static/app.js", "/static/icon.svg", "/static/icon-192.png", "/offline", "/manifest.webmanifest"];
 
 self.addEventListener("install", function (event) {

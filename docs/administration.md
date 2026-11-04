@@ -19,7 +19,7 @@
 | `lpic3ctl uninstall` | entfernen, Daten behalten | ja |
 | `lpic3ctl purge [--yes]` | alles entfernen | ja |
 | `lpic3ctl user ...` | Benutzer verwalten | nein* |
-| `lpic3ctl import DATEI... [--source TEXT --exam-version X.Y --rights STATUS]` | Inhalte importieren (Fragen bleiben unveröffentlicht) | nein* |
+| `lpic3ctl import DATEI... [--source TEXT --exam-code NNN-300 --exam-version X.Y --source-url URL --rights STATUS]` | Inhalte importieren (Fragen bleiben unveröffentlicht) | nein* |
 | `lpic3ctl validate DATEI...` | Inhalte prüfen | nein |
 | `lpic3ctl content-sync` | mitgelieferte Inhalte importieren | nein* |
 | `lpic3ctl migrate` | Migrationen ausführen | nein* |
@@ -37,7 +37,7 @@ Rollen:
 - **Betreuer**: Benutzer freigeben, eigene Gruppen anlegen und betreuen, Fragen importieren und die eigenen Importe für die eigenen Gruppen freigeben, Lernstand der Gruppenmitglieder sehen.
 - **Lernender**: lernen, Gruppen beitreten. Kein Import, keine Freigabe, keine Änderung von Fragen.
 
-Weboberfläche: *Verwaltung › Benutzer*. Dort Freigeben, Rolle ändern, Deaktivieren, Passwort zurücksetzen (neues Passwort wird einmalig angezeigt) und Löschen.
+Weboberfläche: *Verwaltung › Benutzer*. Administratoren legen dort neue Konten mit Rolle und Startpasswort an („Benutzer anlegen“), geben Registrierungen frei, ändern Rollen, deaktivieren, setzen Passwörter zurück (neues Passwort wird einmalig angezeigt) und löschen. Betreuer sehen nur Konten, die auf Freigabe warten, und die Mitglieder ihrer eigenen Lerngruppen; unter *Import* sehen sie nur ihre eigenen Importe.
 
 Kommandozeile:
 
@@ -61,7 +61,9 @@ Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit 
 Rollen und Rechte:
 
 - Nur Administratoren und Betreuer (Lehrer, Tutoren) importieren Fragen. Lernende können Fragen weder importieren noch anlegen, ändern oder freigeben; alle Verwaltungsseiten antworten ihnen mit 403 (getestet).
-- Jeder Import braucht eine nachvollziehbare **Quelle** (`source`, z. B. „ExamTopics 04.11.2026“ oder „Eigene Fragen Kurs A“) und eine **Prüfungsgeneration** (`exam_version`, z. B. `3.0`). Beide stehen im Dateikopf oder werden im Importformular beziehungsweise per CLI angegeben. Ohne diese Angaben wird die Datei abgelehnt. Dazu kommt ein Rechtestatus (`rights`: geklärt, unbekannt, nicht geklärt).
+- Jeder Import braucht eine nachvollziehbare **Quelle** (`source`, z. B. „ExamTopics 04.11.2026“ oder „Eigene Fragen Kurs A“) und eine **Prüfungsgeneration** (`exam_version`, z. B. `3.0`). Beide stehen im Dateikopf oder werden im Importformular beziehungsweise per CLI angegeben. Ohne diese Angaben wird die Datei abgelehnt. Dazu kommen die **Prüfungsnummer** (`exam_code`, z. B. `305-300`; ohne Angabe Modulnummer-300, muss zum Modul passen), optional die **Original-URL** (`source_url`) und ein Rechtestatus (`rights`: geklärt, unbekannt, nicht geklärt). Alle Angaben werden in der Importcharge gespeichert und in Freigabe- und Lernansicht angezeigt.
+- Beim Import vergleicht die Anwendung jede Frage mit dem vorhandenen Bestand des Moduls und meldet mögliche Dubletten (ab 80 % Textähnlichkeit) im Ergebnis; die Fragen werden trotzdem importiert.
+- Einzelne Fragen lassen sich in der Datei mit `"active": false` ausschließen, etwa bei fachlich unsicherer Lösung. Das Kennzeichen bleibt bei erneutem Import erhalten.
 - Importierte Fragen bleiben **unveröffentlicht**. Sie sind nur für den Importierenden und für Administratoren sichtbar.
 - **Betreuer** geben unter *Verwaltung › Freigaben* ihre eigenen Importe für ihre eigenen Lerngruppen frei und nehmen die Freigabe dort wieder zurück. Fremde Importe oder fremde Gruppen können sie nicht freigeben.
 - **Administratoren** geben einen Import systemweit für alle Lernenden frei (Schaltfläche „Systemweit freigeben“) oder für beliebige Gruppen.
@@ -104,7 +106,15 @@ sudo lpic3ctl restore /var/lib/lpic3-trainer/backups/lpic3-trainer-backup-202601
 sudo lpic3ctl restore ARCHIV --with-config    # auch Konfiguration zurückspielen
 ```
 
-`restore` fragt nach, stoppt den Dienst, sichert die aktuelle Datenbank als `lpic3-trainer.before-restore-<Datum>.db`, spielt das Archiv ein, führt Migrationen aus und startet den Dienst wieder.
+`restore` läuft kontrolliert ab:
+
+1. Rückfrage (entfällt mit `--yes`).
+2. Dienstzustand prüfen: Läuft der systemd-Dienst, wird er gestoppt und am Ende wieder gestartet. Läuft stattdessen ein nicht über systemd verwalteter Server (Docker, `lpic3ctl serve` im Vordergrund), bricht `restore` mit einer eindeutigen Fehlermeldung ab, denn ein laufender Server würde sonst unbemerkt in die ersetzte Datei weiterschreiben.
+3. Die aktuelle Datenbank wird als `lpic3-trainer.before-restore-<Datum>.db` gesichert.
+4. Das Archiv wird eingespielt, Migrationen laufen, `PRAGMA integrity_check` muss `ok` liefern, sonst bricht der Befehl ab (die Sicherheitskopie bleibt liegen).
+5. War der Dienst aktiv, wird er gestartet und der Health-Endpunkt abgewartet.
+
+Diese Abläufe sind durch Regressionstests abgedeckt (`tests/test_restore_regression.py`).
 
 ## Betrieb und Diagnose
 

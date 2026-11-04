@@ -34,6 +34,8 @@ Jede Datei wird vor dem Import vollständig geprüft. Bei einem Fehler wird nich
   "kind": "questions",
   "module": "303",
   "source": "LPIC-3 Trainer Projekt",
+  "source_url": "https://github.com/richtertoralf/LPIC-3-Trainer",
+  "exam_code": "303-300",
   "exam_version": "3.0",
   "rights": "cleared",
   "license": "CC BY-SA 4.0",
@@ -68,6 +70,9 @@ Regeln:
 - `choices`: 2 bis 6 Einträge.
 - `source` (Pflicht): nachvollziehbare Quelle der Fragen, max. 160 Zeichen. Wird bei importierten Fragen angezeigt.
 - `exam_version` (Pflicht): Prüfungsgeneration, auf die sich die Fragen beziehen, z. B. `3.0`.
+- `exam_code`: vollständige Prüfungsnummer, z. B. `305-300`; muss mit der Modulnummer beginnen. Ohne Angabe wird Modulnummer-300 gesetzt.
+- `source_url`: Original-URL der Quelle (http/https, optional).
+- je Frage `active`: `false` nimmt die Frage aus Üben und Prüfungen heraus (z. B. unsichere Lösung); das Kennzeichen bleibt bei erneutem Import erhalten.
 - `rights`: `cleared` (Lizenz bekannt), `unknown` (Standard) oder `unverified` (Herkunft bekannt, Nutzungsrechte nicht geklärt).
 - `terms`: fragenbezogene Fachbegriffe. Sie landen zusätzlich im Glossar.
 - `supplementary`: nur für mitgelieferte Dateien relevant. `true` kennzeichnet eine mitgelieferte Datei als externe Quelle, die unveröffentlicht bleibt. Alle Importe über Weboberfläche oder CLI sind automatisch externe Quellen.

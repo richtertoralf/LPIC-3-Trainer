@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand und Freigabeverwaltung für importierte Fragen (erste Entwicklungsversion, keine stabile Produktionsversion).
+Stand: 4. November 2026, Version 0.0.2 (erste Entwicklungsversion, keine stabile Produktionsversion). Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`.
 
 ## Zusammenfassung
 
@@ -61,6 +61,8 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 ### Installation und Betrieb
 
+- Version 0.0.2: Restore verweigert die Ausführung bei laufendem, nicht über systemd verwaltetem Server, sichert vorher, prüft danach die Integrität und wartet auf den Health-Check; CLI legt das Datenverzeichnis selbst an; Administratoren legen Benutzer in der Weboberfläche an; Betreuer sehen nur eigene Mitglieder und Importe; Importchargen tragen Prüfungsnummer und Original-URL; Dublettenwarnung beim Import; `active: false` je Frage; SQLite-Fremdschlüssel sind während Migrationen aus (Migration 0004, Upgrade-Test mit Bestandsdaten).
+
 - `lpic3ctl` mit allen in AGENTS.md vorgesehenen Befehlen plus `rollback`, `serve`, `migrate`, `content-sync`, `import`, `validate`, `user`.
 - Native Installation mit Systembenutzer, venv (`deploy/create-venv.sh`), gehärteter systemd-Unit, Konfiguration unter `/etc/lpic3-trainer`, Daten unter `/var/lib/lpic3-trainer`.
 - Upgrade mit automatischer Sicherung, Erhalt der Konfiguration, automatischer Rückfall bei Fehler; `rollback`.
@@ -76,17 +78,18 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 | Suite | Umfang | Ergebnis |
 |-------|--------|----------|
-| pytest Backend (`tests/`, ohne e2e) | 82 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Import- und Freigaberechte (Lernende 403, Pflichtfelder Quelle und Prüfungsgeneration, Import unveröffentlicht, Freigabe durch Betreuer nur für eigene Importe und Gruppen, systemweite Freigabe nur Administrator, Grundbestand freigegeben, externe Quellen nicht) | 82 bestanden |
-| Playwright (`tests/e2e/`, Chromium) | 10 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Import und Freigabe durch Betreuer mit Kennzeichnung beim Lernenden, Lernender ohne Zugriff auf Verwaltungsseiten | 10 bestanden |
+| pytest Backend (`tests/`, ohne e2e) | 94 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Import- und Freigaberechte (Lernende 403, Pflichtfelder Quelle und Prüfungsgeneration, Import unveröffentlicht, Freigabe durch Betreuer nur für eigene Importe und Gruppen, systemweite Freigabe nur Administrator, Grundbestand freigegeben, externe Quellen nicht), Restore-Regression (laufender Server, Neustart, defektes Archiv), Migrationen mit Bestandsdaten, Benutzeranlage, Betreuer-Sichtbarkeit, Dubletten, Inaktiv-Kennzeichen, Herkunftsfelder | 94 bestanden |
+| Playwright (`tests/e2e/`, Chromium) | 12 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Import und Freigabe durch Betreuer mit Kennzeichnung beim Lernenden, Lernender ohne Zugriff auf Verwaltungsseiten, Rückfrage bei unbeantworteten Prüfungsfragen, Benutzeranlage durch Administrator | 12 bestanden |
 | ruff check / ruff format | `app`, `tests`, `migrations` | ohne Befunde |
 
 JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertests erfasst; keine aufgetreten.
 
 ## Bekannte Einschränkungen
 
-- **Installation nicht auf einem echten System geprüft.** `install`, `upgrade`, `rollback`, `uninstall` und `purge` sind nur im automatisierten Test mit Stub-Befehlen für `useradd`, `userdel` und `systemctl` gelaufen (ohne Root). Dateistruktur, venv, Konfigurationserhalt und Befehlsfolge sind damit geprüft, das Zusammenspiel mit systemd auf einem Server noch nicht.
+- **Native systemd-Installation nicht auf einem echten Server geprüft.** Auf dem Entwicklungsrechner gibt es kein Root und kein Docker. `install`, `upgrade`, `rollback`, `uninstall` und `purge` sind nur im automatisierten Test mit Stub-Befehlen für `useradd`, `userdel` und `systemctl` gelaufen. Geprüft sind damit Dateistruktur, venv, Konfigurationserhalt, Dateirechte (`0640` Konfiguration, `0750` Datenverzeichnis), Inhalt der Unit sowie die Befehlsfolge daemon-reload, enable, restart. Nicht geprüft ist der tatsächliche Start durch systemd mit den Härtungsoptionen. Eine simulierte Installation gilt nicht als erfolgreiche Serverinstallation.
 - **Docker nicht getestet.** Auf dem Entwicklungssystem war kein Docker verfügbar. Dockerfile und Compose-Datei sind ungetestet.
-- **Fragenanzahl.** Mit 60 bis 62 Fragen je Modul zieht eine Modulsimulation nahezu den gesamten Bestand; wiederholte Simulationen enthalten daher weitgehend dieselben Fragen. Kapiteltests mit 15 Fragen sind bei kleinen Themen entsprechend kürzer.
+- **Fragenanzahl.** Mit 60 bis 62 Fragen je Modul zieht eine Modulsimulation nahezu den gesamten Bestand; wiederholte Simulationen enthalten daher weitgehend dieselben Fragen. Kapiteltests mit 15 Fragen sind bei kleinen Themen entsprechend kürzer. Nur 3 von 245 Projektfragen sind Mehrfachauswahl (Abnahmebefund P2-7, offen).
+- **Zwei ExamTopics-Fragen inaktiv.** `300-examtopics-screenshot-08` und `305-examtopics-screenshot-03` sind fachlich unsicher und mit `active: false` ausgeschlossen (P2-8).
 - **Sprachhilfe erkennt Begriffe wörtlich.** Flexionen (z. B. „revoked“ zu „revoke“) werden nur erkannt, wenn der Begriff so im Glossar steht oder der Frage zugeordnet ist.
 - **Prüfungssimulation ohne Fortsetzung nach Browserschließen.** Die Antworten werden erst bei Abgabe gespeichert; die Zeit läuft serverseitig weiter.
 - **Keine E-Mail.** Passwort zurücksetzen erfolgt durch Administratoren (neues Passwort wird angezeigt).

@@ -12,7 +12,9 @@
     <fieldset>
       <legend>Herkunft (Pflicht bei Fragen)</legend>
       <label>Quelle<input name="source" maxlength="160" placeholder="z. B. ExamTopics 04.11.2026 oder Eigene Fragen Kurs A"><small>Erscheint bei jeder Frage. Kann auch im Dateikopf stehen (`source`).</small></label>
+      <label>Prüfungsnummer<input name="exam_code" maxlength="16" placeholder="z. B. 305-300"><small>Vollständige Prüfungsnummer (`exam_code`). Ohne Angabe: Modulnummer-300.</small></label>
       <label>Prüfungsgeneration<input name="exam_version" maxlength="16" placeholder="3.0"><small>Version der Prüfungsziele, auf die sich die Fragen beziehen (`exam_version`).</small></label>
+      <label>Original-URL (optional)<input name="source_url" maxlength="255" placeholder="https://…"><small>Fundstelle der Fragen im Internet (`source_url`).</small></label>
       <label>Rechtestatus<select name="rights"><option value="unknown">unbekannt</option><option value="cleared">geklärt (Lizenz bekannt)</option><option value="unverified">nicht geklärt (Herkunft bekannt, Nutzungsrechte offen)</option></select></label>
     </fieldset>
     <p class="muted small">Importierte Fragen bleiben unveröffentlicht, bis sie unter <a href="/admin/releases">Freigaben</a> für eine Lerngruppe oder systemweit freigegeben werden.</p>
@@ -23,13 +25,13 @@
 <section class="card">
   <h2>Importe</h2>
   <table class="table">
-    <thead><tr><th>Datei</th><th>Art</th><th>Modul</th><th>Anzahl</th><th>Prüfungsgeneration</th><th>Lizenz</th><th>Datum</th><th></th></tr></thead>
+    <thead><tr><th>Datei</th><th>Art</th><th>Modul</th><th>Anzahl</th><th>Prüfung</th><th>Lizenz</th><th>Datum</th><th></th></tr></thead>
     <tbody>
     {% for b in batches %}
     <tr>
       <td>{{ b.filename }}{% if b.bundled %} <span class="tag">mitgeliefert</span>{% endif %}{% if b.supplementary %} <span class="tag {% if b.released %}tag-ok{% else %}tag-warn{% endif %}">{{ b.source }}{% if b.released %} · freigegeben{% else %} · unveröffentlicht{% endif %}</span>{% endif %}</td>
       <td>{{ b.kind }}</td><td>{{ b.module_code }}</td><td><a href="/admin/questions?batch={{ b.id }}">{{ b.item_count }}</a></td>
-      <td>{{ b.exam_version }}</td><td>{{ b.license }}</td><td>{{ b.imported_at.strftime('%d.%m.%Y') }}</td>
+      <td>{% if b.exam_code %}{{ b.exam_code }} ({{ b.exam_version }}){% else %}–{% endif %}</td><td>{{ b.license }}</td><td>{{ b.imported_at.strftime('%d.%m.%Y') }}</td>
       <td>{% if user.is_admin or b.imported_by == user.id %}<form method="post" action="/admin/batches/{{ b.id }}/delete" class="inline" data-confirm="Import {{ b.filename }} mit allen Fragen löschen?"><button class="btn btn-small btn-danger" type="submit">Löschen</button></form>{% endif %}</td>
     </tr>
     {% endfor %}

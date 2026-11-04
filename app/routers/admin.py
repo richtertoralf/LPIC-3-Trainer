@@ -5,7 +5,7 @@ from __future__ import annotations
 import secrets
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.content import ContentError, import_document, parse_json_bytes
@@ -18,6 +18,7 @@ from app.deps import (
     set_setting,
 )
 from app.models import (
+    ROLE_LEARNER,
     ROLES,
     STATUS_ACTIVE,
     STATUS_DISABLED,
@@ -35,7 +36,8 @@ from app.models import (
     User,
     UserModule,
 )
-from app.security import delete_user_sessions, hash_password
+from app.routers.auth import USERNAME_RE
+from app.security import MIN_PASSWORD_LENGTH, delete_user_sessions, hash_password
 from app.services import all_modules, module_progress, set_batch_release
 from app.web import redirect, render
 
@@ -77,8 +79,55 @@ def overview(
 def users(
     request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
 ):
-    rows = list(db.execute(select(User).order_by(User.status, User.username)).scalars())
+    """Administrators see everybody; supervisors see pending accounts and their own members."""
+    stmt = select(User).order_by(User.status, User.username)
+    if not user.is_admin:
+        my_groups = select(GroupMember.group_id).where(
+            GroupMember.user_id == user.id, GroupMember.role == "supervisor"
+        )
+        members = select(GroupMember.user_id).where(GroupMember.group_id.in_(my_groups))
+        stmt = stmt.where(
+            or_(User.status == STATUS_PENDING, User.id.in_(members), User.id == user.id)
+        )
+    rows = list(db.execute(stmt).scalars())
     return render(request, "admin/users.html", {"users": rows, "roles": ROLES})
+
+
+@router.post("/users")
+def create_user(
+    username: str = Form(...),
+    display_name: str = Form(""),
+    role: str = Form(ROLE_LEARNER),
+    password: str = Form(...),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Create an active account from the web interface (P2-2)."""
+    username = username.strip().lower()
+    if not USERNAME_RE.match(username):
+        return redirect(
+            "/admin/users", "Ungültiger Benutzername (3 bis 32 Zeichen, a-z, 0-9, . - _).", "error"
+        )
+    if role not in ROLES:
+        raise HTTPException(400, "Ungültige Rolle")
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return redirect(
+            "/admin/users",
+            f"Das Passwort braucht mindestens {MIN_PASSWORD_LENGTH} Zeichen.",
+            "error",
+        )
+    if db.execute(select(User.id).where(User.username == username)).scalar_one_or_none():
+        return redirect("/admin/users", "Dieser Benutzername ist bereits vergeben.", "error")
+    db.add(
+        User(
+            username=username,
+            display_name=display_name.strip()[:128],
+            password_hash=hash_password(password),
+            role=role,
+            status=STATUS_ACTIVE,
+        )
+    )
+    return redirect("/admin/users", f"Benutzer {username} ({role}) angelegt.", "success")
 
 
 @router.post("/users/{user_id}/approve")
@@ -191,13 +240,18 @@ def save_settings(
 # ---------------------------------------------------------------------- import
 
 
+def _batch_listing(user: User):
+    stmt = select(ImportBatch).order_by(ImportBatch.imported_at.desc())
+    if not user.is_admin:
+        stmt = stmt.where(ImportBatch.imported_by == user.id)
+    return stmt
+
+
 @router.get("/import")
 def import_form(
     request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
 ):
-    batches = list(
-        db.execute(select(ImportBatch).order_by(ImportBatch.imported_at.desc()).limit(50)).scalars()
-    )
+    batches = list(db.execute(_batch_listing(user).limit(50)).scalars())
     return render(request, "admin/import.html", {"batches": batches, "modules": all_modules(db)})
 
 
@@ -206,6 +260,8 @@ async def import_upload(
     request: Request,
     file: UploadFile = File(...),
     source: str = Form(""),
+    source_url: str = Form(""),
+    exam_code: str = Form(""),
     exam_version: str = Form(""),
     rights: str = Form("unknown"),
     user: User = Depends(require_supervisor),
@@ -230,16 +286,16 @@ async def import_upload(
                 data["source"] = source.strip()
             if exam_version.strip():
                 data["exam_version"] = exam_version.strip()
+            if exam_code.strip():
+                data["exam_code"] = exam_code.strip()
+            if source_url.strip():
+                data["source_url"] = source_url.strip()
             if rights != "unknown":
                 data["rights"] = rights
         result = import_document(db, data, filename=filename, imported_by=user.id)
     except ContentError as exc:
         db.rollback()
-        batches = list(
-            db.execute(
-                select(ImportBatch).order_by(ImportBatch.imported_at.desc()).limit(50)
-            ).scalars()
-        )
+        batches = list(db.execute(_batch_listing(user).limit(50)).scalars())
         return render(
             request,
             "admin/import.html",
@@ -254,6 +310,10 @@ async def import_upload(
     msg = f"{filename}: {result.created} neu, {result.updated} aktualisiert ({result.kind})."
     if result.kind == "questions":
         msg += " Die Fragen sind noch nicht freigegeben (Verwaltung › Freigaben)."
+    if result.warnings:
+        shown = "; ".join(result.warnings[:3])
+        more = f" (+{len(result.warnings) - 3} weitere)" if len(result.warnings) > 3 else ""
+        msg += f" Mögliche Dubletten: {shown}{more}."
     return redirect("/admin/import", msg, "success")
 
 

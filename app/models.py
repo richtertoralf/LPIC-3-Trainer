@@ -219,6 +219,8 @@ class ImportBatch(Base):
     supplementary: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     released: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     source: Mapped[str] = mapped_column(String(160), nullable=False, default="")
+    source_url: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    exam_code: Mapped[str] = mapped_column(String(16), nullable=False, default="")
     exam_version: Mapped[str] = mapped_column(String(16), nullable=False, default="")
     rights: Mapped[str] = mapped_column(String(32), nullable=False, default="unknown")
 

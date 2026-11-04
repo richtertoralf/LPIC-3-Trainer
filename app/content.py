@@ -10,6 +10,7 @@ treated as data only: it is never executed and always rendered with HTML escapin
 
 from __future__ import annotations
 
+import difflib
 import hashlib
 import json
 import re
@@ -17,7 +18,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -41,6 +42,9 @@ VISIBILITIES = ("public", "private")
 # unverified (origin known, usage rights not cleared; only for supervisor-enabled pools).
 RIGHTS = ("cleared", "unknown", "unverified")
 EXAM_VERSION_PATTERN = re.compile(r"^\d+\.\d+(\.\d+)?$")
+EXAM_CODE_PATTERN = re.compile(r"^\d{3}-\d{3}$")
+URL_PATTERN = re.compile(r"^https?://[^\s]+$")
+DUPLICATE_THRESHOLD = 0.8
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{1,63}$")
 CODE_PATTERN = re.compile(r"^\d{3}(\.\d)?$")
 MAX_TEXT = 4000
@@ -219,6 +223,8 @@ def validate_question(q: Any, index: int, seen_ids: set[str]) -> list[str]:
     difficulty = q.get("difficulty", 2)
     if not isinstance(difficulty, int) or not 1 <= difficulty <= 3:
         errors.append(f"{w}: 'difficulty' must be 1, 2 or 3")
+    if not isinstance(q.get("active", True), bool):
+        errors.append(f"{w}: 'active' must be true or false")
     _check_str(errors, q, "question", w)
     for key in ("question_de", "explanation_de", "explanation_en"):
         _check_str(errors, q, key, w, required=False)
@@ -268,6 +274,19 @@ def validate_questions(data: dict) -> list[str]:
         errors.append("'exam_version' is required, e.g. \"3.0\" (exam objectives generation)")
     if data.get("rights", "unknown") not in RIGHTS:
         errors.append(f"'rights' must be one of {', '.join(RIGHTS)}")
+    if "exam_code" in data and (
+        not isinstance(data["exam_code"], str) or not EXAM_CODE_PATTERN.match(data["exam_code"])
+    ):
+        errors.append("'exam_code' must look like 305-300")
+    elif isinstance(data.get("exam_code"), str) and isinstance(module, str):
+        if not data["exam_code"].startswith(module + "-"):
+            errors.append(f"'exam_code' {data['exam_code']} does not belong to module {module}")
+    if data.get("source_url") and (
+        not isinstance(data["source_url"], str)
+        or not URL_PATTERN.match(data["source_url"])
+        or len(data["source_url"]) > 255
+    ):
+        errors.append("'source_url' must be an http(s) URL (max 255 chars)")
     questions = data.get("questions")
     if not isinstance(questions, list) or not questions:
         return errors + ["'questions' must be a non-empty list"]
@@ -446,6 +465,30 @@ def import_terms(db: Session, data: dict) -> ImportResult:
     return result
 
 
+def _normalise(text: str) -> str:
+    return re.sub(r"[^a-z0-9 ]", " ", text.lower())
+
+
+def _duplicate_warnings(db: Session, module_id: int, incoming: list[dict]) -> list[str]:
+    """Warn about questions that closely resemble existing questions of the same module."""
+    ids = {q["id"] for q in incoming}
+    existing = [
+        (q.external_id, _normalise(q.text_en))
+        for q in db.execute(select(Question).where(Question.module_id == module_id)).scalars()
+        if q.external_id not in ids
+    ]
+    warnings: list[str] = []
+    for q in incoming:
+        text = _normalise(q["question"])
+        for ext_id, other in existing:
+            ratio = difflib.SequenceMatcher(None, text, other).ratio()
+            if ratio >= DUPLICATE_THRESHOLD:
+                warnings.append(
+                    f"{q['id']} resembles existing question {ext_id} ({round(ratio * 100)} %)"
+                )
+    return warnings
+
+
 def _objective_map(db: Session) -> dict[str, Objective]:
     return {o.code: o for o in db.execute(select(Objective)).scalars()}
 
@@ -515,9 +558,14 @@ def import_questions(
     batch.supplementary = supplementary
     batch.released = released
     batch.source = (kwargs.get("source") or data.get("source") or "")[:160]
+    batch.source_url = (kwargs.get("source_url") or data.get("source_url") or "")[:255]
+    batch.exam_code = (kwargs.get("exam_code") or data.get("exam_code") or f"{module.code}-300")[
+        :16
+    ]
     batch.exam_version = (kwargs.get("exam_version") or data.get("exam_version") or "")[:16]
     batch.rights = kwargs.get("rights") or data.get("rights", "unknown")
     db.flush()
+    result.warnings.extend(_duplicate_warnings(db, module.id, data["questions"]))
     cache: dict[str, Term] = {}
     for q in data["questions"]:
         question = db.execute(
@@ -543,7 +591,9 @@ def import_questions(
         question.explanation_en = q.get("explanation_en", "").strip()
         question.difficulty = int(q.get("difficulty", 2))
         question.visibility = vis
-        question.is_active = True
+        # "active": false in the file keeps a question out of practice and exams, for example
+        # external questions whose answer is disputed; the flag survives re-imports.
+        question.is_active = bool(q.get("active", True))
         question.supplementary = supplementary
         question.import_batch_id = batch.id
         question.created_by = imported_by
@@ -643,7 +693,7 @@ def import_document(
     override the file header before validation (web form and CLI options).
     """
     if data.get("kind") == "questions":
-        for key in ("source", "exam_version", "rights"):
+        for key in ("source", "exam_version", "rights", "exam_code", "source_url"):
             if kwargs.get(key):
                 data[key] = kwargs[key]
     errors = validate(data)
@@ -700,13 +750,23 @@ def sync_bundled_content(db: Session, content_dir: Path) -> list[ImportResult]:
         data = load_json(path)
         if data.get("kind") in ("questions", "labs"):
             existing = db.execute(
-                select(ImportBatch.checksum).where(
+                select(ImportBatch).where(
                     ImportBatch.kind == data["kind"],
                     ImportBatch.filename == path.name,
                     ImportBatch.bundled.is_(True),
                 )
             ).scalar_one_or_none()
-            if existing and existing == document_checksum(data):
+            linked = 0
+            if existing is not None:
+                model = Question if data["kind"] == "questions" else Lab
+                linked = db.execute(
+                    select(func.count(model.id)).where(model.import_batch_id == existing.id)
+                ).scalar_one()
+            if (
+                existing
+                and existing.checksum == document_checksum(data)
+                and linked == len(data[data["kind"]])
+            ):
                 results.append(
                     ImportResult(kind=data["kind"], warnings=[f"{path.name}: unchanged"])
                 )

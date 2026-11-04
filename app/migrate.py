@@ -21,7 +21,8 @@ def alembic_config() -> Config:
 
 
 def upgrade_database() -> None:
-    """Apply all pending migrations."""
+    """Apply all pending migrations. Creates the data directory if it does not exist yet."""
+    get_settings().db_path.parent.mkdir(parents=True, exist_ok=True)
     command.upgrade(alembic_config(), "head")
 
 

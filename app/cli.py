@@ -172,10 +172,14 @@ def cmd_import(args) -> int:
                     path,
                     bundled=False,
                     source=args.source,
+                    source_url=args.source_url,
+                    exam_code=args.exam_code,
                     exam_version=args.exam_version,
                     rights=args.rights,
                 )
             say(f"{path.name}: {result.created} neu, {result.updated} aktualisiert ({result.kind})")
+            for warning in result.warnings:
+                warn(f"mögliche Dublette: {warning}")
         except (ContentError, FileNotFoundError) as exc:
             code = EXIT_ERROR
             errors = getattr(exc, "errors", [str(exc)])
@@ -326,6 +330,15 @@ def cmd_restore(args) -> int:
     was_active = service_active()
     if was_active:
         systemctl("stop", SERVICE_NAME)
+    elif _http_health(settings.host, settings.port).startswith("ok"):
+        # A server not managed by systemd (Docker, foreground) keeps the old database file
+        # open and would silently write into the deleted file after the restore.
+        raise CliError(
+            f"Unter http://{settings.host}:{settings.port}/ läuft noch ein Server, der nicht "
+            "über systemd verwaltet wird. Bitte zuerst stoppen (Docker: docker compose stop) "
+            "und die Wiederherstellung danach ausführen.",
+            EXIT_USAGE,
+        )
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(archive, "r:gz") as tar:
         names = tar.getnames()
@@ -338,7 +351,7 @@ def cmd_restore(args) -> int:
                     f"lpic3-trainer.before-restore-{datetime.now():%Y%m%d-%H%M%S}.db"
                 )
                 _backup_db_copy(db_path, safety)
-                say(f"Vorherige Datenbank gesichert: {safety}")
+                say(f"Vorherige Datenbank vor dem Restore gesichert: {safety}")
             for suffix in ("", "-wal", "-shm"):
                 p = Path(str(db_path) + suffix)
                 if p.exists():
@@ -356,11 +369,42 @@ def cmd_restore(args) -> int:
 
     reset_engine()
     upgrade_database()
-    say(f"Datenbank wiederhergestellt: {db_path}")
+    integrity = _integrity_check(db_path)
+    if integrity != "ok":
+        raise CliError(
+            f"Integritätsprüfung der wiederhergestellten Datenbank fehlgeschlagen: {integrity}. "
+            "Die vorherige Datenbank liegt als Sicherheitskopie im Datenverzeichnis."
+        )
+    say(f"Datenbank wiederhergestellt und geprüft: {db_path}")
     if was_active:
         systemctl("start", SERVICE_NAME)
-        say("Dienst gestartet.")
+        health = _wait_for_health(settings.host, settings.port)
+        say(f"Dienst gestartet, Health-Check: {health}")
+        if not health.startswith("ok"):
+            return EXIT_ERROR
     return EXIT_OK
+
+
+def _integrity_check(db_path: Path) -> str:
+    import sqlite3
+
+    conn = sqlite3.connect(db_path)
+    try:
+        return str(conn.execute("PRAGMA integrity_check").fetchone()[0])
+    finally:
+        conn.close()
+
+
+def _wait_for_health(host: str, port: int, attempts: int = 20) -> str:
+    import time
+
+    result = "nicht erreichbar"
+    for _ in range(attempts):
+        result = _http_health(host, port)
+        if result.startswith("ok"):
+            return result
+        time.sleep(0.5)
+    return result
 
 
 # ---------------------------------------------------------------- installation
@@ -899,6 +943,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--source", default=None, help="Quellenbezeichnung, z. B. 'ExamTopics 04.11.2026'"
     )
     p.add_argument("--exam-version", default=None, help="Prüfungsgeneration, z. B. 3.0")
+    p.add_argument("--exam-code", default=None, help="Prüfungsnummer, z. B. 305-300")
+    p.add_argument("--source-url", default=None, help="Original-URL der Quelle")
     p.add_argument(
         "--rights",
         choices=["cleared", "unknown", "unverified"],

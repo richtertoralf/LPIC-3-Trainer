@@ -154,6 +154,15 @@
     }
     examForm.addEventListener("change", updateCount);
     updateCount();
+    var autoSubmit = false;
+    examForm.addEventListener("submit", function (ev) {
+      if (autoSubmit) { return; }
+      var open = 0;
+      sections.forEach(function (s) { if (!s.querySelector("input:checked")) { open += 1; } });
+      if (open > 0 && !window.confirm(open + " Frage(n) sind noch unbeantwortet. Trotzdem abgeben?")) {
+        ev.preventDefault();
+      }
+    });
     var timer = document.querySelector("[data-timer]");
     if (timer) {
       var remaining = parseInt(timer.getAttribute("data-remaining"), 10);
@@ -161,7 +170,7 @@
         var m = Math.floor(remaining / 60), s = remaining % 60;
         timer.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
         if (remaining <= 300) { timer.classList.add("timer-warn"); }
-        if (remaining <= 0) { examForm.submit(); return; }
+        if (remaining <= 0) { autoSubmit = true; examForm.submit(); return; }
         remaining -= 1;
         setTimeout(tick, 1000);
       }

@@ -1,6 +1,6 @@
 {# Marks supplementary questions with their source and rights status. Expects: source (ImportBatch or None) #}
 {% if source %}
-<p class="source-tag"><span class="tag tag-warn">Zusatzfrage</span> Quelle: <strong>{{ source.source }}</strong>{% if source.exam_version %} · Prüfungsgeneration {{ source.exam_version }}{% endif %}
+<p class="source-tag"><span class="tag tag-warn">Zusatzfrage</span> Quelle: <strong>{{ source.source }}</strong>{% if source.source_url %} (<a href="{{ source.source_url }}" rel="noopener nofollow" target="_blank">Original</a>){% endif %}{% if source.exam_code %} · Prüfung {{ source.exam_code }}{% endif %}{% if source.exam_version %} · Prüfungsgeneration {{ source.exam_version }}{% endif %}
   {% if source.rights == 'unverified' %}· Nutzungsrechte nicht geklärt{% elif source.rights == 'cleared' %}· Rechte geklärt{% endif %}
   {% if source.license %}<br><span class="muted small">{{ source.license }}</span>{% endif %}</p>
 {% endif %}

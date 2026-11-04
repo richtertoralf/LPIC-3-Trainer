@@ -83,10 +83,24 @@ def test_01_install(env):
     assert (root / "var" / "backups").is_dir()
     unit = (root / "systemd" / "lpic3-trainer.service").read_text()
     assert "ExecStart=/opt/lpic3-trainer/venv/bin/lpic3ctl serve" in unit
+    assert "User=lpic3" in unit and "EnvironmentFile=/etc/lpic3-trainer/lpic3-trainer.env" in unit
+    assert "ProtectSystem=strict" in unit and "ReadWritePaths=/var/lib/lpic3-trainer" in unit
+    assert "WantedBy=multi-user.target" in unit
+    # file permissions: configuration not world readable, data directory private
+    assert oct((root / "etc" / "lpic3-trainer.env").stat().st_mode)[-3:] == "640"
+    assert oct((root / "var").stat().st_mode)[-3:] == "750"
+    assert oct((root / "var" / "backups").stat().st_mode)[-3:] == "750"
     assert (root / "bin" / "lpic3ctl").is_symlink()
     log = stub_log(env)
-    assert "useradd --system" in log and "systemctl enable lpic3-trainer" in log
+    assert "useradd --system --home-dir" in log and "--shell /usr/sbin/nologin" in log
+    assert "systemctl daemon-reload" in log
+    assert "systemctl enable lpic3-trainer" in log
     assert "systemctl restart lpic3-trainer" in log
+    assert (
+        log.index("daemon-reload")
+        < log.index("enable lpic3-trainer")
+        < log.index("restart lpic3-trainer")
+    )
     # the installed CLI works on its own and finds content and migrations
     r = subprocess.run(
         [str(root / "opt" / "venv" / "bin" / "lpic3ctl"), "check"],

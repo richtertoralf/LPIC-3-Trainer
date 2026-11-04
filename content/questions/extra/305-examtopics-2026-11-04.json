@@ -4,6 +4,8 @@
   "module": "305",
   "supplementary": true,
   "source": "ExamTopics 04.11.2026",
+  "source_url": "https://www.examtopics.com/exams/lpi/305-300/view/",
+  "exam_code": "305-300",
   "exam_version": "3.0",
   "rights": "unverified",
   "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 305-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freigabe sichtbar; nicht unter CC BY-SA 4.0.",
@@ -146,7 +148,7 @@
           "correct": false
         }
       ],
-      "explanation_de": "Vorläufige Einordnung: A und C sind eindeutig. D wird hier als dritte Antwort angenommen: Beide Systeme erlauben die Bereitstellung einer gegenüber der Basis angepassten Umgebung, allerdings mit unterschiedlicher Arbeitsweise. Die exakte Prüfungsinterpretation von D sollte vor Nutzung geprüft werden.",
+      "explanation_de": "Vorläufige Einordnung: A und C sind eindeutig. D wird hier als dritte Antwort angenommen: Beide Systeme erlauben die Bereitstellung einer gegenüber der Basis angepassten Umgebung, allerdings mit unterschiedlicher Arbeitsweise. Die exakte Prüfungsinterpretation von D sollte vor Nutzung geprüft werden. Hinweis: Diese Frage ist als fachlich unsicher eingestuft (siehe content/questions/extra/README.md) und deshalb inaktiv.",
       "terms": [
         {
           "term": "functionality",
@@ -173,7 +175,8 @@
           "de": "Änderungen anwenden"
         }
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "active": false
     },
     {
       "id": "305-examtopics-screenshot-04",

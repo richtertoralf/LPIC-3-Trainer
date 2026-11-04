@@ -16,7 +16,7 @@ Anwendung starten (Datenbank unter `./data`, Migrationen und Inhalte werden beim
 LPIC3_DATA_DIR=./data .venv/bin/lpic3ctl serve
 ```
 
-Alternativ mit Autoreload: `LPIC3_DATA_DIR=./data .venv/bin/uvicorn app.main:app --reload` (ohne Inhaltsimport; vorher einmal `lpic3ctl content-sync`).
+Alternativ mit Autoreload: `LPIC3_DATA_DIR=./data .venv/bin/uvicorn app.main:app --reload` (ohne Inhaltsimport; vorher einmal `lpic3ctl content-sync`, das Datenverzeichnis wird dabei angelegt).
 
 Beispielkonfiguration: `.env.example`.
 
@@ -52,7 +52,7 @@ LPIC3_DATA_DIR=./data .venv/bin/alembic revision --autogenerate -m "describe cha
 LPIC3_DATA_DIR=./data .venv/bin/alembic upgrade head
 ```
 
-- Migrationen in `migrations/versions/` mit sprechender Revision benennen. Vorhanden: `0001_initial_schema`, `0002_supplementary_questions`, `0003_release_state`. SQLite-Änderungen an Spalten brauchen `batch_alter_table` (in `env.py` aktiviert).
+- Migrationen in `migrations/versions/` mit sprechender Revision benennen. Vorhanden: `0001_initial_schema`, `0002_supplementary_questions`, `0003_release_state`, `0004_source_url_exam_code`. `migrations/env.py` schaltet SQLite-Fremdschlüssel während der Migration aus, weil Tabellenumbauten im Batch-Modus sonst `ON DELETE`-Aktionen auf Kindzeilen auslösen. `tests/test_migrations.py` prüft Upgrade mit Bestandsdaten und Downgrade. SQLite-Änderungen an Spalten brauchen `batch_alter_table` (in `env.py` aktiviert).
 - Die Anwendung führt beim Start `upgrade head` aus.
 
 ## Code

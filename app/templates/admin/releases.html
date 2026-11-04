@@ -10,12 +10,12 @@
 <section class="card">
   <h2>Importierte Quellen</h2>
   <table class="table">
-    <thead><tr><th>Quelle</th><th>Prüfungsgeneration</th><th>Modul</th><th>Fragen</th><th>Rechte</th><th>Importiert von</th><th>Systemweit</th></tr></thead>
+    <thead><tr><th>Quelle</th><th>Prüfung</th><th>Modul</th><th>Fragen</th><th>Rechte</th><th>Importiert von</th><th>Systemweit</th></tr></thead>
     <tbody>
     {% for b in batches %}
     <tr>
-      <td><strong>{{ b.source }}</strong><br><span class="muted small">{{ b.filename }}{% if b.license %} · {{ b.license }}{% endif %}</span></td>
-      <td>{{ b.exam_version }}</td>
+      <td><strong>{{ b.source }}</strong>{% if b.source_url %} · <a href="{{ b.source_url }}" rel="noopener nofollow" target="_blank">Original-URL</a>{% endif %}<br><span class="muted small">{{ b.filename }}{% if b.author %} · Autor: {{ b.author }}{% endif %}{% if b.license %} · {{ b.license }}{% endif %}</span></td>
+      <td>{{ b.exam_code }}<br><span class="muted small">Generation {{ b.exam_version }}</span></td>
       <td>{{ b.module_code }}</td>
       <td><a href="/admin/questions?batch={{ b.id }}">{{ counts.get(b.id, 0) }}</a></td>
       <td>{% if b.rights == 'cleared' %}<span class="tag tag-ok">geklärt</span>{% elif b.rights == 'unverified' %}<span class="tag tag-warn">nicht geklärt</span>{% else %}<span class="tag">unbekannt</span>{% endif %}</td>
@@ -41,7 +41,7 @@
   <form method="post" action="/admin/releases/group/{{ g.id }}">
     {% for b in batches %}
     <label class="radio"><input type="checkbox" name="batch" value="{{ b.id }}" {% if (g.id, b.id) in enabled %}checked{% endif %}>
-      {{ b.source }} <span class="muted">(Modul {{ b.module_code }}, Prüfungsgeneration {{ b.exam_version }}, {{ counts.get(b.id, 0) }} Fragen{% if b.rights == 'unverified' %}, Rechte nicht geklärt{% endif %}{% if b.released %}, bereits systemweit frei{% endif %})</span></label>
+      {{ b.source }} <span class="muted">({{ b.exam_code }}, Prüfungsgeneration {{ b.exam_version }}, {{ counts.get(b.id, 0) }} Fragen{% if b.rights == 'unverified' %}, Rechte nicht geklärt{% endif %}{% if b.released %}, bereits systemweit frei{% endif %})</span></label>
     {% endfor %}
     <button class="btn btn-primary" type="submit">Speichern</button>
   </form>
