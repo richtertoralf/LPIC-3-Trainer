@@ -89,3 +89,147 @@
 - Änderungen und Testergebnisse dokumentieren.
 - Offene Punkte und Einschränkungen benennen.
 - Keine ungetesteten Funktionen als fertig melden.
+
+Installation, Betrieb und Administration
+
+Einheitliches CLI-Werkzeug lpic3ctl bereitstellen.
+
+Installation und Administration ohne manuelle Quellcodeänderungen ermöglichen.
+
+Systemd-Dienst für den regulären Linux-Betrieb bereitstellen.
+
+Standardinstallation unter /opt/lpic3-trainer.
+
+Konfiguration unter /etc/lpic3-trainer.
+
+Persistente Daten unter /var/lib/lpic3-trainer.
+
+Logs über journald.
+
+Installations- und Upgradeverfahren müssen wiederholbar sein.
+
+CLI-Befehle
+
+Befehl
+
+Funktion
+
+lpic3ctl install
+
+Anwendung installieren
+
+lpic3ctl upgrade
+
+Anwendung aktualisieren
+
+lpic3ctl version
+
+Installierte und verfügbare Version anzeigen
+
+lpic3ctl status
+
+Dienststatus und Systemzustand anzeigen
+
+lpic3ctl start
+
+Dienst starten
+
+lpic3ctl stop
+
+Dienst stoppen
+
+lpic3ctl restart
+
+Dienst neu starten
+
+lpic3ctl logs
+
+Dienstprotokolle anzeigen
+
+lpic3ctl backup
+
+Daten und Konfiguration sichern
+
+lpic3ctl restore
+
+Datensicherung wiederherstellen
+
+lpic3ctl check
+
+Installation und Konfiguration prüfen
+
+lpic3ctl uninstall
+
+Anwendung entfernen, Benutzerdaten erhalten
+
+lpic3ctl purge
+
+Anwendung einschließlich aller Daten entfernen
+
+Installationsregeln
+
+Abhängigkeiten automatisch prüfen.
+
+Fehlende Voraussetzungen verständlich melden.
+
+Eigenen Systembenutzer ohne Login-Shell verwenden.
+
+Dateirechte und Verzeichnisse sicher anlegen.
+
+Keine unnötigen Root-Rechte für den laufenden Dienst.
+
+Bestehende Installationen erkennen.
+
+Konfiguration bei erneuter Installation erhalten.
+
+Keine vorhandenen Dienste oder Ports ungefragt überschreiben.
+
+Upgrade-Regeln
+
+Installierte Version vor dem Upgrade prüfen.
+
+Datenbank und Konfiguration vorher sichern.
+
+Datenbankmigrationen automatisch ausführen.
+
+Benutzerdaten, Fragen und Lernstände erhalten.
+
+Fehler beim Upgrade erkennen und verständlich melden.
+
+Wiederherstellung der vorherigen Version vorsehen.
+
+Keine ungeprüfte Überschreibung lokaler Konfiguration.
+
+Versionsinformationen aus Git-Tags beziehungsweise Releases ableiten.
+
+Deinstallation
+
+uninstall entfernt Dienst und Programmdateien.
+
+Konfiguration und Benutzerdaten bleiben erhalten.
+
+purge entfernt zusätzlich Konfiguration und gespeicherte Daten.
+
+Vor purge ausdrückliche Bestätigung verlangen.
+
+Nichtinteraktive Löschung nur mit expliziter Freigabeoption.
+
+Keine fremden Verzeichnisse oder gemeinsam genutzten Dienste löschen.
+
+Betrieb und Diagnose
+
+Health-Endpunkt für die Anwendung bereitstellen.
+
+Datenbankstatus und Schema-Version prüfen.
+
+Fehler über strukturierte Logs nachvollziehbar machen.
+
+Keine Passwörter oder Sitzungsgeheimnisse protokollieren.
+
+CLI-Befehle mit sinnvollen Exit-Codes versehen.
+
+Administrative Befehle mit --help dokumentieren.
+
+Installations-, Upgrade- und Deinstallationsabläufe automatisiert testen.
+
+Docker-Compose-Betrieb und native Installation müssen dieselben persistenten Datenstrukturen verwenden.
