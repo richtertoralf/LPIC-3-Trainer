@@ -37,3 +37,9 @@ Abgedeckt werden die LPIC-3-Prüfungen:
 ## Status
 
 Das Projekt befindet sich in der Planungsphase. Die technischen Vorgaben stehen in [AGENTS.md](AGENTS.md).
+
+## Lizenz
+
+Der Programmcode steht unter der MIT-Lizenz, siehe [LICENSE](LICENSE).
+
+Lerninhalte und importierte Prüfungsfragen sind davon nicht erfasst. Ihre Nutzungsrechte liegen bei den jeweiligen Urhebern. Das Projekt ist unabhängig vom Linux Professional Institute.

@@ -19,6 +19,24 @@
 - Dokumentation, Benutzeroberfläche, Lerninhalte und Kommunikation: Deutsch.
 - Programmcode, Kommentare, technische Bezeichner und Commit-Nachrichten: Englisch.
 
+## Lizenz
+
+- Programmcode: MIT-Lizenz (SPDX: `MIT`), siehe [LICENSE](LICENSE).
+- Lerninhalte und importierte Prüfungsfragen sind von der MIT-Lizenz nicht erfasst und werden durch sie nicht automatisch freigegeben.
+- Rechte an Lerninhalten verbleiben bei den jeweiligen Urhebern; ihre Lizenz wird gesondert angegeben.
+
+## Rechtliche Vorgaben
+
+- Das Projekt ist unabhängig vom Linux Professional Institute.
+- Marken und Zertifizierungsnamen nur zur sachlichen Beschreibung verwenden.
+- Keine offiziellen LPI-Logos ohne entsprechende Nutzungsrechte verwenden.
+- Offizielle Prüfungsziele als Referenz nutzen und Quellen angeben.
+- Lerntexte und Prüfungsfragen selbst erstellen oder zulässig lizenzierte Inhalte verwenden.
+- Keine unberechtigt kopierten Exam-Dumps im Repository veröffentlichen.
+- Importierte Fragen standardmäßig nicht öffentlich freigeben.
+- Die Nutzungsrechte importierter Inhalte beachten.
+- Programmcode und Lerninhalte getrennt lizenzieren.
+
 ## Zielsystem
 
 - Betriebssystem: Linux
