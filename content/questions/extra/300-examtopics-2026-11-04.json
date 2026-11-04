@@ -6,7 +6,7 @@
   "source": "ExamTopics 04.11.2026",
   "exam_version": "3.0",
   "rights": "unverified",
-  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 300-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freischaltung durch Betreuer sichtbar; nicht unter CC BY-SA 4.0.",
+  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 300-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freigabe sichtbar; nicht unter CC BY-SA 4.0.",
   "author": "Quelle: ExamTopics (Übersetzung und Erklärung: LPIC-3 Trainer Projekt)",
   "questions": [
     {
@@ -47,11 +47,11 @@
       "terms": [
         {
           "term": "raw printing",
-          "de": "Rohdruck, unveränderte Weitergabe von Druckdaten"
+          "de": "Rohdruck / unveränderte Weitergabe von Druckdaten"
         },
         {
           "term": "rendered",
-          "de": "aufbereitet, in ein druckbares Format umgesetzt"
+          "de": "aufbereitet / in ein druckbares Format umgesetzt"
         },
         {
           "term": "passed on",
@@ -69,7 +69,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "The configuration of a Samba share contains the following line:\nforce directory mode = 0555\nIf a client creates a new directory with the permissions 0750, which permissions will the resulting directory have in the Samba server's file system?",
-      "question_de": "Eine Samba-Freigabe enthält die Einstellung force directory mode = 0555. Ein Client legt ein Verzeichnis mit den Rechten 0750 an. Welche Rechte hat es anschließend auf dem Samba-Server?",
+      "question_de": "Eine Samba-Freigabe enthält die Einstellung `force directory mode = 0555`. Ein Client legt ein Verzeichnis mit den Rechten 0750 an. Welche Rechte hat es anschließend auf dem Samba-Server?",
       "choices": [
         {
           "text": "0755",
@@ -100,16 +100,448 @@
       "explanation_de": "Samba begrenzt die vom Client gewünschten Rechte zuerst mit directory mask (Standard 0755) und setzt dann per bitweisem ODER die Bits aus force directory mode. 0750 AND 0755 = 0750, 0750 OR 0555 = 0755. Hinweis: Der Internet-Dump nennt 0555 als Lösung; nach der Samba-Dokumentation (smb.conf, Parameter force directory mode) ist 0755 das korrekte Ergebnis.",
       "terms": [
         {
-          "term": "resulting",
-          "de": "resultierend, sich ergebend"
+          "term": "share",
+          "de": "Freigabe"
         },
         {
           "term": "permissions",
-          "de": "Zugriffsrechte"
+          "de": "Dateirechte / Berechtigungen"
         },
         {
-          "term": "bitwise",
-          "de": "bitweise"
+          "term": "resulting",
+          "de": "resultierend / entstehend"
+        },
+        {
+          "term": "force directory mode",
+          "de": "erzwungene Verzeichnisrechte"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-03",
+      "objective": "303.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which of the following smb.conf options turns a regular file share into a DFS share?",
+      "question_de": "Welche der folgenden smb.conf-Optionen macht aus einer gewöhnlichen Dateifreigabe eine DFS-Freigabe?",
+      "choices": [
+        {
+          "text": "msdfs root = yes",
+          "text_de": "msdfs root = yes",
+          "correct": true
+        },
+        {
+          "text": "addfs support = yes",
+          "text_de": "addfs support = yes",
+          "correct": false
+        },
+        {
+          "text": "dfs forward = yes",
+          "text_de": "dfs forward = yes",
+          "correct": false
+        },
+        {
+          "text": "follow symlinks = yes",
+          "text_de": "follow symlinks = yes",
+          "correct": false
+        },
+        {
+          "text": "proxy share = yes",
+          "text_de": "proxy share = yes",
+          "correct": false
+        }
+      ],
+      "explanation_de": "Mit `msdfs root = yes` wird eine Freigabe als DFS-Root markiert. DFS steht für Distributed File System.",
+      "terms": [
+        {
+          "term": "turns ... into",
+          "de": "wandelt ... um in"
+        },
+        {
+          "term": "regular",
+          "de": "gewöhnlich"
+        },
+        {
+          "term": "file share",
+          "de": "Dateifreigabe"
+        },
+        {
+          "term": "DFS share",
+          "de": "DFS-Freigabe"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-04",
+      "objective": "303.2",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which parameter within a share definition in the Samba configuration makes Samba only show files and directories on a file share which a user can access?",
+      "question_de": "Welcher Parameter einer Samba-Freigabe sorgt dafür, dass nur Dateien und Verzeichnisse angezeigt werden, auf die ein Benutzer zugreifen darf?",
+      "choices": [
+        {
+          "text": "hide unreadable = yes",
+          "text_de": "Nicht lesbare Dateien ausblenden.",
+          "correct": true
+        },
+        {
+          "text": "valid files = read,write",
+          "text_de": "Angebliche Liste gültiger Dateien.",
+          "correct": false
+        },
+        {
+          "text": "browse mask = 000",
+          "text_de": "Angebliche Browse-Maske.",
+          "correct": false
+        },
+        {
+          "text": "browseable = readable",
+          "text_de": "Angeblich nur lesbare Freigaben anzeigen.",
+          "correct": false
+        },
+        {
+          "text": "display mode = 100",
+          "text_de": "Angeblicher Anzeigemodus.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "`hide unreadable = yes` unterdrückt in Verzeichnislisten Einträge, die der jeweilige Benutzer nicht lesen darf. Es ersetzt keine Dateisystemberechtigungen.",
+      "terms": [
+        {
+          "term": "parameter",
+          "de": "Einstellungsparameter"
+        },
+        {
+          "term": "share definition",
+          "de": "Freigabedefinition"
+        },
+        {
+          "term": "access",
+          "de": "Zugriff haben"
+        },
+        {
+          "term": "unreadable",
+          "de": "nicht lesbar"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-05",
+      "objective": "303.4",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which of the following lines is missing in the given [printers] share definition?\n[printers]\n    comment = Printers\n    read only = No\n    browseable = No",
+      "question_de": "Welche Zeile fehlt in dieser Samba-Druckerfreigabe `[printers]`? Hinweis: Im Screenshot stand widersprüchlich `[homes]`; das wurde für eine eindeutige Lernfrage zu `[printers]` berichtigt.",
+      "choices": [
+        {
+          "text": "printcap name = cups",
+          "text_de": "CUPS als Quelle der Druckerliste.",
+          "correct": false
+        },
+        {
+          "text": "printable = yes",
+          "text_de": "Freigabe als Druckerfreigabe kennzeichnen.",
+          "correct": true
+        },
+        {
+          "text": "print script = /usr/bin/lp -d %P %s",
+          "text_de": "Druckskript festlegen.",
+          "correct": false
+        },
+        {
+          "text": "print admin = Administrator, root, @lpadmin",
+          "text_de": "Druckeradministratoren festlegen.",
+          "correct": false
+        },
+        {
+          "text": "load printers = yes",
+          "text_de": "Drucker automatisch laden.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "Eine Samba-Druckerfreigabe muss als druckbar gekennzeichnet sein: `printable = yes`. Der Screenshot enthält offenbar einen Fehler: Dort wird nach `[printers]` gefragt, aber `[homes]` angezeigt. Für den Import wurde das Beispiel korrigiert.",
+      "terms": [
+        {
+          "term": "missing",
+          "de": "fehlend"
+        },
+        {
+          "term": "share definition",
+          "de": "Freigabedefinition"
+        },
+        {
+          "term": "printable",
+          "de": "druckbar / als Druckerfreigabe aktiviert"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-06",
+      "objective": "303.1",
+      "type": "multiple",
+      "difficulty": 2,
+      "question": "The [homes] section of smb.conf contains the parameter browseable = no. What are the resulting consequences? (Choose two.)",
+      "question_de": "Im Abschnitt `[homes]` der smb.conf steht `browseable = no`. Welche zwei Folgen hat das?",
+      "choices": [
+        {
+          "text": "When browsing the Samba server, there is no visible share named after the current user.",
+          "text_de": "Beim Durchsuchen des Samba-Servers ist keine nach dem aktuellen Benutzer benannte Freigabe sichtbar.",
+          "correct": false
+        },
+        {
+          "text": "If the Samba server is part of an Active Directory Domain, only users in the group SeBrowsingUsers can browse the homes share.",
+          "text_de": "In einer Active-Directory-Domäne können nur Mitglieder der Gruppe SeBrowsingUsers die homes-Freigabe durchsuchen.",
+          "correct": false
+        },
+        {
+          "text": "When browsing the Samba server, users can open the homes share but they cannot see the content of their home directories.",
+          "text_de": "Benutzer können homes öffnen, sehen aber die Inhalte ihrer Home-Verzeichnisse nicht.",
+          "correct": false
+        },
+        {
+          "text": "The homes share can be directly accessed by specifically opening this share by its UNC path.",
+          "text_de": "Die Home-Freigabe kann über ihren vollständigen UNC-Pfad direkt geöffnet werden.",
+          "correct": true
+        },
+        {
+          "text": "When browsing the Samba server, there is no visible share called homes.",
+          "text_de": "Beim Durchsuchen des Samba-Servers ist keine Freigabe namens homes sichtbar.",
+          "correct": true
+        }
+      ],
+      "explanation_de": "browseable = no in [homes] versteckt nur den Eintrag „homes“ in der Browse-Liste. Die automatisch erzeugte Freigabe mit dem Namen des angemeldeten Benutzers bleibt sichtbar, weil sie den browseable-Wert aus [global] erbt (siehe smb.conf, Abschnitt [homes]). Deshalb ist A falsch. Der direkte Zugriff über den UNC-Pfad \\\\server\\homes oder \\\\server\\benutzername funktioniert weiterhin (D). Richtig sind D und E.",
+      "terms": [
+        {
+          "term": "resulting consequences",
+          "de": "resultierende Folgen"
+        },
+        {
+          "term": "browse",
+          "de": "durchsuchen / in Freigabeliste anzeigen"
+        },
+        {
+          "term": "directly accessed",
+          "de": "direkt aufgerufen"
+        },
+        {
+          "term": "UNC path",
+          "de": "UNC-Netzwerkpfad"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-07",
+      "objective": "301.3",
+      "type": "single",
+      "difficulty": 2,
+      "question": "Which Samba utility, when launched with the appropriate parameters, generates the following output?\nSamba version 4.8.8\nPID    Username  Group  Machine  Protocol Version\n2167   SAMBA\\bob  users  client01  (ipv4:192.168.1.2:52164)  NT1",
+      "question_de": "Welches Samba-Werkzeug zeigt bei passendem Aufruf die aktiven Verbindungen mit PID, Benutzer, Client und Protokollversion?",
+      "choices": [
+        {
+          "text": "smbstatus",
+          "text_de": "Status laufender Samba-Verbindungen anzeigen.",
+          "correct": true
+        },
+        {
+          "text": "smbclient",
+          "text_de": "SMB-Freigaben als Client ansprechen.",
+          "correct": false
+        },
+        {
+          "text": "getfacl",
+          "text_de": "Dateisystem-ACLs auslesen.",
+          "correct": false
+        },
+        {
+          "text": "smbxattr",
+          "text_de": "Erweiterte SMB-Dateiattribute verwalten.",
+          "correct": false
+        },
+        {
+          "text": "smbcacls",
+          "text_de": "SMB-Zugriffslisten verwalten.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "Die gezeigten Spalten stammen von `smbstatus`. In der Screenshot-Frage fehlt `smbstatus` unter den Antwortmöglichkeiten. Deshalb wurde Antwort A zur fachlich richtigen Auswahl berichtigt. Das ist keine unveränderte Übernahme.",
+      "terms": [
+        {
+          "term": "appropriate parameters",
+          "de": "passende Optionen / Parameter"
+        },
+        {
+          "term": "generates",
+          "de": "erzeugt"
+        },
+        {
+          "term": "launched",
+          "de": "gestartet / aufgerufen"
+        },
+        {
+          "term": "protocol version",
+          "de": "Protokollversion"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-08",
+      "objective": "303.2",
+      "type": "multiple",
+      "difficulty": 2,
+      "question": "Which of the following options can be used to limit access to a Samba share? (Choose two.)",
+      "question_de": "Mit welchen zwei der folgenden Samba-Optionen lässt sich der Zugriff beziehungsweise der Schreibzugriff auf eine Freigabe einschränken?",
+      "choices": [
+        {
+          "text": "untrusted users",
+          "text_de": "Keine gültige Standardoption.",
+          "correct": false
+        },
+        {
+          "text": "write list",
+          "text_de": "Benutzerliste mit besonderer Schreibberechtigung.",
+          "correct": true
+        },
+        {
+          "text": "valid groups",
+          "text_de": "Keine gültige Standardoption zur Freigabe-Zugriffskontrolle.",
+          "correct": false
+        },
+        {
+          "text": "valid users",
+          "text_de": "Liste der Benutzer/Gruppen, die die Freigabe betreten dürfen.",
+          "correct": true
+        },
+        {
+          "text": "accept list",
+          "text_de": "Keine gültige Standardoption.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "`valid users` beschränkt, wer die Freigabe öffnen darf. `write list` steuert Schreibberechtigungen bei einer ansonsten schreibgeschützten Freigabe. Sie beschränkt nicht den allgemeinen Verbindungszugriff; die Ausgangsfrage fasst beide Aspekte unter „access“ zusammen.",
+      "terms": [
+        {
+          "term": "limit access",
+          "de": "Zugriff einschränken"
+        },
+        {
+          "term": "share",
+          "de": "Freigabe"
+        },
+        {
+          "term": "write list",
+          "de": "Liste schreibberechtigter Nutzer"
+        },
+        {
+          "term": "valid users",
+          "de": "zugelassene Nutzer"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-09",
+      "objective": "303.1",
+      "type": "single",
+      "difficulty": 2,
+      "question": "In case the following parameters are set in a Samba file share configuration:\ncreate mask = 711\nforce create mode = 750\nWhat are the effective permissions of a file created with the permissions 777?",
+      "question_de": "In einer Samba-Freigabe stehen `create mask = 711` und `force create mode = 750`. Welche effektiven Rechte erhält eine neu angelegte Datei, wenn 777 angefordert wurde?",
+      "choices": [
+        {
+          "text": "066",
+          "text_de": "066",
+          "correct": false
+        },
+        {
+          "text": "027",
+          "text_de": "027",
+          "correct": false
+        },
+        {
+          "text": "777",
+          "text_de": "777",
+          "correct": false
+        },
+        {
+          "text": "761",
+          "text_de": "761",
+          "correct": false
+        },
+        {
+          "text": "751",
+          "text_de": "751",
+          "correct": true
+        }
+      ],
+      "explanation_de": "Zuerst wird die Maske angewendet: 0777 UND 0711 = 0711. Danach die erzwungenen Bits: 0711 ODER 0750 = 0751. Alle Zahlen sind oktale Dateirechte.",
+      "terms": [
+        {
+          "term": "effective permissions",
+          "de": "effektive Berechtigungen"
+        },
+        {
+          "term": "create mask",
+          "de": "Erstellungsmaske"
+        },
+        {
+          "term": "force create mode",
+          "de": "erzwungene Dateirechte"
+        },
+        {
+          "term": "in case",
+          "de": "falls / in dem Fall, dass"
+        }
+      ]
+    },
+    {
+      "id": "300-examtopics-screenshot-10",
+      "objective": "302.5",
+      "type": "multiple",
+      "difficulty": 2,
+      "question": "Which of the following are valid Samba backends to store user and group information? (Choose two.)",
+      "question_de": "Welche zwei der folgenden Samba-Backends können Benutzer- und Gruppeninformationen speichern?",
+      "choices": [
+        {
+          "text": "sdb",
+          "text_de": "Kein hier gültiges Samba-Passdb-Backend.",
+          "correct": false
+        },
+        {
+          "text": "smbpasswd",
+          "text_de": "Dateibasierte Samba-Passwortdatenbank.",
+          "correct": true
+        },
+        {
+          "text": "ldapsam",
+          "text_de": "LDAP-basiertes Samba-Passdb-Backend.",
+          "correct": true
+        },
+        {
+          "text": "krb",
+          "text_de": "Kein Samba-Passdb-Backend dieses Namens.",
+          "correct": false
+        },
+        {
+          "text": "smb",
+          "text_de": "Kein Samba-Passdb-Backend dieses Namens.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "`smbpasswd` und `ldapsam` sind bekannte Samba-passdb-Backends. Die historische Relevanz dieser Backends hängt von Samba-Version und Betriebsmodus ab.",
+      "terms": [
+        {
+          "term": "backends",
+          "de": "Speicher- oder Datenbank-Backends"
+        },
+        {
+          "term": "store",
+          "de": "speichern"
+        },
+        {
+          "term": "user and group information",
+          "de": "Benutzer- und Gruppeninformationen"
+        },
+        {
+          "term": "valid",
+          "de": "gültig / unterstützt"
         }
       ]
     }

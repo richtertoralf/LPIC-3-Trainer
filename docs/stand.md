@@ -53,7 +53,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 - Private Fragen sind für Importierende, Administratoren und Mitglieder betreuter Gruppen sichtbar.
 - Importierte Texte werden immer escaped (getestet).
 - Rollen und Freigabe: Nur Administratoren und Betreuer importieren Fragen; Lernende können nichts importieren, anlegen, ändern oder freigeben. Jeder Import braucht Quelle und Prüfungsgeneration (`source`, `exam_version`) sowie einen Rechtestatus und bleibt unveröffentlicht. Betreuer geben eigene Importe unter *Verwaltung › Freigaben* für eigene Gruppen frei, Administratoren systemweit oder für beliebige Gruppen. Lernende sehen den freigegebenen Grundbestand und die Freigaben ihrer Gruppen; freigegebene Importe sind bei jeder Frage als Zusatzfrage mit Quelle, Prüfungsgeneration und Rechtestatus markiert, mit Pool-Filter beim Üben. Die mitgelieferten Projektfragen bilden den bereits freigegebenen Grundbestand. Migrationen `0002` und `0003`.
-- Mitgelieferte Zusatzquellen unter `content/questions/extra/`: je zwei Fragen aus den öffentlich abrufbaren ExamTopics-Dumps zu den Prüfungen 305-300 und 300-300 (Herkunft per Websuche geprüft, Nutzungsrechte nicht geklärt, Fundstellen in `content/questions/extra/README.md`). Diese Dateien sind von der CC-BY-SA-Lizenz der übrigen Inhalte ausgenommen.
+- Mitgelieferte Zusatzquellen unter `content/questions/extra/`: je zehn Fragen aus den öffentlich abrufbaren ExamTopics-Dumps zu den Prüfungen 305-300 und 300-300, bereitgestellt vom Auftraggeber mit deutscher Sprachhilfe (Herkunft per Websuche geprüft, Nutzungsrechte nicht geklärt, Fundstellen in `content/questions/extra/README.md`). Diese Dateien sind von der CC-BY-SA-Lizenz der übrigen Inhalte ausgenommen.
 
 ### Offline
 

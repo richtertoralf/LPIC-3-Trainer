@@ -6,7 +6,7 @@
   "source": "ExamTopics 04.11.2026",
   "exam_version": "3.0",
   "rights": "unverified",
-  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 305-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freischaltung durch Betreuer sichtbar; nicht unter CC BY-SA 4.0.",
+  "license": "Nutzungsrechte nicht geklärt. Übernommen am 04.11.2026 aus dem öffentlich abrufbaren ExamTopics-Dump zur Prüfung 305-300. Übersetzung und Erklärung: eigene Arbeit. Nur nach Freigabe sichtbar; nicht unter CC BY-SA 4.0.",
   "author": "Quelle: ExamTopics (Übersetzung und Erklärung: LPIC-3 Trainer Projekt)",
   "questions": [
     {
@@ -56,7 +56,8 @@
           "term": "provisioning",
           "de": "automatisierte Bereitstellung und Einrichtung"
         }
-      ]
+      ],
+      "difficulty": 2
     },
     {
       "id": "305-examtopics-screenshot-02",
@@ -98,18 +99,483 @@
           "de": "um ... zu"
         },
         {
-          "term": "amount",
-          "de": "Menge"
-        },
-        {
           "term": "assigned",
           "de": "zugewiesen"
         },
         {
           "term": "specified",
           "de": "angegeben"
+        },
+        {
+          "term": "bootloader",
+          "de": "Bootloader"
         }
-      ]
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-03",
+      "objective": "353.4",
+      "type": "multiple",
+      "question": "Which functionality is provided by Vagrant as well as by Docker? (Choose three.)",
+      "question_de": "Welche Funktionen werden sowohl von Vagrant als auch von Docker bereitgestellt? (Drei auswählen.)",
+      "choices": [
+        {
+          "text": "Both can share directories from the host file system to a guest.",
+          "text_de": "Beide können Verzeichnisse des Host-Dateisystems mit einem Gastsystem teilen.",
+          "correct": true
+        },
+        {
+          "text": "Both start system images as containers instead of virtual machines by default.",
+          "text_de": "Beide starten System-Images standardmäßig als Container statt als virtuelle Maschinen.",
+          "correct": false
+        },
+        {
+          "text": "Both can download required base images.",
+          "text_de": "Beide können benötigte Basis-Images herunterladen.",
+          "correct": true
+        },
+        {
+          "text": "Both can apply changes to a base image.",
+          "text_de": "Beide können Änderungen auf Grundlage eines Basis-Images anwenden.",
+          "correct": true
+        },
+        {
+          "text": "Both start system images as virtual machines instead of containers by default.",
+          "text_de": "Beide starten System-Images standardmäßig als virtuelle Maschinen statt als Container.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "Vorläufige Einordnung: A und C sind eindeutig. D wird hier als dritte Antwort angenommen: Beide Systeme erlauben die Bereitstellung einer gegenüber der Basis angepassten Umgebung, allerdings mit unterschiedlicher Arbeitsweise. Die exakte Prüfungsinterpretation von D sollte vor Nutzung geprüft werden.",
+      "terms": [
+        {
+          "term": "functionality",
+          "de": "Funktionalität"
+        },
+        {
+          "term": "as well as",
+          "de": "ebenso wie"
+        },
+        {
+          "term": "share directories",
+          "de": "Verzeichnisse teilen"
+        },
+        {
+          "term": "host file system",
+          "de": "Host-Dateisystem"
+        },
+        {
+          "term": "required",
+          "de": "benötigt"
+        },
+        {
+          "term": "apply changes",
+          "de": "Änderungen anwenden"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-04",
+      "objective": "353.4",
+      "type": "single",
+      "question": "What is the default provider of Vagrant?",
+      "question_de": "Welcher Provider ist standardmäßig bei Vagrant voreingestellt?",
+      "choices": [
+        {
+          "text": "lxc",
+          "text_de": "lxc",
+          "correct": false
+        },
+        {
+          "text": "hyperv",
+          "text_de": "Hyper-V",
+          "correct": false
+        },
+        {
+          "text": "virtualbox",
+          "text_de": "VirtualBox",
+          "correct": true
+        },
+        {
+          "text": "vmware_workstation",
+          "text_de": "VMware Workstation",
+          "correct": false
+        },
+        {
+          "text": "docker",
+          "text_de": "Docker",
+          "correct": false
+        }
+      ],
+      "explanation_de": "C ist die klassische Vorgabe: VirtualBox. In realen Installationen kann Vagrant je nach Konfiguration, Umgebungsvariable und verfügbaren Providern jedoch einen anderen Provider auswählen.",
+      "terms": [
+        {
+          "term": "default",
+          "de": "Standard / voreingestellt"
+        },
+        {
+          "term": "provider",
+          "de": "Virtualisierungsanbieter bzw. Backend"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-05",
+      "objective": "353.1",
+      "type": "single",
+      "question": "In an IaaS cloud, what is a common method for provisioning new computing instances with an operating system and software?",
+      "question_de": "Wie werden in einer IaaS-Cloud üblicherweise neue Instanzen mit Betriebssystem und Software bereitgestellt?",
+      "choices": [
+        {
+          "text": "Each new instance is connected to the installation media of a Linux distribution and provides access to the installer by logging in via SSH.",
+          "text_de": "Jede neue Instanz greift auf das Installationsmedium einer Linux-Distribution zu; die Installation wird per SSH bedient.",
+          "correct": false
+        },
+        {
+          "text": "Each new instance is created based on an image file that contains the operating system as well as software and default configuration for a given purpose.",
+          "text_de": "Jede neue Instanz wird aus einem Image mit Betriebssystem, Software und einer für den Zweck vorgesehenen Standardkonfiguration erstellt.",
+          "correct": true
+        },
+        {
+          "text": "Each new instance is a clone of another currently running instance that includes all the software, data and state of the original instance.",
+          "text_de": "Jede neue Instanz ist ein Klon einer aktuell laufenden Instanz einschließlich Software, Daten und Laufzeitstatus.",
+          "correct": false
+        },
+        {
+          "text": "Each new instance is connected via a VPN with the computer that started the provisioning and tries to PXE boot from that machine.",
+          "text_de": "Jede neue Instanz verbindet sich per VPN mit dem bereitstellenden Computer und versucht, von dort über PXE zu starten.",
+          "correct": false
+        },
+        {
+          "text": "Each new instance contains a minimal live system running from a virtual CD as the basis from which the administrator deploys the target operating system.",
+          "text_de": "Jede neue Instanz startet ein minimales Live-System von einer virtuellen CD, von dem aus die Administration das Zielsystem installiert.",
+          "correct": false
+        }
+      ],
+      "explanation_de": "B ist richtig: Cloud-Instanzen werden häufig aus vorbereiteten Maschinen-Images gestartet. Zusätzliche Anpassungen können zum Beispiel über cloud-init erfolgen.",
+      "terms": [
+        {
+          "term": "common method",
+          "de": "übliche Methode"
+        },
+        {
+          "term": "provisioning",
+          "de": "Bereitstellung"
+        },
+        {
+          "term": "instances",
+          "de": "Instanzen"
+        },
+        {
+          "term": "as well as",
+          "de": "ebenso wie"
+        },
+        {
+          "term": "given purpose",
+          "de": "bestimmter Zweck"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-06",
+      "objective": "351.4",
+      "type": "single",
+      "question": "Which command within virsh lists the virtual machines that are running on the current host?",
+      "question_de": "Welcher virsh-Befehl listet die aktuell laufenden virtuellen Maschinen des Hosts auf?",
+      "choices": [
+        {
+          "text": "view",
+          "text_de": "view",
+          "correct": false
+        },
+        {
+          "text": "list-vm",
+          "text_de": "list-vm",
+          "correct": false
+        },
+        {
+          "text": "list",
+          "text_de": "list",
+          "correct": true
+        },
+        {
+          "text": "show",
+          "text_de": "show",
+          "correct": false
+        },
+        {
+          "text": "list-all",
+          "text_de": "list-all",
+          "correct": false
+        }
+      ],
+      "explanation_de": "C ist richtig: virsh list zeigt standardmäßig nur laufende Domains. virsh list --all zeigt zusätzlich gestoppte Domains.",
+      "terms": [
+        {
+          "term": "within",
+          "de": "innerhalb von"
+        },
+        {
+          "term": "lists",
+          "de": "listet auf"
+        },
+        {
+          "term": "running",
+          "de": "laufend"
+        },
+        {
+          "term": "current host",
+          "de": "aktueller Host"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-07",
+      "objective": "353.3",
+      "type": "single",
+      "question": "What is the purpose of cloud-init?",
+      "question_de": "Welchen Zweck erfüllt cloud-init?",
+      "choices": [
+        {
+          "text": "Replace common Linux init systems, such as systemd or SysV init.",
+          "text_de": "Gängige Linux-Init-Systeme wie systemd oder SysV init ersetzen.",
+          "correct": false
+        },
+        {
+          "text": "Assign an IaaS instance to a specific computing node within a cloud.",
+          "text_de": "Eine IaaS-Instanz einem bestimmten Rechenknoten in der Cloud zuweisen.",
+          "correct": false
+        },
+        {
+          "text": "Standardize the configuration of infrastructure services, such as load balancers or virtual firewalls in a cloud.",
+          "text_de": "Die Konfiguration von Infrastrukturdiensten wie Loadbalancern oder virtuellen Firewalls standardisieren.",
+          "correct": false
+        },
+        {
+          "text": "Orchestrate the creation and start of multiple related IaaS instances.",
+          "text_de": "Die Erstellung und den Start mehrerer zusammengehöriger IaaS-Instanzen orchestrieren.",
+          "correct": false
+        },
+        {
+          "text": "Prepare the generic image of an IaaS instance to fit a specific instance’s configuration.",
+          "text_de": "Ein allgemeines IaaS-Image an die Konfiguration einer konkreten Instanz anpassen.",
+          "correct": true
+        }
+      ],
+      "explanation_de": "E ist richtig: cloud-init initialisiert und konfiguriert eine Instanz beim ersten Start oder entsprechend der konfigurierten Ausführungshäufigkeit.",
+      "terms": [
+        {
+          "term": "purpose",
+          "de": "Zweck"
+        },
+        {
+          "term": "replace",
+          "de": "ersetzen"
+        },
+        {
+          "term": "assign",
+          "de": "zuweisen"
+        },
+        {
+          "term": "orchestrate",
+          "de": "koordinieren"
+        },
+        {
+          "term": "generic image",
+          "de": "allgemeines Image"
+        },
+        {
+          "term": "specific",
+          "de": "konkret / spezifisch"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-08",
+      "objective": "353.2",
+      "type": "single",
+      "question": "What is the purpose of the packer inspect subcommand?",
+      "question_de": "Welchen Zweck hat der Unterbefehl packer inspect?",
+      "choices": [
+        {
+          "text": "Retrieve files from an existing Packer image.",
+          "text_de": "Dateien aus einem bestehenden Packer-Image abrufen.",
+          "correct": false
+        },
+        {
+          "text": "Execute commands within a running instance of a Packer image.",
+          "text_de": "Befehle in einer laufenden Instanz eines Packer-Images ausführen.",
+          "correct": false
+        },
+        {
+          "text": "List the artifacts created during the build process of a Packer image.",
+          "text_de": "Die während des Packer-Builds erzeugten Artefakte auflisten.",
+          "correct": false
+        },
+        {
+          "text": "Show usage statistics of a Packer image.",
+          "text_de": "Nutzungsstatistiken eines Packer-Images anzeigen.",
+          "correct": false
+        },
+        {
+          "text": "Display an overview of the configuration contained in a Packer template.",
+          "text_de": "Eine Übersicht über die in einem Packer-Template enthaltene Konfiguration anzeigen.",
+          "correct": true
+        }
+      ],
+      "explanation_de": "E ist richtig: packer inspect zeigt Bestandteile einer Packer-Vorlage wie Variablen, Builder und Provisioner.",
+      "terms": [
+        {
+          "term": "purpose",
+          "de": "Zweck"
+        },
+        {
+          "term": "subcommand",
+          "de": "Unterbefehl"
+        },
+        {
+          "term": "retrieve",
+          "de": "abrufen"
+        },
+        {
+          "term": "artifacts",
+          "de": "Artefakte"
+        },
+        {
+          "term": "overview",
+          "de": "Übersicht"
+        },
+        {
+          "term": "contained",
+          "de": "enthalten"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-09",
+      "objective": "352.1",
+      "type": "single",
+      "question": "What is the purpose of capabilities in the context of container virtualization?",
+      "question_de": "Welchen Zweck haben Capabilities im Zusammenhang mit Containervirtualisierung?",
+      "choices": [
+        {
+          "text": "Map potentially dangerous system calls to an emulation layer provided by the container virtualization.",
+          "text_de": "Möglicherweise gefährliche Systemaufrufe auf eine Emulationsschicht der Containervirtualisierung abbilden.",
+          "correct": false
+        },
+        {
+          "text": "Restrict the disk space a container can consume.",
+          "text_de": "Den Speicherplatz begrenzen, den ein Container verbrauchen darf.",
+          "correct": false
+        },
+        {
+          "text": "Enable memory deduplication to cache files which exist in multiple containers.",
+          "text_de": "Speicherdeduplizierung ermöglichen, um Dateien mehrerer Container zwischenzuspeichern.",
+          "correct": false
+        },
+        {
+          "text": "Allow regular users to start containers with elevated permissions.",
+          "text_de": "Normalen Benutzern erlauben, Container mit erhöhten Rechten zu starten.",
+          "correct": false
+        },
+        {
+          "text": "Prevent processes from performing actions which might infringe the container.",
+          "text_de": "Prozesse an Aktionen hindern, die die Isolation bzw. Sicherheit des Containers verletzen könnten.",
+          "correct": true
+        }
+      ],
+      "explanation_de": "E ist im Sinn der Frage am ehesten richtig: Linux Capabilities teilen privilegierte Rechte auf. Durch das Entfernen von Capabilities lassen sich bestimmte privilegierte Aktionen verhindern. Die Formulierung „infringe the container“ ist unpräzise.",
+      "terms": [
+        {
+          "term": "purpose",
+          "de": "Zweck"
+        },
+        {
+          "term": "capabilities",
+          "de": "feingranulare Linux-Berechtigungen"
+        },
+        {
+          "term": "context",
+          "de": "Zusammenhang"
+        },
+        {
+          "term": "restrict",
+          "de": "begrenzen"
+        },
+        {
+          "term": "elevated permissions",
+          "de": "erhöhte Rechte"
+        },
+        {
+          "term": "prevent",
+          "de": "verhindern"
+        }
+      ],
+      "difficulty": 2
+    },
+    {
+      "id": "305-examtopics-screenshot-10",
+      "objective": "353.3",
+      "type": "single",
+      "question": "Which directory is used by cloud-init to store status information and configuration information retrieved from external sources?",
+      "question_de": "In welchem Verzeichnis speichert cloud-init Statusinformationen und Konfigurationsdaten aus externen Quellen?",
+      "choices": [
+        {
+          "text": "/var/lib/cloud/",
+          "text_de": "/var/lib/cloud/",
+          "correct": true
+        },
+        {
+          "text": "/etc/cloud-init/cache/",
+          "text_de": "/etc/cloud-init/cache/",
+          "correct": false
+        },
+        {
+          "text": "/proc/sys/cloud/",
+          "text_de": "/proc/sys/cloud/",
+          "correct": false
+        },
+        {
+          "text": "/tmp/cloud/",
+          "text_de": "/tmp/cloud/",
+          "correct": false
+        },
+        {
+          "text": "/opt/cloud/var/",
+          "text_de": "/opt/cloud/var/",
+          "correct": false
+        }
+      ],
+      "explanation_de": "A ist richtig: /var/lib/cloud/ enthält den persistenten Zustand von cloud-init, unter anderem Daten und Status zu Instanzen.",
+      "terms": [
+        {
+          "term": "directory",
+          "de": "Verzeichnis"
+        },
+        {
+          "term": "store",
+          "de": "speichern"
+        },
+        {
+          "term": "status information",
+          "de": "Statusinformationen"
+        },
+        {
+          "term": "retrieved",
+          "de": "abgerufen"
+        },
+        {
+          "term": "external sources",
+          "de": "externe Quellen"
+        }
+      ],
+      "difficulty": 2
     }
   ]
 }
