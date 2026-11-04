@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 4. November 2026, Version 0.0.1 (erste Entwicklungsversion, keine stabile Produktionsversion).
+Stand: 4. November 2026, Version 0.0.1 mit erweitertem Fragenbestand (erste Entwicklungsversion, keine stabile Produktionsversion).
 
 ## Zusammenfassung
 
@@ -26,7 +26,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 ### Lerninhalte
 
 - Prüfungsziele aller vier Module (300, 303, 305, 306) in Version 3.0 mit Themen, Zielen, Gewichten, deutschen Zusammenfassungen und Werkzeuglisten. Quelle: offizielle LPI-Prüfungsziele; Zusammenfassungen sind eigene Formulierungen.
-- 141 eigene Prüfungsfragen (300: 38, 303: 38, 305: 32, 306: 33), jede mit deutscher Übersetzung von Frage und Antworten sowie deutscher Erklärung. Jedes Prüfungsziel hat mindestens eine Frage.
+- 245 eigene Prüfungsfragen (300: 62, 303: 62, 305: 60, 306: 61) in zwei Dateien je Modul, jede mit deutscher Übersetzung von Frage und Antworten sowie deutscher Erklärung. Jedes Prüfungsziel hat mindestens eine Frage; die Verteilung folgt grob dem Gewicht der Ziele.
 - Glossar mit 216 Fachbegriffen (Englisch, Deutsch, teils Erklärung).
 - 12 Laboraufgaben (3 je Modul) mit Umgebung, Schritten, Befehlen und Selbstkontrollfragen.
 - Lizenz der Inhalte: CC BY-SA 4.0 (`content/LICENSE.md`), getrennt vom MIT-lizenzierten Code.
@@ -70,7 +70,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 - `docs/architektur.md`, `docs/installation.md`, `docs/administration.md`, `docs/bedienung.md`, `docs/entwicklung.md`, `content/README.md`.
 
-## Testergebnisse (4. November 2026)
+## Testergebnisse (4. November 2026, nach Erweiterung des Fragenbestands erneut ausgeführt)
 
 | Suite | Umfang | Ergebnis |
 |-------|--------|----------|
@@ -84,7 +84,7 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 
 - **Installation nicht auf einem echten System geprüft.** `install`, `upgrade`, `rollback`, `uninstall` und `purge` sind nur im automatisierten Test mit Stub-Befehlen für `useradd`, `userdel` und `systemctl` gelaufen (ohne Root). Dateistruktur, venv, Konfigurationserhalt und Befehlsfolge sind damit geprüft, das Zusammenspiel mit systemd auf einem Server noch nicht.
 - **Docker nicht getestet.** Auf dem Entwicklungssystem war kein Docker verfügbar. Dockerfile und Compose-Datei sind ungetestet.
-- **Fragenanzahl.** Mit 32 bis 38 Fragen je Modul enthält eine Modulsimulation weniger als die vorgesehenen 60 Fragen; es werden alle verfügbaren Fragen gezogen. Kapiteltests mit 15 Fragen sind bei kleinen Themen entsprechend kürzer.
+- **Fragenanzahl.** Mit 60 bis 62 Fragen je Modul zieht eine Modulsimulation nahezu den gesamten Bestand; wiederholte Simulationen enthalten daher weitgehend dieselben Fragen. Kapiteltests mit 15 Fragen sind bei kleinen Themen entsprechend kürzer.
 - **Sprachhilfe erkennt Begriffe wörtlich.** Flexionen (z. B. „revoked“ zu „revoke“) werden nur erkannt, wenn der Begriff so im Glossar steht oder der Frage zugeordnet ist.
 - **Prüfungssimulation ohne Fortsetzung nach Browserschließen.** Die Antworten werden erst bei Abgabe gespeichert; die Zeit läuft serverseitig weiter.
 - **Keine E-Mail.** Passwort zurücksetzen erfolgt durch Administratoren (neues Passwort wird angezeigt).
@@ -95,7 +95,7 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 
 1. Installation und Upgrade auf einem frischen Debian 12 oder Ubuntu 24.04 mit systemd durchführen und Ergebnis dokumentieren.
 2. Docker-Image bauen und Compose-Betrieb prüfen.
-3. Fragenbestand ausbauen (Ziel: mindestens 60 je Modul), weitere Labs.
+3. Fragenbestand weiter ausbauen (Ziel: mindestens 120 je Modul, damit Simulationen variieren), weitere Labs.
 4. Begriffserkennung um einfache Wortformen erweitern.
 5. Browsertests auch mit Firefox/WebKit laufen lassen.
 6. Datenmigration mit einer zweiten Alembic-Revision testen, sobald das Schema sich ändert.
