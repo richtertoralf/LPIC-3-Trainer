@@ -2,71 +2,87 @@
 
 ## Projektgrundlage
 
-- Ziel und Funktionsumfang: [README.md](README.md)
+- Projektziel und Funktionsumfang: [README.md](README.md)
 - Die README ist die fachliche Referenz.
+- Hier stehen ausschließlich technische Vorgaben und Entwicklungsregeln.
 
 ## Zielsystem
 
 - Betriebssystem: Linux
 - Unterstützt: Ubuntu 24.04/26.04 LTS, Debian 12/13
 - Architektur: x86_64 und ARM64
-- Nutzung: Browser auf Linux, Windows und Android
-- Bereitstellung: lokal oder auf eigenem Server
+- Clients: Browser auf Linux, Windows und Android
+- Bereitstellung: eigener Linux-Server oder lokale Installation
 - Containerbetrieb: optional mit Docker Compose
 
 ## Technischer Stack
 
 - Backend: Python 3.12+, FastAPI
 - Frontend: HTML5, CSS3, natives JavaScript
-- Datenbank: SQLite
+- Datenbank: SQLite mit WAL-Modus
+- Datenbankzugriff: SQLAlchemy
+- Migrationen: Alembic
 - Webserver: Uvicorn
 - PWA: Service Worker und Web App Manifest
-- Tests: pytest, Browser-End-to-End-Tests
-
-## Datenhaltung
-
-- SQLite für Fragen, Lernstände und Einstellungen.
-- Kein separater Datenbankserver erforderlich.
-- Lerninhalte und Benutzerdaten getrennt speichern.
-- Datenbankmigrationen vorsehen.
-- Backup und Wiederherstellung ermöglichen.
-- Keine Datenbankdateien im Git-Repository.
+- Tests: pytest und Browser-End-to-End-Tests
 
 ## Architektur
 
 - Monolithische Webanwendung.
-- Klare Trennung von Backend, Frontend und Inhalten.
-- REST-API nur für tatsächlich benötigte Funktionen.
+- Klare Trennung von Backend, Frontend und Lerninhalten.
+- REST-API nur bei Bedarf.
 - Keine Microservices.
 - Keine verpflichtenden Cloud-Dienste.
 - Keine externe KI-Anbindung.
 - Keine unnötigen Frameworks oder Abstraktionen.
 
+## Mehrbenutzerbetrieb
+
+- Rollen: Administrator, Betreuer, Lernender.
+- Rollenbasierte Rechteprüfung im Backend.
+- Benutzerbezogene Daten durch Benutzer-IDs trennen.
+- Lerngruppen über eigene Zuordnungstabellen abbilden.
+- Anmeldung und Gruppenzugang konfigurierbar gestalten.
+- Passwörter sicher hashen.
+- Sitzungen sicher verwalten.
+- Keine unberechtigten Zugriffe auf fremde Lernstände.
+
+## Datenhaltung
+
+- SQLite mit WAL-Modus und kurzen Schreibtransaktionen.
+- Datenbankzugriff für späteren PostgreSQL-Wechsel vorbereiten.
+- Gemeinsame Lerninhalte und persönliche Daten getrennt halten.
+- Datenbankmigrationen vorsehen.
+- Backup und Wiederherstellung ermöglichen.
+- Keine Datenbankdateien im Git-Repository.
+
 ## Entwicklung
 
 - Bestehenden Code vor Änderungen prüfen.
 - Änderungen klein und nachvollziehbar halten.
-- Keine parallelen Implementierungen derselben Funktion.
+- Bestehende Funktionen wiederverwenden.
 - Keine unnötigen Refactorings.
-- Abhängigkeiten auf das Notwendige begrenzen.
+- Abhängigkeiten begrenzen.
 - Konfiguration über Umgebungsvariablen.
 - Keine Zugangsdaten im Repository.
 
 ## Sicherheit und Abgrenzung
 
-- Keine administrative Shell-Ausführung über die Weboberfläche.
+- Keine administrative Shell-Ausführung über den Browser.
 - Keine ungeprüfte Ausführung importierter Inhalte.
+- Lab-Aufgaben nur in separaten Testumgebungen.
 - Keine Änderungen an produktiven Linux-Systemen.
-- Lab-Aufgaben werden in einer separaten Testumgebung ausgeführt.
-- Keine öffentliche Bereitstellung ohne Zugriffsschutz.
+- Öffentliche Bereitstellung nur mit HTTPS.
+- Rechte und Datentrennung serverseitig durchsetzen.
 
 ## Qualität
 
-- Automatisierte Tests für zentrale Funktionen.
-- Import, Lernfortschritt und Datenmigrationen testen.
-- Browserdarstellung auf Desktop und Android prüfen.
-- Fehler vor Abschluss beheben.
-- Dokumentation bei technischen Änderungen aktualisieren.
+- Rollen und Zugriffsrechte automatisiert testen.
+- Gleichzeitige Zugriffe mehrerer Nutzer testen.
+- Datenmigrationen und Backups testen.
+- Importfunktionen und Datenintegrität testen.
+- Desktop- und Android-Browser prüfen.
+- Dokumentation aktuell halten.
 
 ## Abschluss
 
