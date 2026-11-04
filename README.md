@@ -9,6 +9,18 @@ Sie verbindet:
 - Technisches Fachenglisch
 - Praktische Übungen im eigenen Linux-Lab
 - Import eigener Prüfungsfragen
+- Prüfungssimulationen für einzelne Kapitel und ganze Module
+
+## Nutzung
+
+Die App kann allein oder gemeinsam genutzt werden.
+
+Linux-Vereine, Lerngruppen und Bildungseinrichtungen können sie ihren Mitgliedern und Teilnehmern bereitstellen.
+
+- Lernende wählen ihre LPIC-3-Module selbst.
+- Jeder hat seinen eigenen Lernfortschritt.
+- Betreuer können Fragen bereitstellen und Lerngruppen begleiten.
+- Die Anmeldung ist offen oder erfolgt mit Freigabe.
 
 **Ziel:** Gezielte Prüfungsvorbereitung mit geringem Zeitaufwand.
 
