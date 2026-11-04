@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session, selectinload
 from app.content import ContentError, import_document, parse_json_bytes
 from app.deps import (
     SETTING_REGISTRATION,
-    get_current_user,
     get_db,
     get_setting,
     require_admin,
@@ -47,7 +46,9 @@ MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 
 
 @router.get("")
-def overview(request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def overview(
+    request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     counts = {
         "users": db.execute(select(func.count(User.id))).scalar_one(),
         "pending": db.execute(
@@ -57,23 +58,32 @@ def overview(request: Request, user: User = Depends(require_supervisor), db: Ses
         "terms": db.execute(select(func.count(Term.id))).scalar_one(),
         "labs": db.execute(select(func.count(Lab.id))).scalar_one(),
         "groups": db.execute(select(func.count(Group.id))).scalar_one(),
-        "exams": db.execute(select(func.count(Exam.id)).where(Exam.finished_at.is_not(None))).scalar_one(),
+        "exams": db.execute(
+            select(func.count(Exam.id)).where(Exam.finished_at.is_not(None))
+        ).scalar_one(),
     }
-    return render(request, "admin/overview.html",
-                  {"counts": counts, "registration_mode": get_setting(db, SETTING_REGISTRATION)})
+    return render(
+        request,
+        "admin/overview.html",
+        {"counts": counts, "registration_mode": get_setting(db, SETTING_REGISTRATION)},
+    )
 
 
 # ----------------------------------------------------------------------- users
 
 
 @router.get("/users")
-def users(request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def users(
+    request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     rows = list(db.execute(select(User).order_by(User.status, User.username)).scalars())
     return render(request, "admin/users.html", {"users": rows, "roles": ROLES})
 
 
 @router.post("/users/{user_id}/approve")
-def approve_user(user_id: int, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def approve_user(
+    user_id: int, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     target = db.get(User, user_id)
     if target is None:
         raise HTTPException(404, "Benutzer nicht gefunden")
@@ -83,8 +93,12 @@ def approve_user(user_id: int, user: User = Depends(require_supervisor), db: Ses
 
 
 @router.post("/users/{user_id}/status")
-def set_user_status(user_id: int, status: str = Form(...), user: User = Depends(require_admin),
-                    db: Session = Depends(get_db)):
+def set_user_status(
+    user_id: int,
+    status: str = Form(...),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
     target = db.get(User, user_id)
     if target is None:
         raise HTTPException(404, "Benutzer nicht gefunden")
@@ -100,22 +114,30 @@ def set_user_status(user_id: int, status: str = Form(...), user: User = Depends(
 
 
 @router.post("/users/{user_id}/role")
-def set_role(user_id: int, role: str = Form(...), user: User = Depends(require_admin),
-             db: Session = Depends(get_db)):
+def set_role(
+    user_id: int,
+    role: str = Form(...),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
     target = db.get(User, user_id)
     if target is None:
         raise HTTPException(404, "Benutzer nicht gefunden")
     if role not in ROLES:
         raise HTTPException(400, "Ungültige Rolle")
     if target.id == user.id and role != "admin":
-        return redirect("/admin/users", "Die eigene Administratorrolle kann nicht entfernt werden.", "error")
+        return redirect(
+            "/admin/users", "Die eigene Administratorrolle kann nicht entfernt werden.", "error"
+        )
     target.role = role
     db.add(target)
     return redirect("/admin/users", f"Rolle von {target.username} ist jetzt {role}.", "success")
 
 
 @router.post("/users/{user_id}/reset-password")
-def reset_password(user_id: int, user: User = Depends(require_admin), db: Session = Depends(get_db)):
+def reset_password(
+    user_id: int, user: User = Depends(require_admin), db: Session = Depends(get_db)
+):
     target = db.get(User, user_id)
     if target is None:
         raise HTTPException(404, "Benutzer nicht gefunden")
@@ -123,8 +145,11 @@ def reset_password(user_id: int, user: User = Depends(require_admin), db: Sessio
     target.password_hash = hash_password(new_password)
     delete_user_sessions(db, target.id)
     db.add(target)
-    return redirect("/admin/users",
-                    f"Neues Passwort für {target.username}: {new_password} (jetzt notieren).", "success")
+    return redirect(
+        "/admin/users",
+        f"Neues Passwort für {target.username}: {new_password} (jetzt notieren).",
+        "success",
+    )
 
 
 @router.post("/users/{user_id}/delete")
@@ -142,14 +167,20 @@ def delete_user(user_id: int, user: User = Depends(require_admin), db: Session =
 
 
 @router.get("/settings")
-def settings_page(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
-    return render(request, "admin/settings.html",
-                  {"registration_mode": get_setting(db, SETTING_REGISTRATION)})
+def settings_page(
+    request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)
+):
+    return render(
+        request, "admin/settings.html", {"registration_mode": get_setting(db, SETTING_REGISTRATION)}
+    )
 
 
 @router.post("/settings")
-def save_settings(registration_mode: str = Form(...), user: User = Depends(require_admin),
-                  db: Session = Depends(get_db)):
+def save_settings(
+    registration_mode: str = Form(...),
+    user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
     if registration_mode not in ("open", "approval"):
         raise HTTPException(400, "Ungültiger Wert")
     set_setting(db, SETTING_REGISTRATION, registration_mode)
@@ -160,7 +191,9 @@ def save_settings(registration_mode: str = Form(...), user: User = Depends(requi
 
 
 @router.get("/import")
-def import_form(request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def import_form(
+    request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     batches = list(
         db.execute(select(ImportBatch).order_by(ImportBatch.imported_at.desc()).limit(50)).scalars()
     )
@@ -168,8 +201,13 @@ def import_form(request: Request, user: User = Depends(require_supervisor), db: 
 
 
 @router.post("/import")
-async def import_upload(request: Request, file: UploadFile = File(...), visibility: str = Form("private"),
-                        user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+async def import_upload(
+    request: Request,
+    file: UploadFile = File(...),
+    visibility: str = Form("private"),
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     if visibility not in ("public", "private"):
         raise HTTPException(400, "Ungültige Sichtbarkeit")
     if visibility == "public" and not user.is_admin:
@@ -181,24 +219,38 @@ async def import_upload(request: Request, file: UploadFile = File(...), visibili
     try:
         data = parse_json_bytes(raw, filename)
         if data.get("kind") in ("objectives", "terms") and not user.is_admin:
-            raise ContentError(["Nur Administratoren dürfen Prüfungsziele oder Glossare importieren."])
-        result = import_document(db, data, filename=filename, imported_by=user.id,
-                                 visibility=visibility)
+            raise ContentError(
+                ["Nur Administratoren dürfen Prüfungsziele oder Glossare importieren."]
+            )
+        result = import_document(
+            db, data, filename=filename, imported_by=user.id, visibility=visibility
+        )
     except ContentError as exc:
         db.rollback()
         batches = list(
-            db.execute(select(ImportBatch).order_by(ImportBatch.imported_at.desc()).limit(50)).scalars()
+            db.execute(
+                select(ImportBatch).order_by(ImportBatch.imported_at.desc()).limit(50)
+            ).scalars()
         )
-        return render(request, "admin/import.html",
-                      {"batches": batches, "modules": all_modules(db), "errors": exc.errors,
-                       "filename": filename}, status_code=400)
-    msg = (f"{filename}: {result.created} neu, {result.updated} aktualisiert "
-           f"({result.kind}).")
+        return render(
+            request,
+            "admin/import.html",
+            {
+                "batches": batches,
+                "modules": all_modules(db),
+                "errors": exc.errors,
+                "filename": filename,
+            },
+            status_code=400,
+        )
+    msg = f"{filename}: {result.created} neu, {result.updated} aktualisiert ({result.kind})."
     return redirect("/admin/import", msg, "success")
 
 
 @router.post("/batches/{batch_id}/delete")
-def delete_batch(batch_id: int, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def delete_batch(
+    batch_id: int, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     batch = db.get(ImportBatch, batch_id)
     if batch is None:
         raise HTTPException(404, "Import nicht gefunden")
@@ -218,10 +270,23 @@ def delete_batch(batch_id: int, user: User = Depends(require_supervisor), db: Se
 
 
 @router.get("/questions")
-def questions(request: Request, module: str = "", batch: int | None = None, q: str = "",
-              user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
-    stmt = select(Question).options(selectinload(Question.module), selectinload(Question.objective),
-                                    selectinload(Question.batch)).order_by(Question.external_id)
+def questions(
+    request: Request,
+    module: str = "",
+    batch: int | None = None,
+    q: str = "",
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
+    stmt = (
+        select(Question)
+        .options(
+            selectinload(Question.module),
+            selectinload(Question.objective),
+            selectinload(Question.batch),
+        )
+        .order_by(Question.external_id)
+    )
     if not user.is_admin:
         stmt = stmt.where((Question.visibility == "public") | (Question.created_by == user.id))
     if module:
@@ -229,16 +294,21 @@ def questions(request: Request, module: str = "", batch: int | None = None, q: s
     if batch:
         stmt = stmt.where(Question.import_batch_id == batch)
     if q.strip():
-        stmt = stmt.where(Question.text_en.contains(q.strip()) | Question.external_id.contains(q.strip()))
+        stmt = stmt.where(
+            Question.text_en.contains(q.strip()) | Question.external_id.contains(q.strip())
+        )
     rows = list(db.execute(stmt.limit(300)).scalars())
-    return render(request, "admin/questions.html",
-                  {"questions": rows, "modules": all_modules(db), "module": module, "q": q,
-                   "batch": batch})
+    return render(
+        request,
+        "admin/questions.html",
+        {"questions": rows, "modules": all_modules(db), "module": module, "q": q, "batch": batch},
+    )
 
 
 @router.post("/questions/{question_id}/toggle")
-def toggle_question(question_id: int, user: User = Depends(require_supervisor),
-                    db: Session = Depends(get_db)):
+def toggle_question(
+    question_id: int, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     question = db.get(Question, question_id)
     if question is None:
         raise HTTPException(404, "Frage nicht gefunden")
@@ -247,8 +317,11 @@ def toggle_question(question_id: int, user: User = Depends(require_supervisor),
     question.is_active = not question.is_active
     db.add(question)
     state = "aktiviert" if question.is_active else "deaktiviert"
-    return redirect(f"/admin/questions?module={question.module.code}",
-                    f"Frage {question.external_id} {state}.", "success")
+    return redirect(
+        f"/admin/questions?module={question.module.code}",
+        f"Frage {question.external_id} {state}.",
+        "success",
+    )
 
 
 # ---------------------------------------------------------------------- groups
@@ -256,33 +329,45 @@ def toggle_question(question_id: int, user: User = Depends(require_supervisor),
 
 def _group_for(db: Session, user: User, group_id: int) -> Group:
     group = db.execute(
-        select(Group).options(selectinload(Group.members).selectinload(GroupMember.user))
+        select(Group)
+        .options(selectinload(Group.members).selectinload(GroupMember.user))
         .where(Group.id == group_id)
     ).scalar_one_or_none()
     if group is None:
         raise HTTPException(404, "Gruppe nicht gefunden")
     if not user.is_admin:
-        supervises = any(
-            m.user_id == user.id and m.role == "supervisor" for m in group.members
-        )
+        supervises = any(m.user_id == user.id and m.role == "supervisor" for m in group.members)
         if not supervises:
             raise HTTPException(403, "Keine Berechtigung")
     return group
 
 
 @router.get("/groups")
-def groups(request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def groups(
+    request: Request, user: User = Depends(require_supervisor), db: Session = Depends(get_db)
+):
     rows = list(
-        db.execute(select(Group).options(selectinload(Group.members)).order_by(Group.name)).scalars()
+        db.execute(
+            select(Group).options(selectinload(Group.members)).order_by(Group.name)
+        ).scalars()
     )
     if not user.is_admin:
-        rows = [g for g in rows if any(m.user_id == user.id and m.role == "supervisor" for m in g.members)]
+        rows = [
+            g
+            for g in rows
+            if any(m.user_id == user.id and m.role == "supervisor" for m in g.members)
+        ]
     return render(request, "admin/groups.html", {"groups": rows})
 
 
 @router.post("/groups")
-def create_group(name: str = Form(...), description: str = Form(""), join_mode: str = Form("approval"),
-                 user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def create_group(
+    name: str = Form(...),
+    description: str = Form(""),
+    join_mode: str = Form("approval"),
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     name = name.strip()[:128]
     if not name:
         return redirect("/admin/groups", "Der Gruppenname darf nicht leer sein.", "error")
@@ -290,7 +375,9 @@ def create_group(name: str = Form(...), description: str = Form(""), join_mode: 
         raise HTTPException(400, "Ungültiger Beitrittsmodus")
     if db.execute(select(Group.id).where(Group.name == name)).scalar_one_or_none():
         return redirect("/admin/groups", "Eine Gruppe mit diesem Namen existiert bereits.", "error")
-    group = Group(name=name, description=description.strip(), join_mode=join_mode, created_by=user.id)
+    group = Group(
+        name=name, description=description.strip(), join_mode=join_mode, created_by=user.id
+    )
     db.add(group)
     db.flush()
     db.add(GroupMember(group_id=group.id, user_id=user.id, role="supervisor", status="active"))
@@ -298,24 +385,30 @@ def create_group(name: str = Form(...), description: str = Form(""), join_mode: 
 
 
 @router.get("/groups/{group_id}")
-def group_detail(request: Request, group_id: int, user: User = Depends(require_supervisor),
-                 db: Session = Depends(get_db)):
+def group_detail(
+    request: Request,
+    group_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     group = _group_for(db, user, group_id)
     modules = all_modules(db)
     report = []
     for member in sorted(group.members, key=lambda m: m.user.username):
         if member.status != "active":
             continue
-        selected = db.execute(
-            select(UserModule).where(UserModule.user_id == member.user_id)
-        ).scalars().all()
+        selected = (
+            db.execute(select(UserModule).where(UserModule.user_id == member.user_id))
+            .scalars()
+            .all()
+        )
         selected_ids = {um.module_id for um in selected}
         progress = [module_progress(db, member.user, m) for m in modules if m.id in selected_ids]
         report.append({"member": member, "progress": progress})
     others = list(
         db.execute(
-            select(User).where(User.status == STATUS_ACTIVE,
-                               User.id.not_in([m.user_id for m in group.members]))
+            select(User)
+            .where(User.status == STATUS_ACTIVE, User.id.not_in([m.user_id for m in group.members]))
             .order_by(User.username)
         ).scalars()
     )
@@ -323,8 +416,13 @@ def group_detail(request: Request, group_id: int, user: User = Depends(require_s
 
 
 @router.post("/groups/{group_id}/members")
-def add_member(group_id: int, user_id: int = Form(...), role: str = Form("member"),
-               user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
+def add_member(
+    group_id: int,
+    user_id: int = Form(...),
+    role: str = Form("member"),
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     group = _group_for(db, user, group_id)
     target = db.get(User, user_id)
     if target is None:
@@ -342,8 +440,12 @@ def add_member(group_id: int, user_id: int = Form(...), role: str = Form("member
 
 
 @router.post("/groups/{group_id}/members/{user_id}/approve")
-def approve_member(group_id: int, user_id: int, user: User = Depends(require_supervisor),
-                   db: Session = Depends(get_db)):
+def approve_member(
+    group_id: int,
+    user_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     group = _group_for(db, user, group_id)
     member = next((m for m in group.members if m.user_id == user_id), None)
     if member is None:
@@ -354,8 +456,12 @@ def approve_member(group_id: int, user_id: int, user: User = Depends(require_sup
 
 
 @router.post("/groups/{group_id}/members/{user_id}/remove")
-def remove_member(group_id: int, user_id: int, user: User = Depends(require_supervisor),
-                  db: Session = Depends(get_db)):
+def remove_member(
+    group_id: int,
+    user_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
     group = _group_for(db, user, group_id)
     member = next((m for m in group.members if m.user_id == user_id), None)
     if member is not None:
@@ -378,7 +484,9 @@ def delete_group(group_id: int, user: User = Depends(require_admin), db: Session
 def stats(request: Request, user: User = Depends(require_admin), db: Session = Depends(get_db)):
     attempts = db.execute(select(func.count(Attempt.id))).scalar_one()
     by_module = db.execute(
-        select(Module.code, func.count(Question.id)).join(Question, Question.module_id == Module.id)
-        .group_by(Module.code).order_by(Module.code)
+        select(Module.code, func.count(Question.id))
+        .join(Question, Question.module_id == Module.id)
+        .group_by(Module.code)
+        .order_by(Module.code)
     ).all()
     return render(request, "admin/stats.html", {"attempts": attempts, "by_module": by_module})

@@ -8,7 +8,7 @@ COPY pyproject.toml README.md LICENSE alembic.ini ./
 COPY app ./app
 COPY content ./content
 COPY migrations ./migrations
-RUN pip install --no-cache-dir . 
+RUN pip install --no-cache-dir --editable .
 USER lpic3
 VOLUME ["/var/lib/lpic3-trainer"]
 EXPOSE 8000

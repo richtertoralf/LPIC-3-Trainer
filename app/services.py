@@ -27,7 +27,6 @@ from app.models import (
     UserTerm,
 )
 
-
 # ------------------------------------------------------------------- visibility
 
 
@@ -154,8 +153,11 @@ def latest_attempts(db: Session, user: User, question_ids: list[int]) -> dict[in
         return {}
     rows = db.execute(
         select(Attempt)
-        .where(Attempt.user_id == user.id, Attempt.question_id.in_(question_ids),
-               Attempt.mode != "entry")
+        .where(
+            Attempt.user_id == user.id,
+            Attempt.question_id.in_(question_ids),
+            Attempt.mode != "entry",
+        )
         .order_by(Attempt.answered_at, Attempt.id)
     ).scalars()
     latest: dict[int, Attempt] = {}
@@ -169,7 +171,8 @@ def help_usage(db: Session, user: User, question_ids: list[int]) -> set[int]:
         return set()
     rows = db.execute(
         select(Attempt.question_id).where(
-            Attempt.user_id == user.id, Attempt.question_id.in_(question_ids),
+            Attempt.user_id == user.id,
+            Attempt.question_id.in_(question_ids),
             Attempt.used_help.is_(True),
         )
     ).scalars()
@@ -214,8 +217,9 @@ def module_progress(db: Session, user: User, module: Module) -> ModuleProgress:
     progress.exams = list(
         db.execute(
             select(Exam)
-            .where(Exam.user_id == user.id, Exam.module_id == module.id,
-                   Exam.finished_at.is_not(None))
+            .where(
+                Exam.user_id == user.id, Exam.module_id == module.id, Exam.finished_at.is_not(None)
+            )
             .order_by(Exam.finished_at.desc())
         ).scalars()
     )
@@ -236,9 +240,13 @@ def module_progress(db: Session, user: User, module: Module) -> ModuleProgress:
 # --------------------------------------------------------------- question choice
 
 
-def pick_practice_question(db: Session, user: User, module: Module,
-                           objective: Objective | None = None,
-                           exclude_id: int | None = None) -> Question | None:
+def pick_practice_question(
+    db: Session,
+    user: User,
+    module: Module,
+    objective: Objective | None = None,
+    exclude_id: int | None = None,
+) -> Question | None:
     """Pick the next practice question: unanswered first, then wrong ones, then any."""
     stmt = visible_questions(db, user).where(Question.module_id == module.id)
     if objective is not None:
@@ -258,8 +266,9 @@ def pick_practice_question(db: Session, user: User, module: Module,
     return random.choice(questions)
 
 
-def select_exam_questions(db: Session, user: User, module: Module, count: int,
-                          topic: Topic | None = None) -> list[int]:
+def select_exam_questions(
+    db: Session, user: User, module: Module, count: int, topic: Topic | None = None
+) -> list[int]:
     """Random question ids, spread across topics roughly by their exam weight."""
     stmt = visible_questions(db, user).where(Question.module_id == module.id)
     if topic is not None:
@@ -326,10 +335,23 @@ def user_term_status(db: Session, user: User, term_ids: list[int]) -> dict[int, 
     return {r.term_id: r.status for r in rows}
 
 
-def record_attempt(db: Session, user: User, question: Question, is_correct: bool,
-                   used_help: bool, mode: str = MODE_PRACTICE, exam_id: int | None = None) -> Attempt:
-    attempt = Attempt(user_id=user.id, question_id=question.id, mode=mode,
-                      is_correct=is_correct, used_help=used_help, exam_id=exam_id)
+def record_attempt(
+    db: Session,
+    user: User,
+    question: Question,
+    is_correct: bool,
+    used_help: bool,
+    mode: str = MODE_PRACTICE,
+    exam_id: int | None = None,
+) -> Attempt:
+    attempt = Attempt(
+        user_id=user.id,
+        question_id=question.id,
+        mode=mode,
+        is_correct=is_correct,
+        used_help=used_help,
+        exam_id=exam_id,
+    )
     db.add(attempt)
     db.flush()
     return attempt

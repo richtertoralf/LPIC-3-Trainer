@@ -74,8 +74,15 @@ def _is_str(value: Any, *, allow_empty: bool = False, max_len: int = MAX_TEXT) -
     return len(value) <= max_len
 
 
-def _check_str(errors: list[str], data: dict, key: str, where: str, *, required: bool = True,
-               max_len: int = MAX_TEXT) -> None:
+def _check_str(
+    errors: list[str],
+    data: dict,
+    key: str,
+    where: str,
+    *,
+    required: bool = True,
+    max_len: int = MAX_TEXT,
+) -> None:
     if key not in data:
         if required:
             errors.append(f"{where}: field '{key}' is missing")
@@ -353,8 +360,11 @@ def _upsert_term(db: Session, cache: dict[str, Term], raw: dict) -> Term:
     if term is None:
         term = db.execute(select(Term).where(Term.term == key)).scalar_one_or_none()
     if term is None:
-        term = Term(term=key, translation_de=raw["de"].strip(),
-                    explanation_de=raw.get("explanation_de", "").strip())
+        term = Term(
+            term=key,
+            translation_de=raw["de"].strip(),
+            explanation_de=raw.get("explanation_de", "").strip(),
+        )
         db.add(term)
         db.flush()
     else:
@@ -430,8 +440,11 @@ def _batch(db: Session, kind: str, filename: str, bundled: bool) -> ImportBatch:
     """Bundled files reuse their batch row so re-syncs do not pile up batches."""
     if bundled:
         existing = db.execute(
-            select(ImportBatch).where(ImportBatch.kind == kind, ImportBatch.filename == filename,
-                                      ImportBatch.bundled.is_(True))
+            select(ImportBatch).where(
+                ImportBatch.kind == kind,
+                ImportBatch.filename == filename,
+                ImportBatch.bundled.is_(True),
+            )
         ).scalar_one_or_none()
         if existing is not None:
             existing.imported_at = utcnow()
@@ -446,8 +459,16 @@ def document_checksum(data: dict) -> str:
     return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
-def import_questions(db: Session, data: dict, *, filename: str, imported_by: int | None,
-                     visibility: str | None, bundled: bool, checksum: str = "") -> ImportResult:
+def import_questions(
+    db: Session,
+    data: dict,
+    *,
+    filename: str,
+    imported_by: int | None,
+    visibility: str | None,
+    bundled: bool,
+    checksum: str = "",
+) -> ImportResult:
     result = ImportResult(kind="questions")
     module = db.execute(select(Module).where(Module.code == data["module"])).scalar_one_or_none()
     if module is None:
@@ -457,7 +478,11 @@ def import_questions(db: Session, data: dict, *, filename: str, imported_by: int
         code = q.get("objective")
         if code and code not in objectives:
             raise ContentError([f"question {q['id']}: objective {code} does not exist"])
-        if code and not code.startswith(module.code[0]) and objectives[code].topic.module_id != module.id:
+        if (
+            code
+            and not code.startswith(module.code[0])
+            and objectives[code].topic.module_id != module.id
+        ):
             raise ContentError([f"question {q['id']}: objective {code} belongs to another module"])
     vis = visibility or data.get("visibility", "private")
     batch = _batch(db, "questions", filename, bundled)
@@ -481,7 +506,9 @@ def import_questions(db: Session, data: dict, *, filename: str, imported_by: int
             result.updated += 1
             for choice in list(question.choices):
                 db.delete(choice)
-            db.execute(QuestionTerm.__table__.delete().where(QuestionTerm.question_id == question.id))
+            db.execute(
+                QuestionTerm.__table__.delete().where(QuestionTerm.question_id == question.id)
+            )
         question.module_id = module.id
         question.objective_id = objectives[q["objective"]].id if q.get("objective") else None
         question.kind = q.get("type", "single")
@@ -496,19 +523,35 @@ def import_questions(db: Session, data: dict, *, filename: str, imported_by: int
         question.created_by = imported_by
         db.flush()
         for pos, c in enumerate(q["choices"]):
-            db.add(Choice(question_id=question.id, position=pos, text_en=c["text"].strip(),
-                          text_de=c.get("text_de", "").strip(), is_correct=bool(c.get("correct"))))
+            db.add(
+                Choice(
+                    question_id=question.id,
+                    position=pos,
+                    text_en=c["text"].strip(),
+                    text_de=c.get("text_de", "").strip(),
+                    is_correct=bool(c.get("correct")),
+                )
+            )
         for raw in q.get("terms", []):
             term = _upsert_term(db, cache, raw)
             db.add(QuestionTerm(question_id=question.id, term_id=term.id))
         db.flush()
+        db.expire(question, ["choices", "terms"])
     batch.item_count = result.total
     result.batch_id = batch.id
     return result
 
 
-def import_labs(db: Session, data: dict, *, filename: str, imported_by: int | None,
-                visibility: str | None, bundled: bool, checksum: str = "") -> ImportResult:
+def import_labs(
+    db: Session,
+    data: dict,
+    *,
+    filename: str,
+    imported_by: int | None,
+    visibility: str | None,
+    bundled: bool,
+    checksum: str = "",
+) -> ImportResult:
     result = ImportResult(kind="labs")
     module = db.execute(select(Module).where(Module.code == data["module"])).scalar_one_or_none()
     if module is None:
@@ -557,9 +600,15 @@ def import_labs(db: Session, data: dict, *, filename: str, imported_by: int | No
     return result
 
 
-def import_document(db: Session, data: dict, *, filename: str = "upload.json",
-                    imported_by: int | None = None, visibility: str | None = None,
-                    bundled: bool = False) -> ImportResult:
+def import_document(
+    db: Session,
+    data: dict,
+    *,
+    filename: str = "upload.json",
+    imported_by: int | None = None,
+    visibility: str | None = None,
+    bundled: bool = False,
+) -> ImportResult:
     """Validate and import one content document. Raises ContentError when invalid."""
     errors = validate(data)
     if errors:
@@ -571,10 +620,24 @@ def import_document(db: Session, data: dict, *, filename: str = "upload.json",
     if kind == "terms":
         return import_terms(db, data)
     if kind == "questions":
-        return import_questions(db, data, filename=filename, imported_by=imported_by,
-                                visibility=visibility, bundled=bundled, checksum=checksum)
-    return import_labs(db, data, filename=filename, imported_by=imported_by,
-                       visibility=visibility, bundled=bundled, checksum=checksum)
+        return import_questions(
+            db,
+            data,
+            filename=filename,
+            imported_by=imported_by,
+            visibility=visibility,
+            bundled=bundled,
+            checksum=checksum,
+        )
+    return import_labs(
+        db,
+        data,
+        filename=filename,
+        imported_by=imported_by,
+        visibility=visibility,
+        bundled=bundled,
+        checksum=checksum,
+    )
 
 
 def import_path(db: Session, path: Path, **kwargs) -> ImportResult:
@@ -601,12 +664,17 @@ def sync_bundled_content(db: Session, content_dir: Path) -> list[ImportResult]:
         if data.get("kind") in ("questions", "labs"):
             existing = db.execute(
                 select(ImportBatch.checksum).where(
-                    ImportBatch.kind == data["kind"], ImportBatch.filename == path.name,
-                    ImportBatch.bundled.is_(True))
+                    ImportBatch.kind == data["kind"],
+                    ImportBatch.filename == path.name,
+                    ImportBatch.bundled.is_(True),
+                )
             ).scalar_one_or_none()
             if existing and existing == document_checksum(data):
-                results.append(ImportResult(kind=data["kind"], warnings=[f"{path.name}: unchanged"]))
+                results.append(
+                    ImportResult(kind=data["kind"], warnings=[f"{path.name}: unchanged"])
+                )
                 continue
-        results.append(import_document(db, data, filename=path.name, visibility="public",
-                                       bundled=True))
+        results.append(
+            import_document(db, data, filename=path.name, visibility="public", bundled=True)
+        )
     return results

@@ -25,19 +25,29 @@ def labs(request: Request, user: User = Depends(get_current_user), db: Session =
     modules = all_modules(db)
     rows = list(
         db.execute(
-            visible_labs(db, user).options(selectinload(Lab.objective)).order_by(Lab.module_id, Lab.id)
+            visible_labs(db, user)
+            .options(selectinload(Lab.objective))
+            .order_by(Lab.module_id, Lab.id)
         ).scalars()
     )
     done = _progress_map(db, user)
-    return render(request, "labs/list.html",
-                  {"modules": modules, "labs": rows, "selected": selected, "done": done})
+    return render(
+        request,
+        "labs/list.html",
+        {"modules": modules, "labs": rows, "selected": selected, "done": done},
+    )
 
 
 @router.get("/lab/{lab_id}")
-def lab_detail(request: Request, lab_id: int, user: User = Depends(get_current_user),
-               db: Session = Depends(get_db)):
+def lab_detail(
+    request: Request,
+    lab_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     lab = db.execute(
-        visible_labs(db, user).options(selectinload(Lab.objective), selectinload(Lab.module))
+        visible_labs(db, user)
+        .options(selectinload(Lab.objective), selectinload(Lab.module))
         .where(Lab.id == lab_id)
     ).scalar_one_or_none()
     if lab is None:
@@ -47,7 +57,9 @@ def lab_detail(request: Request, lab_id: int, user: User = Depends(get_current_u
 
 
 @router.post("/lab/{lab_id}/complete")
-def lab_complete(lab_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def lab_complete(
+    lab_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     lab = db.execute(visible_labs(db, user).where(Lab.id == lab_id)).scalar_one_or_none()
     if lab is None:
         raise HTTPException(404, "Lab nicht gefunden")

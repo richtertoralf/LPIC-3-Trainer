@@ -23,27 +23,38 @@ def progress(user: User = Depends(get_current_user), db: Session = Depends(get_d
     result = []
     for um in user_modules(db, user):
         p = module_progress(db, user, um.module)
-        result.append({
-            "module": um.module.code, "title": um.module.title, "questions": p.total,
-            "answered": p.answered, "correct": p.correct, "percent_correct": p.percent_correct,
-            "help_rate": p.help_rate, "labs_done": p.labs_done, "labs_total": p.labs_total,
-            "best_exam": p.best_exam.percent if p.best_exam else None,
-        })
+        result.append(
+            {
+                "module": um.module.code,
+                "title": um.module.title,
+                "questions": p.total,
+                "answered": p.answered,
+                "correct": p.correct,
+                "percent_correct": p.percent_correct,
+                "help_rate": p.help_rate,
+                "labs_done": p.labs_done,
+                "labs_total": p.labs_total,
+                "best_exam": p.best_exam.percent if p.best_exam else None,
+            }
+        )
     return {"modules": result}
 
 
 @router.get("/questions/{question_id}/terms")
-def question_terms(question_id: int, user: User = Depends(get_current_user),
-                   db: Session = Depends(get_db)):
+def question_terms(
+    question_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     question = db.execute(
         visible_questions(db, user).where(Question.id == question_id)
     ).scalar_one_or_none()
     if question is None:
         raise HTTPException(404, "Frage nicht gefunden")
-    return {"terms": [
-        {"id": t.id, "term": t.term, "de": t.translation_de, "explanation": t.explanation_de}
-        for t in terms_for_question(db, question)
-    ]}
+    return {
+        "terms": [
+            {"id": t.id, "term": t.term, "de": t.translation_de, "explanation": t.explanation_de}
+            for t in terms_for_question(db, question)
+        ]
+    }
 
 
 @router.post("/terms/{term_id}/learn")

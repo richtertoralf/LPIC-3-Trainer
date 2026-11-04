@@ -18,7 +18,7 @@ from app.db import db_health, reset_engine, session_scope
 from app.deps import LoginRequired
 from app.migrate import upgrade_database
 from app.routers import admin, api, auth, exam, labs, learn, pages, vocab
-from app.security import purge_expired_sessions
+from app.security import SESSION_COOKIE, purge_expired_sessions, resolve_session
 from app.web import render
 
 log = logging.getLogger("lpic3")
@@ -53,13 +53,27 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="LPIC-3 Trainer", version=__version__, lifespan=lifespan,
-                  docs_url=None, redoc_url=None, openapi_url=None)
+    app = FastAPI(
+        title="LPIC-3 Trainer",
+        version=__version__,
+        lifespan=lifespan,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+    )
     app.add_middleware(OriginCheckMiddleware)
     app.mount("/static", StaticFiles(directory=str(PACKAGE_DIR / "static")), name="static")
 
-    for router in (auth.router, pages.router, learn.router, exam.router, vocab.router,
-                   labs.router, admin.router, api.router):
+    for router in (
+        auth.router,
+        pages.router,
+        learn.router,
+        exam.router,
+        vocab.router,
+        labs.router,
+        admin.router,
+        api.router,
+    ):
         app.include_router(router)
 
     @app.get("/health", include_in_schema=False)
@@ -80,10 +94,20 @@ def create_app() -> FastAPI:
             "application/json"
         ):
             return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
-        if not hasattr(request.state, "user"):
-            request.state.user = None
-        return render(request, "error.html", {"status_code": exc.status_code, "detail": exc.detail},
-                      status_code=exc.status_code)
+        # The request's database session may have been rolled back; resolve the user afresh
+        # so that the layout can render the navigation.
+        request.state.user = None
+        try:
+            with session_scope() as db:
+                request.state.user = resolve_session(db, request.cookies.get(SESSION_COOKIE))
+        except Exception:  # pragma: no cover - database unavailable
+            pass
+        return render(
+            request,
+            "error.html",
+            {"status_code": exc.status_code, "detail": exc.detail},
+            status_code=exc.status_code,
+        )
 
     return app
 

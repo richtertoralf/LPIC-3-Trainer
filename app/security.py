@@ -49,9 +49,7 @@ def resolve_session(db: Session, session_id: str | None) -> User | None:
     """Return the active user for a session id, or None."""
     if not session_id:
         return None
-    row = db.execute(
-        select(UserSession).where(UserSession.id == session_id)
-    ).scalar_one_or_none()
+    row = db.execute(select(UserSession).where(UserSession.id == session_id)).scalar_one_or_none()
     if row is None:
         return None
     if row.expires_at < utcnow():

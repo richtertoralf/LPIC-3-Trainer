@@ -18,8 +18,10 @@ router = APIRouter()
 def _user_terms(db: Session, user: User) -> list[UserTerm]:
     return list(
         db.execute(
-            select(UserTerm).options(selectinload(UserTerm.term))
-            .where(UserTerm.user_id == user.id).order_by(UserTerm.updated_at.desc())
+            select(UserTerm)
+            .options(selectinload(UserTerm.term))
+            .where(UserTerm.user_id == user.id)
+            .order_by(UserTerm.updated_at.desc())
         ).scalars()
     )
 
@@ -27,9 +29,14 @@ def _user_terms(db: Session, user: User) -> list[UserTerm]:
 @router.get("/vocab")
 def vocab(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     rows = _user_terms(db, user)
-    return render(request, "vocab/list.html",
-                  {"learning": [r for r in rows if r.status == "learning"],
-                   "known": [r for r in rows if r.status == "known"]})
+    return render(
+        request,
+        "vocab/list.html",
+        {
+            "learning": [r for r in rows if r.status == "learning"],
+            "known": [r for r in rows if r.status == "known"],
+        },
+    )
 
 
 @router.get("/vocab/review")
@@ -42,8 +49,13 @@ def review(request: Request, user: User = Depends(get_current_user), db: Session
 
 
 @router.post("/vocab/{term_id}/status")
-def set_status(term_id: int, status: str = Form(...), next: str = Form("/vocab"),
-               user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def set_status(
+    term_id: int,
+    status: str = Form(...),
+    next: str = Form("/vocab"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     if status not in ("learning", "known", "remove"):
         raise HTTPException(400, "Ungültiger Status")
     term = db.get(Term, term_id)
@@ -68,16 +80,19 @@ def set_status(term_id: int, status: str = Form(...), next: str = Form("/vocab")
 
 
 @router.get("/glossary")
-def glossary(request: Request, q: str = "", user: User = Depends(get_current_user),
-             db: Session = Depends(get_db)):
+def glossary(
+    request: Request,
+    q: str = "",
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     stmt = select(Term).order_by(Term.term)
     needle = q.strip().lower()
     if needle:
         stmt = stmt.where(Term.term.contains(needle) | Term.translation_de.contains(needle))
     terms = list(db.execute(stmt).scalars())
     mine = {
-        r.term_id: r.status for r in db.execute(
-            select(UserTerm).where(UserTerm.user_id == user.id)
-        ).scalars()
+        r.term_id: r.status
+        for r in db.execute(select(UserTerm).where(UserTerm.user_id == user.id)).scalars()
     }
     return render(request, "vocab/glossary.html", {"terms": terms, "q": q, "mine": mine})

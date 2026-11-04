@@ -22,9 +22,7 @@ templates = Jinja2Templates(directory=str(PACKAGE_DIR / "templates"))
 def _nl2p(value: str) -> Markup:
     """Render plain text as escaped paragraphs; blank lines separate paragraphs."""
     paragraphs = [p.strip() for p in (value or "").split("\n\n") if p.strip()]
-    html = "".join(
-        f"<p>{escape(p).replace(chr(10), Markup('<br>'))}</p>" for p in paragraphs
-    )
+    html = "".join(f"<p>{escape(p).replace(chr(10), Markup('<br>'))}</p>" for p in paragraphs)
     return Markup(html)
 
 
@@ -42,8 +40,9 @@ templates.env.filters["json_attr"] = _tojson_attr
 templates.env.globals["app_version"] = __version__
 
 
-def render(request: Request, name: str, context: dict[str, Any] | None = None,
-           status_code: int = 200) -> HTMLResponse:
+def render(
+    request: Request, name: str, context: dict[str, Any] | None = None, status_code: int = 200
+) -> HTMLResponse:
     ctx = {"request": request, "user": getattr(request.state, "user", None)}
     flash_raw = request.cookies.get(FLASH_COOKIE)
     flash = None

@@ -24,8 +24,9 @@ router = APIRouter()
 
 
 @router.get("/")
-def index(request: Request, user: User | None = Depends(get_optional_user),
-          db: Session = Depends(get_db)):
+def index(
+    request: Request, user: User | None = Depends(get_optional_user), db: Session = Depends(get_db)
+):
     if user is None:
         return render(request, "landing.html", {"modules": all_modules(db)})
     selected = user_modules(db, user)
@@ -33,17 +34,25 @@ def index(request: Request, user: User | None = Depends(get_optional_user),
         return redirect("/modules")
     progress = [module_progress(db, user, um.module) for um in selected]
     learning_terms = db.execute(
-        select(func.count(UserTerm.id)).where(UserTerm.user_id == user.id,
-                                              UserTerm.status == "learning")
+        select(func.count(UserTerm.id)).where(
+            UserTerm.user_id == user.id, UserTerm.status == "learning"
+        )
     ).scalar_one()
-    return render(request, "dashboard.html",
-                  {"progress": progress, "learning_terms": learning_terms,
-                   "selected": {um.module_id: um for um in selected}})
+    return render(
+        request,
+        "dashboard.html",
+        {
+            "progress": progress,
+            "learning_terms": learning_terms,
+            "selected": {um.module_id: um for um in selected},
+        },
+    )
 
 
 @router.get("/modules")
-def modules(request: Request, user: User = Depends(get_current_user),
-            db: Session = Depends(get_db)):
+def modules(
+    request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     mods = all_modules(db)
     selected = {um.module_id for um in user_modules(db, user)}
     counts: dict[int, int] = {}
@@ -54,13 +63,21 @@ def modules(request: Request, user: User = Depends(get_current_user),
             )
         ).scalar_one()
     labs = dict(db.execute(select(Lab.module_id, func.count(Lab.id)).group_by(Lab.module_id)).all())
-    return render(request, "modules.html",
-                  {"modules": mods, "selected": selected, "counts": counts, "labs": labs})
+    return render(
+        request,
+        "modules.html",
+        {"modules": mods, "selected": selected, "counts": counts, "labs": labs},
+    )
 
 
 @router.post("/modules/select")
-def select_module(request: Request, module_code: str = Form(...), action: str = Form("add"),
-                  user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def select_module(
+    request: Request,
+    module_code: str = Form(...),
+    action: str = Form("add"),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     module = module_by_code(db, module_code)
     if module is None:
         raise HTTPException(404, "Modul nicht gefunden")
@@ -75,29 +92,41 @@ def select_module(request: Request, module_code: str = Form(...), action: str = 
 
 
 @router.get("/module/{code}")
-def module_overview(request: Request, code: str, user: User = Depends(get_current_user),
-                    db: Session = Depends(get_db)):
+def module_overview(
+    request: Request,
+    code: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     module = module_by_code(db, code)
     if module is None:
         raise HTTPException(404, "Modul nicht gefunden")
     um = user_module(db, user, module)
     progress = module_progress(db, user, module)
-    labs = list(db.execute(select(Lab).where(Lab.module_id == module.id).order_by(Lab.id)).scalars())
-    return render(request, "module.html",
-                  {"module": module, "progress": progress, "um": um, "labs": labs})
+    labs = list(
+        db.execute(select(Lab).where(Lab.module_id == module.id).order_by(Lab.id)).scalars()
+    )
+    return render(
+        request, "module.html", {"module": module, "progress": progress, "um": um, "labs": labs}
+    )
 
 
 @router.get("/progress")
-def progress_page(request: Request, user: User = Depends(get_current_user),
-                  db: Session = Depends(get_db)):
+def progress_page(
+    request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     selected = user_modules(db, user)
     progress = [module_progress(db, user, um.module) for um in selected]
-    terms = list(
-        db.execute(select(UserTerm).where(UserTerm.user_id == user.id)).scalars()
+    terms = list(db.execute(select(UserTerm).where(UserTerm.user_id == user.id)).scalars())
+    return render(
+        request,
+        "progress.html",
+        {
+            "progress": progress,
+            "terms_learning": sum(t.status == "learning" for t in terms),
+            "terms_known": sum(t.status == "known" for t in terms),
+        },
     )
-    return render(request, "progress.html",
-                  {"progress": progress, "terms_learning": sum(t.status == "learning" for t in terms),
-                   "terms_known": sum(t.status == "known" for t in terms)})
 
 
 # ---------------------------------------------------------------------- groups
@@ -107,15 +136,16 @@ def progress_page(request: Request, user: User = Depends(get_current_user),
 def groups(request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     all_groups = list(db.execute(select(Group).order_by(Group.name)).scalars())
     memberships = {
-        m.group_id: m for m in db.execute(
-            select(GroupMember).where(GroupMember.user_id == user.id)
-        ).scalars()
+        m.group_id: m
+        for m in db.execute(select(GroupMember).where(GroupMember.user_id == user.id)).scalars()
     }
     return render(request, "groups.html", {"groups": all_groups, "memberships": memberships})
 
 
 @router.post("/groups/{group_id}/join")
-def join_group(group_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def join_group(
+    group_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     group = db.get(Group, group_id)
     if group is None:
         raise HTTPException(404, "Gruppe nicht gefunden")
@@ -131,7 +161,9 @@ def join_group(group_id: int, user: User = Depends(get_current_user), db: Sessio
 
 
 @router.post("/groups/{group_id}/leave")
-def leave_group(group_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def leave_group(
+    group_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     existing = db.execute(
         select(GroupMember).where(GroupMember.group_id == group_id, GroupMember.user_id == user.id)
     ).scalar_one_or_none()
@@ -150,11 +182,15 @@ def offline(request: Request, user: User | None = Depends(get_optional_user)):
 
 @router.get("/manifest.webmanifest", include_in_schema=False)
 def manifest():
-    return FileResponse(PACKAGE_DIR / "static" / "manifest.webmanifest",
-                        media_type="application/manifest+json")
+    return FileResponse(
+        PACKAGE_DIR / "static" / "manifest.webmanifest", media_type="application/manifest+json"
+    )
 
 
 @router.get("/sw.js", include_in_schema=False)
 def service_worker():
-    return FileResponse(PACKAGE_DIR / "static" / "sw.js", media_type="application/javascript",
-                        headers={"Cache-Control": "no-cache"})
+    return FileResponse(
+        PACKAGE_DIR / "static" / "sw.js",
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache"},
+    )

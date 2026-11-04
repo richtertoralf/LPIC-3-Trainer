@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
@@ -37,16 +37,27 @@ def _question_context(db: Session, user: User, question: Question, with_help: bo
     return {
         "question": question,
         "terms": [
-            {"id": t.id, "term": t.term, "de": t.translation_de,
-             "explanation": t.explanation_de, "status": statuses.get(t.id, "")}
+            {
+                "id": t.id,
+                "term": t.term,
+                "de": t.translation_de,
+                "explanation": t.explanation_de,
+                "status": statuses.get(t.id, ""),
+            }
             for t in terms
         ],
     }
 
 
 @router.get("/learn/{code}")
-def practice(request: Request, code: str, objective: str | None = None, skip: int | None = None,
-             user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def practice(
+    request: Request,
+    code: str,
+    objective: str | None = None,
+    skip: int | None = None,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     module = module_by_code(db, code)
     if module is None:
         raise HTTPException(404, "Modul nicht gefunden")
@@ -60,8 +71,12 @@ def practice(request: Request, code: str, objective: str | None = None, skip: in
 
 
 @router.post("/learn/{code}/answer")
-async def answer(request: Request, code: str, user: User = Depends(get_current_user),
-                 db: Session = Depends(get_db)):
+async def answer(
+    request: Request,
+    code: str,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     module = module_by_code(db, code)
     if module is None:
         raise HTTPException(404, "Modul nicht gefunden")
@@ -91,23 +106,43 @@ async def answer(request: Request, code: str, user: User = Depends(get_current_u
     obj_code = form.get("objective") or None
     obj = _objective(db, obj_code) if obj_code else None
     ctx = _question_context(db, user, question, with_help=True)
-    ctx.update({"module": module, "objective": obj, "selected": selected,
-                "is_correct": is_correct, "used_help": used_help, "mode": MODE_PRACTICE})
+    ctx.update(
+        {
+            "module": module,
+            "objective": obj,
+            "selected": selected,
+            "is_correct": is_correct,
+            "used_help": used_help,
+            "mode": MODE_PRACTICE,
+        }
+    )
     return render(request, "learn/result.html", ctx)
 
 
 @router.get("/question/{question_id}")
-def question_detail(request: Request, question_id: int, user: User = Depends(get_current_user),
-                    db: Session = Depends(get_db)):
+def question_detail(
+    request: Request,
+    question_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """Review a single question (used from exam results and progress pages)."""
     question = db.execute(
-        visible_questions(db, user).options(selectinload(Question.choices))
+        visible_questions(db, user)
+        .options(selectinload(Question.choices))
         .where(Question.id == question_id)
     ).scalar_one_or_none()
     if question is None:
         raise HTTPException(404, "Frage nicht gefunden")
     ctx = _question_context(db, user, question, with_help=True)
-    ctx.update({"module": question.module, "objective": question.objective,
-                "selected": question.correct_choice_ids, "is_correct": None,
-                "review": True, "mode": "review"})
+    ctx.update(
+        {
+            "module": question.module,
+            "objective": question.objective,
+            "selected": question.correct_choice_ids,
+            "is_correct": None,
+            "review": True,
+            "mode": "review",
+        }
+    )
     return render(request, "learn/result.html", ctx)

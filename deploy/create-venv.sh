@@ -8,4 +8,5 @@ if [ ! -x "$VENV/bin/python" ]; then
   python3 -m venv "$VENV"
 fi
 "$VENV/bin/python" -m pip install --quiet --upgrade pip
-"$VENV/bin/python" -m pip install --quiet "$APP"
+# Editable install: the package stays in $APP so that content/, migrations/ and alembic.ini are found.
+"$VENV/bin/python" -m pip install --quiet --editable "$APP"

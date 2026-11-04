@@ -26,7 +26,9 @@ def _env_bool(name: str, default: bool) -> bool:
 class Settings:
     """Runtime settings. All values can be overridden through LPIC3_* variables."""
 
-    data_dir: Path = field(default_factory=lambda: Path(_env("DATA_DIR", str(PROJECT_DIR / "data"))))
+    data_dir: Path = field(
+        default_factory=lambda: Path(_env("DATA_DIR", str(PROJECT_DIR / "data")))
+    )
     content_dir: Path = field(
         default_factory=lambda: Path(_env("CONTENT_DIR", str(PROJECT_DIR / "content")))
     )
@@ -40,7 +42,9 @@ class Settings:
     topic_exam_question_count: int = field(
         default_factory=lambda: int(_env("TOPIC_EXAM_QUESTIONS", "15"))
     )
-    entry_test_question_count: int = field(default_factory=lambda: int(_env("ENTRY_QUESTIONS", "10")))
+    entry_test_question_count: int = field(
+        default_factory=lambda: int(_env("ENTRY_QUESTIONS", "10"))
+    )
 
     @property
     def db_path(self) -> Path:

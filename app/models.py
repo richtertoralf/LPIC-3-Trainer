@@ -6,7 +6,7 @@ Shared learning content (modules, objectives, questions, terms, labs) and person
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     JSON,
@@ -36,7 +36,7 @@ MODE_VOCAB = "vocab"
 
 
 def utcnow() -> datetime:
-    return datetime.utcnow().replace(microsecond=0)
+    return datetime.now(UTC).replace(microsecond=0, tzinfo=None)
 
 
 class Base(DeclarativeBase):
@@ -112,7 +112,9 @@ class GroupMember(Base):
     __table_args__ = (UniqueConstraint("group_id", "user_id", name="uq_group_member"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), nullable=False)
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     role: Mapped[str] = mapped_column(String(16), nullable=False, default="member")
     status: Mapped[str] = mapped_column(String(16), nullable=False, default=STATUS_ACTIVE)
@@ -146,7 +148,9 @@ class Topic(Base):
     __tablename__ = "topics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
     code: Mapped[str] = mapped_column(String(8), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(String(128), nullable=False)
     title_de: Mapped[str] = mapped_column(String(128), nullable=False, default="")
@@ -165,7 +169,9 @@ class Objective(Base):
     __tablename__ = "objectives"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    topic_id: Mapped[int] = mapped_column(ForeignKey("topics.id", ondelete="CASCADE"), nullable=False)
+    topic_id: Mapped[int] = mapped_column(
+        ForeignKey("topics.id", ondelete="CASCADE"), nullable=False
+    )
     code: Mapped[str] = mapped_column(String(8), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(String(160), nullable=False)
     title_de: Mapped[str] = mapped_column(String(160), nullable=False, default="")
@@ -198,8 +204,12 @@ class Question(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     external_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
-    objective_id: Mapped[int | None] = mapped_column(ForeignKey("objectives.id", ondelete="SET NULL"))
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
+    objective_id: Mapped[int | None] = mapped_column(
+        ForeignKey("objectives.id", ondelete="SET NULL")
+    )
     kind: Mapped[str] = mapped_column(String(16), nullable=False, default="single")
     text_en: Mapped[str] = mapped_column(Text, nullable=False)
     text_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
@@ -257,7 +267,9 @@ class QuestionTerm(Base):
     question_id: Mapped[int] = mapped_column(
         ForeignKey("questions.id", ondelete="CASCADE"), primary_key=True
     )
-    term_id: Mapped[int] = mapped_column(ForeignKey("terms.id", ondelete="CASCADE"), primary_key=True)
+    term_id: Mapped[int] = mapped_column(
+        ForeignKey("terms.id", ondelete="CASCADE"), primary_key=True
+    )
 
 
 class Lab(Base):
@@ -265,8 +277,12 @@ class Lab(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     external_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
-    objective_id: Mapped[int | None] = mapped_column(ForeignKey("objectives.id", ondelete="SET NULL"))
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
+    objective_id: Mapped[int | None] = mapped_column(
+        ForeignKey("objectives.id", ondelete="SET NULL")
+    )
     title: Mapped[str] = mapped_column(String(160), nullable=False)
     goal_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
     environment_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
@@ -291,7 +307,9 @@ class UserModule(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
     selected_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
     entry_done: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     entry_result: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
@@ -321,7 +339,9 @@ class Exam(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
+    module_id: Mapped[int] = mapped_column(
+        ForeignKey("modules.id", ondelete="CASCADE"), nullable=False
+    )
     topic_id: Mapped[int | None] = mapped_column(ForeignKey("topics.id", ondelete="SET NULL"))
     mode: Mapped[str] = mapped_column(String(16), nullable=False, default=MODE_EXAM)
     question_ids: Mapped[list] = mapped_column(JSON, nullable=False, default=list)

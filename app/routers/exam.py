@@ -35,7 +35,8 @@ def _questions(db: Session, exam: Exam) -> list[Question]:
     if not exam.question_ids:
         return []
     rows = db.execute(
-        select(Question).options(selectinload(Question.choices))
+        select(Question)
+        .options(selectinload(Question.choices))
         .where(Question.id.in_(exam.question_ids))
     ).scalars()
     by_id = {q.id: q for q in rows}
@@ -43,8 +44,12 @@ def _questions(db: Session, exam: Exam) -> list[Question]:
 
 
 @router.get("/exam/{code}/start")
-def start_exam(code: str, topic: str | None = None, user: User = Depends(get_current_user),
-               db: Session = Depends(get_db)):
+def start_exam(
+    code: str,
+    topic: str | None = None,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     settings = get_settings()
     module = module_by_code(db, code)
     if module is None:
@@ -60,9 +65,18 @@ def start_exam(code: str, topic: str | None = None, user: User = Depends(get_cur
         minutes = max(10, round(settings.exam_minutes * count / settings.exam_question_count))
     ids = select_exam_questions(db, user, module, count, topic_obj)
     if not ids:
-        return redirect(f"/module/{module.code}", "Für diese Auswahl gibt es noch keine Fragen.", "error")
-    exam = Exam(user_id=user.id, module_id=module.id, topic_id=topic_obj.id if topic_obj else None,
-                mode=MODE_EXAM, question_ids=ids, duration_minutes=minutes, total_count=len(ids))
+        return redirect(
+            f"/module/{module.code}", "Für diese Auswahl gibt es noch keine Fragen.", "error"
+        )
+    exam = Exam(
+        user_id=user.id,
+        module_id=module.id,
+        topic_id=topic_obj.id if topic_obj else None,
+        mode=MODE_EXAM,
+        question_ids=ids,
+        duration_minutes=minutes,
+        total_count=len(ids),
+    )
     db.add(exam)
     db.flush()
     return redirect(f"/exam/{exam.id}")
@@ -76,17 +90,29 @@ def start_entry(code: str, user: User = Depends(get_current_user), db: Session =
         raise HTTPException(404, "Modul nicht gefunden")
     ids = select_exam_questions(db, user, module, settings.entry_test_question_count)
     if not ids:
-        return redirect(f"/module/{module.code}", "Für dieses Modul gibt es noch keine Fragen.", "error")
-    exam = Exam(user_id=user.id, module_id=module.id, mode=MODE_ENTRY, question_ids=ids,
-                duration_minutes=0, total_count=len(ids))
+        return redirect(
+            f"/module/{module.code}", "Für dieses Modul gibt es noch keine Fragen.", "error"
+        )
+    exam = Exam(
+        user_id=user.id,
+        module_id=module.id,
+        mode=MODE_ENTRY,
+        question_ids=ids,
+        duration_minutes=0,
+        total_count=len(ids),
+    )
     db.add(exam)
     db.flush()
     return redirect(f"/exam/{exam.id}")
 
 
 @router.get("/exam/{exam_id:int}")
-def exam_page(request: Request, exam_id: int, user: User = Depends(get_current_user),
-              db: Session = Depends(get_db)):
+def exam_page(
+    request: Request,
+    exam_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     exam = _load_exam(db, user, exam_id)
     if exam.finished_at:
         return redirect(f"/exam/{exam.id}/result")
@@ -96,13 +122,20 @@ def exam_page(request: Request, exam_id: int, user: User = Depends(get_current_u
     if exam.duration_minutes:
         deadline = exam.started_at + timedelta(minutes=exam.duration_minutes)
         remaining = max(0, int((deadline - utcnow()).total_seconds()))
-    return render(request, "exam/exam.html",
-                  {"exam": exam, "questions": questions, "remaining_seconds": remaining})
+    return render(
+        request,
+        "exam/exam.html",
+        {"exam": exam, "questions": questions, "remaining_seconds": remaining},
+    )
 
 
 @router.post("/exam/{exam_id:int}/submit")
-async def submit_exam(request: Request, exam_id: int, user: User = Depends(get_current_user),
-                      db: Session = Depends(get_db)):
+async def submit_exam(
+    request: Request,
+    exam_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     exam = _load_exam(db, user, exam_id)
     if exam.finished_at:
         return redirect(f"/exam/{exam.id}/result")
@@ -151,8 +184,12 @@ def _topic_scores(exam: Exam, questions: list[Question]) -> dict:
 
 
 @router.get("/exam/{exam_id:int}/result")
-def exam_result(request: Request, exam_id: int, user: User = Depends(get_current_user),
-                db: Session = Depends(get_db)):
+def exam_result(
+    request: Request,
+    exam_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     exam = _load_exam(db, user, exam_id)
     if not exam.finished_at:
         return redirect(f"/exam/{exam.id}")
@@ -162,17 +199,23 @@ def exam_result(request: Request, exam_id: int, user: User = Depends(get_current
         selected = set(exam.answers.get(str(q.id), []))
         details.append({"question": q, "selected": selected, "correct": grade(q, selected)})
     scores = _topic_scores(exam, questions)
-    return render(request, "exam/result.html",
-                  {"exam": exam, "details": details, "topic_scores": scores["topics"]})
+    return render(
+        request,
+        "exam/result.html",
+        {"exam": exam, "details": details, "topic_scores": scores["topics"]},
+    )
 
 
 @router.get("/exams")
-def exam_history(request: Request, user: User = Depends(get_current_user),
-                 db: Session = Depends(get_db)):
+def exam_history(
+    request: Request, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
     exams = list(
         db.execute(
-            select(Exam).options(selectinload(Exam.module), selectinload(Exam.topic))
-            .where(Exam.user_id == user.id).order_by(Exam.started_at.desc())
+            select(Exam)
+            .options(selectinload(Exam.module), selectinload(Exam.topic))
+            .where(Exam.user_id == user.id)
+            .order_by(Exam.started_at.desc())
         ).scalars()
     )
     return render(request, "exam/history.html", {"exams": exams})

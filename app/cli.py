@@ -22,12 +22,13 @@ from app import __version__
 
 INSTALL_DIR = Path(os.environ.get("LPIC3_INSTALL_DIR", "/opt/lpic3-trainer"))
 CONFIG_DIR = Path(os.environ.get("LPIC3_CONFIG_DIR", "/etc/lpic3-trainer"))
-DEFAULT_DATA_DIR = Path("/var/lib/lpic3-trainer")
+DEFAULT_DATA_DIR = Path(os.environ.get("LPIC3_DATA_DIR", "/var/lib/lpic3-trainer"))
 ENV_FILE = CONFIG_DIR / "lpic3-trainer.env"
 SERVICE_NAME = "lpic3-trainer"
 SERVICE_USER = "lpic3"
-UNIT_PATH = Path(f"/etc/systemd/system/{SERVICE_NAME}.service")
-BIN_LINK = Path("/usr/local/bin/lpic3ctl")
+SYSTEMD_DIR = Path(os.environ.get("LPIC3_SYSTEMD_DIR", "/etc/systemd/system"))
+UNIT_PATH = SYSTEMD_DIR / f"{SERVICE_NAME}.service"
+BIN_LINK = Path(os.environ.get("LPIC3_BIN_DIR", "/usr/local/bin")) / "lpic3ctl"
 APP_DIR = INSTALL_DIR / "app"
 PREVIOUS_DIR = INSTALL_DIR / "app.previous"
 VENV_DIR = INSTALL_DIR / "venv"
@@ -72,11 +73,15 @@ def load_env_file(path: Path = ENV_FILE) -> dict[str, str]:
 
 
 def require_root() -> None:
-    if os.geteuid() != 0:
+    # LPIC3_UNPRIVILEGED_TEST=1 lets the automated tests exercise install/upgrade/uninstall
+    # with stubbed system commands; never set it on a real system.
+    if os.geteuid() != 0 and os.environ.get("LPIC3_UNPRIVILEGED_TEST") != "1":
         raise CliError("Dieser Befehl benötigt Root-Rechte (sudo).", EXIT_USAGE)
 
 
-def run(cmd: list[str], check: bool = True, capture: bool = False, **kwargs) -> subprocess.CompletedProcess:
+def run(
+    cmd: list[str], check: bool = True, capture: bool = False, **kwargs
+) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, check=check, text=True, capture_output=capture, **kwargs)
 
 
@@ -96,6 +101,7 @@ def service_active() -> bool:
 
 # ----------------------------------------------------------------- application
 
+
 def _settings():
     from app.config import get_settings
 
@@ -108,8 +114,14 @@ def cmd_serve(args) -> int:
     settings = _settings()
     settings.data_dir.mkdir(parents=True, exist_ok=True)
     _migrate_and_sync(quiet=False)
-    uvicorn.run("app.main:app", host=settings.host, port=settings.port,
-                log_level=settings.log_level, proxy_headers=True, forwarded_allow_ips="*")
+    uvicorn.run(
+        "app.main:app",
+        host=settings.host,
+        port=settings.port,
+        log_level=settings.log_level,
+        proxy_headers=True,
+        forwarded_allow_ips="*",
+    )
     return EXIT_OK
 
 
@@ -188,6 +200,7 @@ def cmd_validate(args) -> int:
 
 # ----------------------------------------------------------------------- users
 
+
 def cmd_user(args) -> int:
     from sqlalchemy import select
 
@@ -210,8 +223,15 @@ def cmd_user(args) -> int:
                 raise CliError(f"Das Passwort muss mindestens {MIN_PASSWORD_LENGTH} Zeichen haben.")
             if args.role not in ROLES:
                 raise CliError(f"Rolle muss eine von {', '.join(ROLES)} sein.", EXIT_USAGE)
-            db.add(User(username=args.username.lower(), display_name=args.display_name or "",
-                        password_hash=hash_password(password), role=args.role, status=STATUS_ACTIVE))
+            db.add(
+                User(
+                    username=args.username.lower(),
+                    display_name=args.display_name or "",
+                    password_hash=hash_password(password),
+                    role=args.role,
+                    status=STATUS_ACTIVE,
+                )
+            )
             say(f"Benutzer {args.username} ({args.role}) angelegt.")
             return EXIT_OK
         user = db.execute(select(User).where(User.username == args.username)).scalar_one_or_none()
@@ -240,6 +260,7 @@ def cmd_user(args) -> int:
 
 
 # ------------------------------------------------------------- backup/restore
+
 
 def _backup_db_copy(db_path: Path, target: Path) -> None:
     import sqlite3
@@ -306,7 +327,9 @@ def cmd_restore(args) -> int:
         with tempfile.TemporaryDirectory() as tmp:
             tar.extract("lpic3-trainer.db", tmp, filter="data")
             if db_path.exists():
-                safety = db_path.with_name(f"lpic3-trainer.before-restore-{datetime.now():%Y%m%d-%H%M%S}.db")
+                safety = db_path.with_name(
+                    f"lpic3-trainer.before-restore-{datetime.now():%Y%m%d-%H%M%S}.db"
+                )
                 _backup_db_copy(db_path, safety)
                 say(f"Vorherige Datenbank gesichert: {safety}")
             for suffix in ("", "-wal", "-shm"):
@@ -335,10 +358,13 @@ def cmd_restore(args) -> int:
 
 # ---------------------------------------------------------------- installation
 
+
 def _check_prerequisites() -> list[str]:
     problems = []
-    if sys.version_info < (3, 11):
-        problems.append(f"Python 3.11 oder neuer wird benötigt (gefunden {sys.version.split()[0]}).")
+    if sys.version_info < (3, 11):  # noqa: UP036 - message for old systems
+        problems.append(
+            f"Python 3.11 oder neuer wird benötigt (gefunden {sys.version.split()[0]})."
+        )
     try:
         import ensurepip  # noqa: F401
         import venv  # noqa: F401
@@ -353,8 +379,18 @@ def _ensure_user() -> None:
     try:
         pwd.getpwnam(SERVICE_USER)
     except KeyError:
-        run(["useradd", "--system", "--home-dir", str(DEFAULT_DATA_DIR), "--shell",
-             "/usr/sbin/nologin", "--no-create-home", SERVICE_USER])
+        run(
+            [
+                "useradd",
+                "--system",
+                "--home-dir",
+                str(DEFAULT_DATA_DIR),
+                "--shell",
+                "/usr/sbin/nologin",
+                "--no-create-home",
+                SERVICE_USER,
+            ]
+        )
         say(f"Systembenutzer {SERVICE_USER} angelegt.")
 
 
@@ -377,13 +413,28 @@ def _copy_source(source: Path, target: Path) -> None:
         if PREVIOUS_DIR.exists():
             shutil.rmtree(PREVIOUS_DIR)
         shutil.move(str(target), str(PREVIOUS_DIR))
-    ignore = shutil.ignore_patterns(".git", ".venv", "venv", "__pycache__", "data", "backups",
-                                    ".pytest_cache", ".ruff_cache", "test-results", "*.db", "*.db-*",
-                                    "node_modules", ".env")
+    ignore = shutil.ignore_patterns(
+        ".git",
+        ".venv",
+        "venv",
+        "__pycache__",
+        "data",
+        "backups",
+        ".pytest_cache",
+        ".ruff_cache",
+        "test-results",
+        "*.db",
+        "*.db-*",
+        "node_modules",
+        ".env",
+    )
     shutil.copytree(source, target, ignore=ignore, symlinks=False)
     try:
-        describe = run(["git", "-C", str(source), "describe", "--tags", "--always", "--dirty"],
-                       check=False, capture=True)
+        describe = run(
+            ["git", "-C", str(source), "describe", "--tags", "--always", "--dirty"],
+            check=False,
+            capture=True,
+        )
         if describe.returncode == 0:
             (target / "GIT_VERSION").write_text(describe.stdout.strip() + "\n")
     except FileNotFoundError:
@@ -414,6 +465,9 @@ def _install_unit() -> None:
 
 def _run_as_service_user(args: list[str]) -> None:
     env = {k: v for k, v in os.environ.items() if k.startswith("LPIC3_") or k in ("PATH", "LANG")}
+    if os.geteuid() != 0:
+        run(args, env=env)
+        return
     run(["runuser", "-u", SERVICE_USER, "--", *args], env=env)
 
 
@@ -429,8 +483,10 @@ def cmd_install(args) -> int:
         raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
     existing = APP_DIR.exists()
     if existing and not args.force:
-        say(f"Es gibt bereits eine Installation unter {INSTALL_DIR}. Nutze 'lpic3ctl upgrade' "
-            "oder 'install --force'.")
+        say(
+            f"Es gibt bereits eine Installation unter {INSTALL_DIR}. Nutze 'lpic3ctl upgrade' "
+            "oder 'install --force'."
+        )
         return EXIT_USAGE
     say(f"Installation nach {INSTALL_DIR} ...")
     _ensure_user()
@@ -439,6 +495,8 @@ def cmd_install(args) -> int:
     _create_venv()
     _write_env_file()
     env = load_env_file()
+    # values already present in the environment take precedence over the file
+    env = {**env, **{k: v for k, v in os.environ.items() if k.startswith("LPIC3_")}}
     data_dir = Path(env.get("LPIC3_DATA_DIR", str(DEFAULT_DATA_DIR)))
     data_dir.mkdir(parents=True, exist_ok=True, mode=0o750)
     (data_dir / "backups").mkdir(exist_ok=True, mode=0o750)
@@ -446,7 +504,10 @@ def cmd_install(args) -> int:
     port = env.get("LPIC3_PORT", "8000")
     host = env.get("LPIC3_HOST", "127.0.0.1")
     if not existing and _port_in_use(host, int(port)):
-        warn(f"Port {port} ist bereits belegt. Passe LPIC3_PORT in {ENV_FILE} an, bevor du den Dienst startest.")
+        warn(
+            f"Port {port} ist bereits belegt. Passe LPIC3_PORT in {ENV_FILE} an, "
+            "bevor du den Dienst startest."
+        )
     say("Datenbank wird eingerichtet und Inhalte werden importiert ...")
     _run_as_service_user([str(VENV_DIR / "bin" / "lpic3ctl"), "content-sync"])
     _install_unit()
@@ -457,8 +518,10 @@ def cmd_install(args) -> int:
     if not args.no_start:
         systemctl("restart", SERVICE_NAME)
         say(f"Dienst {SERVICE_NAME} gestartet auf http://{host}:{port}/")
-    say("Installation abgeschlossen. Das erste registrierte Konto erhält Administratorrechte, "
-        "alternativ: lpic3ctl user create <name> --role admin")
+    say(
+        "Installation abgeschlossen. Das erste registrierte Konto erhält Administratorrechte, "
+        "alternativ: lpic3ctl user create <name> --role admin"
+    )
     return EXIT_OK
 
 
@@ -488,13 +551,16 @@ def _installed_version() -> str:
 def cmd_upgrade(args) -> int:
     require_root()
     if not APP_DIR.exists():
-        raise CliError("Keine Installation gefunden. Bitte zuerst 'lpic3ctl install' ausführen.",
-                       EXIT_MISSING)
+        raise CliError(
+            "Keine Installation gefunden. Bitte zuerst 'lpic3ctl install' ausführen.", EXIT_MISSING
+        )
     source = Path(args.source).resolve() if args.source else SOURCE_DIR
     if source == APP_DIR:
-        raise CliError("Bitte das Upgrade aus einem frischen Quellcode-Checkout starten "
-                       "(z. B. git clone + git checkout vX.Y.Z), nicht aus dem installierten Verzeichnis.",
-                       EXIT_USAGE)
+        raise CliError(
+            "Bitte das Upgrade aus einem frischen Quellcode-Checkout starten "
+            "(z. B. git clone + git checkout vX.Y.Z), nicht aus dem installierten Verzeichnis.",
+            EXIT_USAGE,
+        )
     if not (source / "pyproject.toml").is_file():
         raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
     load_env_file()
@@ -546,8 +612,14 @@ def cmd_rollback(args) -> int:
     shutil.move(str(PREVIOUS_DIR), str(APP_DIR))
     _create_venv()
     _install_unit()
-    say(f"Programmdateien zurückgesetzt auf {_installed_version()}. Die fehlgeschlagene Version liegt unter {current}.")
-    say("Hinweis: Die Datenbank wurde nicht verändert. Bei Schemaänderungen 'lpic3ctl restore' mit der Sicherung vor dem Upgrade nutzen.")
+    say(
+        f"Programmdateien zurückgesetzt auf {_installed_version()}. "
+        f"Die fehlgeschlagene Version liegt unter {current}."
+    )
+    say(
+        "Hinweis: Die Datenbank wurde nicht verändert. Bei Schemaänderungen "
+        "'lpic3ctl restore' mit der Sicherung vor dem Upgrade nutzen."
+    )
     if was_active:
         systemctl("start", SERVICE_NAME)
     return EXIT_OK
@@ -558,10 +630,15 @@ def cmd_version(args) -> int:
     say(f"Installiert:            {_installed_version()}")
     remote = "https://github.com/richtertoralf/LPIC-3-Trainer.git"
     try:
-        result = run(["git", "ls-remote", "--tags", "--refs", remote], check=False, capture=True,
-                     timeout=15)
+        result = run(
+            ["git", "ls-remote", "--tags", "--refs", remote], check=False, capture=True, timeout=15
+        )
         tags = sorted(
-            (line.split("refs/tags/")[-1] for line in result.stdout.splitlines() if "refs/tags/v" in line),
+            (
+                line.split("refs/tags/")[-1]
+                for line in result.stdout.splitlines()
+                if "refs/tags/v" in line
+            ),
             key=lambda t: [int(x) if x.isdigit() else 0 for x in t.lstrip("v").split(".")],
         )
         say(f"Neueste Veröffentlichung: {tags[-1] if tags else 'keine Tags gefunden'}")
@@ -580,7 +657,10 @@ def cmd_status(args) -> int:
     else:
         say("Dienst:        nicht installiert")
     settings = _settings()
-    say(f"Datenbank:     {settings.db_path} ({'vorhanden' if settings.db_path.exists() else 'fehlt'})")
+    say(
+        f"Datenbank:     {settings.db_path} "
+        f"({'vorhanden' if settings.db_path.exists() else 'fehlt'})"
+    )
     try:
         from app.db import db_health
 
@@ -674,15 +754,25 @@ def cmd_check(args) -> int:
             errors = exc.errors
         if errors:
             bad.append(path.name)
-    report("Inhaltsdateien gültig", not bad, f"{len(files)} Dateien" + (f", fehlerhaft: {', '.join(bad)}" if bad else ""))
+    report(
+        "Inhaltsdateien gültig",
+        not bad,
+        f"{len(files)} Dateien" + (f", fehlerhaft: {', '.join(bad)}" if bad else ""),
+    )
     if has_systemd():
         report("systemd-Unit", UNIT_PATH.exists(), str(UNIT_PATH))
         if UNIT_PATH.exists():
             report("Dienst aktiv", service_active())
-    report("Health-Endpunkt", _http_health(settings.host, settings.port).startswith("ok"),
-           _http_health(settings.host, settings.port))
+    report(
+        "Health-Endpunkt",
+        _http_health(settings.host, settings.port).startswith("ok"),
+        _http_health(settings.host, settings.port),
+    )
     if settings.host not in ("127.0.0.1", "localhost", "::1") and not settings.secure_cookies:
-        say("[..] Hinweis: Öffentliche Bindung ohne LPIC3_SECURE_COOKIES=true. Nur hinter einem HTTPS-Reverse-Proxy betreiben.")
+        say(
+            "[..] Hinweis: Öffentliche Bindung ohne LPIC3_SECURE_COOKIES=true. "
+            "Nur hinter einem HTTPS-Reverse-Proxy betreiben."
+        )
     return EXIT_OK if ok else EXIT_ERROR
 
 
@@ -707,7 +797,9 @@ def cmd_purge(args) -> int:
     load_env_file()
     data_dir = Path(os.environ.get("LPIC3_DATA_DIR", str(DEFAULT_DATA_DIR)))
     if not args.yes:
-        answer = input(f"Alle Daten unter {data_dir} und {CONFIG_DIR} endgültig löschen? Tippe 'löschen': ")
+        answer = input(
+            f"Alle Daten unter {data_dir} und {CONFIG_DIR} endgültig löschen? Tippe 'löschen': "
+        )
         if answer.strip() != "löschen":
             say("Abgebrochen.")
             return EXIT_USAGE
@@ -727,9 +819,11 @@ def cmd_purge(args) -> int:
 
 # ---------------------------------------------------------------------- parser
 
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="lpic3ctl",
-                                     description="LPIC-3 Trainer installieren, betreiben und verwalten.")
+    parser = argparse.ArgumentParser(
+        prog="lpic3ctl", description="LPIC-3 Trainer installieren, betreiben und verwalten."
+    )
     parser.add_argument("--version", action="version", version=f"lpic3ctl {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -744,8 +838,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-start", action="store_true")
     p.set_defaults(func=cmd_upgrade)
 
-    sub.add_parser("rollback", help="vorherige Programmversion wiederherstellen (Root)").set_defaults(func=cmd_rollback)
-    sub.add_parser("version", help="installierte und verfügbare Version anzeigen").set_defaults(func=cmd_version)
+    sub.add_parser(
+        "rollback", help="vorherige Programmversion wiederherstellen (Root)"
+    ).set_defaults(func=cmd_rollback)
+    sub.add_parser("version", help="installierte und verfügbare Version anzeigen").set_defaults(
+        func=cmd_version
+    )
     sub.add_parser("status", help="Dienststatus und Systemzustand").set_defaults(func=cmd_status)
     sub.add_parser("start", help="Dienst starten").set_defaults(func=cmd_start)
     sub.add_parser("stop", help="Dienst stoppen").set_defaults(func=cmd_stop)
@@ -763,19 +861,27 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("restore", help="Sicherung wiederherstellen")
     p.add_argument("archive")
-    p.add_argument("--with-config", action="store_true", help="auch die Konfiguration wiederherstellen")
+    p.add_argument(
+        "--with-config", action="store_true", help="auch die Konfiguration wiederherstellen"
+    )
     p.add_argument("--yes", action="store_true", help="ohne Rückfrage")
     p.set_defaults(func=cmd_restore)
 
-    sub.add_parser("check", help="Installation und Konfiguration prüfen").set_defaults(func=cmd_check)
-    sub.add_parser("uninstall", help="Anwendung entfernen, Daten behalten (Root)").set_defaults(func=cmd_uninstall)
+    sub.add_parser("check", help="Installation und Konfiguration prüfen").set_defaults(
+        func=cmd_check
+    )
+    sub.add_parser("uninstall", help="Anwendung entfernen, Daten behalten (Root)").set_defaults(
+        func=cmd_uninstall
+    )
     p = sub.add_parser("purge", help="Anwendung mit allen Daten entfernen (Root)")
     p.add_argument("--yes", action="store_true", help="ohne Rückfrage löschen")
     p.set_defaults(func=cmd_purge)
 
     sub.add_parser("serve", help="Anwendung im Vordergrund starten").set_defaults(func=cmd_serve)
     sub.add_parser("migrate", help="Datenbankmigrationen ausführen").set_defaults(func=cmd_migrate)
-    sub.add_parser("content-sync", help="mitgelieferte Inhalte importieren").set_defaults(func=cmd_content_sync)
+    sub.add_parser("content-sync", help="mitgelieferte Inhalte importieren").set_defaults(
+        func=cmd_content_sync
+    )
 
     p = sub.add_parser("import", help="Inhaltsdateien (JSON) importieren")
     p.add_argument("files", nargs="+")

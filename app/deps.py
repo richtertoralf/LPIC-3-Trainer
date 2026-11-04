@@ -40,8 +40,12 @@ class LoginRequired(Exception):
 
 def get_current_user(request: Request, user: User | None = Depends(get_optional_user)) -> User:
     if user is None:
-        if request.headers.get("accept", "").startswith("application/json") or request.url.path.startswith("/api/"):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Anmeldung erforderlich")
+        if request.headers.get("accept", "").startswith(
+            "application/json"
+        ) or request.url.path.startswith("/api/"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Anmeldung erforderlich"
+            )
         raise LoginRequired(str(request.url.path))
     return user
 
