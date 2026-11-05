@@ -1096,6 +1096,17 @@ def cmd_status(args) -> int:
     except Exception as exc:
         say(f"Schema:        nicht lesbar ({exc.__class__.__name__})")
     health = _http_health(settings.host, settings.port)
+    if state in ("active", "activating", "reloading") and not health.startswith("ok"):
+        # Found in the container test: right after a (re)start the unit is "active" while
+        # the application still runs migrations and the content import. Retry briefly
+        # before calling it an error.
+        import time
+
+        for _ in range(5):
+            time.sleep(2)
+            health = _http_health(settings.host, settings.port)
+            if health.startswith("ok"):
+                break
     say(f"Health-Check:  {health}")
     if state in ("active", "activating", "reloading") and not health.startswith("ok"):
         say("Fehler:        Dienst aktiv, aber der Health-Endpunkt antwortet nicht.")
