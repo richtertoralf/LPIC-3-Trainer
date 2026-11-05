@@ -11,6 +11,7 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models import (
+    LAB_COMPLETED,
     MODE_PRACTICE,
     Attempt,
     Exam,
@@ -269,7 +270,9 @@ def module_progress(db: Session, user: User, module: Module) -> ModuleProgress:
     if lab_ids:
         progress.labs_done = db.execute(
             select(func.count(LabProgress.id)).where(
-                LabProgress.user_id == user.id, LabProgress.lab_id.in_(lab_ids)
+                LabProgress.user_id == user.id,
+                LabProgress.lab_id.in_(lab_ids),
+                LabProgress.status == LAB_COMPLETED,
             )
         ).scalar_one()
     return progress

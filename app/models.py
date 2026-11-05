@@ -318,6 +318,13 @@ class Lab(Base):
     duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
     steps: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     checks: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    # didactic fields (schema v1, optional): task statement, tool/documentation hints,
+    # verifiable success criteria, typical pitfalls and notes shown only to supervisors
+    task_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    tools_de: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    success_criteria_de: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    pitfalls_de: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    instructor_notes_de: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     visibility: Mapped[str] = mapped_column(String(16), nullable=False, default="public")
     import_batch_id: Mapped[int | None] = mapped_column(
         ForeignKey("import_batches.id", ondelete="SET NULL")
@@ -408,13 +415,37 @@ class UserTerm(Base):
     term: Mapped[Term] = relationship()
 
 
+LAB_STARTED = "started"
+LAB_COMPLETED = "completed"
+
+
 class LabProgress(Base):
+    """Lab status of one learner: a row means started or completed, no row means not started."""
+
     __tablename__ = "lab_progress"
     __table_args__ = (UniqueConstraint("user_id", "lab_id", name="uq_lab_progress"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     lab_id: Mapped[int] = mapped_column(ForeignKey("labs.id", ondelete="CASCADE"), nullable=False)
-    completed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default=LAB_COMPLETED)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, default=utcnow)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+    lab: Mapped[Lab] = relationship()
+
+
+class GroupLab(Base):
+    """Labs a supervisor recommends to a learning group (no course plan, no grading)."""
+
+    __tablename__ = "group_labs"
+    __table_args__ = (UniqueConstraint("group_id", "lab_id", name="uq_group_lab"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    group_id: Mapped[int] = mapped_column(
+        ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
+    lab_id: Mapped[int] = mapped_column(ForeignKey("labs.id", ondelete="CASCADE"), nullable=False)
+    added_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=utcnow)
 
     lab: Mapped[Lab] = relationship()

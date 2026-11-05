@@ -141,9 +141,9 @@ def test_labs_listing_detail_and_completion(client, learner):
     r = learner.get(f"/lab/{lab_id}")
     assert r.status_code == 200 and "Selbstkontrolle" in r.text and "<pre>" in r.text
     assert learner.post(f"/lab/{lab_id}/complete").status_code == 303
-    assert "erledigt am" in learner.get(f"/lab/{lab_id}").text
+    assert "abgeschlossen am" in learner.get(f"/lab/{lab_id}").text
     assert learner.post(f"/lab/{lab_id}/reset").status_code == 303
-    assert "erledigt am" not in learner.get(f"/lab/{lab_id}").text
+    assert "abgeschlossen am" not in learner.get(f"/lab/{lab_id}").text
     assert learner.get("/lab/99999").status_code == 404
 
 

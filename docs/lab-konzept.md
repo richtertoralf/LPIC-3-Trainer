@@ -1,6 +1,6 @@
 # Didaktisches Konzept für die Laboraufgaben (LABs)
 
-Stand: 4. November 2026. Dieses Dokument hält die didaktischen Festlegungen des Auftraggebers zu den LABs fest und gleicht sie mit dem tatsächlichen Stand der Anwendung ab. Es ist die Grundlage für die nächste LAB-Überarbeitung; es wurde noch keine Funktion daraus umgesetzt.
+Stand: 5. November 2026. Dieses Dokument hält die didaktischen Festlegungen des Auftraggebers zu den LABs fest und gleicht sie mit dem tatsächlichen Stand der Anwendung ab. Abschnitt 2 zeigt den Stand nach Arbeitspaket 2 (LAB-Überarbeitung), Abschnitt 4 die ursprüngliche Lückenanalyse vom 4. November 2026.
 
 ## 1. Festlegungen
 
@@ -38,7 +38,29 @@ Jede Fach-LAB-Aufgabe soll enthalten:
 
 Ziel: fachlich fundierte, flexibel nutzbare Unterstützung für Präsenzunterricht, betreute Lerngruppen und Selbststudium. Keine komplette Lernplattform.
 
-## 2. Abgleich mit dem Stand der Anwendung (Version 0.0.2)
+## 2. Stand nach Arbeitspaket 2 (5. November 2026)
+
+| Festlegung | Umsetzung | Bewertung |
+|---|---|---|
+| LAB-Umgebung eigenständig, Empfehlung KVM/QEMU/libvirt, Dokumentation als Orientierung | `docs/lab-umgebung.md` (Hardware, Virtualisierungsprüfung, Werkzeuge, VM-Erstellung, NAT/isoliert/geroutet, virtueller Router, Adressierung, Zusatzplatten, Sicherheit, Snapshots, Funktionsprüfung); in der Oberfläche unter *Labs › LAB-Umgebung einrichten* (`/labs/umgebung`, aus der Markdown-Datei gerendert) | erfüllt |
+| Keine Provisionierung, keine Zusatzdienste | unverändert; die Anleitung beschreibt nur | erfüllt |
+| Lernziel, Prüfungsziel, Voraussetzungen, Zeitbedarf | Felder `goal_de`, `objective`, `environment_de`, `duration_minutes`, mit Versionsangabe der Prüfungsziele | erfüllt |
+| Aufgabenstellung mit konkretem Ziel, Hinweise statt Lösungsweg | neues Feld `task_de`; Schritte mit Befehlen bleiben erhalten, aber als eingeklappte *Hilfestellung: ein möglicher Lösungsweg* mit Hinweis, dass andere Wege gleichwertig sind | erfüllt |
+| Werkzeuge und Dokumentation | Feld `tools_de` (Manpages, Herstellerdokumentation) | erfüllt |
+| Überprüfbare Erfolgskriterien | Feld `success_criteria_de`, eigener Abschnitt | erfüllt |
+| Selbstkontrollfragen | `checks` wie bisher | erfüllt |
+| Typische Fehler und Schwierigkeiten | Feld `pitfalls_de`, für alle sichtbar | erfüllt |
+| Dozentenhinweise getrennt darstellbar | Feld `instructor_notes_de`, nur für Betreuer und Administratoren gerendert (getestet) | erfüllt |
+| Warnhinweise bei destruktiven Befehlen | `warning_de` je Schritt (luksFormat, mdadm --create, drbdadm create-md, undefine --remove-all-storage, iptables -P DROP, resolv.conf, fstab/crypttab) | erfüllt |
+| Verweis auf Prüfungsfragen | Schaltfläche *Fragen zu diesem Prüfungsziel üben* auf jeder LAB-Seite | erfüllt |
+| Getrennte Lernbereiche, freie Reihenfolge | LAB-Umgebung, Fach-LABs, Fragen und Simulationen unabhängig; Hinweistext auf der LAB-Seite | erfüllt |
+| LAB-Status nicht begonnen / in Bearbeitung / abgeschlossen | `lab_progress.status` (Migration 0006), Lernende setzen den Status selbst; nur abgeschlossene zählen im Fortschritt | erfüllt |
+| Gruppenübersicht der LAB-Stände, nur eigene Mitglieder | Abschnitt *LAB-Stände der Gruppe* in der Gruppenansicht; fremde Betreuer erhalten 403 (getestet) | erfüllt |
+| Dozent wählt Übungen gezielt aus, kein Kursplan | Empfohlene LABs je Gruppe (`group_labs`), Kennzeichnung in der LAB-Liste der Mitglieder; keine Reihenfolge, keine Pflicht | erfüllt |
+| Technische Plausibilität | Alle Befehle gegen Manpages und Herstellerdokumentation durchgesehen; versionsabhängige Punkte als Pitfall vermerkt (DRBD 8.4 im Debian-12-Kernel gegenüber DRBD 9, `-copy_extensions` ab OpenSSL 3.0, interne Snapshots mit eingelegter ISO, cgroup-v2-Controller) | erfüllt, ohne Ausführung in einer Testumgebung |
+| Gruppenauswertung je Prüfungsziel | noch nicht umgesetzt (Arbeitspaket 3) | offen |
+
+## 4. Lückenanalyse vom 4. November 2026 (Version 0.0.2)
 
 | Festlegung | Stand | Bewertung |
 |---|---|---|
@@ -58,7 +80,7 @@ Ziel: fachlich fundierte, flexibel nutzbare Unterstützung für Präsenzunterric
 | LAB-Status der Gruppe (nicht begonnen, in Bearbeitung, abgeschlossen) | Lernende können ein LAB als erledigt markieren (`lab_progress`); die Gruppenansicht zeigt nur die Zahl erledigter Labs je Mitglied. Den Zustand „in Bearbeitung“ gibt es nicht. | **teilweise**: Status „begonnen“ ergänzen und je Gruppe eine LAB-Übersicht (Mitglied × LAB) anzeigen. |
 | Dozent erkennt beherrschte und zu vertiefende Prüfungsziele | Die Gruppenansicht zeigt je Mitglied und Modul: geübte Fragen, Trefferquote, Hilfequote, beste Simulation. Eingangstest-Ergebnisse je Thema sind nur dem Lernenden sichtbar; eine Auswertung je Prüfungsziel über die Gruppe fehlt. | **teilweise**: Gruppenauswertung je Thema/Ziel (Trefferquote aus Übungen, Simulationen und Eingangstests) für Betreuer. |
 
-## 3. Vorschlag für die nächste LAB-Überarbeitung
+## 3. Vorschlag für die nächste LAB-Überarbeitung (Grundlage von Arbeitspaket 2, umgesetzt bis auf Punkt 4)
 
 Reihenfolge nach Nutzen für den Unterricht, alle Punkte ohne neue Infrastruktur und ohne neue Rolle:
 

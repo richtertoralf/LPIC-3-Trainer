@@ -18,6 +18,8 @@ from app.deps import (
     set_setting,
 )
 from app.models import (
+    LAB_COMPLETED,
+    LAB_STARTED,
     ROLE_LEARNER,
     ROLES,
     STATUS_ACTIVE,
@@ -26,10 +28,12 @@ from app.models import (
     Attempt,
     Exam,
     Group,
+    GroupLab,
     GroupMember,
     GroupSource,
     ImportBatch,
     Lab,
+    LabProgress,
     Module,
     Question,
     Term,
@@ -482,7 +486,84 @@ def group_detail(
             .order_by(User.username)
         ).scalars()
     )
-    return render(request, "admin/group.html", {"group": group, "report": report, "others": others})
+    lab_report = _group_lab_report(db, group)
+    return render(
+        request,
+        "admin/group.html",
+        {"group": group, "report": report, "others": others, **lab_report},
+    )
+
+
+def _group_lab_report(db: Session, group: Group) -> dict:
+    """Lab status of the group's active members (not started / started / completed) and the
+    labs recommended for the group. Only data of the group's own members is read."""
+    member_ids = [m.user_id for m in group.members if m.status == STATUS_ACTIVE]
+    labs = list(
+        db.execute(
+            select(Lab)
+            .options(selectinload(Lab.objective), selectinload(Lab.module))
+            .where(Lab.visibility == "public")
+            .order_by(Lab.module_id, Lab.id)
+        ).scalars()
+    )
+    rows = []
+    if member_ids:
+        rows = db.execute(select(LabProgress).where(LabProgress.user_id.in_(member_ids))).scalars()
+    status: dict[int, dict[int, str]] = {}  # lab id -> user id -> status
+    for row in rows:
+        status.setdefault(row.lab_id, {})[row.user_id] = row.status
+    names = {m.user_id: m.user.label for m in group.members}
+    recommended = set(
+        db.execute(select(GroupLab.lab_id).where(GroupLab.group_id == group.id)).scalars()
+    )
+    lab_rows = []
+    for lab in labs:
+        per_user = status.get(lab.id, {})
+        completed = sorted(names[u] for u in member_ids if per_user.get(u) == LAB_COMPLETED)
+        started = sorted(names[u] for u in member_ids if per_user.get(u) == LAB_STARTED)
+        not_started = sorted(names[u] for u in member_ids if u not in per_user)
+        lab_rows.append(
+            {
+                "lab": lab,
+                "recommended": lab.id in recommended,
+                "completed": completed,
+                "started": started,
+                "not_started": not_started,
+            }
+        )
+    member_labs = {
+        u: {
+            "completed": sum(1 for s in status.values() if s.get(u) == LAB_COMPLETED),
+            "started": sum(1 for s in status.values() if s.get(u) == LAB_STARTED),
+        }
+        for u in member_ids
+    }
+    return {"lab_rows": lab_rows, "member_labs": member_labs, "lab_total": len(labs)}
+
+
+@router.post("/groups/{group_id}/labs")
+async def set_group_labs(
+    request: Request,
+    group_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
+    """Replace the set of labs recommended to the group (checkbox form)."""
+    group = _group_for(db, user, group_id)
+    form = await request.form()
+    wanted = {int(v) for v in form.getlist("lab_ids") if str(v).isdigit()}
+    valid = set(db.execute(select(Lab.id).where(Lab.visibility == "public")).scalars())
+    wanted &= valid
+    existing = {
+        gl.lab_id: gl
+        for gl in db.execute(select(GroupLab).where(GroupLab.group_id == group.id)).scalars()
+    }
+    for lab_id, gl in existing.items():
+        if lab_id not in wanted:
+            db.delete(gl)
+    for lab_id in wanted - set(existing):
+        db.add(GroupLab(group_id=group.id, lab_id=lab_id))
+    return redirect(f"/admin/groups/{group.id}", f"{len(wanted)} LABs für die Gruppe empfohlen.")
 
 
 @router.post("/groups/{group_id}/members")

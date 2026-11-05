@@ -41,11 +41,31 @@ def test_upgrade_from_initial_schema_migrates_existing_data(tmp_path):
         "(1, 'q1', 1, 'single', 'Q1', '', '', '', 2, 'public', 1, 1, '2026-01-01'),"
         "(2, 'q2', 1, 'single', 'Q2', '', '', '', 2, 'private', 1, 2, '2026-01-01')"
     )
+    db.execute(
+        "INSERT INTO users (id, username, display_name, password_hash, role, status,"
+        " created_at) VALUES (1, 'u', '', 'x', 'learner', 'active', '2026-01-01')"
+    )
+    db.execute(
+        "INSERT INTO labs (id, external_id, module_id, title, goal_de, environment_de,"
+        " duration_minutes, steps, checks, visibility) VALUES"
+        " (1, 'lab-1', 1, 'L', 'G', '', 30, '[]', '[]', 'public')"
+    )
+    db.execute(
+        "INSERT INTO lab_progress (id, user_id, lab_id, completed_at) VALUES"
+        " (1, 1, 1, '2026-01-02 10:00:00')"
+    )
     db.commit()
     db.close()
     r = alembic(env, "upgrade", "head")
     assert r.returncode == 0, r.stderr
     db = sqlite3.connect(data_dir / "lpic3-trainer.db")
+    # 0006: old "done" marks become completed labs that started when they were completed
+    assert db.execute("SELECT status, started_at FROM lab_progress").fetchone() == (
+        "completed",
+        "2026-01-02 10:00:00",
+    )
+    assert db.execute("SELECT task_de, tools_de FROM labs").fetchone() == ("", "[]")
+    assert db.execute("SELECT COUNT(*) FROM group_labs").fetchone()[0] == 0
     rows = {
         r[0]: r[1:]
         for r in db.execute(

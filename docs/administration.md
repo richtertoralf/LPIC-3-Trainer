@@ -54,7 +54,11 @@ Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit 
 
 ## Lerngruppen
 
-*Verwaltung › Gruppen*: Gruppe anlegen mit Beitritt `offen` oder `mit Freigabe`. Wer eine Gruppe anlegt, ist ihr Betreuer. Auf der Gruppenseite: Beitrittsanfragen freigeben, Mitglieder hinzufügen oder entfernen, Lernstand je Mitglied und Modul (geübte Fragen, Trefferquote, Hilfequote, beste Simulation). Lernende treten unter *Gruppen* bei.
+*Verwaltung › Gruppen*: Gruppe anlegen mit Beitritt `offen` oder `mit Freigabe`. Wer eine Gruppe anlegt, ist ihr Betreuer. Auf der Gruppenseite: Beitrittsanfragen freigeben, Mitglieder hinzufügen oder entfernen, Lernstand je Mitglied und Modul (geübte Fragen, Trefferquote, Hilfequote, beste Simulation) sowie je Mitglied die Zahl der abgeschlossenen, begonnenen und nicht begonnenen LABs. Lernende treten unter *Gruppen* bei.
+
+**LAB-Stände und Empfehlungen.** Der Abschnitt *LAB-Stände der Gruppe* zeigt je Fach-LAB, welche aktiven Mitglieder es abgeschlossen haben, bearbeiten oder noch nicht begonnen haben. Betreuer sehen ausschließlich Mitglieder ihrer eigenen Gruppen (serverseitig geprüft, fremde Gruppen liefern 403). Mit den Häkchen *Empfohlen* wählt der Dozent die LABs für den Unterricht aus; die Mitglieder sehen die Empfehlung in ihrer LAB-Liste. Es gibt keinen Kursplan und keine Benotung.
+
+**Dozentenhinweise.** Auf jeder LAB-Seite sehen Betreuer und Administratoren zusätzlich den Abschnitt *Hinweise für Dozenten* (Lernschwierigkeiten, alternative Lösungswege, Erfolgskontrolle, passende Prüfungsziele). Lernenden wird er nicht ausgeliefert.
 
 ## Fragenimport, Herkunft und Freigabe
 

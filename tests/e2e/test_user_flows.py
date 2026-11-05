@@ -107,15 +107,28 @@ def test_labs(page: Page, server, username, browser_errors, admin_credentials):
     base = server["base"]
     register(page, base, username)
     page.goto(base + "/labs")
+    expect(page.locator("a[href='/labs/umgebung']").first).to_be_visible()
     page.locator("a[href^='/lab/']").first.click()
+    expect(page.locator("h2", has_text="Aufgabe")).to_be_visible()
+    expect(page.locator("h2", has_text="Erfolgskriterien")).to_be_visible()
+    # the full command sequence is a collapsed hint, not the prescribed way
     expect(page.locator(".lab-steps li").first).to_be_visible()
-    expect(page.locator("pre").first).to_be_visible()
+    expect(page.locator(".lab-steps pre").first).not_to_be_visible()
+    page.locator(".lab-steps details.hint summary").first.click()
+    expect(page.locator(".lab-steps pre").first).to_be_visible()
     page.locator(".checks summary").first.click()
     expect(page.locator(".checks details[open] p").first).to_be_visible()
-    page.click("button:has-text('Lab als erledigt markieren')")
-    expect(page.locator(".tag-ok")).to_contain_text("erledigt")
+    expect(page.locator("text=Hinweise für Dozenten")).to_have_count(0)
+    expect(page.locator("a:has-text('Fragen zu diesem Prüfungsziel üben')")).to_be_visible()
+    page.click("button:has-text('LAB beginnen')")
+    expect(page.locator(".tag-progress")).to_contain_text("in Bearbeitung")
+    page.click("button:has-text('Als abgeschlossen markieren')")
+    expect(page.locator(".tag-ok")).to_contain_text("abgeschlossen")
     page.goto(base + "/labs")
     expect(page.locator(".tag-ok").first).to_be_visible()
+    page.click("a[href='/labs/umgebung']")
+    expect(page.locator("h1")).to_contain_text("LAB-Umgebung einrichten")
+    expect(page.locator("h2", has_text="Funktionsprüfung")).to_be_visible()
 
 
 def test_admin_import_and_role_check(
@@ -166,7 +179,7 @@ def test_group_approval_flow(page: Page, server, username, browser_errors, admin
     page.goto(base + "/admin/groups")
     page.click(f"a:has-text('Gruppe {username}')")
     page.click("button:has-text('Freigeben')")
-    expect(page.locator("table")).to_contain_text(username)
+    expect(page.locator("table").first).to_contain_text(username)
 
 
 @pytest.mark.parametrize("viewport", [{"width": 390, "height": 844}], ids=["android-phone"])

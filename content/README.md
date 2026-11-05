@@ -99,14 +99,20 @@ Die Titel und Gewichte folgen den offiziellen Prüfungszielen des LPI (Quelle in
   "schema_version": 1, "kind": "labs", "module": "306", "license": "CC BY-SA 4.0",
   "labs": [{
     "id": "lab-306-01", "objective": "361.3", "title": "Titel",
-    "goal_de": "Lernziel", "environment_de": "Benötigte Testumgebung", "duration_minutes": 45,
-    "steps": [{"title": "Schritt", "text_de": "Anleitung", "commands": ["befehl 1", "befehl 2"]}],
-    "checks": [{"question_de": "Kontrollfrage", "answer_de": "Antwort"}]
+    "goal_de": "Lernziel", "task_de": "Aufgabenstellung mit konkretem Ziel",
+    "environment_de": "Benötigte Testumgebung", "duration_minutes": 45,
+    "tools_de": ["man drbdadm", "LINBIT User's Guide"],
+    "success_criteria_de": ["Überprüfbares Kriterium 1", "Kriterium 2"],
+    "steps": [{"title": "Schritt", "text_de": "Hinweis", "commands": ["befehl 1", "befehl 2"],
+               "warning_de": "optional: Warnung bei destruktiven Befehlen"}],
+    "checks": [{"question_de": "Kontrollfrage", "answer_de": "Antwort"}],
+    "pitfalls_de": ["Typischer Fehler"],
+    "instructor_notes_de": ["Hinweis nur für Betreuer und Administratoren"]
   }]
 }
 ```
 
-Befehle werden nur angezeigt, nie ausgeführt.
+Pflicht sind `id`, `title`, `goal_de`, `steps`. Die didaktischen Felder `task_de`, `tools_de`, `success_criteria_de`, `pitfalls_de`, `instructor_notes_de` und `warning_de` je Schritt sind optional (Listen aus nicht leeren Zeichenketten). Die Oberfläche zeigt die Schritte als eingeklappte Hilfestellung, `instructor_notes_de` nur Betreuern und Administratoren. Befehle werden nur angezeigt, nie ausgeführt.
 
 ## Eigene Inhalte
 
