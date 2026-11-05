@@ -767,14 +767,18 @@ def _supervised_groups(db: Session, user: User) -> list[Group]:
 
 
 def _releasable_batches(db: Session, user: User) -> list[ImportBatch]:
-    """External question pools the user may release: own imports, or all for administrators."""
+    """Supplementary question pools the user may release for groups.
+
+    Administrators: all. Supervisors: their own imports and the pools bundled with the
+    trainer (content/questions/extra), so that a lecturer can run a group without asking the
+    administrator; the rights note of each pool is shown next to it."""
     stmt = (
         select(ImportBatch)
         .where(ImportBatch.kind == "questions", ImportBatch.supplementary.is_(True))
         .order_by(ImportBatch.module_code, ImportBatch.source, ImportBatch.imported_at)
     )
     if not user.is_admin:
-        stmt = stmt.where(ImportBatch.imported_by == user.id)
+        stmt = stmt.where(or_(ImportBatch.imported_by == user.id, ImportBatch.bundled.is_(True)))
     return list(db.execute(stmt).scalars())
 
 
@@ -824,7 +828,7 @@ async def save_group_releases(
     user: User = Depends(require_supervisor),
     db: Session = Depends(get_db),
 ):
-    """Enable the selected pools for one group. Supervisors may only use their own imports."""
+    """Enable the selected pools for one group (own imports and bundled pools for supervisors)."""
     group = _group_for(db, user, group_id)
     form = await request.form()
     wanted: set[int] = set()

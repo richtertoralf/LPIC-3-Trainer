@@ -34,7 +34,7 @@ Exit-Codes: `0` Erfolg, `1` Fehler, `2` Bedienfehler oder Abbruch, `3` fehlende 
 Rollen:
 
 - **Administrator**: alles, einschließlich Einstellungen, Rollen, Löschen und systemweiter Freigabe von Importen.
-- **Betreuer**: Benutzer freigeben, eigene Gruppen anlegen und betreuen, Fragen importieren und die eigenen Importe für die eigenen Gruppen freigeben, Lernstand der Gruppenmitglieder sehen.
+- **Betreuer**: Benutzer freigeben, eigene Gruppen anlegen und betreuen, Fragen importieren und die eigenen Importe sowie die mitgelieferten Zusatzpools für die eigenen Gruppen freigeben, Lernstand der Gruppenmitglieder sehen.
 - **Lernender**: lernen, Gruppen beitreten. Kein Import, keine Freigabe, keine Änderung von Fragen.
 
 Weboberfläche: *Verwaltung › Benutzer*. Administratoren legen dort neue Konten mit Rolle und Startpasswort an („Benutzer anlegen“), geben Registrierungen frei, ändern Rollen, deaktivieren, setzen Passwörter zurück (neues Passwort wird einmalig angezeigt) und löschen. Betreuer sehen nur Konten, die auf Freigabe warten, und die Mitglieder ihrer eigenen Lerngruppen; unter *Import* sehen sie nur ihre eigenen Importe.
@@ -71,7 +71,7 @@ Rollen und Rechte:
 - Beim Import vergleicht die Anwendung jede Frage mit dem vorhandenen Bestand des Moduls und meldet mögliche Dubletten (ab 80 % Textähnlichkeit) im Ergebnis; die Fragen werden trotzdem importiert.
 - Einzelne Fragen lassen sich in der Datei mit `"active": false` ausschließen, etwa bei fachlich unsicherer Lösung. Das Kennzeichen bleibt bei erneutem Import erhalten.
 - Importierte Fragen bleiben **unveröffentlicht**. Sie sind nur für den Importierenden und für Administratoren sichtbar.
-- **Betreuer** geben unter *Verwaltung › Freigaben* ihre eigenen Importe für ihre eigenen Lerngruppen frei und nehmen die Freigabe dort wieder zurück. Fremde Importe oder fremde Gruppen können sie nicht freigeben.
+- **Betreuer** geben unter *Verwaltung › Freigaben* ihre eigenen Importe und die mit dem Trainer mitgelieferten Zusatzpools (`content/questions/extra`, Rechtestatus wird angezeigt) für ihre eigenen Lerngruppen frei und nehmen die Freigabe dort wieder zurück. Fremde Importe oder fremde Gruppen können sie nicht freigeben, systemweit freigeben nur Administratoren. (Seit Arbeitspaket 4; vorher nur eigene Importe, womit ein Dozent für die mitgelieferten Pools den Administrator brauchte.)
 - **Administratoren** geben einen Import systemweit für alle Lernenden frei (Schaltfläche „Systemweit freigeben“) oder für beliebige Gruppen.
 - **Lernende** sehen den freigegebenen Grundbestand (mitgelieferte Projektfragen und systemweit freigegebene Importe) sowie die Freigaben ihrer eigenen Lerngruppen. Freigegebene Importe sind bei jeder Frage als „Zusatzfrage“ mit Quelle, Prüfungsgeneration und Rechtestatus markiert.
 - Die **mitgelieferten Projektfragen** (`content/questions/*.json`, Quelle „LPIC-3 Trainer Projekt“, Prüfungsgeneration 3.0, CC BY-SA 4.0) bilden den bereits freigegebenen Grundbestand. Dateien unter `content/questions/extra/` sind externe Quellen und werden beim `content-sync` zwar importiert, bleiben aber unveröffentlicht.

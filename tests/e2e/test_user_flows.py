@@ -76,7 +76,11 @@ def test_exam_simulation_without_help(
     cards = page.locator(".question-card")
     assert cards.count() == 6
     for i in range(cards.count()):
-        cards.nth(i).locator("input").first.check()
+        text = cards.nth(i).locator("input[type=text]")
+        if text.count():  # fill-in-the-blank question
+            text.fill("antwort")
+        else:
+            cards.nth(i).locator("input").first.check()
     expect(page.locator("[data-answered-count]")).to_have_text("6 von 6 beantwortet")
     page.click("button:has-text('Abgeben')")
     expect(page).to_have_url(re.compile(r"/exam/\d+/result$"))

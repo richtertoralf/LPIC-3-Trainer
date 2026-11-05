@@ -25,7 +25,16 @@ def _free_port() -> int:
 
 @pytest.fixture(scope="session")
 def server():
-    """Start the application in a subprocess with a fresh database and bundled content."""
+    """Start the application in a subprocess with a fresh database and bundled content.
+
+    With LPIC3_E2E_BASE set (e.g. http://10.0.0.5:8080) the tests run against that existing
+    installation instead, for example a real systemd install in a test VM or container. The
+    account used as administrator then comes from LPIC3_E2E_ADMIN_USER/LPIC3_E2E_ADMIN_PASS,
+    or the first registered account when the installation is still empty."""
+    external = os.environ.get("LPIC3_E2E_BASE")
+    if external:
+        yield {"base": external.rstrip("/"), "data_dir": None, "external": True}
+        return
     data_dir = tempfile.mkdtemp(prefix="lpic3-e2e-")
     port = _free_port()
     env = {
@@ -60,7 +69,7 @@ def server():
             time.sleep(0.5)
     else:
         raise RuntimeError("server did not start")
-    yield {"base": base, "data_dir": data_dir}
+    yield {"base": base, "data_dir": data_dir, "external": False}
     proc.terminate()
     proc.wait(timeout=10)
     log.close()
@@ -122,7 +131,12 @@ def select_module(page, base: str, code: str) -> None:
 @pytest.fixture(scope="session")
 def admin_credentials(server, browser):
     """Registers the very first account (administrator) through the real browser once."""
-    name = "e2eadmin"
+    if os.environ.get("LPIC3_E2E_ADMIN_USER"):
+        return {
+            "username": os.environ["LPIC3_E2E_ADMIN_USER"],
+            "password": os.environ.get("LPIC3_E2E_ADMIN_PASS", "geheim123"),
+        }
+    name = "e2eadmin" if not server["external"] else f"e2eadmin{int(time.time()) % 100000}"
     context = browser.new_context()
     page = context.new_page()
     register(page, server["base"], name)
