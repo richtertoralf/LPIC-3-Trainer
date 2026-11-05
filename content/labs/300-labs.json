@@ -6,59 +6,338 @@
   "visibility": "public",
   "labs": [
     {
-      "id": "lab-300-01", "objective": "303.1", "title": "Samba-Dateiserver mit zwei Freigaben einrichten",
+      "id": "lab-300-01",
+      "objective": "303.1",
+      "title": "Samba-Dateiserver mit zwei Freigaben einrichten",
       "goal_de": "Einen eigenständigen Samba-Server mit einer öffentlichen Lesefreigabe und einer gruppenbeschränkten Schreibfreigabe aufsetzen und von einem Linux-Client testen.",
+      "task_de": "Richte auf deiner Server-VM einen Samba-Dateiserver (Standalone, keine Domäne) mit zwei Freigaben ein: `public` darf jeder ohne Anmeldung lesen, `editors` dürfen nur Mitglieder der Unix-Gruppe editors lesen und schreiben. Neue Dateien in `editors` müssen automatisch der Gruppe gehören und für die Gruppe schreibbar sein. Prüfe von einem Client (zweite VM oder smbclient auf dem Server) mit zwei Benutzern, dass die Rechte wie gefordert wirken.",
       "environment_de": "Eine Test-VM mit Debian 12 oder Ubuntu 24.04 (Server) und optional eine zweite VM als Client. Root-Rechte in der VM. Keine produktiven Systeme.",
+      "tools_de": [
+        "man smb.conf (Abschnitte valid users, create mask, directory mask, guest ok)",
+        "man testparm, man smbclient, man smbpasswd, man smbstatus",
+        "Samba-Wiki: Setting up Samba as a Standalone Server",
+        "chmod(1), SetGID-Bit auf Verzeichnissen"
+      ],
       "duration_minutes": 45,
+      "success_criteria_de": [
+        "`testparm -s` meldet keine Fehler und zeigt beide Freigaben.",
+        "`smbclient -L <server> -N` listet public und editors.",
+        "Ein Gast kann in public lesen, aber nichts schreiben.",
+        "Benutzer alice (Mitglied von editors) kann in editors eine Datei anlegen; Benutzer bob (kein Mitglied) erhält NT_STATUS_ACCESS_DENIED.",
+        "Die von alice angelegte Datei gehört auf dem Server der Gruppe editors und hat Modus 0660."
+      ],
       "steps": [
-        {"title": "Samba installieren", "text_de": "Installiere Samba und die Client-Werkzeuge. Prüfe anschließend die Version.", "commands": ["sudo apt install samba smbclient", "smbd --version"]},
-        {"title": "Benutzer und Gruppe anlegen", "text_de": "Lege eine Unix-Gruppe editors sowie zwei Benutzer an. Nur alice ist Mitglied der Gruppe. Beide bekommen zusätzlich ein Samba-Passwort.", "commands": ["sudo groupadd editors", "sudo useradd -M -s /usr/sbin/nologin alice", "sudo useradd -M -s /usr/sbin/nologin bob", "sudo usermod -aG editors alice", "sudo smbpasswd -a alice", "sudo smbpasswd -a bob"]},
-        {"title": "Verzeichnisse vorbereiten", "text_de": "Erzeuge die Verzeichnisse für beide Freigaben. Das Schreibverzeichnis gehört der Gruppe editors und erhält das SetGID-Bit, damit neue Dateien die Gruppe erben.", "commands": ["sudo mkdir -p /srv/samba/public /srv/samba/editors", "sudo chmod 755 /srv/samba/public", "sudo chgrp editors /srv/samba/editors", "sudo chmod 2770 /srv/samba/editors"]},
-        {"title": "Freigaben konfigurieren", "text_de": "Ergänze am Ende von /etc/samba/smb.conf zwei Abschnitte. Die Freigabe public ist für alle lesbar, editors ist nur für die Gruppe sichtbar und beschreibbar.", "commands": ["[public]", "   path = /srv/samba/public", "   read only = yes", "   guest ok = yes", "", "[editors]", "   path = /srv/samba/editors", "   valid users = @editors", "   read only = no", "   create mask = 0660", "   directory mask = 0770"]},
-        {"title": "Konfiguration prüfen und Dienst neu laden", "text_de": "Prüfe die Syntax mit testparm. Behebe gemeldete Fehler, bevor du den Dienst neu lädst.", "commands": ["testparm -s", "sudo systemctl restart smbd", "sudo systemctl status smbd --no-pager"]},
-        {"title": "Zugriff testen", "text_de": "Liste die Freigaben und greife als alice und bob zu. bob darf editors nicht öffnen. Lege als alice eine Datei an und prüfe Besitzer und Gruppe auf dem Server.", "commands": ["smbclient -L localhost -N", "smbclient //localhost/editors -U alice -c 'put /etc/hostname test.txt; ls'", "smbclient //localhost/editors -U bob -c 'ls'", "ls -l /srv/samba/editors", "sudo smbstatus"]}
+        {
+          "title": "Samba installieren",
+          "text_de": "Installiere Samba und die Client-Werkzeuge. Prüfe anschließend die Version.",
+          "commands": [
+            "sudo apt install samba smbclient",
+            "smbd --version"
+          ]
+        },
+        {
+          "title": "Benutzer und Gruppe anlegen",
+          "text_de": "Lege eine Unix-Gruppe editors sowie zwei Benutzer an. Nur alice ist Mitglied der Gruppe. Beide bekommen zusätzlich ein Samba-Passwort.",
+          "commands": [
+            "sudo groupadd editors",
+            "sudo useradd -M -s /usr/sbin/nologin alice",
+            "sudo useradd -M -s /usr/sbin/nologin bob",
+            "sudo usermod -aG editors alice",
+            "sudo smbpasswd -a alice",
+            "sudo smbpasswd -a bob"
+          ]
+        },
+        {
+          "title": "Verzeichnisse vorbereiten",
+          "text_de": "Erzeuge die Verzeichnisse für beide Freigaben. Das Schreibverzeichnis gehört der Gruppe editors und erhält das SetGID-Bit, damit neue Dateien die Gruppe erben.",
+          "commands": [
+            "sudo mkdir -p /srv/samba/public /srv/samba/editors",
+            "sudo chmod 755 /srv/samba/public",
+            "sudo chgrp editors /srv/samba/editors",
+            "sudo chmod 2770 /srv/samba/editors"
+          ]
+        },
+        {
+          "title": "Freigaben konfigurieren",
+          "text_de": "Ergänze am Ende von /etc/samba/smb.conf zwei Abschnitte. Die Freigabe public ist für alle lesbar, editors ist nur für die Gruppe sichtbar und beschreibbar.",
+          "commands": [
+            "[public]",
+            "   path = /srv/samba/public",
+            "   read only = yes",
+            "   guest ok = yes",
+            "",
+            "[editors]",
+            "   path = /srv/samba/editors",
+            "   valid users = @editors",
+            "   read only = no",
+            "   create mask = 0660",
+            "   directory mask = 0770"
+          ]
+        },
+        {
+          "title": "Konfiguration prüfen und Dienst neu laden",
+          "text_de": "Prüfe die Syntax mit testparm. Behebe gemeldete Fehler, bevor du den Dienst neu lädst.",
+          "commands": [
+            "testparm -s",
+            "sudo systemctl restart smbd",
+            "sudo systemctl status smbd --no-pager"
+          ]
+        },
+        {
+          "title": "Zugriff testen",
+          "text_de": "Liste die Freigaben und greife als alice und bob zu. bob darf editors nicht öffnen. Lege als alice eine Datei an und prüfe Besitzer und Gruppe auf dem Server.",
+          "commands": [
+            "smbclient -L localhost -N",
+            "smbclient //localhost/editors -U alice -c 'put /etc/hostname test.txt; ls'",
+            "smbclient //localhost/editors -U bob -c 'ls'",
+            "ls -l /srv/samba/editors",
+            "sudo smbstatus"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Warum sieht bob die Freigabe editors in der Liste, kann sie aber nicht öffnen?", "answer_de": "valid users beschränkt den Zugriff, nicht die Sichtbarkeit. Um sie auszublenden, wäre browsable = no oder access based share enum = yes nötig."},
-        {"question_de": "Welche Gruppe hat die von alice angelegte Datei und warum?", "answer_de": "Die Gruppe editors, weil das Verzeichnis das SetGID-Bit (2770) trägt. Zusätzlich sorgt create mask = 0660 für Gruppenschreibrechte."},
-        {"question_de": "Welcher Befehl zeigt die gerade verbundenen Sitzungen?", "answer_de": "smbstatus zeigt Sitzungen, Freigabeverbindungen und gesperrte Dateien."}
+        {
+          "question_de": "Warum sieht bob die Freigabe editors in der Liste, kann sie aber nicht öffnen?",
+          "answer_de": "valid users beschränkt den Zugriff, nicht die Sichtbarkeit. Um sie auszublenden, wäre browsable = no oder access based share enum = yes nötig."
+        },
+        {
+          "question_de": "Welche Gruppe hat die von alice angelegte Datei und warum?",
+          "answer_de": "Die Gruppe editors, weil das Verzeichnis das SetGID-Bit (2770) trägt. Zusätzlich sorgt create mask = 0660 für Gruppenschreibrechte."
+        },
+        {
+          "question_de": "Welcher Befehl zeigt die gerade verbundenen Sitzungen?",
+          "answer_de": "smbstatus zeigt Sitzungen, Freigabeverbindungen und gesperrte Dateien."
+        }
+      ],
+      "pitfalls_de": [
+        "Samba-Passwort vergessen: Unix-Benutzer brauchen zusätzlich `smbpasswd -a`, sonst scheitert die Anmeldung mit NT_STATUS_LOGON_FAILURE.",
+        "Unix-Rechte schlagen Samba-Rechte: Ist das Verzeichnis für die Gruppe nicht schreibbar (fehlende 2770), hilft `read only = no` nichts.",
+        "Gruppenmitgliedschaft wird erst nach neuer Anmeldung beziehungsweise `smbd`-Neustart wirksam.",
+        "`guest ok` braucht einen gültigen Gastbenutzer (`map to guest = Bad User` in [global] bei Bedarf).",
+        "AppArmor oder SELinux können Zugriffe auf Pfade außerhalb von /srv blockieren; Protokolle in /var/log/samba lesen."
+      ],
+      "instructor_notes_de": [
+        "Typische Schwierigkeit: Unterschied zwischen Sichtbarkeit (browsable) und Zugriff (valid users) sowie Zusammenspiel von Unix-Rechten und Samba-Masken. Vorher kurz Rechteberechnung wiederholen.",
+        "Alternative Lösungswege: `write list = @editors` statt `valid users`, oder `force group = editors` statt SetGID; beide erfüllen die Kriterien und eignen sich für eine Diskussion der Unterschiede.",
+        "Erfolgskontrolle: Lernende zeigen `testparm -s`, ein `smbclient`-Protokoll mit beiden Benutzern und `ls -l /srv/samba/editors`.",
+        "Passende Prüfungsziele: 303.1 (Freigaben), 303.2 (Dateidienste); Fragen zu `valid users`, `create mask`, `smbstatus`, `testparm` im Übungsmodus zu Ziel 303.1."
       ]
     },
     {
-      "id": "lab-300-02", "objective": "302.1", "title": "Samba als Active-Directory-Domänencontroller provisionieren",
+      "id": "lab-300-02",
+      "objective": "302.1",
+      "title": "Samba als Active-Directory-Domänencontroller provisionieren",
       "goal_de": "Eine eigene AD-Domäne mit Samba einrichten, Benutzer anlegen, DNS und Kerberos prüfen und die Passwortrichtlinie anpassen.",
+      "task_de": "Baue aus einer frischen VM einen Samba Active-Directory-Domänencontroller für die Domäne `lab.example` (Realm LAB.EXAMPLE) mit internem DNS. Lege eine Gruppe und zwei Benutzer an, mache einen Benutzer zum Gruppenmitglied und setze die minimale Passwortlänge auf 12 Zeichen. Weise nach, dass DNS-SRV-Einträge und Kerberos funktionieren.",
       "environment_de": "Eine frische Test-VM (Debian 12 oder Ubuntu 24.04) mit fester IP-Adresse und mindestens 2 GB RAM. Die VM darf keinen anderen Samba- oder DNS-Dienst betreiben.",
+      "tools_de": [
+        "samba-tool (domain provision, user, group, domain passwordsettings, dbcheck, fsmo, drs)",
+        "Samba-Wiki: Setting up Samba as an Active Directory Domain Controller",
+        "man samba-tool, man krb5.conf, man kinit, man klist",
+        "host/dig für SRV-Abfragen"
+      ],
       "duration_minutes": 60,
+      "success_criteria_de": [
+        "`samba-tool domain level show` zeigt die Domäne; `systemctl is-active samba-ad-dc` meldet active.",
+        "`host -t SRV _ldap._tcp.lab.example` und `_kerberos._udp.lab.example` liefern den DC.",
+        "`kinit administrator` gelingt, `klist` zeigt ein TGT für LAB.EXAMPLE.",
+        "`samba-tool user list` zeigt beide Benutzer, `samba-tool group listmembers linuxadmins` den zugeordneten Benutzer.",
+        "`samba-tool domain passwordsettings show` zeigt Minimum password length: 12.",
+        "`samba-tool dbcheck` meldet 0 Fehler."
+      ],
       "steps": [
-        {"title": "Pakete installieren und Dienste stoppen", "text_de": "Installiere Samba mit AD-Unterstützung, Kerberos-Client und DNS-Werkzeuge. Deaktiviere die klassischen Samba-Dienste und systemd-resolved, weil Samba den DNS-Port selbst nutzt.", "commands": ["sudo apt install samba krb5-user winbind dnsutils", "sudo systemctl disable --now smbd nmbd winbind", "sudo systemctl disable --now systemd-resolved", "sudo rm /etc/resolv.conf"]},
-        {"title": "Hostname und Namensauflösung vorbereiten", "text_de": "Der Server braucht einen FQDN in der künftigen Domäne. Trage ihn in /etc/hosts ein und setze /etc/resolv.conf auf die eigene Adresse.", "commands": ["sudo hostnamectl set-hostname dc1.lab.example", "echo '192.168.56.10 dc1.lab.example dc1' | sudo tee -a /etc/hosts", "printf 'nameserver 192.168.56.10\\nsearch lab.example\\n' | sudo tee /etc/resolv.conf"]},
-        {"title": "Domäne provisionieren", "text_de": "Verschiebe die vorhandene smb.conf und starte die interaktive Provisionierung. Verwende den internen DNS-Server und den Weiterleiter deines Netzes. Merke dir das Administrator-Passwort.", "commands": ["sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.orig", "sudo samba-tool domain provision --use-rfc2307 --interactive", "sudo cp /var/lib/samba/private/krb5.conf /etc/krb5.conf", "sudo systemctl unmask samba-ad-dc", "sudo systemctl enable --now samba-ad-dc"]},
-        {"title": "DNS und Kerberos prüfen", "text_de": "Prüfe die SRV-Einträge für LDAP und Kerberos. Hole ein Ticket als Administrator und zeige es an.", "commands": ["host -t SRV _ldap._tcp.lab.example", "host -t SRV _kerberos._udp.lab.example", "kinit administrator", "klist", "sudo samba-tool dbcheck"]},
-        {"title": "Benutzer, Gruppe und Richtlinie", "text_de": "Lege eine Gruppe und zwei Benutzer an, mache einen davon zum Gruppenmitglied und setze die minimale Passwortlänge auf 12 Zeichen.", "commands": ["sudo samba-tool group add linuxadmins", "sudo samba-tool user create jdoe", "sudo samba-tool user create msmith", "sudo samba-tool group addmembers linuxadmins jdoe", "sudo samba-tool domain passwordsettings set --min-pwd-length=12", "sudo samba-tool domain passwordsettings show", "sudo samba-tool user list"]},
-        {"title": "FSMO-Rollen und Replikation ansehen", "text_de": "Auch mit einem einzigen DC lohnt der Blick auf die Rollen und den Replikationsstatus.", "commands": ["sudo samba-tool fsmo show", "sudo samba-tool drs showrepl"]}
+        {
+          "title": "Pakete installieren und Dienste stoppen",
+          "text_de": "Installiere Samba mit AD-Unterstützung, Kerberos-Client und DNS-Werkzeuge. Deaktiviere die klassischen Samba-Dienste und systemd-resolved, weil Samba den DNS-Port selbst nutzt.",
+          "commands": [
+            "sudo apt install samba krb5-user winbind dnsutils",
+            "sudo systemctl disable --now smbd nmbd winbind",
+            "sudo systemctl disable --now systemd-resolved",
+            "sudo rm /etc/resolv.conf"
+          ],
+          "warning_de": "Dieser Schritt deaktiviert systemd-resolved und löscht /etc/resolv.conf. Nur in der dafür vorgesehenen Test-VM ausführen; danach ist die Namensauflösung bis zur Provisionierung gestört."
+        },
+        {
+          "title": "Hostname und Namensauflösung vorbereiten",
+          "text_de": "Der Server braucht einen FQDN in der künftigen Domäne. Trage ihn in /etc/hosts ein und setze /etc/resolv.conf auf die eigene Adresse.",
+          "commands": [
+            "sudo hostnamectl set-hostname dc1.lab.example",
+            "echo '192.168.56.10 dc1.lab.example dc1' | sudo tee -a /etc/hosts",
+            "printf 'nameserver 192.168.56.10\\nsearch lab.example\\n' | sudo tee /etc/resolv.conf"
+          ]
+        },
+        {
+          "title": "Domäne provisionieren",
+          "text_de": "Verschiebe die vorhandene smb.conf und starte die interaktive Provisionierung. Verwende den internen DNS-Server und den Weiterleiter deines Netzes. Merke dir das Administrator-Passwort.",
+          "commands": [
+            "sudo mv /etc/samba/smb.conf /etc/samba/smb.conf.orig",
+            "sudo samba-tool domain provision --use-rfc2307 --interactive",
+            "sudo cp /var/lib/samba/private/krb5.conf /etc/krb5.conf",
+            "sudo systemctl unmask samba-ad-dc",
+            "sudo systemctl enable --now samba-ad-dc"
+          ]
+        },
+        {
+          "title": "DNS und Kerberos prüfen",
+          "text_de": "Prüfe die SRV-Einträge für LDAP und Kerberos. Hole ein Ticket als Administrator und zeige es an.",
+          "commands": [
+            "host -t SRV _ldap._tcp.lab.example",
+            "host -t SRV _kerberos._udp.lab.example",
+            "kinit administrator",
+            "klist",
+            "sudo samba-tool dbcheck"
+          ]
+        },
+        {
+          "title": "Benutzer, Gruppe und Richtlinie",
+          "text_de": "Lege eine Gruppe und zwei Benutzer an, mache einen davon zum Gruppenmitglied und setze die minimale Passwortlänge auf 12 Zeichen.",
+          "commands": [
+            "sudo samba-tool group add linuxadmins",
+            "sudo samba-tool user create jdoe",
+            "sudo samba-tool user create msmith",
+            "sudo samba-tool group addmembers linuxadmins jdoe",
+            "sudo samba-tool domain passwordsettings set --min-pwd-length=12",
+            "sudo samba-tool domain passwordsettings show",
+            "sudo samba-tool user list"
+          ]
+        },
+        {
+          "title": "FSMO-Rollen und Replikation ansehen",
+          "text_de": "Auch mit einem einzigen DC lohnt der Blick auf die Rollen und den Replikationsstatus.",
+          "commands": [
+            "sudo samba-tool fsmo show",
+            "sudo samba-tool drs showrepl"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Warum mussten smbd, nmbd und winbind deaktiviert werden?", "answer_de": "Der Prozess samba (samba-ad-dc) startet die benötigten Teildienste selbst. Parallel laufende klassische Dienste würden Ports und TDB-Dateien blockieren."},
-        {"question_de": "Welche Aufgabe hat die Option --use-rfc2307?", "answer_de": "Sie erweitert das Schema um Unix-Attribute (uidNumber, gidNumber, loginShell), damit idmap_ad auf Mitgliedsservern konsistente IDs liefern kann."},
-        {"question_de": "Wie würdest du die Domäne sichern?", "answer_de": "Mit samba-tool domain backup online oder offline; TDB-Dateien einzeln mit tdbbackup. Ein einfaches Kopieren im laufenden Betrieb ist nicht konsistent."}
+        {
+          "question_de": "Warum mussten smbd, nmbd und winbind deaktiviert werden?",
+          "answer_de": "Der Prozess samba (samba-ad-dc) startet die benötigten Teildienste selbst. Parallel laufende klassische Dienste würden Ports und TDB-Dateien blockieren."
+        },
+        {
+          "question_de": "Welche Aufgabe hat die Option --use-rfc2307?",
+          "answer_de": "Sie erweitert das Schema um Unix-Attribute (uidNumber, gidNumber, loginShell), damit idmap_ad auf Mitgliedsservern konsistente IDs liefern kann."
+        },
+        {
+          "question_de": "Wie würdest du die Domäne sichern?",
+          "answer_de": "Mit samba-tool domain backup online oder offline; TDB-Dateien einzeln mit tdbbackup. Ein einfaches Kopieren im laufenden Betrieb ist nicht konsistent."
+        }
+      ],
+      "pitfalls_de": [
+        "Laufende smbd/nmbd/winbind oder systemd-resolved blockieren Ports 53/88/389/445; die Provisionierung bricht dann ab.",
+        "Hostname ohne FQDN oder /etc/hosts ohne passenden Eintrag führt zu Kerberos-Fehlern (Cannot find KDC).",
+        "resolv.conf zeigt nach einem Neustart wieder auf den alten Resolver, wenn ein Netzwerkmanager sie verwaltet; Datei schützen oder Resolver im Netzwerkmanager setzen.",
+        "Uhrzeit: Kerberos toleriert nur wenige Minuten Abweichung; NTP in der VM prüfen.",
+        "Zu wenig RAM (unter 2 GB) macht die Provisionierung extrem langsam."
+      ],
+      "instructor_notes_de": [
+        "Lernschwierigkeit: Zusammenspiel von DNS, Kerberos und LDAP. Ein Tafelbild der Anmeldekette (DNS-SRV → KDC → Ticket → LDAP) hilft vor dem LAB.",
+        "Alternativer Weg: Provisionierung nicht interaktiv mit `--realm --domain --server-role=dc --dns-backend=SAMBA_INTERNAL --adminpass`; oder BIND9_DLZ als DNS-Backend für Fortgeschrittene.",
+        "Erfolgskontrolle: Ausgabe von `klist`, SRV-Abfragen und `passwordsettings show` zeigen lassen; Diskussion, warum `--use-rfc2307` für idmap_ad nötig ist.",
+        "Prüfungsziele: 302.1 (Provisionierung), 302.2 (FSMO, Replikation), 303.3 (Kerberos). Im Trainer Fragen zu Ziel 302.1 üben; Zusatzfragen zu Samba-AD nur freigeben, wenn fachlich geprüft."
       ]
     },
     {
-      "id": "lab-300-03", "objective": "305.4", "title": "NFSv4-Export mit Pseudo-Dateisystem und ACLs",
+      "id": "lab-300-03",
+      "objective": "305.4",
+      "title": "NFSv4-Export mit Pseudo-Dateisystem und ACLs",
       "goal_de": "Einen NFSv4-Server mit zwei Exporten unter einer gemeinsamen Wurzel einrichten, vom Client einhängen und NFSv4-ACLs setzen.",
+      "task_de": "Richte einen NFSv4-Server mit einer Pseudo-Wurzel (fsid=0) und zwei Exporten ein: `projects` lesend und schreibend mit root_squash, `public` nur lesend mit all_squash. Ein Client soll mit einem einzigen Mount `server:/` beide Exporte sehen. Setze anschließend für eine Datei eine NFSv4-ACL für einen zweiten Benutzer und weise die Wirkung nach.",
       "environment_de": "Zwei Test-VMs im selben Netz (Server und Client), Debian 12 oder Ubuntu 24.04.",
+      "tools_de": [
+        "man exports (fsid, crossmnt, root_squash, all_squash, no_subtree_check)",
+        "man exportfs, man nfs4_setfacl, man nfs4_getfacl, man mount.nfs",
+        "Kernel-Dokumentation NFSv4 pseudo file system; Red Hat/Debian-Handbücher zu NFS",
+        "showmount, rpcinfo, nfsstat zur Diagnose"
+      ],
       "duration_minutes": 40,
+      "success_criteria_de": [
+        "`exportfs -v` zeigt /export mit fsid=0 und beide Unterverzeichnisse mit den geforderten Optionen.",
+        "Auf dem Client zeigt `mount | grep nfs4` genau einen Mount von `server:/`, `ls /mnt/nfs` zeigt projects und public.",
+        "Eine von root auf dem Client angelegte Datei gehört auf dem Server nobody/nogroup (UID 65534).",
+        "Schreiben nach public scheitert mit Permission denied.",
+        "`nfs4_getfacl` zeigt den zusätzlichen ACE und der zweite Benutzer kann die Datei lesen und schreiben."
+      ],
       "steps": [
-        {"title": "Server vorbereiten", "text_de": "Installiere den NFS-Server und lege die Exportwurzel mit zwei Unterverzeichnissen an. Die echten Daten werden per bind-Mount unter die Wurzel gehängt.", "commands": ["sudo apt install nfs-kernel-server nfs4-acl-tools", "sudo mkdir -p /export/projects /export/public /srv/projects /srv/public", "echo '/srv/projects /export/projects none bind 0 0' | sudo tee -a /etc/fstab", "echo '/srv/public /export/public none bind 0 0' | sudo tee -a /etc/fstab", "sudo mount -a"]},
-        {"title": "Exporte definieren", "text_de": "Die Wurzel bekommt fsid=0 und wird damit zur NFSv4-Pseudowurzel. Die Unterverzeichnisse werden mit unterschiedlichen Rechten exportiert.", "commands": ["/export          192.168.56.0/24(ro,fsid=0,crossmnt,no_subtree_check)", "/export/projects 192.168.56.0/24(rw,root_squash,no_subtree_check)", "/export/public   192.168.56.0/24(ro,all_squash,no_subtree_check)", "sudo exportfs -rav", "sudo exportfs -v"]},
-        {"title": "Client einhängen", "text_de": "Auf dem Client reicht ein einziger Mount der Wurzel. Beide Exporte erscheinen darunter.", "commands": ["sudo apt install nfs-common nfs4-acl-tools", "sudo mkdir -p /mnt/nfs", "sudo mount -t nfs4 192.168.56.10:/ /mnt/nfs", "ls /mnt/nfs", "mount | grep nfs4"]},
-        {"title": "Rechte testen", "text_de": "Erzeuge als normaler Benutzer eine Datei in projects. Versuche als root eine Datei zu erstellen und prüfe auf dem Server, welchem Benutzer sie gehört.", "commands": ["touch /mnt/nfs/projects/user-file", "sudo touch /mnt/nfs/projects/root-file", "ls -ln /srv/projects"]},
-        {"title": "NFSv4-ACL setzen", "text_de": "Gib einem zweiten Benutzer Lese- und Schreibrecht per NFSv4-ACL und zeige die ACL an.", "commands": ["nfs4_setfacl -a A::1001:rw /mnt/nfs/projects/user-file", "nfs4_getfacl /mnt/nfs/projects/user-file"]}
+        {
+          "title": "Server vorbereiten",
+          "text_de": "Installiere den NFS-Server und lege die Exportwurzel mit zwei Unterverzeichnissen an. Die echten Daten werden per bind-Mount unter die Wurzel gehängt.",
+          "commands": [
+            "sudo apt install nfs-kernel-server nfs4-acl-tools",
+            "sudo mkdir -p /export/projects /export/public /srv/projects /srv/public",
+            "echo '/srv/projects /export/projects none bind 0 0' | sudo tee -a /etc/fstab",
+            "echo '/srv/public /export/public none bind 0 0' | sudo tee -a /etc/fstab",
+            "sudo mount -a"
+          ],
+          "warning_de": "Dieser Schritt ergänzt /etc/fstab. Ein Tippfehler kann den Start der VM verzögern oder blockieren; vorher einen Snapshot anlegen und die Zeilen prüfen."
+        },
+        {
+          "title": "Exporte definieren",
+          "text_de": "Die Wurzel bekommt fsid=0 und wird damit zur NFSv4-Pseudowurzel. Die Unterverzeichnisse werden mit unterschiedlichen Rechten exportiert.",
+          "commands": [
+            "/export          192.168.56.0/24(ro,fsid=0,crossmnt,no_subtree_check)",
+            "/export/projects 192.168.56.0/24(rw,root_squash,no_subtree_check)",
+            "/export/public   192.168.56.0/24(ro,all_squash,no_subtree_check)",
+            "sudo exportfs -rav",
+            "sudo exportfs -v"
+          ]
+        },
+        {
+          "title": "Client einhängen",
+          "text_de": "Auf dem Client reicht ein einziger Mount der Wurzel. Beide Exporte erscheinen darunter.",
+          "commands": [
+            "sudo apt install nfs-common nfs4-acl-tools",
+            "sudo mkdir -p /mnt/nfs",
+            "sudo mount -t nfs4 192.168.56.10:/ /mnt/nfs",
+            "ls /mnt/nfs",
+            "mount | grep nfs4"
+          ]
+        },
+        {
+          "title": "Rechte testen",
+          "text_de": "Erzeuge als normaler Benutzer eine Datei in projects. Versuche als root eine Datei zu erstellen und prüfe auf dem Server, welchem Benutzer sie gehört.",
+          "commands": [
+            "touch /mnt/nfs/projects/user-file",
+            "sudo touch /mnt/nfs/projects/root-file",
+            "ls -ln /srv/projects"
+          ]
+        },
+        {
+          "title": "NFSv4-ACL setzen",
+          "text_de": "Gib einem zweiten Benutzer Lese- und Schreibrecht per NFSv4-ACL und zeige die ACL an.",
+          "commands": [
+            "nfs4_setfacl -a A::1001:rw /mnt/nfs/projects/user-file",
+            "nfs4_getfacl /mnt/nfs/projects/user-file"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Welchem Benutzer gehört die von root angelegte Datei auf dem Server und warum?", "answer_de": "nobody bzw. nfsnobody (UID 65534), weil root_squash die UID 0 des Clients auf den anonymen Benutzer abbildet."},
-        {"question_de": "Was bewirkt fsid=0?", "answer_de": "Es kennzeichnet den Export als Wurzel des NFSv4-Pseudo-Dateisystems. Clients hängen server:/ ein und sehen die anderen Exporte als Unterverzeichnisse."},
-        {"question_de": "Wie würdest du den Export mit Kerberos absichern?", "answer_de": "Beide Seiten in einen Kerberos-Realm aufnehmen, nfs/-Principals in Keytabs ablegen, in /etc/exports sec=krb5, krb5i oder krb5p setzen und auf dem Client mit -o sec=krb5 einhängen."}
+        {
+          "question_de": "Welchem Benutzer gehört die von root angelegte Datei auf dem Server und warum?",
+          "answer_de": "nobody bzw. nfsnobody (UID 65534), weil root_squash die UID 0 des Clients auf den anonymen Benutzer abbildet."
+        },
+        {
+          "question_de": "Was bewirkt fsid=0?",
+          "answer_de": "Es kennzeichnet den Export als Wurzel des NFSv4-Pseudo-Dateisystems. Clients hängen server:/ ein und sehen die anderen Exporte als Unterverzeichnisse."
+        },
+        {
+          "question_de": "Wie würdest du den Export mit Kerberos absichern?",
+          "answer_de": "Beide Seiten in einen Kerberos-Realm aufnehmen, nfs/-Principals in Keytabs ablegen, in /etc/exports sec=krb5, krb5i oder krb5p setzen und auf dem Client mit -o sec=krb5 einhängen."
+        }
+      ],
+      "pitfalls_de": [
+        "Bind-Mounts vergessen: Ohne `mount -a` sind /export/projects und /export/public leer.",
+        "Firewall: NFSv4 braucht nur TCP 2049; bei NFSv3 zusätzlich rpcbind und mountd.",
+        "Benutzer-IDs: Ohne Kerberos oder idmapd müssen UIDs auf Client und Server übereinstimmen, sonst wirken ACLs scheinbar falsch.",
+        "`no_subtree_check` fehlt: exportfs warnt nur, der Export funktioniert dennoch; die Warnung verwirrt Lernende.",
+        "Nach Änderungen an /etc/exports `exportfs -ra` nicht vergessen."
+      ],
+      "instructor_notes_de": [
+        "Schwierigkeit: Konzept der Pseudo-Wurzel gegenüber NFSv3-Exporten. Kurz zeigen, dass `showmount -e` bei reinem NFSv4 wenig aussagt.",
+        "Alternativer Weg: Exporte ohne Bind-Mounts direkt unter /export anlegen; oder zusätzlich `sec=krb5` mit dem AD-DC aus LAB 300-02 verbinden (Fortgeschrittene).",
+        "Erfolgskontrolle: `exportfs -v`, `ls -ln` auf dem Server für die root-Datei, `nfs4_getfacl`-Ausgabe.",
+        "Prüfungsziele: 305.4 (NFS) und 303.2 (Dateidienste); Fragen zu root_squash, fsid=0 und NFSv4-ACLs zu Ziel 305.4 üben."
       ]
     }
   ]

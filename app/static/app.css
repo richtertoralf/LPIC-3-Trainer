@@ -134,3 +134,19 @@ details summary { cursor: pointer; }
 .lab-steps > li h2::before { content: counter(step) ". "; color: var(--muted); }
 .lab-list, .checks { padding-left: 1.2rem; }
 .checks li { margin: 0.4rem 0; }
+
+/* labs: status, hints, warnings, instructor notes, rendered documentation */
+.tag-progress { background: var(--accent); color: var(--primary); border: 1px solid var(--primary); }
+.lab-status form { margin-left: 0.4rem; }
+details.hint summary { font-weight: 600; padding: 0.3rem 0; }
+.lab-steps > li details.hint summary::before { content: counter(step) ". "; color: var(--muted); }
+.lab-steps > li h2::before { content: none; }
+.warning { background: var(--warn-bg); color: var(--warn); padding: 0.5rem 0.8rem; border-radius: 6px; }
+.criteria li { margin-bottom: 0.3rem; }
+.card.instructor { border-color: var(--warn); }
+.doc h1 { font-size: 1.5rem; }
+.doc h2 { font-size: 1.2rem; margin-top: 1.4rem; }
+.doc h3 { font-size: 1.05rem; margin-top: 1rem; }
+.doc table { font-size: 0.95rem; }
+.lab-matrix td, .lab-matrix th { vertical-align: top; }
+.lab-matrix .names { display: block; font-size: 0.85rem; color: var(--muted); }

@@ -337,6 +337,11 @@ def validate_labs(data: dict) -> list[str]:
         _check_str(errors, lab, "title", w, max_len=160)
         _check_str(errors, lab, "goal_de", w)
         _check_str(errors, lab, "environment_de", w, required=False)
+        _check_str(errors, lab, "task_de", w, required=False, max_len=4000)
+        for key in ("tools_de", "success_criteria_de", "pitfalls_de", "instructor_notes_de"):
+            items = lab.get(key, [])
+            if not isinstance(items, list) or not all(_is_str(x, max_len=1000) for x in items):
+                errors.append(f"{w}: '{key}' must be a list of non-empty strings")
         duration = lab.get("duration_minutes", 30)
         if not isinstance(duration, int) or not 5 <= duration <= 600:
             errors.append(f"{w}: 'duration_minutes' must be between 5 and 600")
@@ -351,6 +356,7 @@ def validate_labs(data: dict) -> list[str]:
                     continue
                 _check_str(errors, step, "title", sw, max_len=160)
                 _check_str(errors, step, "text_de", sw)
+                _check_str(errors, step, "warning_de", sw, required=False, max_len=1000)
                 cmds = step.get("commands", [])
                 if not isinstance(cmds, list) or not all(
                     _is_str(c, allow_empty=True, max_len=500) for c in cmds
@@ -663,8 +669,18 @@ def import_labs(
         lab.goal_de = raw["goal_de"].strip()
         lab.environment_de = raw.get("environment_de", "").strip()
         lab.duration_minutes = int(raw.get("duration_minutes", 30))
+        lab.task_de = raw.get("task_de", "").strip()
+        lab.tools_de = [x.strip() for x in raw.get("tools_de", [])]
+        lab.success_criteria_de = [x.strip() for x in raw.get("success_criteria_de", [])]
+        lab.pitfalls_de = [x.strip() for x in raw.get("pitfalls_de", [])]
+        lab.instructor_notes_de = [x.strip() for x in raw.get("instructor_notes_de", [])]
         lab.steps = [
-            {"title": s["title"], "text_de": s["text_de"], "commands": s.get("commands", [])}
+            {
+                "title": s["title"],
+                "text_de": s["text_de"],
+                "commands": s.get("commands", []),
+                "warning_de": s.get("warning_de", ""),
+            }
             for s in raw["steps"]
         ]
         lab.checks = [

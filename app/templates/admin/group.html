@@ -22,12 +22,34 @@
     <tr>
       <td>{{ r.member.user.label }}</td>
       <td>{{ r.member.role }}</td>
-      <td>{% for p in r.progress %}<div>{{ p.module.code }}: {{ p.answered }}/{{ p.total }} geübt, {{ p.percent_correct }} % richtig, {{ p.help_rate }} % Hilfe{% if p.best_exam %}, Simulation {{ p.best_exam.percent }} %{% endif %}</div>{% else %}<span class="muted">keine Module gewählt</span>{% endfor %}</td>
+      <td>{% for p in r.progress %}<div>{{ p.module.code }}: {{ p.answered }}/{{ p.total }} geübt, {{ p.percent_correct }} % richtig, {{ p.help_rate }} % Hilfe{% if p.best_exam %}, Simulation {{ p.best_exam.percent }} %{% endif %}</div>{% else %}<span class="muted">keine Module gewählt</span>{% endfor %}
+        {% set ml = member_labs.get(r.member.user_id) %}{% if ml %}<div class="small muted">LABs: {{ ml.completed }} abgeschlossen, {{ ml.started }} in Bearbeitung, {{ lab_total - ml.completed - ml.started }} nicht begonnen</div>{% endif %}</td>
       <td><form method="post" action="/admin/groups/{{ group.id }}/members/{{ r.member.user_id }}/remove" class="inline"><button class="btn btn-small" type="submit">Entfernen</button></form></td>
     </tr>
     {% endfor %}
     </tbody>
   </table>
+</section>
+<section class="card">
+  <h2>LAB-Stände der Gruppe</h2>
+  <p class="muted small">Stand je Fach-LAB für die aktiven Mitglieder dieser Gruppe. Mit dem Häkchen empfiehlst du ein LAB für die Gruppe; die Mitglieder sehen die Empfehlung in ihrer LAB-Liste. Keine Benotung, kein Kursplan.</p>
+  <form method="post" action="/admin/groups/{{ group.id }}/labs">
+  <table class="table lab-matrix">
+    <thead><tr><th>Empfohlen</th><th>LAB</th><th>Abgeschlossen</th><th>In Bearbeitung</th><th>Nicht begonnen</th></tr></thead>
+    <tbody>
+    {% for row in lab_rows %}
+    <tr>
+      <td><input type="checkbox" name="lab_ids" value="{{ row.lab.id }}" {% if row.recommended %}checked{% endif %} aria-label="{{ row.lab.title }} empfehlen"></td>
+      <td><a href="/lab/{{ row.lab.id }}">{{ row.lab.title }}</a><span class="names">{{ row.lab.module.code }}{% if row.lab.objective %} · Ziel {{ row.lab.objective.code }}{% endif %}</span></td>
+      <td>{{ row.completed | length }}{% if row.completed %}<span class="names">{{ row.completed | join(', ') }}</span>{% endif %}</td>
+      <td>{{ row.started | length }}{% if row.started %}<span class="names">{{ row.started | join(', ') }}</span>{% endif %}</td>
+      <td>{{ row.not_started | length }}{% if row.not_started %}<span class="names">{{ row.not_started | join(', ') }}</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn btn-primary" type="submit">Empfehlungen speichern</button>
+  </form>
 </section>
 <section class="card narrow">
   <h2>Mitglied hinzufügen</h2>

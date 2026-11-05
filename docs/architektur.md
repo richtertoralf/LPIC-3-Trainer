@@ -46,7 +46,7 @@ Lerninhalte:
 - `modules` → `topics` → `objectives`: Prüfungsziele mit Gewicht, deutscher Zusammenfassung und Werkzeugliste.
 - `questions` → `choices`: englische Frage und Antworten, optional deutsche Übersetzung, deutsche Erklärung, Schwierigkeit, Sichtbarkeit (`public`/`private`), Ersteller, Importcharge.
 - `terms`: Glossar Fachenglisch. `question_terms` verknüpft fragenbezogene Begriffe.
-- `labs`: Laboranleitungen mit Schritten (`steps`, JSON) und Selbstkontrollfragen (`checks`, JSON).
+- `labs`: Laboraufgaben mit Lernziel, Aufgabenstellung (`task_de`), Werkzeugen (`tools_de`), Erfolgskriterien (`success_criteria_de`), Schritten als Hilfestellung (`steps`, JSON, optional `warning_de`), Selbstkontrollfragen (`checks`), typischen Fehlern (`pitfalls_de`) und Dozentenhinweisen (`instructor_notes_de`, nur Betreuer/Administratoren).
 - `import_batches`: jede Importdatei mit Quelle (`source`), Prüfungsgeneration (`exam_version`), Rechtestatus (`rights`), Lizenz, Autor, Prüfsumme, Kennzeichnung als externe Quelle (`supplementary`) und systemweiter Freigabe (`released`).
 
 Persönliche Daten:
@@ -57,7 +57,8 @@ Persönliche Daten:
 - `attempts`: jede beantwortete Frage mit Modus (`practice`, `exam`, `entry`), Ergebnis und Kennzeichen „Sprachhilfe genutzt“
 - `exams`: Prüfungssimulationen und Eingangstests mit Fragenliste und Antworten (JSON)
 - `user_terms`: gemerkte Fachbegriffe (`learning`/`known`)
-- `lab_progress`: erledigte Labs
+- `lab_progress`: LAB-Status je Lernendem (`status` started/completed, `started_at`, `completed_at`; keine Zeile = nicht begonnen)
+- `group_labs`: von Betreuern für eine Gruppe empfohlene LABs
 - `group_sources`: Importchargen, die ein Betreuer oder Administrator für eine Gruppe freigegeben hat
 
 Alle Benutzerdaten tragen eine `user_id`. Beim Löschen eines Benutzers werden sie per `ON DELETE CASCADE` entfernt.

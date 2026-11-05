@@ -46,7 +46,15 @@ Neben den mitgelieferten Projektfragen können Betreuer eigene oder importierte 
 
 ## Labs
 
-*Labs* listet die Laboraufgaben je Modul. Jede Aufgabe nennt Ziel, Umgebung und Dauer, dann Schritte mit Befehlen und am Ende Selbstkontrollfragen mit aufklappbarer Antwort. Nach Abschluss *Lab als erledigt markieren*.
+*Labs* ist ein eigener Lernbereich neben Fragen und Simulationen; die Reihenfolge ist frei (erst Fragen, dann LAB, oder umgekehrt, oder im Wechsel).
+
+**LAB-Umgebung.** Die Fach-LABs laufen in deiner eigenen Testumgebung. Die Anleitung *LAB-Umgebung einrichten* (Schaltfläche oben auf der Labs-Seite, auch unter `docs/lab-umgebung.md`) beschreibt Hardwarevoraussetzungen, KVM/QEMU mit libvirt, VMs, isolierte Netze, einen virtuellen Router, zusätzliche Platten, Sicherheit, Snapshots und eine Funktionsprüfung. KVM/libvirt ist eine Empfehlung; andere Virtualisierer sind zulässig. Der Trainer stellt keine Maschinen bereit und führt nichts aus.
+
+**Fach-LABs.** Jede Aufgabe zeigt Lernziel, offizielles Prüfungsziel, Voraussetzungen, Zeitbedarf, die Aufgabenstellung mit konkretem Ziel, Werkzeuge und Dokumentation sowie überprüfbare Erfolgskriterien. Darunter liegt die *Hilfestellung*: ein möglicher Lösungsweg in Schritten mit Befehlen, eingeklappt. Versuche die Aufgabe zuerst eigenständig; andere Lösungen sind richtig, wenn sie die Erfolgskriterien erfüllen. Gefährliche Schritte (Formatieren, Firewall-Richtlinie, Löschen von VMs) tragen einen Warnhinweis. Es folgen Selbstkontrollfragen mit aufklappbarer Antwort und typische Fehler.
+
+**Status.** *LAB beginnen* setzt das LAB auf *in Bearbeitung*, *Als abgeschlossen markieren* auf *abgeschlossen*; beides lässt sich zurücknehmen. Nur abgeschlossene LABs zählen im Fortschritt. Betreuer deiner Gruppe sehen deinen LAB-Stand; LABs, die sie für die Gruppe empfehlen, tragen in deiner Liste die Kennzeichnung *empfohlen*.
+
+**Fragen zum LAB.** Die Schaltfläche *Fragen zu diesem Prüfungsziel üben* führt direkt in den Übungsmodus für das Prüfungsziel des LABs.
 
 Wichtig: Die App führt nichts aus. Nutze nur eigene Testsysteme wie virtuelle Maschinen, nie produktive Systeme.
 

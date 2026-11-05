@@ -6,59 +6,334 @@
   "visibility": "public",
   "labs": [
     {
-      "id": "lab-303-01", "objective": "331.1", "title": "Eigene Zertifizierungsstelle mit OpenSSL betreiben",
+      "id": "lab-303-01",
+      "objective": "331.1",
+      "title": "Eigene Zertifizierungsstelle mit OpenSSL betreiben",
       "goal_de": "Eine Root-CA anlegen, ein Serverzertifikat beantragen und signieren, es widerrufen und eine CRL erzeugen.",
+      "task_de": "Betreibe eine eigene Zertifizierungsstelle: Erzeuge eine Root-CA (mit CA:TRUE und keyCertSign), stelle ein Serverzertifikat für `www.lab.example` mit Subject Alternative Names aus, prüfe die Kette, widerrufe das Zertifikat und veröffentliche eine CRL, gegen die eine Prüfung mit `-crl_check` fehlschlägt.",
       "environment_de": "Beliebige Linux-Test-VM mit OpenSSL. Keine Root-Rechte nötig.",
+      "tools_de": [
+        "man openssl-req, man openssl-x509, man openssl-ca, man openssl-crl, man openssl-verify",
+        "man x509v3_config (basicConstraints, keyUsage, subjectAltName)",
+        "OpenSSL-Cookbook (Ivan Ristić), Kapitel zur privaten CA",
+        "RFC 5280 (Zertifikate und CRLs), zur Vertiefung"
+      ],
       "duration_minutes": 45,
+      "success_criteria_de": [
+        "`openssl x509 -in certs/ca.crt -noout -text` zeigt CA:TRUE (critical) und Key Usage Certificate Sign, CRL Sign.",
+        "Das Serverzertifikat enthält beide DNS-Namen im SAN und ist von der CA signiert (`openssl verify -CAfile certs/ca.crt certs/www.crt` → OK).",
+        "`openssl crl -in crl/ca.crl -noout -text` listet die Seriennummer des Serverzertifikats als widerrufen.",
+        "`openssl verify -crl_check` mit CA und CRL meldet `certificate revoked`.",
+        "Der CA-Schlüssel ist passphrasengeschützt und hat Modus 0600."
+      ],
       "steps": [
-        {"title": "CA-Verzeichnis und Schlüssel", "text_de": "Lege eine Verzeichnisstruktur an und erzeuge den privaten Schlüssel der CA. Schütze ihn mit einer Passphrase.", "commands": ["mkdir -p ~/ca/{certs,crl,newcerts,private} && cd ~/ca", "touch index.txt && echo 1000 > serial && echo 1000 > crlnumber", "openssl genrsa -aes256 -out private/ca.key 4096", "chmod 600 private/ca.key"]},
-        {"title": "Root-Zertifikat erstellen", "text_de": "Erzeuge ein selbst signiertes CA-Zertifikat mit CA:TRUE. Prüfe die Erweiterungen im Ergebnis.", "commands": ["openssl req -x509 -new -key private/ca.key -days 3650 -sha256 -subj '/CN=Lab Root CA/O=Lab' -addext 'basicConstraints=critical,CA:TRUE' -addext 'keyUsage=critical,keyCertSign,cRLSign' -out certs/ca.crt", "openssl x509 -in certs/ca.crt -noout -text | grep -A1 -E 'Basic Constraints|Key Usage'"]},
-        {"title": "Server-CSR erzeugen", "text_de": "Erzeuge Schlüssel und Antrag für www.lab.example mit einem Subject Alternative Name.", "commands": ["openssl req -new -newkey rsa:2048 -nodes -keyout private/www.key -subj '/CN=www.lab.example' -addext 'subjectAltName=DNS:www.lab.example,DNS:lab.example' -out www.csr", "openssl req -in www.csr -noout -text | grep -A1 'Alternative Name'"]},
-        {"title": "CSR signieren", "text_de": "Signiere den Antrag mit der CA. Die Erweiterungen aus dem CSR werden übernommen. Prüfe danach die Kette.", "commands": ["openssl x509 -req -in www.csr -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial -days 365 -sha256 -copy_extensions copy -out certs/www.crt", "openssl verify -CAfile certs/ca.crt certs/www.crt", "openssl x509 -in certs/www.crt -noout -subject -issuer -dates"]},
-        {"title": "Zertifikat widerrufen und CRL erzeugen", "text_de": "Für den Widerruf braucht openssl ca eine Konfiguration. Lege eine minimale Datei an, widerrufe das Zertifikat und erzeuge die CRL.", "commands": ["cat > ca.cnf <<'CFG'", "[ ca ]", "default_ca = lab", "[ lab ]", "dir = .", "database = $dir/index.txt", "new_certs_dir = $dir/newcerts", "certificate = $dir/certs/ca.crt", "private_key = $dir/private/ca.key", "serial = $dir/serial", "crlnumber = $dir/crlnumber", "default_md = sha256", "default_crl_days = 30", "policy = policy_any", "[ policy_any ]", "commonName = supplied", "CFG", "openssl ca -config ca.cnf -revoke certs/www.crt", "openssl ca -config ca.cnf -gencrl -out crl/ca.crl", "openssl crl -in crl/ca.crl -noout -text | head -20", "openssl verify -crl_check -CAfile <(cat certs/ca.crt crl/ca.crl) certs/www.crt"]}
+        {
+          "title": "CA-Verzeichnis und Schlüssel",
+          "text_de": "Lege eine Verzeichnisstruktur an und erzeuge den privaten Schlüssel der CA. Schütze ihn mit einer Passphrase.",
+          "commands": [
+            "mkdir -p ~/ca/{certs,crl,newcerts,private} && cd ~/ca",
+            "touch index.txt && echo 1000 > serial && echo 1000 > crlnumber",
+            "openssl genrsa -aes256 -out private/ca.key 4096",
+            "chmod 600 private/ca.key"
+          ]
+        },
+        {
+          "title": "Root-Zertifikat erstellen",
+          "text_de": "Erzeuge ein selbst signiertes CA-Zertifikat mit CA:TRUE. Prüfe die Erweiterungen im Ergebnis.",
+          "commands": [
+            "openssl req -x509 -new -key private/ca.key -days 3650 -sha256 -subj '/CN=Lab Root CA/O=Lab' -addext 'basicConstraints=critical,CA:TRUE' -addext 'keyUsage=critical,keyCertSign,cRLSign' -out certs/ca.crt",
+            "openssl x509 -in certs/ca.crt -noout -text | grep -A1 -E 'Basic Constraints|Key Usage'"
+          ]
+        },
+        {
+          "title": "Server-CSR erzeugen",
+          "text_de": "Erzeuge Schlüssel und Antrag für www.lab.example mit einem Subject Alternative Name.",
+          "commands": [
+            "openssl req -new -newkey rsa:2048 -nodes -keyout private/www.key -subj '/CN=www.lab.example' -addext 'subjectAltName=DNS:www.lab.example,DNS:lab.example' -out www.csr",
+            "openssl req -in www.csr -noout -text | grep -A1 'Alternative Name'"
+          ]
+        },
+        {
+          "title": "CSR signieren",
+          "text_de": "Signiere den Antrag mit der CA. Die Erweiterungen aus dem CSR werden übernommen. Prüfe danach die Kette.",
+          "commands": [
+            "openssl x509 -req -in www.csr -CA certs/ca.crt -CAkey private/ca.key -CAcreateserial -days 365 -sha256 -copy_extensions copy -out certs/www.crt",
+            "openssl verify -CAfile certs/ca.crt certs/www.crt",
+            "openssl x509 -in certs/www.crt -noout -subject -issuer -dates"
+          ]
+        },
+        {
+          "title": "Zertifikat widerrufen und CRL erzeugen",
+          "text_de": "Für den Widerruf braucht openssl ca eine Konfiguration. Lege eine minimale Datei an, widerrufe das Zertifikat und erzeuge die CRL.",
+          "commands": [
+            "cat > ca.cnf <<'CFG'",
+            "[ ca ]",
+            "default_ca = lab",
+            "[ lab ]",
+            "dir = .",
+            "database = $dir/index.txt",
+            "new_certs_dir = $dir/newcerts",
+            "certificate = $dir/certs/ca.crt",
+            "private_key = $dir/private/ca.key",
+            "serial = $dir/serial",
+            "crlnumber = $dir/crlnumber",
+            "default_md = sha256",
+            "default_crl_days = 30",
+            "policy = policy_any",
+            "[ policy_any ]",
+            "commonName = supplied",
+            "CFG",
+            "openssl ca -config ca.cnf -revoke certs/www.crt",
+            "openssl ca -config ca.cnf -gencrl -out crl/ca.crl",
+            "openssl crl -in crl/ca.crl -noout -text | head -20",
+            "openssl verify -crl_check -CAfile <(cat certs/ca.crt crl/ca.crl) certs/www.crt"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Warum sollte der CA-Schlüssel mit einer Passphrase geschützt und offline gehalten werden?", "answer_de": "Wer den CA-Schlüssel besitzt, kann beliebige vertrauenswürdige Zertifikate ausstellen. Passphrase und Offline-Aufbewahrung begrenzen das Risiko."},
-        {"question_de": "Welche Datei muss ein Client kennen, um das Serverzertifikat zu prüfen?", "answer_de": "Das CA-Zertifikat (certs/ca.crt) als Vertrauensanker. Den CA-Schlüssel braucht er nicht."},
-        {"question_de": "Wie unterscheiden sich CRL und OCSP?", "answer_de": "Die CRL ist eine periodisch signierte Liste aller gesperrten Seriennummern. OCSP beantwortet Statusanfragen zu einzelnen Zertifikaten online."}
+        {
+          "question_de": "Warum sollte der CA-Schlüssel mit einer Passphrase geschützt und offline gehalten werden?",
+          "answer_de": "Wer den CA-Schlüssel besitzt, kann beliebige vertrauenswürdige Zertifikate ausstellen. Passphrase und Offline-Aufbewahrung begrenzen das Risiko."
+        },
+        {
+          "question_de": "Welche Datei muss ein Client kennen, um das Serverzertifikat zu prüfen?",
+          "answer_de": "Das CA-Zertifikat (certs/ca.crt) als Vertrauensanker. Den CA-Schlüssel braucht er nicht."
+        },
+        {
+          "question_de": "Wie unterscheiden sich CRL und OCSP?",
+          "answer_de": "Die CRL ist eine periodisch signierte Liste aller gesperrten Seriennummern. OCSP beantwortet Statusanfragen zu einzelnen Zertifikaten online."
+        }
+      ],
+      "pitfalls_de": [
+        "`-copy_extensions copy` gibt es erst ab OpenSSL 3.0; mit älteren Versionen fehlen SAN und Erweiterungen im signierten Zertifikat.",
+        "`openssl ca` verlangt eine Datenbank (index.txt), Seriennummerndateien und eine Konfiguration; ohne ca.cnf gibt es kryptische Fehler.",
+        "Ein CN ohne SAN wird von Browsern seit Jahren nicht mehr akzeptiert; SAN immer setzen.",
+        "Die Passphrase bei `genrsa -aes256` wird bei jedem Signieren abgefragt; das ist beabsichtigt.",
+        "CRL-Gültigkeit (default_crl_days) abgelaufen: Prüfungen schlagen dann mit `CRL has expired` fehl."
+      ],
+      "instructor_notes_de": [
+        "Schwierigkeit: Unterscheidung von Schlüssel, Antrag (CSR) und Zertifikat sowie Rolle der X.509v3-Erweiterungen. Vorher die Begriffe mit dem Glossar klären.",
+        "Alternative Wege: Vollständig mit `openssl ca` statt `openssl x509 -req` arbeiten; oder eine Zwischen-CA ergänzen (Kette aus drei Zertifikaten) für Fortgeschrittene.",
+        "Erfolgskontrolle: Die vier `openssl ... -noout -text`-Ausgaben und das Ergebnis von `verify -crl_check` zeigen lassen; OCSP als Gegenstück diskutieren.",
+        "Prüfungsziele: 331.1 (X.509-Zertifikate und PKI), 331.2 (Zertifikate für Dienste); Fragen zu Ziel 331.1 üben."
       ]
     },
     {
-      "id": "lab-303-02", "objective": "331.3", "title": "Verschlüsseltes Blockgerät mit LUKS",
+      "id": "lab-303-02",
+      "objective": "331.3",
+      "title": "Verschlüsseltes Blockgerät mit LUKS",
       "goal_de": "Eine Datei als Blockgerät verschlüsseln, zwei Schlüsselplätze verwenden, das Gerät beim Boot über /etc/crypttab einrichten und den Header sichern.",
+      "task_de": "Verschlüssle ein Blockgerät mit LUKS (dm-crypt), das als Image-Datei über ein Loop-Gerät bereitgestellt wird. Richte zwei Schlüsselplätze ein (Passphrase und Schlüsseldatei), sichere den LUKS-Header, binde das Gerät über /etc/crypttab und /etc/fstab ein und weise nach, dass es sich nach dem Schließen mit der Schlüsseldatei wieder öffnen und einhängen lässt. Räume am Ende sauber auf.",
       "environment_de": "Test-VM mit Root-Rechten. Es wird eine Image-Datei verwendet, keine echte Platte.",
+      "tools_de": [
+        "man cryptsetup (luksFormat, open, luksAddKey, luksDump, luksHeaderBackup)",
+        "man crypttab, man fstab, man losetup",
+        "cryptsetup-FAQ (gitlab.com/cryptsetup) zu LUKS2, Header und Schlüsselplätzen",
+        "dmsetup, lsblk zur Kontrolle"
+      ],
       "duration_minutes": 35,
+      "success_criteria_de": [
+        "`cryptsetup luksDump /dev/loopN` zeigt zwei belegte Schlüsselplätze.",
+        "Die Header-Sicherung /root/secret-header.img existiert und ist größer als 0 Bytes.",
+        "Nach `cryptsetup close` und `cryptdisks_start secret` ist das Dateisystem ohne Passphrase (über die Schlüsseldatei) wieder eingehängt und test.txt lesbar.",
+        "Die Schlüsseldatei hat Modus 0600 und gehört root.",
+        "Nach dem Aufräumen zeigen `losetup -a`, /etc/crypttab und /etc/fstab keine Reste mehr."
+      ],
       "steps": [
-        {"title": "Image-Datei und Loop-Gerät", "text_de": "Erzeuge eine 200-MB-Datei und binde sie als Loop-Gerät ein.", "commands": ["sudo apt install cryptsetup", "sudo fallocate -l 200M /var/tmp/secret.img", "sudo losetup -f --show /var/tmp/secret.img"]},
-        {"title": "LUKS einrichten und öffnen", "text_de": "Formatiere das Loop-Gerät mit LUKS (ersetze loop0 durch die Ausgabe des vorherigen Befehls), öffne es und lege ein Dateisystem an.", "commands": ["sudo cryptsetup luksFormat /dev/loop0", "sudo cryptsetup open /dev/loop0 secret", "sudo mkfs.ext4 /dev/mapper/secret", "sudo mkdir -p /mnt/secret && sudo mount /dev/mapper/secret /mnt/secret", "echo 'vertraulich' | sudo tee /mnt/secret/test.txt"]},
-        {"title": "Zweiten Schlüssel hinzufügen", "text_de": "Erzeuge eine Schlüsseldatei und füge sie als zweiten Schlüsselplatz hinzu. Zeige die belegten Schlüsselplätze an.", "commands": ["sudo dd if=/dev/urandom of=/root/secret.key bs=64 count=1", "sudo chmod 600 /root/secret.key", "sudo cryptsetup luksAddKey /dev/loop0 /root/secret.key", "sudo cryptsetup luksDump /dev/loop0 | grep -E 'Keyslots|^  [0-9]+:'"]},
-        {"title": "Header sichern", "text_de": "Sichere den LUKS-Header. Ohne Header sind die Daten unwiederbringlich verloren.", "commands": ["sudo cryptsetup luksHeaderBackup /dev/loop0 --header-backup-file /root/secret-header.img", "ls -l /root/secret-header.img"]},
-        {"title": "crypttab und fstab", "text_de": "Trage das Gerät in /etc/crypttab mit der Schlüsseldatei ein und ergänze /etc/fstab. Teste das Schließen und erneute Öffnen.", "commands": ["echo 'secret /var/tmp/secret.img /root/secret.key luks' | sudo tee -a /etc/crypttab", "echo '/dev/mapper/secret /mnt/secret ext4 defaults,nofail 0 2' | sudo tee -a /etc/fstab", "sudo umount /mnt/secret && sudo cryptsetup close secret", "sudo cryptdisks_start secret && sudo mount /mnt/secret && cat /mnt/secret/test.txt"]},
-        {"title": "Aufräumen", "text_de": "Entferne die Einträge aus crypttab und fstab wieder, schließe das Gerät und löse das Loop-Gerät.", "commands": ["sudo umount /mnt/secret", "sudo cryptsetup close secret", "sudo losetup -d /dev/loop0", "sudo sed -i '/^secret /d' /etc/crypttab", "sudo sed -i '\\#/dev/mapper/secret#d' /etc/fstab"]}
+        {
+          "title": "Image-Datei und Loop-Gerät",
+          "text_de": "Erzeuge eine 200-MB-Datei und binde sie als Loop-Gerät ein.",
+          "commands": [
+            "sudo apt install cryptsetup",
+            "sudo fallocate -l 200M /var/tmp/secret.img",
+            "sudo losetup -f --show /var/tmp/secret.img"
+          ]
+        },
+        {
+          "title": "LUKS einrichten und öffnen",
+          "text_de": "Formatiere das Loop-Gerät mit LUKS (ersetze loop0 durch die Ausgabe des vorherigen Befehls), öffne es und lege ein Dateisystem an.",
+          "commands": [
+            "sudo cryptsetup luksFormat /dev/loop0",
+            "sudo cryptsetup open /dev/loop0 secret",
+            "sudo mkfs.ext4 /dev/mapper/secret",
+            "sudo mkdir -p /mnt/secret && sudo mount /dev/mapper/secret /mnt/secret",
+            "echo 'vertraulich' | sudo tee /mnt/secret/test.txt"
+          ],
+          "warning_de": "`luksFormat` löscht alle Daten auf dem angegebenen Gerät unwiderruflich. Prüfe mit `losetup -a`, dass du das Loop-Gerät der Image-Datei und nicht eine echte Platte angibst."
+        },
+        {
+          "title": "Zweiten Schlüssel hinzufügen",
+          "text_de": "Erzeuge eine Schlüsseldatei und füge sie als zweiten Schlüsselplatz hinzu. Zeige die belegten Schlüsselplätze an.",
+          "commands": [
+            "sudo dd if=/dev/urandom of=/root/secret.key bs=64 count=1",
+            "sudo chmod 600 /root/secret.key",
+            "sudo cryptsetup luksAddKey /dev/loop0 /root/secret.key",
+            "sudo cryptsetup luksDump /dev/loop0 | grep -E 'Keyslots|^  [0-9]+:'"
+          ]
+        },
+        {
+          "title": "Header sichern",
+          "text_de": "Sichere den LUKS-Header. Ohne Header sind die Daten unwiederbringlich verloren.",
+          "commands": [
+            "sudo cryptsetup luksHeaderBackup /dev/loop0 --header-backup-file /root/secret-header.img",
+            "ls -l /root/secret-header.img"
+          ]
+        },
+        {
+          "title": "crypttab und fstab",
+          "text_de": "Trage das Gerät in /etc/crypttab mit der Schlüsseldatei ein und ergänze /etc/fstab. Teste das Schließen und erneute Öffnen.",
+          "commands": [
+            "echo 'secret /var/tmp/secret.img /root/secret.key luks' | sudo tee -a /etc/crypttab",
+            "echo '/dev/mapper/secret /mnt/secret ext4 defaults,nofail 0 2' | sudo tee -a /etc/fstab",
+            "sudo umount /mnt/secret && sudo cryptsetup close secret",
+            "sudo cryptdisks_start secret && sudo mount /mnt/secret && cat /mnt/secret/test.txt"
+          ],
+          "warning_de": "Fehlerhafte Einträge in /etc/crypttab oder /etc/fstab können den nächsten Start der VM blockieren. Vorher Snapshot anlegen, `nofail` beibehalten."
+        },
+        {
+          "title": "Aufräumen",
+          "text_de": "Entferne die Einträge aus crypttab und fstab wieder, schließe das Gerät und löse das Loop-Gerät.",
+          "commands": [
+            "sudo umount /mnt/secret",
+            "sudo cryptsetup close secret",
+            "sudo losetup -d /dev/loop0",
+            "sudo sed -i '/^secret /d' /etc/crypttab",
+            "sudo sed -i '\\#/dev/mapper/secret#d' /etc/fstab"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Was passiert, wenn der LUKS-Header beschädigt ist, aber die Passphrase bekannt ist?", "answer_de": "Die Daten sind ohne Header verloren, weil er die verschlüsselten Hauptschlüssel enthält. Deshalb ist luksHeaderBackup wichtig."},
-        {"question_de": "Wie viele Schlüsselplätze hat LUKS1 und wozu dienen mehrere?", "answer_de": "Acht. Mehrere Passphrasen oder Schlüsseldateien können unabhängig voneinander hinzugefügt und entfernt werden, ohne die Daten neu zu verschlüsseln."},
-        {"question_de": "Worin unterscheidet sich eCryptfs von dm-crypt?", "answer_de": "eCryptfs verschlüsselt auf Dateiebene über einem bestehenden Dateisystem, dm-crypt verschlüsselt das gesamte Blockgerät unterhalb des Dateisystems."}
+        {
+          "question_de": "Was passiert, wenn der LUKS-Header beschädigt ist, aber die Passphrase bekannt ist?",
+          "answer_de": "Die Daten sind ohne Header verloren, weil er die verschlüsselten Hauptschlüssel enthält. Deshalb ist luksHeaderBackup wichtig."
+        },
+        {
+          "question_de": "Wie viele Schlüsselplätze hat LUKS1 und wozu dienen mehrere?",
+          "answer_de": "Acht. Mehrere Passphrasen oder Schlüsseldateien können unabhängig voneinander hinzugefügt und entfernt werden, ohne die Daten neu zu verschlüsseln."
+        },
+        {
+          "question_de": "Worin unterscheidet sich eCryptfs von dm-crypt?",
+          "answer_de": "eCryptfs verschlüsselt auf Dateiebene über einem bestehenden Dateisystem, dm-crypt verschlüsselt das gesamte Blockgerät unterhalb des Dateisystems."
+        }
+      ],
+      "pitfalls_de": [
+        "Falsches Loop-Gerät: `losetup -f --show` nennt das verwendete Gerät; `/dev/loop0` kann bereits belegt sein (Snap-Pakete!). Immer die Ausgabe verwenden.",
+        "Debian 12 formatiert standardmäßig LUKS2; einige Prüfungsfragen beziehen sich auf LUKS1 (8 Schlüsselplätze). Unterschied kennen.",
+        "Ein Eintrag in /etc/crypttab mit falschem Pfad oder fehlendem `nofail` kann den Bootvorgang anhalten; vor dem Neustart prüfen.",
+        "Header verloren = Daten verloren, auch mit richtiger Passphrase. Deshalb Header-Backup an einem anderen Ort speichern.",
+        "`cryptdisks_start` gibt es nur unter Debian/Ubuntu; auf anderen Distributionen `systemctl start systemd-cryptsetup@secret`."
+      ],
+      "instructor_notes_de": [
+        "Schwierigkeit: Schichtenmodell Datei → Loop-Gerät → LUKS-Container → Mapper-Gerät → Dateisystem. Mit `lsblk` sichtbar machen.",
+        "Alternative Wege: Statt Loop-Image eine zusätzliche virtuelle Platte (vdb) verwenden; statt Schlüsseldatei einen zweiten Passphrase-Slot. Fortgeschrittene: LUKS mit TPM oder `clevis`.",
+        "Erfolgskontrolle: `luksDump`-Ausgabe mit zwei Slots, Nachweis des erneuten Öffnens mit Schlüsseldatei, sauberer Endzustand.",
+        "Prüfungsziele: 331.3 (Verschlüsselte Dateisysteme). Fragen zu dm-crypt/LUKS, crypttab und eCryptfs zu Ziel 331.3 üben."
       ]
     },
     {
-      "id": "lab-303-03", "objective": "334.3", "title": "Zustandsbehaftete Firewall mit iptables",
+      "id": "lab-303-03",
+      "objective": "334.3",
+      "title": "Zustandsbehaftete Firewall mit iptables",
       "goal_de": "Einen Host mit einer Standard-Deny-Firewall absichern, die SSH und HTTP erlaubt, bestehende Verbindungen zulässt und Regeln dauerhaft speichert.",
+      "task_de": "Sichere die VM mit einer zustandsbehafteten Paketfilter-Firewall ab: Standardrichtlinie DROP für eingehende und weitergeleitete Pakete, erlaubt sind Loopback, bestehende Verbindungen, SSH (mit Ratenbegrenzung für neue Verbindungen), HTTP und ICMP Echo. Abgewiesene Pakete werden begrenzt protokolliert. Die Regeln überleben einen Neustart.",
       "environment_de": "Test-VM mit Root-Rechten und Konsolenzugriff (nicht nur SSH), damit eine fehlerhafte Regel nicht aussperrt.",
+      "tools_de": [
+        "man iptables, man iptables-extensions (conntrack, limit, LOG)",
+        "man iptables-save, man iptables-restore, Paket iptables-persistent / netfilter-persistent",
+        "Netfilter-Dokumentation (netfilter.org), Kapitel Connection Tracking",
+        "nmap, ss, journalctl -k zur Prüfung"
+      ],
       "duration_minutes": 40,
+      "success_criteria_de": [
+        "`iptables -L INPUT -n -v` zeigt policy DROP, und die conntrack-Regel steht vor den Dienstfreigaben.",
+        "Deine bestehende SSH-Sitzung bleibt nach dem Setzen der Richtlinie erhalten.",
+        "`nmap -Pn -p 22,80,443` zeigt 22 und 80 open, 443 filtered.",
+        "Im Kernel-Protokoll erscheinen Einträge mit dem Präfix IPT-DROP für abgewiesene Pakete.",
+        "Nach einem Neustart der VM sind die Regeln aktiv (`iptables -L -n` nach `reboot`)."
+      ],
       "steps": [
-        {"title": "Ausgangslage prüfen", "text_de": "Installiere iptables und sieh dir die aktuellen Regeln an. Arbeite über die VM-Konsole, nicht ausschließlich über SSH.", "commands": ["sudo apt install iptables iptables-persistent", "sudo iptables -L -n -v", "sudo iptables -t nat -L -n"]},
-        {"title": "Grundregeln setzen", "text_de": "Erlaube Loopback und Antworten bestehender Verbindungen, bevor du die Standardrichtlinie änderst.", "commands": ["sudo iptables -A INPUT -i lo -j ACCEPT", "sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT", "sudo iptables -A INPUT -m conntrack --ctstate INVALID -j DROP"]},
-        {"title": "Dienste freigeben", "text_de": "Erlaube SSH mit einem Verbindungslimit sowie HTTP und ICMP Echo.", "commands": ["sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m limit --limit 5/min --limit-burst 10 -j ACCEPT", "sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT", "sudo iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT"]},
-        {"title": "Protokollieren und Standardrichtlinie", "text_de": "Protokolliere abgewiesene Pakete begrenzt und setze INPUT auf DROP. Prüfe, dass deine SSH-Sitzung weiter funktioniert.", "commands": ["sudo iptables -A INPUT -m limit --limit 10/min -j LOG --log-prefix 'IPT-DROP: '", "sudo iptables -P INPUT DROP", "sudo iptables -P FORWARD DROP", "sudo iptables -L -n -v --line-numbers"]},
-        {"title": "Testen", "text_de": "Prüfe von einem zweiten Rechner oder mit nmap aus der VM heraus, welche Ports erreichbar sind, und sieh dir die Protokollmeldungen an.", "commands": ["sudo apt install nmap", "nmap -Pn -p 22,80,443 127.0.0.1", "sudo journalctl -k | grep IPT-DROP | tail"]},
-        {"title": "Regeln dauerhaft speichern", "text_de": "Speichere die Regeln, damit sie nach einem Neustart aktiv sind, und prüfe die gespeicherte Datei.", "commands": ["sudo iptables-save | sudo tee /etc/iptables/rules.v4", "cat /etc/iptables/rules.v4"]}
+        {
+          "title": "Ausgangslage prüfen",
+          "text_de": "Installiere iptables und sieh dir die aktuellen Regeln an. Arbeite über die VM-Konsole, nicht ausschließlich über SSH.",
+          "commands": [
+            "sudo apt install iptables iptables-persistent",
+            "sudo iptables -L -n -v",
+            "sudo iptables -t nat -L -n"
+          ]
+        },
+        {
+          "title": "Grundregeln setzen",
+          "text_de": "Erlaube Loopback und Antworten bestehender Verbindungen, bevor du die Standardrichtlinie änderst.",
+          "commands": [
+            "sudo iptables -A INPUT -i lo -j ACCEPT",
+            "sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT",
+            "sudo iptables -A INPUT -m conntrack --ctstate INVALID -j DROP"
+          ]
+        },
+        {
+          "title": "Dienste freigeben",
+          "text_de": "Erlaube SSH mit einem Verbindungslimit sowie HTTP und ICMP Echo.",
+          "commands": [
+            "sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -m limit --limit 5/min --limit-burst 10 -j ACCEPT",
+            "sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT",
+            "sudo iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT"
+          ]
+        },
+        {
+          "title": "Protokollieren und Standardrichtlinie",
+          "text_de": "Protokolliere abgewiesene Pakete begrenzt und setze INPUT auf DROP. Prüfe, dass deine SSH-Sitzung weiter funktioniert.",
+          "commands": [
+            "sudo iptables -A INPUT -m limit --limit 10/min -j LOG --log-prefix 'IPT-DROP: '",
+            "sudo iptables -P INPUT DROP",
+            "sudo iptables -P FORWARD DROP",
+            "sudo iptables -L -n -v --line-numbers"
+          ],
+          "warning_de": "`iptables -P INPUT DROP` sperrt dich aus, wenn die Regeln für Loopback, ESTABLISHED,RELATED und SSH nicht vorher vorhanden sind. Nur mit Konsolenzugriff auf die VM ausführen."
+        },
+        {
+          "title": "Testen",
+          "text_de": "Prüfe von einem zweiten Rechner oder mit nmap aus der VM heraus, welche Ports erreichbar sind, und sieh dir die Protokollmeldungen an.",
+          "commands": [
+            "sudo apt install nmap",
+            "nmap -Pn -p 22,80,443 127.0.0.1",
+            "sudo journalctl -k | grep IPT-DROP | tail"
+          ]
+        },
+        {
+          "title": "Regeln dauerhaft speichern",
+          "text_de": "Speichere die Regeln, damit sie nach einem Neustart aktiv sind, und prüfe die gespeicherte Datei.",
+          "commands": [
+            "sudo iptables-save | sudo tee /etc/iptables/rules.v4",
+            "cat /etc/iptables/rules.v4"
+          ]
+        }
       ],
       "checks": [
-        {"question_de": "Warum muss die Regel für ESTABLISHED,RELATED vor der Richtlinie DROP stehen?", "answer_de": "Sonst würden Antworten bestehender Verbindungen, auch der eigenen SSH-Sitzung, verworfen. Regeln werden der Reihe nach ausgewertet."},
-        {"question_de": "Welchen Zweck hat --ctstate INVALID -j DROP?", "answer_de": "Pakete, die zu keiner bekannten Verbindung passen oder fehlerhaft sind, werden früh verworfen, bevor sie weitere Regeln durchlaufen."},
-        {"question_de": "Wie würdest du dieselbe Firewall für IPv6 umsetzen?", "answer_de": "Mit ip6tables und eigenen Regeln, insbesondere für ICMPv6 (Neighbor Discovery darf nicht blockiert werden), gespeichert in /etc/iptables/rules.v6."}
+        {
+          "question_de": "Warum muss die Regel für ESTABLISHED,RELATED vor der Richtlinie DROP stehen?",
+          "answer_de": "Sonst würden Antworten bestehender Verbindungen, auch der eigenen SSH-Sitzung, verworfen. Regeln werden der Reihe nach ausgewertet."
+        },
+        {
+          "question_de": "Welchen Zweck hat --ctstate INVALID -j DROP?",
+          "answer_de": "Pakete, die zu keiner bekannten Verbindung passen oder fehlerhaft sind, werden früh verworfen, bevor sie weitere Regeln durchlaufen."
+        },
+        {
+          "question_de": "Wie würdest du dieselbe Firewall für IPv6 umsetzen?",
+          "answer_de": "Mit ip6tables und eigenen Regeln, insbesondere für ICMPv6 (Neighbor Discovery darf nicht blockiert werden), gespeichert in /etc/iptables/rules.v6."
+        }
+      ],
+      "pitfalls_de": [
+        "Aussperren: Wer die Richtlinie vor der ESTABLISHED,RELATED-Regel setzt, verliert die SSH-Verbindung. Deshalb Konsole bereithalten.",
+        "Debian 12 nutzt nftables als Backend (`iptables -V` zeigt nf_tables); parallele nft-Regeln können sich mit iptables überschneiden.",
+        "Docker oder libvirt fügen eigene Regeln ein; auf einer reinen Test-VM arbeiten.",
+        "Loopback vergessen: viele lokale Dienste (DNS-Cache, Datenbanken) fallen dann aus.",
+        "Regeln nur im Speicher: Ohne iptables-save/-persistent sind sie nach dem Neustart weg."
+      ],
+      "instructor_notes_de": [
+        "Schwierigkeit: Reihenfolge der Regeln und Bedeutung der Verbindungszustände. Mit `--line-numbers` und einem Paket-Durchlauf an der Tafel arbeiten.",
+        "Alternative Wege: Dieselbe Firewall mit nftables (`nft add table inet filter ...`) umsetzen und beide Regelsätze vergleichen; oder ufw/firewalld als Frontend zeigen und das erzeugte Regelwerk lesen.",
+        "Erfolgskontrolle: Ausgabe von `iptables -L -n -v --line-numbers`, nmap-Ergebnis von einem zweiten System, Protokollzeilen; nach Neustart erneut prüfen.",
+        "Prüfungsziele: 334.3 (Paketfilter), 334.1 (Netzwerkhärtung). Fragen zu conntrack-Zuständen, LOG-Ziel und ip6tables zu Ziel 334.3 üben."
       ]
     }
   ]

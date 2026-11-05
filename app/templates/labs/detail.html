@@ -3,23 +3,69 @@
 {% block content %}
 <nav class="breadcrumb"><a href="/labs">Labs</a> › <a href="/module/{{ lab.module.code }}">{{ lab.module.code }}</a>{% if lab.objective %} › {{ lab.objective.code }} {{ lab.objective.title }}{% endif %}</nav>
 <h1>{{ lab.title }}</h1>
+
 <section class="card">
-  <p><strong>Ziel:</strong> {{ lab.goal_de }}</p>
-  {% if lab.environment_de %}<p><strong>Umgebung:</strong> {{ lab.environment_de }}</p>{% endif %}
-  <p class="muted small">Dauer ca. {{ lab.duration_minutes }} Minuten. Nur in einer Testumgebung ausführen, nie auf produktiven Systemen.</p>
-  {% if progress %}<p><span class="tag tag-ok">erledigt am {{ progress.completed_at.strftime('%d.%m.%Y') }}</span>
-    <form method="post" action="/lab/{{ lab.id }}/reset" class="inline"><button class="link" type="submit">Markierung entfernen</button></form></p>{% endif %}
+  <p><strong>Lernziel:</strong> {{ lab.goal_de }}</p>
+  {% if lab.objective %}<p><strong>Prüfungsziel:</strong> {{ lab.objective.code }} {{ lab.objective.title }} (LPIC-3 {{ lab.module.code }}, Prüfungsziele Version {{ lab.module.version }})</p>{% endif %}
+  {% if lab.environment_de %}<p><strong>Voraussetzungen:</strong> {{ lab.environment_de }} <a class="small" href="/labs/umgebung">Anleitung zur LAB-Umgebung</a></p>{% endif %}
+  <p><strong>Zeitbedarf:</strong> ca. {{ lab.duration_minutes }} Minuten. <span class="muted">Nur in einer Testumgebung ausführen, nie auf produktiven Systemen.</span></p>
+  {% if recommended_by %}<p><span class="tag tag-warn">empfohlen in {{ recommended_by | join(', ') }}</span></p>{% endif %}
+  <p class="lab-status">
+    {% if progress and progress.status == 'completed' %}
+      <span class="tag tag-ok">abgeschlossen am {{ progress.completed_at.strftime('%d.%m.%Y') }}</span>
+      <form method="post" action="/lab/{{ lab.id }}/start" class="inline"><button class="link" type="submit">wieder in Bearbeitung</button></form>
+      <form method="post" action="/lab/{{ lab.id }}/reset" class="inline"><button class="link" type="submit">Markierung entfernen</button></form>
+    {% elif progress %}
+      <span class="tag tag-progress">in Bearbeitung seit {{ progress.started_at.strftime('%d.%m.%Y') if progress.started_at else '' }}</span>
+      <form method="post" action="/lab/{{ lab.id }}/complete" class="inline"><button class="btn btn-small btn-primary" type="submit">Als abgeschlossen markieren</button></form>
+      <form method="post" action="/lab/{{ lab.id }}/reset" class="inline"><button class="link" type="submit">Markierung entfernen</button></form>
+    {% else %}
+      <span class="tag">nicht begonnen</span>
+      <form method="post" action="/lab/{{ lab.id }}/start" class="inline"><button class="btn btn-small btn-primary" type="submit">LAB beginnen</button></form>
+    {% endif %}
+  </p>
 </section>
-<ol class="lab-steps">
-  {% for step in lab.steps %}
-  <li class="card">
-    <h2>{{ step.title }}</h2>
-    {{ step.text_de | nl2p }}
-    {% if step.commands %}<pre><code>{% for c in step.commands %}{{ c }}
+
+{% if lab.task_de %}
+<section class="card">
+  <h2>Aufgabe</h2>
+  {{ lab.task_de | nl2p }}
+</section>
+{% endif %}
+
+{% if lab.tools_de %}
+<section class="card">
+  <h2>Werkzeuge und Dokumentation</h2>
+  <ul>{% for t in lab.tools_de %}<li>{{ t }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+{% if lab.success_criteria_de %}
+<section class="card">
+  <h2>Erfolgskriterien</h2>
+  <p class="muted small">Das LAB ist geschafft, wenn du jeden Punkt an deinem System nachweisen kannst.</p>
+  <ul class="criteria">{% for c in lab.success_criteria_de %}<li>{{ c }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Hilfestellung: ein möglicher Lösungsweg</h2>
+  <p class="muted small">Versuche die Aufgabe zuerst eigenständig. Die folgenden Schritte sind ein Vorschlag, kein verpflichtender Weg; andere Lösungen sind ebenso richtig, wenn sie die Erfolgskriterien erfüllen.</p>
+  <ol class="lab-steps">
+    {% for step in lab.steps %}
+    <li>
+      <details class="hint">
+        <summary>{{ step.title }}</summary>
+        {% if step.warning_de %}<p class="warning"><strong>Achtung:</strong> {{ step.warning_de }}</p>{% endif %}
+        {{ step.text_de | nl2p }}
+        {% if step.commands %}<pre><code>{% for c in step.commands %}{{ c }}
 {% endfor %}</code></pre>{% endif %}
-  </li>
-  {% endfor %}
-</ol>
+      </details>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
 {% if lab.checks %}
 <section class="card">
   <h2>Selbstkontrolle</h2>
@@ -30,7 +76,28 @@
   </ol>
 </section>
 {% endif %}
-{% if not progress %}
-<form method="post" action="/lab/{{ lab.id }}/complete"><button class="btn btn-primary" type="submit">Lab als erledigt markieren</button></form>
+
+{% if lab.pitfalls_de %}
+<section class="card">
+  <h2>Typische Fehler und Schwierigkeiten</h2>
+  <ul>{% for p in lab.pitfalls_de %}<li>{{ p }}</li>{% endfor %}</ul>
+</section>
 {% endif %}
+
+{% if instructor and lab.instructor_notes_de %}
+<section class="card instructor">
+  <h2>Hinweise für Dozenten</h2>
+  <p class="muted small">Nur für Betreuer und Administratoren sichtbar.</p>
+  <ul>{% for n in lab.instructor_notes_de %}<li>{{ n }}</li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Weiter lernen</h2>
+  {% if practice_url %}<p><a class="btn btn-primary" href="{{ practice_url }}">Fragen zu diesem Prüfungsziel üben</a></p>{% endif %}
+  <p class="muted small">Du kannst zuerst Fragen bearbeiten und dann das LAB durchführen, erst praktisch arbeiten und dann Fragen beantworten oder zwischen beidem wechseln.</p>
+  {% if not progress or progress.status != 'completed' %}
+  <form method="post" action="/lab/{{ lab.id }}/complete"><button class="btn" type="submit">LAB als abgeschlossen markieren</button></form>
+  {% endif %}
+</section>
 {% endblock %}

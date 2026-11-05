@@ -2,7 +2,12 @@
 {% block title %}Labs · LPIC-3 Trainer{% endblock %}
 {% block content %}
 <h1>Laboraufgaben</h1>
-<p class="muted">Anleitungen für dein eigenes Linux-Lab mit Selbstkontrolle. Die App führt nichts aus. Nutze ausschließlich Testsysteme, zum Beispiel virtuelle Maschinen.</p>
+<p class="muted">Praktische Aufgaben für dein eigenes Linux-Lab. Die App führt nichts aus. Nutze ausschließlich Testsysteme, zum Beispiel virtuelle Maschinen. LABs, Fragen und Simulationen sind unabhängig voneinander nutzbar; die Reihenfolge wählst du selbst.</p>
+<section class="card">
+  <h2>Deine LAB-Umgebung</h2>
+  <p>Bevor du ein Fach-LAB bearbeitest, brauchst du eine eigene Testumgebung: ein Linux-Rechner mit Virtualisierung (empfohlen KVM/QEMU mit libvirt), zwei bis drei VMs, ein isoliertes virtuelles Netz und Snapshots zum Zurücksetzen.</p>
+  <p><a class="btn btn-primary" href="/labs/umgebung">Anleitung: LAB-Umgebung einrichten</a></p>
+</section>
 {% for m in modules %}
 {% set mlabs = labs | selectattr('module_id', 'equalto', m.id) | list %}
 {% if mlabs %}
@@ -10,8 +15,13 @@
   <h2>{{ m.code }} · {{ m.title }}</h2>
   <ul class="lab-list">
     {% for lab in mlabs %}
-    <li>{% if lab.id in done %}<span class="tag tag-ok">erledigt</span>{% endif %} <a href="/lab/{{ lab.id }}">{{ lab.title }}</a>
-      <span class="muted small">{% if lab.objective %}Ziel {{ lab.objective.code }} · {% endif %}ca. {{ lab.duration_minutes }} min</span></li>
+    {% set p = progress.get(lab.id) %}
+    <li>
+      {% if p and p.status == 'completed' %}<span class="tag tag-ok">abgeschlossen</span>{% elif p %}<span class="tag tag-progress">in Bearbeitung</span>{% else %}<span class="tag">nicht begonnen</span>{% endif %}
+      <a href="/lab/{{ lab.id }}">{{ lab.title }}</a>
+      <span class="muted small">{% if lab.objective %}Ziel {{ lab.objective.code }} · {% endif %}ca. {{ lab.duration_minutes }} min</span>
+      {% if lab.id in recommended %}<span class="tag tag-warn" title="Empfohlen in: {{ recommended[lab.id] | join(', ') }}">empfohlen · {{ recommended[lab.id] | join(', ') }}</span>{% endif %}
+    </li>
     {% endfor %}
   </ul>
 </section>
