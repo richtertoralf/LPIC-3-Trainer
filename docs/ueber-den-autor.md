@@ -48,10 +48,6 @@ Auch der Lernweg bleibt offen. Manche beginnen mit Prüfungsfragen, andere mit e
 
 ## Ein offenes Projekt
 
-Der LPIC-3-Trainer ist ein Projekt von RICHTER.PROJECTS.
-
-Unser Leitgedanke lautet: **Möglichkeiten schaffen.**
-
 Ich möchte ein Werkzeug entwickeln, das Einzelpersonen ebenso nutzen können wie Linux-Vereine, freiberufliche Dozenten und Bildungseinrichtungen.
 
 Der Quellcode ist öffentlich zugänglich. Beiträge, praktische Erfahrungen, Verbesserungsvorschläge und die gemeinsame Weiterentwicklung sind willkommen.
