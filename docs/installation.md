@@ -21,7 +21,7 @@ Prüfstand: Der komplette Ablauf (Installation, Dienststart durch systemd, Neust
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout v0.0.3          # oder ein neuerer Tag; nicht v0.0.2, siehe Hinweis oben
+git checkout v0.0.4          # oder ein neuerer Tag; nicht v0.0.2, siehe Hinweis oben
 ```
 
 Für den Betrieb den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
@@ -183,7 +183,7 @@ Manueller Weg für Entwicklungsstände, Offline-Server oder eine ältere Version
 ```bash
 cd ~/LPIC-3-Trainer
 git fetch --tags
-git checkout v0.0.3        # gewünschter Stand, siehe git tag
+git checkout v0.0.4        # gewünschter Stand, siehe git tag
 sudo lpic3ctl --upgrade --source "$PWD"
 ```
 
@@ -210,7 +210,7 @@ Hat das Upgrade das Datenbankschema geändert, verweigert `rollback` ohne `--res
 Version prüfen:
 
 ```bash
-lpic3ctl --version            # z. B. LPIC-3 Trainer 0.0.3 (commit b8c30f5, release v0.0.3, installiert 2026-11-05T09:12:00+01:00)
+lpic3ctl --version            # z. B. LPIC-3 Trainer 0.0.4 (commit 1a2b3c4, release v0.0.4, installiert 2026-11-05T21:30:00+01:00)
 lpic3ctl version --remote     # zusätzlich das neueste stabile Release auf GitHub
 ```
 
