@@ -10,6 +10,7 @@ import argparse
 import getpass
 import os
 import pwd
+import re
 import shutil
 import subprocess
 import sys
@@ -31,13 +32,25 @@ UNIT_PATH = SYSTEMD_DIR / f"{SERVICE_NAME}.service"
 BIN_LINK = Path(os.environ.get("LPIC3_BIN_DIR", "/usr/local/bin")) / "lpic3ctl"
 APP_DIR = INSTALL_DIR / "app"
 PREVIOUS_DIR = INSTALL_DIR / "app.previous"
+STAGING_DIR = INSTALL_DIR / "app.new"
+STAGING_VENV = INSTALL_DIR / "venv.new"
 VENV_DIR = INSTALL_DIR / "venv"
+BUILD_FILE = APP_DIR / "BUILD"
 SOURCE_DIR = Path(__file__).resolve().parent.parent
+PRODUCT = "LPIC-3 Trainer"
+# Upgrade source: the newest stable tag vX.Y.Z of this repository (RICHTER.PROJECTS ADR-002).
+# Overridable for tests and mirrors.
+REMOTE_URL = os.environ.get(
+    "LPIC3_UPGRADE_REMOTE", "https://github.com/richtertoralf/LPIC-3-Trainer.git"
+)
+STABLE_TAG_RE = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 
+# Exit codes as in RICHTER.PROJECTS ADR-002: 0 success (also "already up to date" or a
+# deliberately stopped service), 1 technical error (also "not installed"), 2 invalid
+# parameters or configuration.
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_USAGE = 2
-EXIT_MISSING = 3
 
 
 class CliError(Exception):
@@ -263,7 +276,7 @@ def cmd_user(args) -> int:
             return EXIT_OK
         user = db.execute(select(User).where(User.username == args.username)).scalar_one_or_none()
         if user is None:
-            raise CliError(f"Benutzer {args.username} nicht gefunden.", EXIT_MISSING)
+            raise CliError(f"Benutzer {args.username} nicht gefunden.", EXIT_ERROR)
         if args.user_command == "set-role":
             if args.role not in ROLES:
                 raise CliError(f"Rolle muss eine von {', '.join(ROLES)} sein.", EXIT_USAGE)
@@ -307,7 +320,7 @@ def cmd_backup(args) -> int:
     settings = _settings()
     db_path = settings.db_path
     if not db_path.is_file():
-        raise CliError(f"Datenbank {db_path} nicht gefunden.", EXIT_MISSING)
+        raise CliError(f"Datenbank {db_path} nicht gefunden.", EXIT_ERROR)
     target_dir = Path(args.to) if args.to else settings.data_dir / "backups"
     target_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -424,7 +437,7 @@ def _code_revisions(app_dir: Path) -> set[str]:
 def cmd_restore(args) -> int:
     archive = Path(args.archive)
     if not archive.is_file():
-        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_MISSING)
+        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_ERROR)
     settings = _settings()
     db_path = settings.db_path
     if not args.yes:
@@ -540,6 +553,11 @@ def _copy_source(source: Path, target: Path) -> None:
         if PREVIOUS_DIR.exists():
             shutil.rmtree(PREVIOUS_DIR)
         shutil.move(str(target), str(PREVIOUS_DIR))
+    _copy_tree(source, target)
+
+
+def _copy_tree(source: Path, target: Path) -> None:
+    """Copy a source checkout to ``target`` and record the build information there."""
     ignore = shutil.ignore_patterns(
         ".git",
         ".venv",
@@ -566,6 +584,116 @@ def _copy_source(source: Path, target: Path) -> None:
             (target / "GIT_VERSION").write_text(describe.stdout.strip() + "\n")
     except FileNotFoundError:
         pass
+    _write_build_info(source, target)
+
+
+def _git(source: Path, *args: str) -> str:
+    """Output of a git command in ``source`` or an empty string (no git, no repository)."""
+    try:
+        result = run(["git", "-C", str(source), *args], check=False, capture=True)
+    except FileNotFoundError:
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _version_in(app_dir: Path) -> str:
+    init = app_dir / "app" / "__init__.py"
+    if init.is_file():
+        for line in init.read_text().splitlines():
+            if line.startswith("__version__"):
+                return line.split("=")[1].strip().strip('"')
+    return "unbekannt"
+
+
+def _write_build_info(source: Path, target: Path) -> None:
+    """Write ``BUILD`` (version, commit, branch, release, dirty, source, time) into ``target``.
+
+    Every path that copies program files goes through here, so ``--version`` and ``--status``
+    can report the installed software state offline (ADR-002, section 4.1).
+    """
+    branch = _git(source, "rev-parse", "--abbrev-ref", "HEAD")
+    info = {
+        "version": _version_in(target),
+        "commit": _git(source, "rev-parse", "HEAD") or "unbekannt",
+        "branch": branch if branch and branch != "HEAD" else "",
+        "release": _git(source, "describe", "--tags", "--exact-match"),
+        "dirty": "true" if _git(source, "status", "--porcelain") else "false",
+        "source": str(source),
+        "installed_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+    }
+    (target / "BUILD").write_text("".join(f"{k}={v}\n" for k, v in info.items()))
+
+
+def _build_info() -> dict[str, str]:
+    """Build information of the installation (empty when not installed or pre-BUILD)."""
+    info: dict[str, str] = {}
+    if BUILD_FILE.is_file():
+        for line in BUILD_FILE.read_text().splitlines():
+            key, sep, value = line.partition("=")
+            if sep:
+                info[key.strip()] = value.strip()
+    return info
+
+
+def _parse_version(text: str) -> tuple[int, ...] | None:
+    """``v0.0.3`` / ``0.0.3`` -> (0, 0, 3); anything else -> None."""
+    match = re.match(r"^v?(\d+)\.(\d+)\.(\d+)$", text.strip())
+    return tuple(int(x) for x in match.groups()) if match else None
+
+
+def _version_line() -> str:
+    """One line in the RICHTER.PROJECTS format, without network, venv or running service."""
+    if not APP_DIR.exists():
+        return (
+            f"{PRODUCT} {__version__} (nicht installiert; dieses lpic3ctl läuft aus {SOURCE_DIR})"
+        )
+    info = _build_info()
+    version = info.get("version") or _installed_version()
+    parts = [f"commit {info['commit'][:7] if info.get('commit') else 'unbekannt'}"]
+    if info.get("dirty") == "true":
+        parts[0] += ", dirty"
+    if info.get("release"):
+        parts.append(f"release {info['release']}")
+    elif info.get("branch"):
+        parts.append(f"branch {info['branch']}")
+    else:
+        parts.append("branch unbekannt")
+    parts.append(f"installiert {info.get('installed_at') or 'unbekannt'}")
+    return f"{PRODUCT} {version} ({', '.join(parts)})"
+
+
+def _latest_stable_tag(remote: str = REMOTE_URL) -> tuple[str, tuple[int, ...]]:
+    """Newest tag ``vX.Y.Z`` of the remote. Pre-releases (``v1.0.0-rc1``) are ignored."""
+    try:
+        result = run(
+            ["git", "ls-remote", "--tags", "--refs", remote],
+            check=False,
+            capture=True,
+            timeout=60,
+            env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        )
+    except FileNotFoundError:
+        raise CliError("git ist nicht installiert; Upgrade mit --source PFAD.") from None
+    except subprocess.TimeoutExpired:
+        raise CliError(
+            "Keine Antwort von GitHub; Installation unverändert. "
+            "Netz prüfen oder Upgrade mit --source PFAD."
+        ) from None
+    if result.returncode != 0:
+        raise CliError(
+            "Kein Zugriff auf GitHub; Installation unverändert. "
+            "Netz prüfen oder Upgrade mit --source PFAD."
+        )
+    tags = []
+    for line in result.stdout.splitlines():
+        tag = line.split("refs/tags/")[-1].strip()
+        parsed = _parse_version(tag) if STABLE_TAG_RE.match(tag) else None
+        if parsed:
+            tags.append((parsed, tag))
+    if not tags:
+        raise CliError("Kein stabiles Release (Tag vX.Y.Z) gefunden; Installation unverändert.")
+    parsed, tag = max(tags)
+    return tag, parsed
 
 
 def _create_venv() -> None:
@@ -604,7 +732,7 @@ def cmd_install(args) -> int:
     if problems:
         for p in problems:
             print(f"Fehlende Voraussetzung: {p}", file=sys.stderr)
-        return EXIT_MISSING
+        return EXIT_ERROR
     source = Path(args.source).resolve() if args.source else SOURCE_DIR
     if not (source / "pyproject.toml").is_file():
         raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
@@ -678,20 +806,109 @@ def _installed_version() -> str:
 def cmd_upgrade(args) -> int:
     require_root()
     if not APP_DIR.exists():
-        raise CliError(
-            "Keine Installation gefunden. Bitte zuerst 'lpic3ctl install' ausführen.", EXIT_MISSING
-        )
-    source = Path(args.source).resolve() if args.source else SOURCE_DIR
-    if source == APP_DIR:
-        raise CliError(
-            "Bitte das Upgrade aus einem frischen Quellcode-Checkout starten "
-            "(z. B. git clone + git checkout vX.Y.Z), nicht aus dem installierten Verzeichnis.",
-            EXIT_USAGE,
-        )
-    if not (source / "pyproject.toml").is_file():
-        raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
+        raise CliError("Keine Installation gefunden. Bitte zuerst 'lpic3ctl install' ausführen.")
     load_env_file()
+    tmp: str | None = None
+    if args.source:
+        source = Path(args.source).resolve()
+        if source == APP_DIR:
+            raise CliError(
+                "Bitte das Upgrade aus einem frischen Quellcode-Checkout starten "
+                "(z. B. git clone + git checkout vX.Y.Z), nicht aus dem installierten Verzeichnis.",
+                EXIT_USAGE,
+            )
+    else:
+        # Standard way (ADR-002): the newest stable release tag of the repository.
+        tag, latest = _latest_stable_tag()
+        info = _build_info()
+        installed_text = info.get("release") or info.get("version") or _installed_version()
+        installed = _parse_version(installed_text)
+        say(f"Installiert: {installed_text}, neuestes stabiles Release: {tag}")
+        if installed is not None and installed == latest:
+            say("Bereits aktuell. Keine Änderung, kein Neustart.")
+            return EXIT_OK
+        if installed is not None and installed > latest:
+            say(
+                "Der installierte Stand ist neuer als das neueste Release; kein Downgrade. "
+                "Ein anderer Stand lässt sich mit --source PFAD installieren."
+            )
+            return EXIT_OK
+        tmp = tempfile.mkdtemp(prefix="lpic3-upgrade-")
+        source = Path(tmp) / "src"
+        clone = run(
+            ["git", "clone", "--quiet", "--depth", "1", "--branch", tag, REMOTE_URL, str(source)],
+            check=False,
+            capture=True,
+            env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        )
+        if clone.returncode != 0:
+            shutil.rmtree(tmp, ignore_errors=True)
+            raise CliError(
+                f"Release {tag} konnte nicht geladen werden; Installation unverändert.\n"
+                f"{clone.stderr.strip()}"
+            )
+    if not (source / "pyproject.toml").is_file():
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
+        raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
+    try:
+        return _perform_upgrade(source, args)
+    finally:
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _probe_new_version(stage: Path) -> None:
+    """Build the new version next to the running one and check it before any service stop.
+
+    The probe venv is a throwaway: it proves that the dependencies resolve, the package
+    imports and the operator's existing configuration is accepted by the new code.
+    """
+    if STAGING_VENV.exists():
+        shutil.rmtree(STAGING_VENV)
+    run(["bash", str(stage / "deploy" / "create-venv.sh"), str(STAGING_VENV), str(stage)])
+    env = {k: v for k, v in os.environ.items() if k.startswith("LPIC3_") or k in ("PATH", "LANG")}
+    env["LPIC3_QUIET_MIGRATIONS"] = "1"
+    probe = run(
+        [
+            str(STAGING_VENV / "bin" / "python"),
+            "-c",
+            "import app.main\nfrom app.config import Settings\nSettings()",
+        ],
+        check=False,
+        capture=True,
+        env=env,
+        cwd=str(stage),
+    )
+    shutil.rmtree(STAGING_VENV, ignore_errors=True)
+    if probe.returncode != 0:
+        detail = probe.stderr.strip().splitlines()
+        last = detail[-1] if detail else "unbekannter Fehler"
+        config_error = "ValueError" in last and "LPIC3_" in last
+        raise CliError(
+            "Die neue Version wurde nicht übernommen, der Dienst läuft unverändert weiter: "
+            + (
+                f"die vorhandene Konfiguration passt nicht zur neuen Version ({last})"
+                if config_error
+                else f"Start-Probe fehlgeschlagen ({last})"
+            ),
+            EXIT_USAGE if config_error else EXIT_ERROR,
+        )
+
+
+def _perform_upgrade(source: Path, args) -> int:
     say(f"Installierte Version: {_installed_version()}")
+    # 1. Stage and check the new version while the service keeps running.
+    if STAGING_DIR.exists():
+        shutil.rmtree(STAGING_DIR)
+    say("Neue Version wird neben der laufenden aufgebaut und geprüft ...")
+    try:
+        _copy_tree(source, STAGING_DIR)
+        _probe_new_version(STAGING_DIR)
+    except Exception:
+        shutil.rmtree(STAGING_DIR, ignore_errors=True)
+        raise
+    # 2. Backup, then swap with the service stopped; the systemd state is restored exactly.
     say("Sicherung vor dem Upgrade ...")
     backup_args = argparse.Namespace(to=None, keep=None)
     settings = _settings()
@@ -701,7 +918,10 @@ def cmd_upgrade(args) -> int:
     if was_active:
         systemctl("stop", SERVICE_NAME)
     try:
-        _copy_source(source, APP_DIR)
+        if PREVIOUS_DIR.exists():
+            shutil.rmtree(PREVIOUS_DIR)
+        shutil.move(str(APP_DIR), str(PREVIOUS_DIR))
+        shutil.move(str(STAGING_DIR), str(APP_DIR))
         _create_venv()
         _write_env_file()
         _chown_service_files()
@@ -718,8 +938,10 @@ def cmd_upgrade(args) -> int:
         if was_active:
             systemctl("start", SERVICE_NAME, check=False)
         return EXIT_ERROR
-    if was_active or not args.no_start:
+    if was_active and not args.no_start:
         systemctl("restart", SERVICE_NAME)
+    elif not was_active:
+        say("Der Dienst war gestoppt und bleibt gestoppt.")
     say(f"Upgrade abgeschlossen. Neue Version: {_installed_version()}")
     say(f"Vorherige Programmdateien liegen unter {PREVIOUS_DIR} ('lpic3ctl rollback').")
     return EXIT_OK
@@ -728,13 +950,13 @@ def cmd_upgrade(args) -> int:
 def cmd_rollback(args) -> int:
     require_root()
     if not PREVIOUS_DIR.exists():
-        raise CliError("Keine vorherige Version vorhanden.", EXIT_MISSING)
+        raise CliError("Keine vorherige Version vorhanden.", EXIT_ERROR)
     load_env_file()
     settings = _settings()
     db_path = settings.db_path
     archive = Path(args.restore).resolve() if args.restore else None
     if archive and not archive.is_file():
-        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_MISSING)
+        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_ERROR)
     # The previous code must know the database schema, otherwise the service would
     # crash at start (Alembic: "Can't locate revision"). Checked before touching anything.
     db_rev = _db_revision(db_path)
@@ -789,39 +1011,74 @@ def cmd_rollback(args) -> int:
 
 
 def cmd_version(args) -> int:
-    say(f"Dieses lpic3ctl:        {__version__}")
-    say(f"Installiert:            {_installed_version()}")
-    remote = "https://github.com/richtertoralf/LPIC-3-Trainer.git"
-    try:
-        result = run(
-            ["git", "ls-remote", "--tags", "--refs", remote], check=False, capture=True, timeout=15
-        )
-        tags = sorted(
-            (
-                line.split("refs/tags/")[-1]
-                for line in result.stdout.splitlines()
-                if "refs/tags/v" in line
-            ),
-            key=lambda t: [int(x) if x.isdigit() else 0 for x in t.lstrip("v").split(".")],
-        )
-        say(f"Neueste Veröffentlichung: {tags[-1] if tags else 'keine Tags gefunden'}")
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        say("Neueste Veröffentlichung: nicht abrufbar (kein Netz oder git fehlt)")
+    say(_version_line())
+    if getattr(args, "remote", False):
+        try:
+            tag, _ = _latest_stable_tag()
+            say(f"Neuestes stabiles Release: {tag}")
+        except CliError as exc:
+            say(f"Neuestes stabiles Release: nicht abrufbar ({exc})")
     return EXIT_OK
 
 
+def _lan_addresses(ip_output: str | None = None) -> list[str]:
+    """Global IPv4 addresses of physical interfaces (virtual bridges and veths left out)."""
+    if ip_output is None:
+        try:
+            ip_output = run(
+                ["ip", "-o", "-4", "addr", "show", "scope", "global"], check=False, capture=True
+            ).stdout
+        except FileNotFoundError:
+            return []
+    skip = ("docker", "br-", "virbr", "lxdbr", "lxcbr", "veth", "vnet", "tap")
+    addresses = []
+    for line in ip_output.splitlines():
+        fields = line.split()
+        if len(fields) < 4 or fields[2] != "inet":
+            continue
+        iface, address = fields[1], fields[3].split("/")[0]
+        if iface.startswith(skip):
+            continue
+        addresses.append(address)
+    return addresses
+
+
+def _access_urls(host: str, port: int) -> list[str]:
+    """Complete URLs for the local address and, when bound to all interfaces, the LAN."""
+    if host in ("0.0.0.0", "::", ""):
+        return [f"http://127.0.0.1:{port}/"] + [f"http://{a}:{port}/" for a in _lan_addresses()]
+    shown = f"[{host}]" if ":" in host else host
+    return [f"http://{shown}:{port}/"]
+
+
 def cmd_status(args) -> int:
+    """Read-only state. Exit 0 also for a deliberately stopped service, 1 for a technical
+    error (unit failed, active but not answering, not installed), 2 for invalid configuration."""
     load_env_file()
-    say(f"Version:       {_installed_version()}")
+    if not APP_DIR.exists():
+        say(f"{PRODUCT}: nicht installiert ({INSTALL_DIR} fehlt), siehe docs/installation.md")
+        return EXIT_ERROR
+    code = EXIT_OK
+    say(f"Version:       {_version_line()}")
     if CONFIG_UNREADABLE:
-        say(f"Konfiguration: {ENV_FILE} nicht lesbar (Root-Rechte nötig, Werte sind Standardwerte)")
+        say(f"Konfiguration: {ENV_FILE} (nicht lesbar, Standardwerte; 'sudo lpic3ctl --status')")
+    else:
+        say(f"Konfiguration: {ENV_FILE}" + ("" if ENV_FILE.is_file() else " (fehlt)"))
+    try:
+        settings = _settings()
+    except ValueError as exc:
+        say(f"Fehler:        ungültige Konfiguration: {exc}")
+        return EXIT_USAGE
+    state = "nicht installiert"
     if has_systemd() and UNIT_PATH.exists():
-        state = systemctl("is-active", SERVICE_NAME, check=False).stdout.strip()
-        enabled = systemctl("is-enabled", SERVICE_NAME, check=False).stdout.strip()
-        say(f"Dienst:        {state} ({enabled})")
+        state = systemctl("is-active", SERVICE_NAME, check=False).stdout.strip() or "unknown"
+        enabled = systemctl("is-enabled", SERVICE_NAME, check=False).stdout.strip() or "unknown"
+        say(f"Dienst:        {state}")
+        say(f"Autostart:     {enabled}")
+        if state == "failed":
+            code = EXIT_ERROR
     else:
         say("Dienst:        nicht installiert")
-    settings = _settings()
     say(
         f"Datenbank:     {settings.db_path} "
         f"({'vorhanden' if settings.db_path.exists() else 'fehlt'})"
@@ -835,7 +1092,21 @@ def cmd_status(args) -> int:
         say(f"Schema:        nicht lesbar ({exc.__class__.__name__})")
     health = _http_health(settings.host, settings.port)
     say(f"Health-Check:  {health}")
-    return EXIT_OK
+    if state in ("active", "activating", "reloading") and not health.startswith("ok"):
+        say("Fehler:        Dienst aktiv, aber der Health-Endpunkt antwortet nicht.")
+        code = EXIT_ERROR
+    running = _running_version(health)
+    installed = _build_info().get("version")
+    if running and installed and running != installed:
+        say(f"Hinweis:       laufend {running}, installiert {installed}: Neustart nötig.")
+    for url in _access_urls(settings.host, settings.port):
+        say(f"Adresse:       {url}")
+    return code
+
+
+def _running_version(health: str) -> str:
+    match = re.search(r"Version ([^)]+)\)", health)
+    return match.group(1) if match else ""
 
 
 def _http_health(host: str, port: int) -> str:
@@ -854,7 +1125,7 @@ def _http_health(host: str, port: int) -> str:
 def _service_cmd(action: str) -> int:
     require_root()
     if not UNIT_PATH.exists():
-        raise CliError("Der Dienst ist nicht installiert.", EXIT_MISSING)
+        raise CliError("Der Dienst ist nicht installiert.", EXIT_ERROR)
     result = systemctl(action, SERVICE_NAME, check=False)
     if result.returncode != 0:
         print(result.stderr.strip(), file=sys.stderr)
@@ -877,7 +1148,7 @@ def cmd_restart(args) -> int:
 
 def cmd_logs(args) -> int:
     if shutil.which("journalctl") is None:
-        raise CliError("journalctl nicht gefunden.", EXIT_MISSING)
+        raise CliError("journalctl nicht gefunden.", EXIT_ERROR)
     cmd = ["journalctl", "-u", SERVICE_NAME, "-n", str(args.lines), "--no-pager"]
     if args.follow:
         cmd.append("-f")
@@ -1000,9 +1271,21 @@ def cmd_purge(args) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="lpic3ctl", description="LPIC-3 Trainer installieren, betreiben und verwalten."
+        prog="lpic3ctl",
+        description="LPIC-3 Trainer installieren, betreiben und verwalten.",
+        epilog=(
+            "Verwaltung nach RICHTER.PROJECTS-Standard (Langoptionen, gleichwertig zu den "
+            "Unterbefehlen):\n"
+            "  lpic3ctl --version                  installierte Version und Herkunft (offline)\n"
+            "  lpic3ctl --status                   Betriebszustand, Exit 0/1/2\n"
+            "  sudo lpic3ctl --upgrade             neuestes stabiles Release installieren\n"
+            "  sudo lpic3ctl --upgrade --source P  aus einem lokalen Checkout installieren\n"
+            "  sudo lpic3ctl --uninstall           entfernen, Konfiguration und Daten bleiben\n"
+            "  sudo lpic3ctl --uninstall --purge   zusätzlich Konfiguration und Daten entfernen\n"
+            "  zusätzlich: --check, --restart"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--version", action="version", version=f"lpic3ctl {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("install", help="Anwendung installieren (Root)")
@@ -1011,8 +1294,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-start", action="store_true", help="Dienst nicht starten")
     p.set_defaults(func=cmd_install)
 
-    p = sub.add_parser("upgrade", help="Anwendung aktualisieren (Root)")
-    p.add_argument("--source", help="Quellverzeichnis mit der neuen Version")
+    p = sub.add_parser(
+        "upgrade", help="auf das neueste stabile Release aktualisieren (Root); --source: lokal"
+    )
+    p.add_argument("--source", help="Quellverzeichnis mit der neuen Version statt GitHub-Release")
     p.add_argument("--no-start", action="store_true")
     p.set_defaults(func=cmd_upgrade)
 
@@ -1023,9 +1308,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="zusätzlich die Datenbank aus dieser Sicherung (von vor dem Upgrade) einspielen",
     )
     p.set_defaults(func=cmd_rollback)
-    sub.add_parser("version", help="installierte und verfügbare Version anzeigen").set_defaults(
-        func=cmd_version
-    )
+    p = sub.add_parser("version", help="installierte Version und Herkunft anzeigen (offline)")
+    p.add_argument("--remote", action="store_true", help="zusätzlich das neueste Release abfragen")
+    p.set_defaults(func=cmd_version)
     sub.add_parser("status", help="Dienststatus und Systemzustand").set_defaults(func=cmd_status)
     sub.add_parser("start", help="Dienst starten").set_defaults(func=cmd_start)
     sub.add_parser("stop", help="Dienst stoppen").set_defaults(func=cmd_stop)
@@ -1122,10 +1407,33 @@ def _restore_data_ownership() -> None:
         warn(f"Dateirechte konnten nicht gesetzt werden: {exc}")
 
 
+# Long options of the RICHTER.PROJECTS standard (ADR-002) mapped onto the existing
+# subcommands. ``--uninstall --purge`` becomes ``purge``; everything after the option is
+# passed through unchanged, so ``--upgrade --source PFAD`` works as documented.
+LONG_OPTIONS = {
+    "--version": "version",
+    "--status": "status",
+    "--upgrade": "upgrade",
+    "--uninstall": "uninstall",
+    "--check": "check",
+    "--restart": "restart",
+}
+
+
+def translate_argv(argv: list[str]) -> list[str]:
+    if not argv or argv[0] not in LONG_OPTIONS:
+        return argv
+    rest = list(argv[1:])
+    if argv[0] == "--uninstall" and "--purge" in rest:
+        rest.remove("--purge")
+        return ["purge", *rest]
+    return [LONG_OPTIONS[argv[0]], *rest]
+
+
 def main(argv: list[str] | None = None) -> int:
     load_env_file()
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = parser.parse_args(translate_argv(sys.argv[1:] if argv is None else list(argv)))
     if args.command not in ("serve", "migrate", "upgrade", "install", "content-sync", "import"):
         os.environ.setdefault("LPIC3_QUIET_MIGRATIONS", "1")
     try:

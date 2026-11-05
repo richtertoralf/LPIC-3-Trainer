@@ -4,13 +4,29 @@
 
 `lpic3ctl` ist das zentrale Werkzeug. Nach der Installation liegt es unter `/usr/local/bin/lpic3ctl`. Jeder Befehl hat `--help`.
 
+Verwaltung nach dem einheitlichen Standard der RICHTER.PROJECTS-Anwendungen (Langoptionen; die Unterbefehle darunter bleiben als Aliase gültig):
+
+| Aufruf | Bedeutung | Exit |
+|---|---|---|
+| `lpic3ctl --help` | Kurzhilfe mit allen Befehlen | 0 |
+| `lpic3ctl --version` | eine Zeile: `LPIC-3 Trainer <Version> (commit <7 Zeichen>[, dirty], release <Tag> oder branch <Name>, installiert <Zeit>)`, aus `/opt/lpic3-trainer/app/BUILD`, ohne Netz, venv oder laufenden Dienst; unbekannte Werte heißen `unbekannt` | 0 |
+| `lpic3ctl --status` | rein lesend: Version, Konfigurationsdatei, Dienst, Autostart, Datenbank, Schema, Health-Check, Hinweis „Neustart nötig“ bei abweichender laufender Version, Zugriffsadressen (`http://127.0.0.1:PORT/`, bei Bindung an alle Schnittstellen auch die LAN-Adressen ohne Docker-, libvirt- und LXD-Bridges) | 0 kein technischer Fehler (auch gestoppter Dienst), 1 Unit `failed`, aktiv ohne Antwort oder nicht installiert, 2 ungültige Konfiguration |
+| `sudo lpic3ctl --upgrade` | neuestes stabiles Release `vX.Y.Z` von GitHub installieren; „Bereits aktuell“ ohne Änderung und Neustart; kein Downgrade, keine Vorabversionen, nie `main` | 0 Erfolg oder bereits aktuell, 1 Fehler oder kein Netz (Installation unverändert oder wiederhergestellt), 2 Konfiguration passt nicht zur neuen Version |
+| `sudo lpic3ctl --upgrade --source PFAD` | aus einem lokalen Checkout installieren (Branch, Arbeitsstand, offline, ältere Version) | wie oben |
+| `sudo lpic3ctl --uninstall` | Dienst, Programmdateien und Kommando entfernen; Konfiguration, Daten und Dienstkonto bleiben | 0 |
+| `sudo lpic3ctl --uninstall --purge [--yes]` | zusätzlich Konfiguration, Daten und Dienstkonto `lpic3` entfernen, mit Rückfrage | 0, 2 bei Abbruch |
+
+Zusätzlich, nicht Teil des Standards: `lpic3ctl --check` (Prüfliste) und `sudo lpic3ctl --restart`.
+
+Vollständige Befehlsliste:
+
 | Befehl | Funktion | Root |
 |--------|----------|------|
 | `lpic3ctl install [--source DIR] [--force] [--no-start]` | installieren | ja |
-| `lpic3ctl upgrade --source DIR` | aktualisieren mit Sicherung | ja |
+| `lpic3ctl upgrade [--source DIR]` | aktualisieren mit Prüfung vor dem Stopp, Sicherung und Rückfall | ja |
 | `lpic3ctl rollback [--restore ARCHIV]` | vorherige Programmversion zurück, bei Schemaänderung zusammen mit der Sicherung | ja |
-| `lpic3ctl version` | installierte und neueste Version (Git-Tags) | nein |
-| `lpic3ctl status` | Dienst, Datenbank, Schema, Health-Check | nein |
+| `lpic3ctl version [--remote]` | installierte Version und Herkunft; `--remote` fragt zusätzlich das neueste Release ab | nein |
+| `lpic3ctl status` | Betriebszustand mit Zugriffsadressen | nein |
 | `lpic3ctl start` / `stop` / `restart` | Dienst steuern | ja |
 | `lpic3ctl logs [-n N] [-f]` | journald-Protokolle | nein |
 | `lpic3ctl backup [--to DIR] [--keep N]` | Sicherung erstellen | nein* |
@@ -27,7 +43,7 @@
 
 \* Benötigt Schreibrechte auf das Datenverzeichnis. Auf einer Standardinstallation als `root` oder `lpic3` ausführen, zum Beispiel `sudo lpic3ctl backup`. Nach einem als Root ausgeführten Befehl setzt `lpic3ctl` die Eigentümer im Daten- und Konfigurationsverzeichnis wieder auf den Dienstbenutzer, damit keine root-eigenen `-wal`/`-shm`-Dateien den Dienst blockieren. Ohne Root ist die Konfiguration (`0640 root:lpic3`) nicht lesbar; `status` und `check` melden das und arbeiten mit Standardwerten.
 
-Exit-Codes: `0` Erfolg, `1` Fehler, `2` Bedienfehler oder Abbruch, `3` fehlende Voraussetzung oder Objekt nicht gefunden.
+Exit-Codes nach dem RICHTER.PROJECTS-Standard: `0` Erfolg (auch „bereits aktuell“, „nichts zu entfernen“ oder bewusst gestoppter Dienst), `1` technischer Fehler (auch nicht installiert, Objekt nicht gefunden, kein Netz), `2` ungültige Parameter, ungültige Konfiguration oder Abbruch durch den Benutzer. Der frühere Code `3` wird nicht mehr verwendet.
 
 ## Benutzerverwaltung
 
@@ -150,14 +166,15 @@ Diese Abläufe sind durch Regressionstests abgedeckt (`tests/test_restore_regres
 
 ## Upgrade und Rollback
 
-`lpic3ctl upgrade --source DIR` sichert zuerst (Archiv in `backups/`), stoppt den Dienst, verschiebt die alte Version nach `/opt/lpic3-trainer/app.previous`, kopiert die neue, erneuert das venv, migriert die Datenbank, importiert die mitgelieferten Inhalte, aktualisiert die Unit und startet. Scheitert ein Schritt (zum Beispiel pip), wird die vorherige Version automatisch zurückgespielt und der Dienst wieder gestartet.
+`sudo lpic3ctl --upgrade` holt das neueste stabile Release (höchstes Tag `vX.Y.Z`, keine Vorabversionen, nie `main`) in ein temporäres Verzeichnis; `--upgrade --source DIR` nimmt stattdessen ein lokales Checkout. Ist das Release bereits installiert, endet der Befehl mit „Bereits aktuell“ ohne Änderung und Neustart; ein neuerer installierter Stand wird nicht zurückgestuft. Dann: neue Version nach `/opt/lpic3-trainer/app.new` kopieren und mit einem eigenen Prüf-venv (`venv.new`, wird danach gelöscht) Abhängigkeiten, Import und die vorhandene Konfiguration prüfen, solange der Dienst noch läuft; sichern (Archiv in `backups/`); den Dienst nur stoppen, wenn er lief; alte Version nach `app.previous`, neue nach `app`, venv erneuern, Datenbank migrieren, mitgelieferte Inhalte importieren, Unit aktualisieren; einen vorher laufenden Dienst neu starten, einen gestoppten gestoppt lassen. Scheitert die Prüfung, bleibt alles unverändert (Exit 2 bei unpassender Konfiguration, sonst 1); scheitert ein Schritt nach dem Tausch, wird die vorherige Version automatisch zurückgespielt und ein vorher laufender Dienst wieder gestartet. Jede Installation schreibt `app/BUILD` (Version, Commit, Branch, Release, `dirty`, Quelle, Zeitpunkt).
 
 `lpic3ctl rollback` tauscht die Programmdateien zurück. Vorher prüft der Befehl, ob die vorherige Version das aktuelle Datenbankschema kennt (Vergleich der Alembic-Revision mit den Migrationsdateien in `app.previous`). Kennt sie es nicht, verweigert er die Ausführung und nennt das Archiv von vor dem Upgrade. `lpic3ctl rollback --restore ARCHIV` setzt dann Programmdateien und Datenbank gemeinsam zurück: Dienst stoppen, Programmdateien tauschen, venv neu bauen, Datenbank mit Sicherheitskopie ersetzen, `PRAGMA integrity_check`, Revision der Sicherung gegen die alte Version prüfen, Dienst starten, Health abwarten. Es laufen dabei keine Migrationen; die alte Version findet beim Start ihr eigenes Schema vor.
 
 ## Betrieb und Diagnose
 
 ```bash
-lpic3ctl status          # Dienst, Datenbank, Schema, Health
+lpic3ctl --version       # installierte Version und Herkunft (offline)
+lpic3ctl --status        # Dienst, Autostart, Datenbank, Schema, Health, Adressen; Exit 0/1/2
 lpic3ctl check           # Prüfliste mit [OK]/[!!]
 sudo lpic3ctl logs -f    # Protokolle
 curl http://127.0.0.1:8000/health

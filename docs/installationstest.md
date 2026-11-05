@@ -105,7 +105,7 @@ Voraussetzung: frisches Debian 12/13 oder Ubuntu 24.04/26.04, Root per sudo, Int
 4. Im Browser registrieren (erstes Konto = Administrator), Modul wählen, drei Fragen beantworten, unter Verwaltung eine Gruppe anlegen.
 5. `sudo reboot`; danach `systemctl is-active lpic3-trainer` und Health.
 6. `sudo lpic3ctl backup`, `sudo lpic3ctl restore <Archiv>`: Sicherheitskopie, Integrität ok, Dienst wieder aktiv, Anmeldung mit dem Konto aus Schritt 4.
-7. Neueren Tag auschecken, `sudo lpic3ctl upgrade --source "$PWD"`; Daten aus Schritt 4 vorhanden, Schema aktuell.
+7. `sudo lpic3ctl --upgrade` (neuestes stabiles Release; zweiter Aufruf meldet „Bereits aktuell“ ohne Neustart) oder neueren Tag auschecken und `sudo lpic3ctl --upgrade --source "$PWD"`; Daten aus Schritt 4 vorhanden, Schema aktuell, `lpic3ctl --version` zeigt Commit und Release. Noch nicht auf einem echten System ausgeführt: der Weg ohne `--source` und die Prüfung vor dem Dienststopp (Stand 5. November 2026, nur Stub-Tests).
 8. `sudo lpic3ctl rollback` (erwartet: Verweigerung mit Hinweis auf die Sicherung, falls Schemaänderung), dann `sudo lpic3ctl rollback --restore <Archiv>`; anschließend erneut upgraden.
 9. Reverse Proxy mit HTTPS einrichten, `LPIC3_SECURE_COOKIES=true`, Anmeldung über den Proxy, `Set-Cookie` enthält `Secure`.
 10. `sudo lpic3ctl uninstall` (Daten bleiben), erneut `install` (Konfiguration und Daten wieder nutzbar), zum Schluss optional `sudo lpic3ctl purge`.

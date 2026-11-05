@@ -271,6 +271,16 @@ CLAUDE.md
 - Administrative Befehle mit `--help` dokumentieren.
 - Installations-, Upgrade- und Deinstallationsabläufe automatisiert testen.
 
+## Dokumentation
+
+- README als verständlicher Einstieg: Nutzen vor technischen Details.
+- Nur tatsächlich vorhandene Funktionen und Befehle als verfügbar beschreiben; Status und bekannte Grenzen korrekt halten.
+- Bei Änderungen an Funktionen, Installation, Bedienung, Verwaltungsbefehlen oder Entwicklungsstand README und `docs/` auf nötige Anpassungen prüfen.
+- Technische Details in `docs/` dieses Repositorys pflegen; keine notwendigen Informationen nur in anderen Repositories.
+- Bestehende Informationen nicht ohne fachlichen Grund entfernen.
+- Die vorhandene Dokumentationsstruktur dieses Projekts respektieren.
+- Versionsquelle ist `__version__` in `app/__init__.py`; `pyproject.toml`, das Versions-Badge in `README.md` und aktuelle Versionsangaben in `docs/` ändern sich im selben Commit (geprüft durch `tests/test_readme_version.py`).
+
 ## Abschluss
 
 - Änderungen und Testergebnisse dokumentieren.

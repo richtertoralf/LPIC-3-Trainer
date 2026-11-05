@@ -65,6 +65,6 @@ LPIC3_DATA_DIR=./data .venv/bin/alembic upgrade head
 
 ## Release
 
-1. Version in `pyproject.toml` und `app/__init__.py` erhöhen.
+1. Version in `app/__init__.py` (maßgebliche Quelle), `pyproject.toml`, im Versions-Badge der `README.md` und in den aktuellen Versionsangaben der Dokumentation (`git checkout vX.Y.Z` in README und `docs/installation.md`) im selben Commit erhöhen; `tests/test_readme_version.py` prüft die Übereinstimmung.
 2. `docs/stand.md` aktualisieren.
 3. Commit, Tag `vX.Y.Z`, Push, GitHub-Release mit deutschen Release Notes.
