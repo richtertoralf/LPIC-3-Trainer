@@ -302,3 +302,44 @@ def test_cli_import_is_unreleased_and_needs_origin(tmp_path, data_dir):
             select(ImportBatch).where(ImportBatch.source == "CLI-Quelle")
         ).scalar_one()
         assert batch.supplementary and not batch.released and batch.exam_version == "3.0"
+
+
+def test_supervisor_releases_bundled_extra_pool_for_own_group(client, admin):
+    """A lecturer must be able to enable the bundled supplementary pools for the own group
+    without the administrator (pilot finding); system-wide release stays with admins."""
+    sup, _sup_id = _supervisor(admin)
+    gid = _group(sup, unique("Kurs B "))
+    with session_scope() as db:
+        batch = (
+            db.execute(
+                select(ImportBatch).where(
+                    ImportBatch.bundled.is_(True),
+                    ImportBatch.supplementary.is_(True),
+                    ImportBatch.module_code == "305",
+                    ImportBatch.source.like("%Ergänzungspool%"),
+                )
+            )
+            .scalars()
+            .first()
+        )
+        batch_id, source = batch.id, batch.source
+        qid = (
+            db.execute(
+                select(Question.id).where(Question.import_batch_id == batch_id, Question.is_active)
+            )
+            .scalars()
+            .first()
+        )
+    page = sup.get("/admin/releases").text
+    assert source in page and "Systemweit freigeben" not in page
+    member = new_client(unique("bmem"))
+    member.post("/modules/select", data={"module_code": "305", "action": "add"})
+    assert member.post(f"/groups/{gid}/join").status_code == 303
+    assert member.get(f"/question/{qid}").status_code == 404
+    assert sup.post(f"/admin/releases/group/{gid}", data={"batch": [batch_id]}).status_code == 303
+    assert member.get(f"/question/{qid}").status_code == 200
+    assert sup.post(f"/admin/releases/{batch_id}/global", data={"released": "1"}).status_code == 403
+    outsider = new_client(unique("bout"))
+    assert outsider.get(f"/question/{qid}").status_code == 404
+    assert sup.post(f"/admin/releases/group/{gid}", data={}).status_code == 303
+    assert member.get(f"/question/{qid}").status_code == 404

@@ -83,7 +83,7 @@ Einmal aufgerufene Seiten (Fragen, Ergebnisse, Labs, Vokabeln) bleiben im Browse
 - *Verwaltung › Benutzer*: Konten freigeben.
 - *Verwaltung › Gruppen*: Gruppe anlegen, Beitritte freigeben, Lernstand und LAB-Stände einsehen, LABs empfehlen, *Auswertung je Prüfungsziel* (Trefferquote, Sprachhilfe, Einschätzung „vertiefen“/„sicher“, häufig falsch beantwortete Fragen).
 - *Verwaltung › Import*: eigene Fragen als JSON hochladen, mit Quelle und Prüfungsgeneration. Format in `content/README.md`. Die Fragen bleiben unveröffentlicht.
-- *Verwaltung › Freigaben*: eigene Importe für die eigenen Lerngruppen freigeben oder die Freigabe zurücknehmen.
+- *Verwaltung › Freigaben*: eigene Importe und die mitgelieferten Zusatzpools für die eigenen Lerngruppen freigeben oder die Freigabe zurücknehmen; der Rechtestatus jedes Pools steht daneben.
 - *Verwaltung › Fragen*: eigene Fragen deaktivieren oder aktivieren.
 
 Details in `docs/administration.md`.

@@ -62,6 +62,7 @@ Erste Entwicklungsversion (0.0.x), noch keine stabile Produktionsversion. Die te
 - [Installation](docs/installation.md): native Installation mit systemd (Standardweg), Konfiguration, Update, Docker Compose (optional); [Installationstest](docs/installationstest.md) mit Ergebnissen und Testplan
 - [Administration](docs/administration.md): Benutzer, Gruppen, Fragenimport und Freigabe, Backup und Restore, `lpic3ctl`
 - [LAB-Umgebung einrichten](docs/lab-umgebung.md): eigene Testumgebung für die praktischen Aufgaben (Empfehlung KVM/QEMU mit libvirt); [LAB-Konzept](docs/lab-konzept.md)
+- [Pilotbetrieb](docs/pilotbetrieb.md): Bedienablauf für Administrator, Dozent und Lernende, Plan für eine reale Lerngruppe; [Umsetzungsbericht November 2026](docs/umsetzungsbericht-2026-11.md)
 - [Bedienung](docs/bedienung.md), [Architektur](docs/architektur.md), [Entwicklung](docs/entwicklung.md), [Entwicklungsstand](docs/stand.md)
 - [Über den Autor](docs/ueber-den-autor.md): Motivation, Hintergrund und Bildungsverständnis
 

@@ -34,6 +34,7 @@ Beispielkonfiguration: `.env.example`.
 - `tests/test_cli_ops.py` ruft `lpic3ctl` als Unterprozess auf (Migration, Benutzer, Backup, Restore, Check).
 - `tests/test_cli_install.py` prüft `install`, `upgrade`, `rollback`, `uninstall` und `purge` in einem temporären Verzeichnisbaum. Root und systemd werden durch `LPIC3_UNPRIVILEGED_TEST=1` sowie Stub-Befehle für `useradd`, `userdel` und `systemctl` ersetzt. Der Test erzeugt ein echtes venv und dauert etwa eine Minute.
 - `tests/test_concurrency.py` lässt acht Benutzer parallel antworten.
+- Mit `LPIC3_E2E_BASE=http://host:port` laufen die Browsertests gegen eine bestehende Installation statt gegen den eigenen Testserver (Administrator über `LPIC3_E2E_ADMIN_USER`/`LPIC3_E2E_ADMIN_PASS` oder erstes Konto); gedacht für `tests/e2e/test_pilot.py` auf einem Testserver, nie auf produktiven Daten.
 - Browsertests (`tests/e2e/`) starten einen Uvicorn-Server mit eigener Datenbank, verkleinerten Prüfungsgrößen und prüfen Registrierung, Anmeldung, Rollen, Üben mit Sprachhilfe, Simulation, Eingangstest, Labs, Import, Gruppen, mobile Darstellung (390 px) und Offline-Verhalten. JavaScript-Fehler und fehlgeschlagene Anfragen lassen Tests fehlschlagen. Screenshots fehlgeschlagener Tests landen unter `test-results/`.
 
 ## Inhalte

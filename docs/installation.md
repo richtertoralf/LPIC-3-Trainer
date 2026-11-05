@@ -21,7 +21,7 @@ Prüfstand: Der komplette Ablauf (Installation, Dienststart durch systemd, Neust
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout main            # oder ein neuerer Tag als v0.0.2, siehe Hinweis oben
+git checkout v0.0.3          # oder ein neuerer Tag; nicht v0.0.2, siehe Hinweis oben
 ```
 
 Für den Betrieb den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
