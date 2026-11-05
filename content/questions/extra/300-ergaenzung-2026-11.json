@@ -354,15 +354,16 @@
           "text_de": "net ads undelete <SID>"
         }
       ],
-      "explanation_de": "Mit aktiviertem Papierkorb bleiben gelöschte Objekte vollständig unter CN=Deleted Objects erhalten. Die Wiederherstellung geschieht per LDAP-Änderung (ldbmodify oder ldbedit): das Attribut isDeleted löschen und den distinguishedName auf den ursprünglichen DN setzen. tombstones expunge entfernt gelöschte Objekte endgültig, ein neues Objekt bekäme eine neue SID.",
-      "reference": "https://wiki.samba.org/index.php/Samba_AD_Recycle_Bin",
+      "explanation_de": "Mit aktiviertem Papierkorb bleiben gelöschte Objekte vollständig unter CN=Deleted Objects erhalten. Die Wiederherstellung geschieht per LDAP-Änderung (ldbmodify oder ldbedit): das Attribut isDeleted löschen und den distinguishedName auf den ursprünglichen DN setzen. tombstones expunge entfernt gelöschte Objekte endgültig, ein neues Objekt bekäme eine neue SID. Hinweis (Prüfung 5. November 2026): Die angegebene Samba-Wiki-Seite ist nicht mehr erreichbar (HTTP 404) und das Vorgehen konnte nicht gegen Herstellerdokumentation belegt werden. Die Frage ist deshalb inaktiv und prüfbedürftig.",
+      "reference": "Samba-Wiki-Seite zum AD-Papierkorb nicht erreichbar (Stand 5.11.2026); samba-tool(8)",
       "terms": [
         {
           "term": "accidentally",
           "de": "versehentlich"
         }
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "active": false
     },
     {
       "id": "300-erg-301.4-06",
@@ -551,7 +552,7 @@
         }
       ],
       "explanation_de": "Samba signiert NTP-Antworten über einen Unix-Socket (Standard /var/lib/samba/ntp_signd). ntpd bzw. chrony werden mit ntpsigndsocket beziehungsweise ntpsigndsocket-Direktive darauf konfiguriert und brauchen Leserechte auf das Verzeichnis. Samba selbst ist kein Zeitserver.",
-      "reference": "https://wiki.samba.org/index.php/Time_Synchronisation",
+      "reference": "https://wiki.samba.org/index.php/Time_Synchronisation (ntpd und chrony: Direktive ntpsigndsocket, geprüft 5.11.2026)",
       "terms": [
         {
           "term": "signed",
@@ -1175,7 +1176,7 @@
           "text_de": "DFS erfordert Kerberos; die Linux-Benutzer haben sich mit NTLM angemeldet."
         }
       ],
-      "explanation_de": "DFS-Verweise werden vom Server als Referral geliefert; der Client muss sie auflösen. Der Kernel-CIFS-Client folgt Referrals, bei smbclient hängt es von Version und Protokoll ab. host msdfs gilt für den Server, der die Wurzel anbietet.",
+      "explanation_de": "DFS-Verweise werden vom Server als Referral geliefert; der Client muss sie auflösen. Der Kernel-CIFS-Client folgt Referrals, bei smbclient hängt es von Version und Protokoll ab. host msdfs gilt für den Server, der die Wurzel anbietet. Hinweis (Prüfung 5. November 2026): Das Verhalten von smbclient bei DFS-Verweisen ist versions- und protokollabhängig; die richtige Antwort ist deshalb nicht eindeutig belegbar. Die Frage ist inaktiv und prüfbedürftig.",
       "reference": "smb.conf(5), Parameter host msdfs; mount.cifs(8)",
       "terms": [
         {
@@ -1183,7 +1184,8 @@
           "de": "folgen"
         }
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "active": false
     },
     {
       "id": "300-erg-303.4-03",

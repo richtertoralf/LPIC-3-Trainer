@@ -123,6 +123,21 @@ Alle Lösungen wurden gegen die angegebene Referenz geprüft. Eine zweite fachli
 - 306-erg-362.1-02 (DRBD-Fencing-Handler): Skriptnamen `crm-fence-peer.9.sh` gelten für DRBD 9; bei DRBD 8 ohne `.9`.
 - Unverändert unsicher und inaktiv: 300-examtopics-screenshot-08, 305-examtopics-screenshot-03.
 
+### Ergebnis der Nachprüfung (Arbeitspaket 3, 5. November 2026)
+
+Die fünf Punkte wurden gegen Herstellerdokumentation geprüft (Abruf am 5. November 2026):
+
+| Frage | Quelle | Ergebnis |
+|---|---|---|
+| 300-erg-301.4-05 | wiki.samba.org „Samba_AD_Recycle_Bin“ | **nicht erreichbar (HTTP 404)**, auch über die Wiki-Suche nicht auffindbar; Vorgehen nicht belegbar. Frage **deaktiviert** (`active: false`), prüfbedürftig. |
+| 300-erg-302.1-09 | wiki.samba.org/index.php/Time_Synchronisation | bestätigt: ntpd und chrony nutzen die Direktive `ntpsigndsocket`, der Pfad ist distributionsabhängig; kein smb.conf-Parameter. Bleibt aktiv, Referenz ergänzt. |
+| 300-erg-303.3-02 | smb.conf(5), mount.cifs(8) | versions- und protokollabhängig, keine eindeutig belegbare Lösung. Frage **deaktiviert**, prüfbedürftig. |
+| 305-erg-352.2-03 | canonical.com/lxd/docs, Reference „Disk devices“ | bestätigt: Eigenschaft `shift` (bool, Standard false) „sets up a shifting overlay to translate the source UID/GID to match the instance“. Bleibt aktiv, Referenz auf die URL gesetzt. |
+| 306-erg-362.1-02 | linbit.com DRBD 9 User's Guide, Pacemaker fencing | Handler `crm-fence-peer.9.sh` und `crm-unfence-peer.9.sh` im Abschnitt zur Pacemaker-Integration (aus Seitenzusammenfassung, nicht wörtlich gelesen). Bleibt aktiv, Referenz auf die URL gesetzt. |
+| 300-examtopics-screenshot-08, 305-examtopics-screenshot-03 | – | Lösungen nicht belegbar; bleiben **deaktiviert**. |
+
+Damit sind vier Fragen inaktiv (zwei ExamTopics, zwei Ergänzungsfragen). Aktiv nutzbar: 482 von 486 Fragen.
+
 ## 7. Qualitätssicherung
 
 | Prüfung | Ergebnis |

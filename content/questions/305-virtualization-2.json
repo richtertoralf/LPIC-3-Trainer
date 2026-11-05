@@ -856,6 +856,26 @@
       ],
       "explanation_de": "Multi-Machine-Setups nutzen config.vm.define je Maschine mit eigener Box, Netzwerk und Provisionierung. vagrant up web startet nur eine davon, vagrant status zeigt alle.",
       "terms": []
+    },
+    {
+      "id": "305-351.4-text-01",
+      "objective": "351.4",
+      "type": "text",
+      "difficulty": 2,
+      "case_sensitive": true,
+      "question": "Which virsh subcommand shows the IP addresses of a running domain's network interfaces? (Fill in the blank: virsh ______ <domain>)",
+      "question_de": "Welches virsh-Unterkommando zeigt die IP-Adressen der Netzwerkschnittstellen einer laufenden Domäne? (Lückentext: virsh ______ <Domäne>)",
+      "answers": [
+        "domifaddr"
+      ],
+      "explanation_de": "virsh domifaddr <Domäne> fragt die Adressen über den DHCP-Lease des libvirt-Netzes oder den QEMU-Gastagenten ab (--source agent). domiflist zeigt nur die Schnittstellen ohne Adressen.",
+      "reference": "virsh(1), Abschnitt domifaddr",
+      "terms": [
+        {
+          "term": "domain",
+          "de": "Domäne (virtuelle Maschine in libvirt)"
+        }
+      ]
     }
   ]
 }

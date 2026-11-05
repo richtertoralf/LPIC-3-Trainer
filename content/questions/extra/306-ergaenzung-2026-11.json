@@ -938,7 +938,7 @@
         }
       ],
       "explanation_de": "Der fence-peer-Handler setzt bei Verbindungsverlust eine Location-Constraint in der CIB, die die Promotion auf dem veralteten Knoten verbietet; unfence-peer entfernt sie nach der Resynchronisation. allow-two-primaries ist nur für Dual-Primary (GFS2/OCFS2) gedacht.",
-      "reference": "DRBD 9 User's Guide, Resource-level fencing using the Cluster Information Base",
+      "reference": "https://linbit.com/drbd-user-guide/drbd-guide-9_0-en/#s-pacemaker-fencing (crm-fence-peer.9.sh / crm-unfence-peer.9.sh, geprüft 5.11.2026)",
       "terms": [
         {
           "term": "outdated",

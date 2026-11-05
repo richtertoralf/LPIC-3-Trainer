@@ -5,6 +5,7 @@
 <section class="card question-card">
   {% if not review %}
     {% if is_correct %}<div class="verdict verdict-ok">Richtig!</div>{% else %}<div class="verdict verdict-wrong">Leider falsch.</div>{% endif %}
+    {% if feedback and not is_correct %}<p class="muted small">Teilweise richtig zählt nicht: {{ feedback.hit }} von {{ feedback.needed }} richtigen Antworten gewählt{% if feedback.wrong %}, dazu {{ feedback.wrong }} falsche{% endif %}. In der Prüfung wird nur die vollständig richtige Auswahl gewertet.</p>{% endif %}
     {% if used_help %}<p class="muted small">Du hast die Sprachhilfe genutzt. Die Antwort wird trotzdem normal bewertet.</p>{% endif %}
   {% endif %}
   {% include "learn/_source_tag.html" %}

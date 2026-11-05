@@ -58,7 +58,7 @@ Ziel: fachlich fundierte, flexibel nutzbare Unterstützung für Präsenzunterric
 | Gruppenübersicht der LAB-Stände, nur eigene Mitglieder | Abschnitt *LAB-Stände der Gruppe* in der Gruppenansicht; fremde Betreuer erhalten 403 (getestet) | erfüllt |
 | Dozent wählt Übungen gezielt aus, kein Kursplan | Empfohlene LABs je Gruppe (`group_labs`), Kennzeichnung in der LAB-Liste der Mitglieder; keine Reihenfolge, keine Pflicht | erfüllt |
 | Technische Plausibilität | Alle Befehle gegen Manpages und Herstellerdokumentation durchgesehen; versionsabhängige Punkte als Pitfall vermerkt (DRBD 8.4 im Debian-12-Kernel gegenüber DRBD 9, `-copy_extensions` ab OpenSSL 3.0, interne Snapshots mit eingelegter ISO, cgroup-v2-Controller) | erfüllt, ohne Ausführung in einer Testumgebung |
-| Gruppenauswertung je Prüfungsziel | noch nicht umgesetzt (Arbeitspaket 3) | offen |
+| Gruppenauswertung je Prüfungsziel | Arbeitspaket 3: Seite *Auswertung je Prüfungsziel* je Gruppe (Trefferquote, Sprachhilfe, Einschätzung, häufig falsche Fragen) | erfüllt |
 
 ## 4. Lückenanalyse vom 4. November 2026 (Version 0.0.2)
 

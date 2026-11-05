@@ -765,6 +765,26 @@
           "de": "wahrscheinlichste"
         }
       ]
+    },
+    {
+      "id": "300-302.3-text-01",
+      "objective": "302.3",
+      "type": "text",
+      "difficulty": 1,
+      "case_sensitive": true,
+      "question": "On a Samba AD DC, which complete command lists all user accounts of the domain? (Fill in the blank: ______)",
+      "question_de": "Welcher vollständige Befehl listet auf einem Samba-AD-DC alle Benutzerkonten der Domäne auf? (Lückentext)",
+      "answers": [
+        "samba-tool user list"
+      ],
+      "explanation_de": "samba-tool ist das Verwaltungswerkzeug des Samba-AD-DC; das Unterkommando user list gibt alle Benutzerkonten aus. Prüfungen der Generation 3.0 enthalten neben Mehrfachauswahl auch Lückentextfragen, bei denen ein Befehl oder Dateiname eingetippt wird.",
+      "reference": "samba-tool(8), Abschnitt user list",
+      "terms": [
+        {
+          "term": "user account",
+          "de": "Benutzerkonto"
+        }
+      ]
     }
   ]
 }

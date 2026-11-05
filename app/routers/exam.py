@@ -13,10 +13,12 @@ from app.config import get_settings
 from app.deps import get_current_user, get_db
 from app.models import MODE_ENTRY, MODE_EXAM, Exam, Question, Topic, User, utcnow
 from app.services import (
-    grade,
+    answer_feedback,
+    grade_submission,
     module_by_code,
     record_attempt,
     select_exam_questions,
+    stored_answer_correct,
     user_module,
 )
 from app.web import redirect, render
@@ -144,17 +146,13 @@ async def submit_exam(
     answers: dict[str, list[int]] = {}
     correct = 0
     for q in questions:
-        valid = {c.id for c in q.choices}
-        selected = set()
-        for raw in form.getlist(f"q{q.id}"):
-            try:
-                selected.add(int(raw))
-            except ValueError:
-                continue
-        selected &= valid
-        ok = grade(q, selected)
+        if q.kind == "text":
+            raw_values = [str(form.get(f"q{q.id}_text", ""))]
+        else:
+            raw_values = [str(v) for v in form.getlist(f"q{q.id}")]
+        ok, stored = grade_submission(q, raw_values)
         correct += int(ok)
-        answers[str(q.id)] = sorted(selected)
+        answers[str(q.id)] = stored
         record_attempt(db, user, q, ok, used_help=False, mode=exam.mode, exam_id=exam.id)
     exam.answers = answers
     exam.correct_count = correct
@@ -178,8 +176,7 @@ def _topic_scores(exam: Exam, questions: list[Question]) -> dict:
         entry = per_topic[code]
         entry["title"] = topic.title if topic else "Sonstige"
         entry["total"] += 1
-        selected = set(exam.answers.get(str(q.id), []))
-        entry["correct"] += int(grade(q, selected))
+        entry["correct"] += int(stored_answer_correct(q, exam.answers.get(str(q.id), [])))
     return {"percent": exam.percent, "topics": dict(per_topic)}
 
 
@@ -196,8 +193,16 @@ def exam_result(
     questions = _questions(db, exam)
     details = []
     for q in questions:
-        selected = set(exam.answers.get(str(q.id), []))
-        details.append({"question": q, "selected": selected, "correct": grade(q, selected)})
+        stored = exam.answers.get(str(q.id), [])
+        selected = stored if q.kind == "text" else set(stored)
+        details.append(
+            {
+                "question": q,
+                "selected": selected,
+                "correct": stored_answer_correct(q, stored),
+                "feedback": answer_feedback(q, selected) if q.kind != "text" else None,
+            }
+        )
     scores = _topic_scores(exam, questions)
     return render(
         request,

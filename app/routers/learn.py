@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session, selectinload
 from app.deps import get_current_user, get_db
 from app.models import MODE_PRACTICE, Objective, Question, User
 from app.services import (
-    grade,
+    answer_feedback,
+    grade_submission,
     module_by_code,
     pick_practice_question,
     record_attempt,
@@ -36,6 +37,7 @@ def _question_context(db: Session, user: User, question: Question, with_help: bo
     statuses = user_term_status(db, user, [t.id for t in terms])
     return {
         "question": question,
+        "shuffle_seed": f"u{user.id}",
         "source": question.batch if question.supplementary and question.batch else None,
         "terms": [
             {
@@ -96,16 +98,13 @@ async def answer(
     ).scalar_one_or_none()
     if question is None:
         raise HTTPException(404, "Frage nicht gefunden")
-    selected: set[int] = set()
-    for raw in form.getlist("choice"):
-        try:
-            selected.add(int(raw))
-        except ValueError:
-            continue
-    valid_ids = {c.id for c in question.choices}
-    selected &= valid_ids
+    if question.kind == "text":
+        raw_values = [str(form.get("choice_text", ""))]
+    else:
+        raw_values = [str(v) for v in form.getlist("choice")]
+    is_correct, stored = grade_submission(question, raw_values)
+    selected = stored if question.kind == "text" else set(stored)
     used_help = form.get("used_help") == "1"
-    is_correct = grade(question, selected)
     record_attempt(db, user, question, is_correct, used_help, MODE_PRACTICE)
     db.commit()  # release the write lock before the (read-only) rendering work
     obj_code = form.get("objective") or None
@@ -117,6 +116,7 @@ async def answer(
             "objective": obj,
             "selected": selected,
             "is_correct": is_correct,
+            "feedback": answer_feedback(question, selected) if question.kind != "text" else None,
             "used_help": used_help,
             "mode": MODE_PRACTICE,
             "pool": form.get("pool") or "all",
@@ -145,8 +145,12 @@ def question_detail(
         {
             "module": question.module,
             "objective": question.objective,
-            "selected": question.correct_choice_ids,
-            "is_correct": None,
+            "selected": (
+                [question.choices[0].text_en]
+                if question.kind == "text" and question.choices
+                else question.correct_choice_ids
+            ),
+            "is_correct": True,
             "review": True,
             "mode": "review",
         }

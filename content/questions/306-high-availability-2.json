@@ -861,6 +861,26 @@
       ],
       "explanation_de": ".netdev erzeugt virtuelle Geräte (bond, vlan, bridge), .network konfiguriert Schnittstellen und bindet Slaves per Bond=. ifcfg-Dateien gehören zu den klassischen Red-Hat-Skripten, /etc/network/interfaces mit bond-slaves zu Debian ifupdown.",
       "terms": []
+    },
+    {
+      "id": "306-364.2-text-01",
+      "objective": "364.2",
+      "type": "text",
+      "difficulty": 1,
+      "case_sensitive": true,
+      "question": "Which file in the proc filesystem shows the state of all Linux software RAID arrays? (Fill in the blank with the full path: ______)",
+      "question_de": "Welche Datei im proc-Dateisystem zeigt den Zustand aller Linux-Software-RAID-Verbünde? (Lückentext, vollständiger Pfad)",
+      "answers": [
+        "/proc/mdstat"
+      ],
+      "explanation_de": "/proc/mdstat listet alle md-Geräte mit RAID-Level, Mitgliedsplatten, Zustand ([UU], [_U]) und laufenden Synchronisationen. mdadm --detail liefert dieselben Informationen je Array.",
+      "reference": "md(4); mdadm(8)",
+      "terms": [
+        {
+          "term": "array",
+          "de": "Verbund (RAID)"
+        }
+      ]
     }
   ]
 }

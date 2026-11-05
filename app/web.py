@@ -40,6 +40,15 @@ templates.env.filters["json_attr"] = _tojson_attr
 templates.env.globals["app_version"] = __version__
 
 
+def _display_choices(question, seed=0):
+    from app.services import display_choices
+
+    return display_choices(question, seed)
+
+
+templates.env.globals["display_choices"] = _display_choices
+
+
 def render(
     request: Request, name: str, context: dict[str, Any] | None = None, status_code: int = 200
 ) -> HTMLResponse:

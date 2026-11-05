@@ -1211,7 +1211,7 @@
         }
       ],
       "explanation_de": "Disk-Geräte mit source und path hängen Hostpfade ein; shift=true (oder raw.idmap) verschiebt die Besitzer-IDs passend zum unprivilegierten Container. file push kopiert nur, storage volume attach gilt für LXD-Volumes, nic ist ein Netzwerkgerät.",
-      "reference": "LXD-Dokumentation, disk devices",
+      "reference": "https://canonical.com/lxd/docs/en/latest/reference/devices_disk/ (Eigenschaft shift, geprüft 5.11.2026)",
       "terms": [
         {
           "term": "map",

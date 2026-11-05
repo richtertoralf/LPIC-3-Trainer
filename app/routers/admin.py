@@ -20,6 +20,7 @@ from app.deps import (
 from app.models import (
     LAB_COMPLETED,
     LAB_STARTED,
+    MODE_PRACTICE,
     ROLE_LEARNER,
     ROLES,
     STATUS_ACTIVE,
@@ -35,8 +36,10 @@ from app.models import (
     Lab,
     LabProgress,
     Module,
+    Objective,
     Question,
     Term,
+    Topic,
     User,
     UserModule,
 )
@@ -539,6 +542,125 @@ def _group_lab_report(db: Session, group: Group) -> dict:
         for u in member_ids
     }
     return {"lab_rows": lab_rows, "member_labs": member_labs, "lab_total": len(labs)}
+
+
+@router.get("/groups/{group_id}/auswertung")
+def group_evaluation(
+    request: Request,
+    group_id: int,
+    user: User = Depends(require_supervisor),
+    db: Session = Depends(get_db),
+):
+    """Where does the group stand per exam objective? Aggregates the members' practice,
+    exam and entry-test attempts (no grading, no per-member ranking)."""
+    group = _group_for(db, user, group_id)
+    member_ids = [m.user_id for m in group.members if m.status == STATUS_ACTIVE]
+    report = _objective_report(db, member_ids)
+    return render(request, "admin/group_eval.html", {"group": group, **report})
+
+
+MIN_ATTEMPTS_FOR_VERDICT = 5
+LOW_CORRECT_PERCENT = 60
+HIGH_HELP_PERCENT = 50
+
+
+def _objective_report(db: Session, member_ids: list[int]) -> dict:
+    rows = []
+    if member_ids:
+        rows = db.execute(
+            select(
+                Module.code,
+                Topic.code,
+                Topic.title,
+                Objective.code,
+                Objective.title,
+                Attempt.question_id,
+                Attempt.user_id,
+                Attempt.is_correct,
+                Attempt.used_help,
+                Attempt.mode,
+            )
+            .join(Question, Question.id == Attempt.question_id)
+            .join(Module, Module.id == Question.module_id)
+            .outerjoin(Objective, Objective.id == Question.objective_id)
+            .outerjoin(Topic, Topic.id == Objective.topic_id)
+            .where(Attempt.user_id.in_(member_ids))
+        ).all()
+    objectives: dict[tuple, dict] = {}
+    questions: dict[int, dict] = {}
+    for mod, tcode, ttitle, ocode, otitle, qid, uid, ok, help_used, mode in rows:
+        key = (mod, tcode or "", ocode or "")
+        entry = objectives.setdefault(
+            key,
+            {
+                "module": mod,
+                "topic": tcode or "",
+                "topic_title": ttitle or "",
+                "objective": ocode or "ohne Ziel",
+                "title": otitle or "",
+                "attempts": 0,
+                "correct": 0,
+                "help": 0,
+                "practice": 0,
+                "members": set(),
+            },
+        )
+        entry["attempts"] += 1
+        entry["correct"] += int(ok)
+        entry["members"].add(uid)
+        if mode == MODE_PRACTICE:
+            entry["practice"] += 1
+            entry["help"] += int(help_used)
+        q = questions.setdefault(qid, {"attempts": 0, "wrong": 0, "objective": ocode or ""})
+        q["attempts"] += 1
+        q["wrong"] += int(not ok)
+    result = []
+    for entry in sorted(objectives.values(), key=lambda e: (e["module"], e["objective"])):
+        entry["members"] = len(entry["members"])
+        entry["percent"] = round(100 * entry["correct"] / entry["attempts"])
+        entry["help_percent"] = (
+            round(100 * entry["help"] / entry["practice"]) if entry["practice"] else 0
+        )
+        entry["verdict"] = ""
+        if entry["attempts"] >= MIN_ATTEMPTS_FOR_VERDICT:
+            if entry["percent"] < LOW_CORRECT_PERCENT:
+                entry["verdict"] = "vertiefen"
+            elif entry["help_percent"] >= HIGH_HELP_PERCENT:
+                entry["verdict"] = "Fachenglisch üben"
+            else:
+                entry["verdict"] = "sicher"
+        result.append(entry)
+    # questions that are wrong unusually often (at least two wrong answers, half or more)
+    frequent = [
+        (qid, q)
+        for qid, q in questions.items()
+        if q["wrong"] >= 2 and q["wrong"] * 2 >= q["attempts"]
+    ]
+    frequent.sort(key=lambda item: (-item[1]["wrong"], item[0]))
+    frequent_questions = []
+    if frequent:
+        qmap = {
+            q.id: q
+            for q in db.execute(
+                select(Question)
+                .options(selectinload(Question.objective))
+                .where(Question.id.in_([qid for qid, _ in frequent[:10]]))
+            ).scalars()
+        }
+        for qid, q in frequent[:10]:
+            question = qmap.get(qid)
+            if question is not None:
+                frequent_questions.append({"question": question, **q})
+    modules = sorted({e["module"] for e in result})
+    return {
+        "objectives": result,
+        "frequent_questions": frequent_questions,
+        "modules": modules,
+        "member_count": len(member_ids),
+        "min_attempts": MIN_ATTEMPTS_FOR_VERDICT,
+        "low_percent": LOW_CORRECT_PERCENT,
+        "high_help": HIGH_HELP_PERCENT,
+    }
 
 
 @router.post("/groups/{group_id}/labs")

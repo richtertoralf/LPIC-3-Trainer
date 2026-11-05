@@ -236,7 +236,10 @@ class Question(Base):
     objective_id: Mapped[int | None] = mapped_column(
         ForeignKey("objectives.id", ondelete="SET NULL")
     )
+    # single: one correct choice; multiple: several correct choices (all required);
+    # text: fill-in-the-blank, the accepted answers are stored as correct choices
     kind: Mapped[str] = mapped_column(String(16), nullable=False, default="single")
+    case_sensitive: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     text_en: Mapped[str] = mapped_column(Text, nullable=False)
     text_de: Mapped[str] = mapped_column(Text, nullable=False, default="")
     explanation_de: Mapped[str] = mapped_column(Text, nullable=False, default="")

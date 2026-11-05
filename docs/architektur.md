@@ -57,6 +57,7 @@ Persönliche Daten:
 - `attempts`: jede beantwortete Frage mit Modus (`practice`, `exam`, `entry`), Ergebnis und Kennzeichen „Sprachhilfe genutzt“
 - `exams`: Prüfungssimulationen und Eingangstests mit Fragenliste und Antworten (JSON)
 - `user_terms`: gemerkte Fachbegriffe (`learning`/`known`)
+- `questions.kind`: `single`, `multiple` oder `text` (Lückentext; akzeptierte Antworten liegen als richtige `choices`, `case_sensitive` steuert den Vergleich, Migration 0007). Antwortmöglichkeiten werden beim Rendern deterministisch je Lernendem gemischt (`services.display_choices`).
 - `lab_progress`: LAB-Status je Lernendem (`status` started/completed, `started_at`, `completed_at`; keine Zeile = nicht begonnen)
 - `group_labs`: von Betreuern für eine Gruppe empfohlene LABs
 - `group_sources`: Importchargen, die ein Betreuer oder Administrator für eine Gruppe freigegeben hat

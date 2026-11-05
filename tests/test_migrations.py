@@ -65,6 +65,8 @@ def test_upgrade_from_initial_schema_migrates_existing_data(tmp_path):
         "2026-01-02 10:00:00",
     )
     assert db.execute("SELECT task_de, tools_de FROM labs").fetchone() == ("", "[]")
+    # 0007: existing questions keep case-sensitive comparison (only relevant for text answers)
+    assert db.execute("SELECT case_sensitive FROM questions WHERE id = 1").fetchone() == (1,)
     assert db.execute("SELECT COUNT(*) FROM group_labs").fetchone()[0] == 0
     rows = {
         r[0]: r[1:]

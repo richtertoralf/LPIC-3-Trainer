@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Auswertung {{ group.name }} · LPIC-3 Trainer{% endblock %}
+{% block content %}
+<h1>Auswertung je Prüfungsziel: {{ group.name }}</h1>
+{% include "admin/_nav.html" %}
+<p class="muted">Zusammengefasste Antworten der {{ member_count }} aktiven Mitglieder aus Übungen, Kapiteltests, Simulationen und Eingangstests. Keine Benotung, keine Rangliste. Ein Urteil erscheint ab {{ min_attempts }} Antworten je Ziel: unter {{ low_percent }} % richtig heißt <span class="eval-low">vertiefen</span>, Sprachhilfe bei mindestens {{ high_help }} % der Übungsantworten heißt <em>Fachenglisch üben</em>.</p>
+<p><a href="/admin/groups/{{ group.id }}">Zurück zur Gruppe</a></p>
+{% if not objectives %}
+<section class="card"><p class="muted">Noch keine Antworten von Mitgliedern dieser Gruppe.</p></section>
+{% endif %}
+{% for m in modules %}
+<section class="card">
+  <h2>Modul {{ m }}</h2>
+  <table class="table eval">
+    <thead><tr><th>Prüfungsziel</th><th>Antworten</th><th>richtig</th><th>Sprachhilfe</th><th>Mitglieder</th><th>Einschätzung</th></tr></thead>
+    <tbody>
+    {% for e in objectives if e.module == m %}
+    <tr>
+      <td><a href="/learn/{{ e.module }}?objective={{ e.objective }}">{{ e.objective }}</a> {{ e.title }}{% if e.topic %}<span class="small muted"> · Thema {{ e.topic }} {{ e.topic_title }}</span>{% endif %}</td>
+      <td>{{ e.attempts }}</td>
+      <td><span class="eval-bar" style="width: {{ e.percent * 0.6 }}px"></span>{{ e.percent }} %</td>
+      <td>{{ e.help_percent }} %</td>
+      <td>{{ e.members }}</td>
+      <td>{% if e.verdict == 'vertiefen' %}<span class="eval-low">vertiefen</span>{% elif e.verdict == 'sicher' %}<span class="eval-ok">sicher</span>{% elif e.verdict %}{{ e.verdict }}{% else %}<span class="muted small">zu wenig Antworten</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endfor %}
+{% if frequent_questions %}
+<section class="card">
+  <h2>Häufig falsch beantwortete Fragen</h2>
+  <p class="muted small">Mindestens zwei falsche Antworten und mindestens die Hälfte der Antworten falsch.</p>
+  <ul>
+    {% for f in frequent_questions %}
+    <li><a href="/question/{{ f.question.id }}">{{ f.question.external_id }}</a>{% if f.question.objective %} · Ziel {{ f.question.objective.code }}{% endif %}: {{ f.wrong }} von {{ f.attempts }} falsch<span class="small muted"> · {{ f.question.text_en[:120] }}{% if f.question.text_en | length > 120 %}…{% endif %}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}
