@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 5. November 2026, Version 0.0.3 (erste Testversion, keine stabile Produktionsversion). Umsetzungsbericht der Arbeitspakete 1 bis 4: `docs/umsetzungsbericht-2026-11.md`. Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`. Installationstest: `docs/installationstest.md`. Pilotbetrieb: `docs/pilotbetrieb.md`.
+Stand: 5. November 2026, Version 0.0.4 (Testversion, keine stabile Produktionsversion). Umsetzungsbericht der Arbeitspakete 1 bis 4: `docs/umsetzungsbericht-2026-11.md`. Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`. Installationstest: `docs/installationstest.md`. Pilotbetrieb: `docs/pilotbetrieb.md`.
 
 ## Zusammenfassung
 
@@ -69,7 +69,8 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 - Exit-Codes auf 0/1/2 vereinheitlicht (bisher 3 für „nicht gefunden“).
 - README nach dem RICHTER.PROJECTS-README-Standard: Versions-Badge auf `app/__init__.py`, Status „In Entwicklung“, Tabelle „Bedienung und Verwaltung“, Abschnitte Mitmachen und RICHTER.PROJECTS; AGENTS.md um den Dokumentationsblock ergänzt. `tests/test_readme_version.py` prüft Badge und Versionsangaben gegen `__version__`.
 - Begründete Abweichung: Erstinstallation bleibt `sudo python3 -m app.cli install` statt `sudo ./install.sh` (kein zusätzliches Skript, Weg ist real geprüft).
-- Integrationstest am 5. November 2026 im LXD-Container (Ubuntu 26.04, systemd) mit lokaler Git-Remote und Test-Tags v0.0.4 bis v0.0.7: `--version`, `--status` laufend/gestoppt/fehlerhaft/ungültige Konfiguration, `--upgrade` bereits aktuell (auch gegen GitHub), neueres Release, Erhalt von Konfiguration, Datenbank und systemd-Zustand, unerreichbares Remote, Abbruch vor dem Stopp bei unpassender Konfiguration, automatische Wiederherstellung nach fehlgeschlagenem Upgrade, `--uninstall`. Drei Befunde behoben: Remote aus der env-Datei wurde ignoriert, `--status` direkt nach einem Neustart meldete Exit 1 (jetzt kurze Wiederholung), Inhaltsfehler wurden als „Ungültige Konfiguration“ bezeichnet. Protokoll: `docs/installationstest.md`, Abschnitt 6. Ein echtes Release-Upgrade von GitHub steht erst mit einem Tag neuer als v0.0.3 an.
+- Integrationstest am 5. November 2026 im LXD-Container (Ubuntu 26.04, systemd) mit lokaler Git-Remote und Test-Tags v0.0.4 bis v0.0.7: `--version`, `--status` laufend/gestoppt/fehlerhaft/ungültige Konfiguration, `--upgrade` bereits aktuell (auch gegen GitHub), neueres Release, Erhalt von Konfiguration, Datenbank und systemd-Zustand, unerreichbares Remote, Abbruch vor dem Stopp bei unpassender Konfiguration, automatische Wiederherstellung nach fehlgeschlagenem Upgrade, `--uninstall`. Drei Befunde behoben: Remote aus der env-Datei wurde ignoriert, `--status` direkt nach einem Neustart meldete Exit 1 (jetzt kurze Wiederholung), Inhaltsfehler wurden als „Ungültige Konfiguration“ bezeichnet. Protokoll: `docs/installationstest.md`, Abschnitt 6. Ein echtes Release-Upgrade von GitHub wird erst mit v0.0.4 möglich und steht noch aus: von v0.0.3 aus mit `sudo lpic3ctl upgrade --source <Checkout von v0.0.4>`, ab v0.0.4 mit `sudo lpic3ctl --upgrade`.
+- Version 0.0.4 (5. November 2026): Netzwerkdokumentation, Passwortrichtlinie, CLI-Standard und die drei Befunde aus dem Containertest; Pull Requests #6, #7, #8. Browsertest des Eingangstests gegen zufällig gezogene Lückentext-Fragen abgesichert.
 
 ### Netzwerkzugriff und Passwortrichtlinie (nach 0.0.3, 5. November 2026)
 

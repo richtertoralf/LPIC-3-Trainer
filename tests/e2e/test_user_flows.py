@@ -98,7 +98,11 @@ def test_entry_test_and_progress(page: Page, server, username, browser_errors, a
     assert page.locator("[data-timer]").count() == 0
     cards = page.locator(".question-card")
     for i in range(cards.count()):
-        cards.nth(i).locator("input").first.check()
+        text = cards.nth(i).locator("input[type=text]")
+        if text.count():  # the entry test may draw a fill-in-the-blank question
+            text.fill("antwort")
+        else:
+            cards.nth(i).locator("input").first.check()
     page.click("button:has-text('Abgeben')")
     page.goto(base + "/module/306")
     expect(page.locator("summary", has_text="Eingangstest:")).to_be_visible()

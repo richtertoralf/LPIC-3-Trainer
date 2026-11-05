@@ -1,6 +1,6 @@
 # LPIC-3 Trainer
 
-[![Version 0.0.3](https://img.shields.io/badge/version-0.0.3-blue)](app/__init__.py)
+[![Version 0.0.4](https://img.shields.io/badge/version-0.0.4-blue)](app/__init__.py)
 [![Lizenz MIT](https://img.shields.io/badge/Lizenz-MIT-blue)](LICENSE)
 
 **Vorbereitung auf die LPIC-3-Prüfungen für Linux-Kenner, deren Englisch für die Prüfung noch nicht ausreicht.**
@@ -74,7 +74,7 @@ Voraussetzungen: Debian 12/13 oder Ubuntu 24.04/26.04 mit systemd, Python 3.11 o
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout v0.0.3
+git checkout v0.0.4
 sudo python3 -m app.cli install
 ```
 

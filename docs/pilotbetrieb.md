@@ -68,7 +68,7 @@ Weitere Beobachtungen, nicht behoben (Empfehlungen):
 2. Die Prüfungssimulation lässt sich nach Schließen des Browsers nicht fortsetzen (bekannte Einschränkung).
 3. Die Seite *LAB-Umgebung einrichten* ist nur angemeldet erreichbar; für Interessierte ohne Konto steht `docs/lab-umgebung.md` im Repository.
 4. In der Gruppenauswertung erscheint ein Urteil erst ab fünf Antworten je Ziel; kleine Gruppen zu Kursbeginn sehen deshalb vor allem „zu wenig Antworten“. Das ist beabsichtigt, sollte dem Dozenten aber gesagt werden.
-5. Der Footer zeigt die Programmversion; nach einem Upgrade erkennt man daran den Stand (0.0.3).
+5. Der Footer zeigt die Programmversion; nach einem Upgrade erkennt man daran den Stand (z. B. 0.0.4).
 
 ## 3. Automatisierter Durchlauf
 
