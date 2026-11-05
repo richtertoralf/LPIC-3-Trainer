@@ -13,6 +13,7 @@
     <form method="post" action="/admin/groups/{{ group.id }}/members/{{ m.user_id }}/remove" class="inline"><button class="btn btn-small" type="submit">Ablehnen</button></form></li>{% endfor %}</ul>
 </section>
 {% endif %}
+<p><a class="btn" href="/admin/groups/{{ group.id }}/auswertung">Auswertung je Prüfungsziel</a></p>
 <section class="card">
   <h2>Mitglieder und Lernstand</h2>
   <table class="table">

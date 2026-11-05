@@ -750,6 +750,27 @@
       ],
       "explanation_de": "-sC entspricht --script=default. Einzelne Skripte oder Kategorien wählt --script=vuln,http-title. -sN ist der TCP-Null-Scan, -Pn überspringt die Host-Erkennung, -oX schreibt XML-Ausgabe.",
       "terms": []
+    },
+    {
+      "id": "303-334.3-text-01",
+      "objective": "334.3",
+      "type": "text",
+      "difficulty": 1,
+      "case_sensitive": true,
+      "question": "Which nft command prints the complete currently loaded nftables ruleset? (Fill in the blank: ______)",
+      "question_de": "Welcher nft-Befehl gibt das vollständige, aktuell geladene nftables-Regelwerk aus? (Lückentext)",
+      "answers": [
+        "nft list ruleset",
+        "sudo nft list ruleset"
+      ],
+      "explanation_de": "nft list ruleset zeigt alle Tabellen, Chains und Regeln. Da nftables Root-Rechte verlangt, wird auch die Variante mit sudo als richtig gewertet.",
+      "reference": "nft(8), Abschnitt RULESET",
+      "terms": [
+        {
+          "term": "ruleset",
+          "de": "Regelwerk"
+        }
+      ]
     }
   ]
 }

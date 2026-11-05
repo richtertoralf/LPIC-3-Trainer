@@ -36,7 +36,8 @@ from app.models import (
 
 SCHEMA_VERSION = 1
 KINDS = ("objectives", "terms", "questions", "labs")
-QUESTION_TYPES = ("single", "multiple")
+QUESTION_TYPES = ("single", "multiple", "text")
+MAX_TEXT_ANSWERS = 10
 VISIBILITIES = ("public", "private")
 # Rights status of an imported question pool: cleared (licence known), unknown, or
 # unverified (origin known, usage rights not cleared; only for supervisor-enabled pools).
@@ -219,7 +220,7 @@ def validate_question(q: Any, index: int, seen_ids: set[str]) -> list[str]:
         errors.append(f"{w}: 'objective' must look like 301.1")
     qtype = q.get("type", "single")
     if qtype not in QUESTION_TYPES:
-        errors.append(f"{w}: 'type' must be single or multiple")
+        errors.append(f"{w}: 'type' must be single, multiple or text")
     difficulty = q.get("difficulty", 2)
     if not isinstance(difficulty, int) or not 1 <= difficulty <= 3:
         errors.append(f"{w}: 'difficulty' must be 1, 2 or 3")
@@ -229,6 +230,27 @@ def validate_question(q: Any, index: int, seen_ids: set[str]) -> list[str]:
     for key in ("question_de", "explanation_de", "explanation_en"):
         _check_str(errors, q, key, w, required=False)
     _check_str(errors, q, "reference", w, required=False, max_len=255)
+    if qtype == "text":
+        # fill-in-the-blank: short technical answers, compared literally after whitespace
+        # normalisation; no choices, no fuzzy matching
+        answers = q.get("answers")
+        if (
+            not isinstance(answers, list)
+            or not 1 <= len(answers) <= MAX_TEXT_ANSWERS
+            or not all(_is_str(a, max_len=200) for a in answers)
+        ):
+            errors.append(f"{w}: 'answers' must be a list of 1 to {MAX_TEXT_ANSWERS} strings")
+        elif len({_normalize_answer(a, q.get("case_sensitive", True)) for a in answers}) != len(
+            answers
+        ):
+            errors.append(f"{w}: 'answers' contains duplicates after normalisation")
+        if not isinstance(q.get("case_sensitive", True), bool):
+            errors.append(f"{w}: 'case_sensitive' must be true or false")
+        if "choices" in q:
+            errors.append(f"{w}: a text question has 'answers', not 'choices'")
+        if "terms" in q:
+            validate_terms_list(errors, q["terms"], w)
+        return errors
     choices = q.get("choices")
     if not isinstance(choices, list) or not 2 <= len(choices) <= 6:
         errors.append(f"{w}: 'choices' must be a list with 2 to 6 entries")
@@ -254,6 +276,12 @@ def validate_question(q: Any, index: int, seen_ids: set[str]) -> list[str]:
     if "terms" in q:
         validate_terms_list(errors, q["terms"], w)
     return errors
+
+
+def _normalize_answer(value: str, case_sensitive: bool) -> str:
+    """Trim, collapse whitespace; fold case only when the question allows it."""
+    text = " ".join(str(value).split())
+    return text if case_sensitive else text.casefold()
 
 
 def validate_questions(data: dict) -> list[str]:
@@ -592,6 +620,7 @@ def import_questions(
         question.module_id = module.id
         question.objective_id = objectives[q["objective"]].id if q.get("objective") else None
         question.kind = q.get("type", "single")
+        question.case_sensitive = bool(q.get("case_sensitive", True))
         question.text_en = q["question"].strip()
         question.text_de = q.get("question_de", "").strip()
         question.explanation_de = q.get("explanation_de", "").strip()
@@ -606,16 +635,29 @@ def import_questions(
         question.import_batch_id = batch.id
         question.created_by = imported_by
         db.flush()
-        for pos, c in enumerate(q["choices"]):
-            db.add(
-                Choice(
-                    question_id=question.id,
-                    position=pos,
-                    text_en=c["text"].strip(),
-                    text_de=c.get("text_de", "").strip(),
-                    is_correct=bool(c.get("correct")),
+        if question.kind == "text":
+            # accepted answers are stored as correct choices; nothing else is needed
+            for pos, answer in enumerate(q["answers"]):
+                db.add(
+                    Choice(
+                        question_id=question.id,
+                        position=pos,
+                        text_en=" ".join(str(answer).split()),
+                        text_de="",
+                        is_correct=True,
+                    )
                 )
-            )
+        else:
+            for pos, c in enumerate(q["choices"]):
+                db.add(
+                    Choice(
+                        question_id=question.id,
+                        position=pos,
+                        text_en=c["text"].strip(),
+                        text_de=c.get("text_de", "").strip(),
+                        is_correct=bool(c.get("correct")),
+                    )
+                )
         for raw in q.get("terms", []):
             term = _upsert_term(db, cache, raw)
             db.add(QuestionTerm(question_id=question.id, term_id=term.id))

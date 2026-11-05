@@ -147,18 +147,24 @@
   if (examForm) {
     var counter = examForm.querySelector("[data-answered-count]");
     var sections = examForm.querySelectorAll(".question-card");
+    var isAnswered = function (s) {
+      if (s.querySelector("input:checked")) { return true; }
+      var text = s.querySelector("input[type=text]");
+      return !!(text && text.value.trim());
+    };
     function updateCount() {
       var answered = 0;
-      sections.forEach(function (s) { if (s.querySelector("input:checked")) { answered += 1; } });
+      sections.forEach(function (s) { if (isAnswered(s)) { answered += 1; } });
       if (counter) { counter.textContent = answered + " von " + sections.length + " beantwortet"; }
     }
     examForm.addEventListener("change", updateCount);
+    examForm.addEventListener("input", updateCount);
     updateCount();
     var autoSubmit = false;
     examForm.addEventListener("submit", function (ev) {
       if (autoSubmit) { return; }
       var open = 0;
-      sections.forEach(function (s) { if (!s.querySelector("input:checked")) { open += 1; } });
+      sections.forEach(function (s) { if (!isAnswered(s)) { open += 1; } });
       if (open > 0 && !window.confirm(open + " Frage(n) sind noch unbeantwortet. Trotzdem abgeben?")) {
         ev.preventDefault();
       }

@@ -150,3 +150,13 @@ details.hint summary { font-weight: 600; padding: 0.3rem 0; }
 .doc table { font-size: 0.95rem; }
 .lab-matrix td, .lab-matrix th { vertical-align: top; }
 .lab-matrix .names { display: block; font-size: 0.85rem; color: var(--muted); }
+
+/* fill-in-the-blank answers, evaluation page */
+.text-answer label { display: block; margin: 0.6rem 0; }
+.answer-input { width: 100%; max-width: 32rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--fg); }
+.answer-input.choice-correct { border-color: var(--ok); background: var(--ok-bg); }
+.answer-input.choice-wrong { border-color: var(--warn); background: var(--warn-bg); }
+.accepted code { margin-right: 0.2rem; }
+.eval-low { color: var(--warn); font-weight: 600; }
+.eval-ok { color: var(--ok); }
+.eval-bar { display: inline-block; height: 0.6rem; background: var(--primary); border-radius: 3px; vertical-align: middle; margin-right: 0.4rem; }

@@ -10,7 +10,7 @@
   {% for q in questions %}
   <section class="card question-card" id="q{{ loop.index }}">
     <p class="muted small">Frage {{ loop.index }} von {{ questions | length }}</p>
-    {% with help=False, selected=[], show_result=False, input_name='q' ~ q.id, question=q %}{% include "learn/_question_body.html" %}{% endwith %}
+    {% with help=False, selected=[], show_result=False, input_name='q' ~ q.id, question=q, shuffle_seed='e' ~ exam.id %}{% include "learn/_question_body.html" %}{% endwith %}
   </section>
   {% endfor %}
   <div class="exam-footer">

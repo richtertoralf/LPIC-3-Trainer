@@ -16,6 +16,14 @@ Jedes Modul bietet einmalig einen kurzen Eingangstest ohne Sprachhilfe und ohne 
 
 In der Modulübersicht *Üben* für das ganze Modul oder *Üben* neben einem einzelnen Prüfungsziel. Die Frage erscheint auf Englisch.
 
+Fragetypen wie in der echten Prüfung (LPI: „60 multiple-choice and fill-in-the-blank questions“, 90 Minuten):
+
+- **Einfachauswahl**: genau eine Antwort ist richtig (Optionsfelder).
+- **Mehrfachauswahl**: die Frage nennt, wie viele Antworten richtig sind („genau 2 Antworten sind richtig“, Kontrollkästchen). Gewertet wird nur die vollständig richtige Auswahl; eine teilweise richtige Antwort zählt als falsch, das Ergebnis zeigt dann, wie viele richtige getroffen und wie viele falsche gewählt wurden.
+- **Lückentext (fill in the blank)**: ein Befehl, eine Option oder ein Dateiname wird eingetippt. Verglichen wird wörtlich nach Entfernen überflüssiger Leerzeichen; die Frage sagt, ob Groß- und Kleinschreibung zählt. Nach der Antwort werden alle akzeptierten Schreibweisen gezeigt.
+
+Die Reihenfolge der Antwortmöglichkeiten wird je Lernendem gemischt, damit die Position nichts über die Lösung verrät; Fragen- und Ergebnisseite zeigen dieselbe Reihenfolge.
+
 Sprachhilfen:
 
 - **Übersetzung anzeigen**: deutsche Übersetzung von Frage und Antworten.
@@ -73,7 +81,7 @@ Einmal aufgerufene Seiten (Fragen, Ergebnisse, Labs, Vokabeln) bleiben im Browse
 ## Für Betreuer
 
 - *Verwaltung › Benutzer*: Konten freigeben.
-- *Verwaltung › Gruppen*: Gruppe anlegen, Beitritte freigeben, Lernstand einsehen.
+- *Verwaltung › Gruppen*: Gruppe anlegen, Beitritte freigeben, Lernstand und LAB-Stände einsehen, LABs empfehlen, *Auswertung je Prüfungsziel* (Trefferquote, Sprachhilfe, Einschätzung „vertiefen“/„sicher“, häufig falsch beantwortete Fragen).
 - *Verwaltung › Import*: eigene Fragen als JSON hochladen, mit Quelle und Prüfungsgeneration. Format in `content/README.md`. Die Fragen bleiben unveröffentlicht.
 - *Verwaltung › Freigaben*: eigene Importe für die eigenen Lerngruppen freigeben oder die Freigabe zurücknehmen.
 - *Verwaltung › Fragen*: eigene Fragen deaktivieren oder aktivieren.

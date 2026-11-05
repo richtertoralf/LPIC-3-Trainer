@@ -65,9 +65,10 @@ Regeln:
 - `module`: dreistelliger Modulcode. Das Modul muss durch eine Objectives-Datei bekannt sein.
 - `id`: eindeutig, 2 bis 64 Zeichen aus Buchstaben, Ziffern, Punkt, Minus, Unterstrich. Beim erneuten Import wird eine Frage mit gleicher `id` aktualisiert; Lernstände bleiben erhalten.
 - `objective`: optional, Format `301.1`. Muss existieren.
-- `type`: `single` (genau eine richtige Antwort) oder `multiple` (mindestens zwei richtige und mindestens eine falsche).
+- `type`: `single` (genau eine richtige Antwort), `multiple` (mindestens zwei richtige und mindestens eine falsche) oder `text` (Lückentext).
+- Lückentext (`type: text`): statt `choices` eine Liste `answers` mit 1 bis 10 akzeptierten Antworten (je max. 200 Zeichen), optional `case_sensitive` (Standard `true`). Die Eingabe wird nach Entfernen überflüssiger Leerzeichen wörtlich verglichen, bei `case_sensitive: false` ohne Beachtung der Groß-/Kleinschreibung. Keine unscharfe Auswertung: Was nicht in `answers` steht, ist falsch. Beispiel: `"type": "text", "question": "Which file shows the state of all software RAID arrays? ______", "answers": ["/proc/mdstat"]`.
 - `difficulty`: 1 bis 3, Standard 2.
-- `choices`: 2 bis 6 Einträge.
+- `choices`: 2 bis 6 Einträge (nicht bei `type: text`). Die Reihenfolge in der Datei ist beliebig; die Oberfläche mischt sie je Lernendem.
 - `source` (Pflicht): nachvollziehbare Quelle der Fragen, max. 160 Zeichen. Wird bei importierten Fragen angezeigt.
 - `exam_version` (Pflicht): Prüfungsgeneration, auf die sich die Fragen beziehen, z. B. `3.0`.
 - `exam_code`: vollständige Prüfungsnummer, z. B. `305-300`; muss mit der Modulnummer beginnen. Ohne Angabe wird Modulnummer-300 gesetzt.

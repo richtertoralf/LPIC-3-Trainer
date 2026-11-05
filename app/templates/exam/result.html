@@ -14,8 +14,8 @@
 <h2>Fragen im Detail</h2>
 {% for d in details %}
 <section class="card question-card {% if d.correct %}result-ok{% else %}result-wrong{% endif %}">
-  <p class="muted small">Frage {{ loop.index }} · {{ d.question.external_id }} · {% if d.correct %}richtig{% else %}falsch{% endif %}</p>
-  {% with help=False, show_result=True, question=d.question, selected=d.selected %}{% include "learn/_question_body.html" %}{% endwith %}
+  <p class="muted small">Frage {{ loop.index }} · {{ d.question.external_id }} · {% if d.correct %}richtig{% else %}falsch{% endif %}{% if d.feedback and not d.correct %} · {{ d.feedback.hit }} von {{ d.feedback.needed }} richtigen gewählt{% if d.feedback.wrong %}, {{ d.feedback.wrong }} falsche{% endif %}{% endif %}</p>
+  {% with help=False, show_result=True, question=d.question, selected=d.selected, is_correct=d.correct, shuffle_seed='e' ~ exam.id %}{% include "learn/_question_body.html" %}{% endwith %}
   <details><summary>Erklärung und Sprachhilfe</summary>
     {% if d.question.explanation_de %}{{ d.question.explanation_de | nl2p }}{% endif %}
     <p><a href="/question/{{ d.question.id }}">Frage mit Sprachhilfe öffnen</a></p>

@@ -353,7 +353,76 @@ def select_exam_questions(
 
 
 def grade(question: Question, selected: set[int]) -> bool:
+    """Choice questions: only the exact set of correct choices counts (no partial credit)."""
     return selected == question.correct_choice_ids and bool(selected)
+
+
+def normalize_text_answer(value: str, case_sensitive: bool) -> str:
+    text = " ".join((value or "").split())
+    return text if case_sensitive else text.casefold()
+
+
+def grade_text(question: Question, answer: str) -> bool:
+    """Fill-in-the-blank: the normalised input must equal one of the accepted answers.
+    No fuzzy matching; what is not listed is wrong."""
+    given = normalize_text_answer(answer, question.case_sensitive)
+    if not given:
+        return False
+    accepted = {normalize_text_answer(c.text_en, question.case_sensitive) for c in question.choices}
+    return given in accepted
+
+
+def grade_submission(question: Question, raw_values: list[str]) -> tuple[bool, list]:
+    """Grade the form values of one question.
+
+    Returns (is_correct, stored) where stored is what is kept for the result page: the sorted
+    choice ids for choice questions, or a one-element list with the typed text."""
+    if question.kind == "text":
+        text = " ".join((raw_values[0] if raw_values else "").split())[:200]
+        return grade_text(question, text), [text]
+    valid = {c.id for c in question.choices}
+    selected: set[int] = set()
+    for raw in raw_values:
+        try:
+            selected.add(int(raw))
+        except (TypeError, ValueError):
+            continue
+    selected &= valid
+    return grade(question, selected), sorted(selected)
+
+
+def stored_answer_correct(question: Question, stored: list) -> bool:
+    """Re-grade an answer stored in Exam.answers (ids for choices, text for text questions)."""
+    if question.kind == "text":
+        return grade_text(question, str(stored[0]) if stored else "")
+    return grade(question, {int(x) for x in stored if str(x).isdigit()})
+
+
+def answer_feedback(question: Question, selected: set[int]) -> dict | None:
+    """For multiple-choice: how many correct choices were hit and how many wrong ones chosen.
+    Used to explain why a partially correct answer counts as wrong."""
+    if question.kind != "multiple":
+        return None
+    correct = question.correct_choice_ids
+    return {
+        "hit": len(selected & correct),
+        "needed": len(correct),
+        "wrong": len(selected - correct),
+    }
+
+
+def display_choices(question: Question, seed: str | int = 0) -> list:
+    """Choices in a shuffled but reproducible order.
+
+    In the content files the correct choice is almost always listed first; without shuffling
+    the first option would give the answer away. The order depends only on the seed and the
+    question id, so the question page and its result page show the same order."""
+    choices = list(question.choices)
+    if question.kind == "text" or len(choices) < 2:
+        return choices
+    rng = random.Random(f"{seed}:{question.id}")
+    rng.shuffle(choices)
+    return choices
 
 
 # ----------------------------------------------------------------------- terms

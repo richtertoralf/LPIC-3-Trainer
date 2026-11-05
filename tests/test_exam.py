@@ -19,7 +19,9 @@ def _answers_for(exam_url, correct_count):
         data = {}
         for i, qid in enumerate(exam.question_ids):
             q = db.get(Question, qid)
-            if i < correct_count:
+            if q.kind == "text":
+                data[f"q{qid}_text"] = q.choices[0].text_en if i < correct_count else "wrong"
+            elif i < correct_count:
                 data[f"q{qid}"] = [c.id for c in q.choices if c.is_correct]
             else:
                 wrong = [c for c in q.choices if not c.is_correct]
