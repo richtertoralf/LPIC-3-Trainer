@@ -39,10 +39,7 @@ BUILD_FILE = APP_DIR / "BUILD"
 SOURCE_DIR = Path(__file__).resolve().parent.parent
 PRODUCT = "LPIC-3 Trainer"
 # Upgrade source: the newest stable tag vX.Y.Z of this repository (RICHTER.PROJECTS ADR-002).
-# Overridable for tests and mirrors.
-REMOTE_URL = os.environ.get(
-    "LPIC3_UPGRADE_REMOTE", "https://github.com/richtertoralf/LPIC-3-Trainer.git"
-)
+DEFAULT_REMOTE_URL = "https://github.com/richtertoralf/LPIC-3-Trainer.git"
 STABLE_TAG_RE = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 
 # Exit codes as in RICHTER.PROJECTS ADR-002: 0 success (also "already up to date" or a
@@ -60,11 +57,13 @@ class CliError(Exception):
 
 
 def say(msg: str) -> None:
-    print(msg)
+    # flush: keep our lines in order with the output of child processes (pip, content-sync)
+    # when stdout is a pipe or a log file
+    print(msg, flush=True)
 
 
 def warn(msg: str) -> None:
-    print(f"Warnung: {msg}", file=sys.stderr)
+    print(f"Warnung: {msg}", file=sys.stderr, flush=True)
 
 
 CONFIG_UNREADABLE = False
@@ -662,8 +661,16 @@ def _version_line() -> str:
     return f"{PRODUCT} {version} ({', '.join(parts)})"
 
 
-def _latest_stable_tag(remote: str = REMOTE_URL) -> tuple[str, tuple[int, ...]]:
+def remote_url() -> str:
+    """Upgrade remote: LPIC3_UPGRADE_REMOTE (environment or the central env file, for
+    mirrors and tests), otherwise the project repository. Read at call time, after
+    ``load_env_file()``."""
+    return os.environ.get("LPIC3_UPGRADE_REMOTE") or DEFAULT_REMOTE_URL
+
+
+def _latest_stable_tag(remote: str | None = None) -> tuple[str, tuple[int, ...]]:
     """Newest tag ``vX.Y.Z`` of the remote. Pre-releases (``v1.0.0-rc1``) are ignored."""
+    remote = remote or remote_url()
     try:
         result = run(
             ["git", "ls-remote", "--tags", "--refs", remote],
@@ -836,7 +843,7 @@ def cmd_upgrade(args) -> int:
         tmp = tempfile.mkdtemp(prefix="lpic3-upgrade-")
         source = Path(tmp) / "src"
         clone = run(
-            ["git", "clone", "--quiet", "--depth", "1", "--branch", tag, REMOTE_URL, str(source)],
+            ["git", "clone", "--quiet", "--depth", "1", "--branch", tag, remote_url(), str(source)],
             check=False,
             capture=True,
             env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
@@ -1091,6 +1098,17 @@ def cmd_status(args) -> int:
     except Exception as exc:
         say(f"Schema:        nicht lesbar ({exc.__class__.__name__})")
     health = _http_health(settings.host, settings.port)
+    if state in ("active", "activating", "reloading") and not health.startswith("ok"):
+        # Found in the container test: right after a (re)start the unit is "active" while
+        # the application still runs migrations and the content import. Retry briefly
+        # before calling it an error.
+        import time
+
+        for _ in range(5):
+            time.sleep(2)
+            health = _http_health(settings.host, settings.port)
+            if health.startswith("ok"):
+                break
     say(f"Health-Check:  {health}")
     if state in ("active", "activating", "reloading") and not health.startswith("ok"):
         say("Fehler:        Dienst aktiv, aber der Health-Endpunkt antwortet nicht.")
@@ -1444,9 +1462,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Fehler: {exc}", file=sys.stderr)
         return exc.code
     except ValueError as exc:
-        # invalid LPIC3_* value, e.g. a password length outside the allowed range
-        print(f"Fehler: Ungültige Konfiguration: {exc}", file=sys.stderr)
-        return EXIT_USAGE
+        # ConfigError: invalid LPIC3_* value (exit 2). Other ValueErrors, e.g. an invalid
+        # content file during content-sync, are ordinary errors (exit 1); seen in the
+        # container test, where they were mislabelled as configuration errors.
+        from app.config import ConfigError
+
+        if isinstance(exc, ConfigError):
+            print(f"Fehler: Ungültige Konfiguration: {exc}", file=sys.stderr)
+            return EXIT_USAGE
+        print(f"Fehler: {exc}", file=sys.stderr)
+        return EXIT_ERROR
     except subprocess.CalledProcessError as exc:
         print(f"Fehler: Befehl fehlgeschlagen: {' '.join(exc.cmd)}", file=sys.stderr)
         if exc.stderr:

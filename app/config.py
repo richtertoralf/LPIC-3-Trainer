@@ -19,6 +19,10 @@ def _env(name: str, default: str) -> str:
     return os.environ.get(PREFIX + name, default)
 
 
+class ConfigError(ValueError):
+    """An LPIC3_* variable has an invalid value. Reported by the CLI as configuration error."""
+
+
 def _env_int(name: str, default: int) -> int:
     raw = os.environ.get(PREFIX + name)
     if raw is None or not raw.strip():
@@ -27,7 +31,7 @@ def _env_int(name: str, default: int) -> int:
         return int(raw.strip())
     except ValueError:
         msg = f"{PREFIX}{name} muss eine ganze Zahl sein, nicht {raw.strip()!r}."
-        raise ValueError(msg) from None
+        raise ConfigError(msg) from None
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -72,12 +76,12 @@ class Settings:
     def __post_init__(self) -> None:
         lo, hi = self.password_min_length, self.password_max_length
         if not 1 <= lo <= PASSWORD_LENGTH_LIMIT:
-            raise ValueError(
+            raise ConfigError(
                 f"LPIC3_PASSWORD_MIN_LENGTH muss zwischen 1 und {PASSWORD_LENGTH_LIMIT} liegen, "
                 f"nicht {lo}."
             )
         if not lo <= hi <= PASSWORD_LENGTH_LIMIT:
-            raise ValueError(
+            raise ConfigError(
                 f"LPIC3_PASSWORD_MAX_LENGTH muss zwischen LPIC3_PASSWORD_MIN_LENGTH ({lo}) und "
                 f"{PASSWORD_LENGTH_LIMIT} liegen, nicht {hi}."
             )

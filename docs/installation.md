@@ -93,6 +93,7 @@ Datei `/etc/lpic3-trainer/lpic3-trainer.env` (Beispiel in `deploy/lpic3-trainer.
 | `LPIC3_ENTRY_QUESTIONS` | `10` | Fragen je Eingangstest |
 | `LPIC3_PASSWORD_MIN_LENGTH` | `8` | Mindestlänge neuer Passwörter in Zeichen (1 bis 1024) |
 | `LPIC3_PASSWORD_MAX_LENGTH` | `128` | Höchstlänge neuer Passwörter in Zeichen (Mindestlänge bis 1024) |
+| `LPIC3_UPGRADE_REMOTE` | GitHub-Repository des Projekts | Git-Remote (URL oder Pfad) für `lpic3ctl --upgrade`, z. B. ein lokaler Spiegel; gilt nur für Upgrade und `version --remote` |
 
 Nach Änderungen: `sudo lpic3ctl restart`.
 
