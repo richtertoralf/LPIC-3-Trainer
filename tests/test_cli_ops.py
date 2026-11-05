@@ -47,7 +47,7 @@ def test_user_commands(fresh):
     r = run_cli(fresh, "user", "set-role", "cliadmin", "supervisor")
     assert r.returncode == 0
     r = run_cli(fresh, "user", "set-role", "nobody", "admin")
-    assert r.returncode == 3
+    assert r.returncode == 1
     r = run_cli(fresh, "user", "disable", "cliadmin")
     assert r.returncode == 0
     r = run_cli(fresh, "user", "list")

@@ -32,6 +32,8 @@ Für den Betrieb den Tag der gewünschten Version auschecken (`git tag` zeigt al
 sudo python3 -m app.cli install
 ```
 
+Abweichung vom RICHTER.PROJECTS-Standard (`sudo ./install.sh`): Der LPIC-3 Trainer hat kein Installationsskript, weil `lpic3ctl` ein Python-Modul der Anwendung ist und die Erstinstallation mit dem Systempython ohne venv läuft (Vorgabe in AGENTS.md). Dieser Weg ist auf Debian 12/13 und Ubuntu 24.04/26.04 geprüft; eine zusätzliche Skriptschicht nur zur Vereinheitlichung gibt es nicht. Alle weiteren Verwaltungsbefehle folgen dem Standard (`--version`, `--status`, `--upgrade`, `--uninstall`).
+
 `install` erledigt:
 
 1. Prüfung der Voraussetzungen (Python, venv, systemd).
@@ -50,11 +52,14 @@ Ohne Root liefern `lpic3ctl status` und `check` nur Standardwerte, weil die Konf
 ### 3. Status prüfen
 
 ```bash
-sudo lpic3ctl status     # Dienst, Datenbank, Schema, Health-Check
+lpic3ctl --version       # installierte Version, Commit, Release oder Branch, Installationszeit (offline)
+sudo lpic3ctl --status   # Dienst, Autostart, Datenbank, Schema, Health-Check, Zugriffsadressen
 sudo lpic3ctl check      # Prüfliste mit [OK]/[!!]
 sudo lpic3ctl logs -n 50 # Protokolle aus journald
 curl http://127.0.0.1:8000/health
 ```
+
+`--status` endet mit 0, wenn kein technischer Fehler vorliegt, auch bei bewusst gestopptem Dienst; mit 1 bei `failed`, bei aktivem Dienst ohne Antwort am Health-Endpunkt oder ohne Installation; mit 2 bei ungültiger Konfiguration. Ohne Root ist die Konfiguration nicht lesbar, `--status` weist darauf hin und zeigt Standardwerte.
 
 ### 4. Erster Administrator und Browserzugriff
 
@@ -164,25 +169,33 @@ In der Konfiguration `LPIC3_SECURE_COOKIES=true` setzen. Der `Host`- beziehungsw
 
 ## Update
 
-Neue Version aus Git holen und aus dem Checkout upgraden:
+Standardweg: auf das neueste stabile Release aktualisieren.
+
+```bash
+sudo lpic3ctl --upgrade
+```
+
+`--upgrade` fragt die Tags des Repositorys ab und nimmt das höchste `vX.Y.Z`. Vorabversionen (`v1.0.0-rc1`) und der Branch `main` werden nie automatisch installiert. Ist das Release bereits installiert, meldet der Befehl „Bereits aktuell“ und ändert nichts, insbesondere kein Neustart (Exit 0). Ist der installierte Stand neuer (Entwicklungsinstallation aus einem Checkout), gibt es kein Downgrade. Ohne Netz oder ohne Zugriff auf GitHub bricht der Befehl vor jeder Änderung mit Exit 1 ab.
+
+Manueller Weg für Entwicklungsstände, Offline-Server oder eine ältere Version: aus einem lokalen Checkout upgraden.
 
 ```bash
 cd ~/LPIC-3-Trainer
 git fetch --tags
-git checkout v0.0.3        # gewünschte neue Version, siehe git tag
-sudo lpic3ctl upgrade --source "$PWD"
+git checkout v0.0.3        # gewünschter Stand, siehe git tag
+sudo lpic3ctl --upgrade --source "$PWD"
 ```
 
-`upgrade`:
+Ablauf in beiden Fällen:
 
 1. zeigt die installierte Version,
-2. sichert Datenbank und Konfiguration nach `/var/lib/lpic3-trainer/backups/`,
-3. stoppt den Dienst, verschiebt die alte Version nach `/opt/lpic3-trainer/app.previous`,
-4. kopiert die neue Version, erneuert das venv,
+2. baut die neue Version mit eigenem Prüf-venv neben der laufenden auf (`/opt/lpic3-trainer/app.new`), prüft Abhängigkeiten, Import und die vorhandene Konfiguration mit dem neuen Code; schlägt das fehl, läuft der Dienst unverändert weiter (Exit 2 bei unpassender Konfiguration, sonst 1),
+3. sichert Datenbank und Konfiguration nach `/var/lib/lpic3-trainer/backups/`,
+4. stoppt den Dienst nur, wenn er lief, verschiebt die alte Version nach `/opt/lpic3-trainer/app.previous` und tauscht die neue ein, erneuert das venv,
 5. führt Datenbankmigrationen aus und importiert die mitgelieferten Inhalte,
-6. aktualisiert die systemd-Unit und startet den Dienst.
+6. aktualisiert die systemd-Unit und stellt den vorherigen Dienstzustand wieder her: ein laufender Dienst wird neu gestartet, ein gestoppter bleibt gestoppt, Autostart bleibt unverändert.
 
-Die Konfiguration wird nicht überschrieben. Schlägt ein Schritt fehl, wird die vorherige Version automatisch zurückgespielt.
+Die Konfiguration wird nicht überschrieben. Schlägt ein Schritt nach dem Tausch fehl, wird die vorherige Version automatisch zurückgespielt. Jede Installation schreibt `/opt/lpic3-trainer/app/BUILD` mit Version, Commit, Branch oder Release, `dirty`, Quelle und Zeitpunkt; `lpic3ctl --version` liest nur diese Datei.
 
 Zurück zur vorherigen Programmversion:
 
@@ -196,7 +209,8 @@ Hat das Upgrade das Datenbankschema geändert, verweigert `rollback` ohne `--res
 Version prüfen:
 
 ```bash
-lpic3ctl version
+lpic3ctl --version            # z. B. LPIC-3 Trainer 0.0.3 (commit b8c30f5, release v0.0.3, installiert 2026-11-05T09:12:00+01:00)
+lpic3ctl version --remote     # zusätzlich das neueste stabile Release auf GitHub
 ```
 
 ## Backup und Restore
@@ -236,7 +250,9 @@ Hinweis: Der Docker-Betrieb wurde nicht getestet, weil auf dem Entwicklungssyste
 ## Entfernen
 
 ```bash
-sudo lpic3ctl uninstall      # Dienst und Programmdateien entfernen, Daten bleiben
-sudo lpic3ctl purge          # zusätzlich Konfiguration und Daten löschen, mit Rückfrage
-sudo lpic3ctl purge --yes    # ohne Rückfrage (Skripte)
+sudo lpic3ctl --uninstall            # Dienst und Programmdateien entfernen, Konfiguration und Daten bleiben
+sudo lpic3ctl --uninstall --purge    # zusätzlich Konfiguration, Daten und Dienstkonto löschen, mit Rückfrage
+sudo lpic3ctl --uninstall --purge --yes   # ohne Rückfrage (Skripte)
 ```
+
+Gleichwertig: `lpic3ctl uninstall` und `lpic3ctl purge [--yes]`.

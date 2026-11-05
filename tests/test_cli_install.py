@@ -94,6 +94,8 @@ def test_01_install(env):
     assert oct((root / "var").stat().st_mode)[-3:] == "750"
     assert oct((root / "var" / "backups").stat().st_mode)[-3:] == "750"
     assert (root / "bin" / "lpic3ctl").is_symlink()
+    build = (root / "opt" / "app" / "BUILD").read_text()
+    assert "version=0." in build and "commit=" in build and "installed_at=" in build
     log = stub_log(env)
     assert "useradd --system --home-dir" in log and "--shell /usr/sbin/nologin" in log
     assert "systemctl daemon-reload" in log
@@ -123,12 +125,46 @@ def test_03_upgrade_keeps_config_and_creates_backup(env):
     root = Path(env["_root"])
     env_file = root / "etc" / "lpic3-trainer.env"
     env_file.write_text(env_file.read_text() + "# local change\n")
-    r = cli(env, "upgrade", "--source", str(PROJECT_DIR))
+    before = stub_log(env)
+    r = cli(env, "--upgrade", "--source", str(PROJECT_DIR))
     assert r.returncode == 0, r.stdout + r.stderr
     assert "# local change" in env_file.read_text()
     assert list((root / "var" / "backups").glob("lpic3-trainer-backup-*.tar.gz"))
     assert (root / "opt" / "app.previous").is_dir()
-    assert "systemctl restart lpic3-trainer" in stub_log(env)
+    assert not (root / "opt" / "app.new").exists() and not (root / "opt" / "venv.new").exists()
+    assert "geprüft" in r.stdout, "the new version is staged and probed before the swap"
+    # the stub reports the service as inactive: a stopped service stays stopped (ADR-002)
+    delta = stub_log(env)[len(before) :]
+    assert "restart" not in delta and "start lpic3-trainer" not in delta, delta
+    assert "bleibt gestoppt" in r.stdout
+
+
+def test_03b_upgrade_installs_newest_stable_release_tag(env, tmp_path_factory):
+    """Standard way: ``--upgrade`` without ``--source`` takes the newest tag vX.Y.Z of the
+    remote (here a local bare clone), ignores pre-releases and does nothing when current."""
+    root = Path(env["_root"])
+    remote = tmp_path_factory.mktemp("remote") / "repo.git"
+    subprocess.run(["git", "clone", "--quiet", "--bare", str(PROJECT_DIR), str(remote)], check=True)
+    subprocess.run(["git", "-C", str(remote), "tag", "v99.0.0"], check=True)
+    subprocess.run(["git", "-C", str(remote), "tag", "v99.1.0-rc1"], check=True)
+    env2 = {**env, "LPIC3_UPGRADE_REMOTE": str(remote)}
+    r = cli(env2, "--upgrade")
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "v99.0.0" in r.stdout and "rc1" not in r.stdout
+    build = (root / "opt" / "app" / "BUILD").read_text()
+    assert "release=v99.0.0" in build and "dirty=false" in build
+    r = cli(env2, "--version")
+    assert r.returncode == 0 and r.stdout.startswith("LPIC-3 Trainer ")
+    assert "release v99.0.0" in r.stdout and "commit " in r.stdout and "installiert " in r.stdout
+    # already up to date: no change, no systemctl call
+    before = stub_log(env)
+    r = cli(env2, "--upgrade")
+    assert r.returncode == 0 and "Bereits aktuell" in r.stdout, r.stdout + r.stderr
+    assert stub_log(env) == before
+    # unreachable remote: exit 1, installation untouched
+    r = cli({**env, "LPIC3_UPGRADE_REMOTE": str(remote) + "-missing"}, "--upgrade")
+    assert r.returncode == 1 and "unverändert" in r.stderr and "--source" in r.stderr
+    assert "release=v99.0.0" in (root / "opt" / "app" / "BUILD").read_text()
 
 
 def test_04_rollback_refuses_unknown_schema_and_restores_backup(env):
@@ -163,7 +199,7 @@ def test_05_status_and_version(env):
     r = cli(env, "status")
     assert r.returncode == 0 and "Schema:" in r.stdout
     r = cli(env, "version")
-    assert r.returncode == 0 and "Installiert:" in r.stdout
+    assert r.returncode == 0 and r.stdout.startswith("LPIC-3 Trainer ") and "commit " in r.stdout
 
 
 def test_06_uninstall_keeps_data(env):

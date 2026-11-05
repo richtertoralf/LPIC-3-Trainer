@@ -60,6 +60,17 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 - Web App Manifest, Service Worker: statische Dateien und besuchte Seiten bleiben verfügbar, Offline-Seite als Rückfall, Banner ohne Verbindung.
 
+### CLI-Standard RICHTER.PROJECTS (nach 0.0.3, 5. November 2026)
+
+- `lpic3ctl` folgt dem einheitlichen Verwaltungsstandard der RICHTER.PROJECTS-Anwendungen (ADR-002): Langoptionen `--help`, `--version`, `--status`, `--upgrade [--source PFAD]`, `--uninstall [--purge]` als Aliase der bestehenden Unterbefehle, zusätzlich `--check` und `--restart`; alle Unterbefehle bleiben gültig.
+- `--version` offline aus `app/BUILD` (Version, Commit, dirty, Release oder Branch, Installationszeit); die Datei schreibt jede Installation. `version --remote` fragt zusätzlich das neueste Release ab.
+- `--status` mit Rückgabecodes 0 (auch gestoppter Dienst), 1 (`failed`, aktiv ohne Antwort, nicht installiert), 2 (ungültige Konfiguration), Autostart, Hinweis „Neustart nötig“ und Zugriffsadressen (lokal, bei `0.0.0.0` auch LAN-Adressen ohne virtuelle Bridges).
+- `--upgrade` ohne Quelle installiert das neueste stabile Tag `vX.Y.Z` (keine Vorabversionen, nie `main`), meldet „Bereits aktuell“ ohne Neustart, stuft nicht zurück; neue Version wird vor dem Dienststopp mit Prüf-venv gebaut und gegen die vorhandene Konfiguration geprüft; ein gestoppter Dienst bleibt gestoppt. `--upgrade --source PFAD` bleibt für lokale Checkouts. Backup, Migrationen und Rollback unverändert.
+- Exit-Codes auf 0/1/2 vereinheitlicht (bisher 3 für „nicht gefunden“).
+- README nach dem RICHTER.PROJECTS-README-Standard: Versions-Badge auf `app/__init__.py`, Status „In Entwicklung“, Tabelle „Bedienung und Verwaltung“, Abschnitte Mitmachen und RICHTER.PROJECTS; AGENTS.md um den Dokumentationsblock ergänzt. `tests/test_readme_version.py` prüft Badge und Versionsangaben gegen `__version__`.
+- Begründete Abweichung: Erstinstallation bleibt `sudo python3 -m app.cli install` statt `sudo ./install.sh` (kein zusätzliches Skript, Weg ist real geprüft).
+- Nicht praktisch geprüft: `--upgrade` von GitHub und die Prüfung vor dem Dienststopp liefen nur in den Stub-Tests (lokales Bare-Repository mit Tags), nicht in einem Container oder auf einer VM.
+
 ### Netzwerkzugriff und Passwortrichtlinie (nach 0.0.3, 5. November 2026)
 
 - Praxistest von v0.0.3 auf einer Ubuntu-26.04-VM durch den Auftraggeber: Installation, venv, systemd, Migrationen und Health-Check fehlerfrei. Daraus ergänzt: Abschnitt *Zugriff aus dem lokalen Netzwerk* in `docs/installation.md` (`LPIC3_HOST`, Kontrolle mit `ss -ltnp` und Health-Endpunkt, Firewall, libvirt-NAT gegenüber Bridged, HTTP im LAN nur für Tests, HTTPS für den dauerhaften Betrieb).
@@ -93,9 +104,9 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 - `lpic3ctl` mit allen in AGENTS.md vorgesehenen Befehlen plus `rollback`, `serve`, `migrate`, `content-sync`, `import`, `validate`, `user`.
 - Native Installation mit Systembenutzer, venv (`deploy/create-venv.sh`), gehärteter systemd-Unit, Konfiguration unter `/etc/lpic3-trainer`, Daten unter `/var/lib/lpic3-trainer`.
-- Upgrade mit automatischer Sicherung, Erhalt der Konfiguration, automatischer Rückfall bei Fehler; `rollback`.
+- `--upgrade` auf das neueste stabile Release oder `--source` aus einem Checkout, Prüfung vor dem Dienststopp, automatische Sicherung, Erhalt der Konfiguration und des Dienstzustands, automatischer Rückfall bei Fehler; `rollback`.
 - Backup über SQLite-Backup-API als tar.gz mit Konfiguration, Rotation mit `--keep`; Restore mit Rückfrage und Sicherheitskopie.
-- `check`, `status`, `version` (Git-Tags), `logs`.
+- `check`, `--status`, `--version` (aus `BUILD`), `logs`.
 - Dockerfile und Docker Compose mit gleicher Datenstruktur.
 
 ### Dokumentation

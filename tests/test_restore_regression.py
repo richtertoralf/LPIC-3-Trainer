@@ -181,8 +181,8 @@ def test_restore_rejects_corrupt_archive(env):
 
 def test_commands_report_missing_prerequisites(env):
     r = cli(env, "backup")
-    assert r.returncode == 3 and "nicht gefunden" in r.stderr
+    assert r.returncode == 1 and "nicht gefunden" in r.stderr
     r = cli(env, "restore", env["_tmp"] + "/missing.tar.gz", "--yes")
-    assert r.returncode == 3 and "nicht gefunden" in r.stderr
+    assert r.returncode == 1 and "nicht gefunden" in r.stderr
     r = cli(env, "user", "set-role", "nobody", "admin")
-    assert r.returncode == 3
+    assert r.returncode == 1
