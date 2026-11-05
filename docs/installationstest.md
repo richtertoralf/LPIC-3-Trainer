@@ -134,6 +134,9 @@ Umgebung: LXD-Systemcontainer `lpic3-ubu26` (Ubuntu 26.04 daily 20261016, Python
 | M | defektes Tag aus der Remote entfernt, `--upgrade` | v0.0.6 installiert, Exit 0, `/health` 0.0.6 |
 | N | `lpic3ctl --uninstall` | Dienst und `/opt/lpic3-trainer` entfernt, `/etc/lpic3-trainer/lpic3-trainer.env`, Datenbank und Sicherungen vorhanden. Danach gibt es kein `lpic3ctl` mehr; „nicht installiert“ (Exit 1) meldet nur `python3 -m app.cli --status` aus einem Checkout. |
 
+| O | Neuinstallation `install --source /root/work --force` mit dem korrigierten Stand bei vorhandener Konfiguration und Datenbank; `lpic3ctl --status` unmittelbar nach dem Start | env-Datei und Benutzer erhalten; `--status` Exit 0 mit `Health-Check: ok` (Wiederholung wirkt) |
+| P | `content-sync` mit defekter Inhaltsdatei über das installierte venv | „Fehler: 300.json: invalid JSON …“, Exit 1, keine Bezeichnung als Konfigurationsfehler |
+
 Kosmetischer Befund: In einer Pipe erschienen die Meldungen von `lpic3ctl` nach denen der Kindprozesse (gepufferte Ausgabe). Behoben durch `flush` in `say`/`warn`. Die pip-Warnung „BuildBackendWarning: Editable installation“ unter Python 3.14 stammt von setuptools und ist unkritisch.
 
 Nicht geprüft: `--upgrade --purge`-Kombinationen, ARM64, blankes Metall, Docker.
