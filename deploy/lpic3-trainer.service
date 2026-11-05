@@ -12,20 +12,33 @@ ExecStart=/opt/lpic3-trainer/venv/bin/lpic3ctl serve
 Restart=on-failure
 RestartSec=5
 
-# Hardening
+# Hardening (systemd-analyze security: 2.6 OK). The service needs no capabilities:
+# it binds an unprivileged port; ports below 1024 belong to the reverse proxy.
+UMask=0027
 NoNewPrivileges=true
 PrivateTmp=true
+PrivateDevices=true
 ProtectSystem=strict
 ProtectHome=true
 ReadWritePaths=/var/lib/lpic3-trainer
+ProtectProc=invisible
+ProcSubset=pid
+ProtectHostname=true
+ProtectClock=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
+ProtectKernelLogs=true
 ProtectControlGroups=true
+RestrictNamespaces=true
 RestrictSUIDSGID=true
 LockPersonality=true
 RestrictRealtime=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
+AmbientCapabilities=
 
 [Install]
 WantedBy=multi-user.target

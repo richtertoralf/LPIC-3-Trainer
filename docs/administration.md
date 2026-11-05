@@ -8,7 +8,7 @@
 |--------|----------|------|
 | `lpic3ctl install [--source DIR] [--force] [--no-start]` | installieren | ja |
 | `lpic3ctl upgrade --source DIR` | aktualisieren mit Sicherung | ja |
-| `lpic3ctl rollback` | vorherige Programmversion zurück | ja |
+| `lpic3ctl rollback [--restore ARCHIV]` | vorherige Programmversion zurück, bei Schemaänderung zusammen mit der Sicherung | ja |
 | `lpic3ctl version` | installierte und neueste Version (Git-Tags) | nein |
 | `lpic3ctl status` | Dienst, Datenbank, Schema, Health-Check | nein |
 | `lpic3ctl start` / `stop` / `restart` | Dienst steuern | ja |
@@ -25,7 +25,7 @@
 | `lpic3ctl migrate` | Migrationen ausführen | nein* |
 | `lpic3ctl serve` | im Vordergrund starten (wird von systemd genutzt) | nein |
 
-\* Benötigt Schreibrechte auf das Datenverzeichnis. Auf einer Standardinstallation als `root` oder `lpic3` ausführen, zum Beispiel `sudo lpic3ctl backup`.
+\* Benötigt Schreibrechte auf das Datenverzeichnis. Auf einer Standardinstallation als `root` oder `lpic3` ausführen, zum Beispiel `sudo lpic3ctl backup`. Nach einem als Root ausgeführten Befehl setzt `lpic3ctl` die Eigentümer im Daten- und Konfigurationsverzeichnis wieder auf den Dienstbenutzer, damit keine root-eigenen `-wal`/`-shm`-Dateien den Dienst blockieren. Ohne Root ist die Konfiguration (`0640 root:lpic3`) nicht lesbar; `status` und `check` melden das und arbeiten mit Standardwerten.
 
 Exit-Codes: `0` Erfolg, `1` Fehler, `2` Bedienfehler oder Abbruch, `3` fehlende Voraussetzung oder Objekt nicht gefunden.
 
@@ -109,12 +109,18 @@ sudo lpic3ctl restore ARCHIV --with-config    # auch Konfiguration zurückspiele
 `restore` läuft kontrolliert ab:
 
 1. Rückfrage (entfällt mit `--yes`).
-2. Dienstzustand prüfen: Läuft der systemd-Dienst, wird er gestoppt und am Ende wieder gestartet. Läuft stattdessen ein nicht über systemd verwalteter Server (Docker, `lpic3ctl serve` im Vordergrund), bricht `restore` mit einer eindeutigen Fehlermeldung ab, denn ein laufender Server würde sonst unbemerkt in die ersetzte Datei weiterschreiben.
+2. Dienstzustand prüfen: Läuft der systemd-Dienst (auch im Zustand `activating`, also in einer Neustartschleife), wird er gestoppt und am Ende wieder gestartet. Läuft stattdessen ein nicht über systemd verwalteter Server (Docker, `lpic3ctl serve` im Vordergrund), bricht `restore` mit einer eindeutigen Fehlermeldung ab, denn ein laufender Server würde sonst unbemerkt in die ersetzte Datei weiterschreiben.
 3. Die aktuelle Datenbank wird als `lpic3-trainer.before-restore-<Datum>.db` gesichert.
 4. Das Archiv wird eingespielt, Migrationen laufen, `PRAGMA integrity_check` muss `ok` liefern, sonst bricht der Befehl ab (die Sicherheitskopie bleibt liegen).
 5. War der Dienst aktiv, wird er gestartet und der Health-Endpunkt abgewartet.
 
-Diese Abläufe sind durch Regressionstests abgedeckt (`tests/test_restore_regression.py`).
+Diese Abläufe sind durch Regressionstests abgedeckt (`tests/test_restore_regression.py`, `tests/test_cli_permissions.py`) und wurden am 5. November 2026 auf Debian 12/13 und Ubuntu 24.04/26.04 in Containern tatsächlich ausgeführt (`docs/installationstest.md`).
+
+## Upgrade und Rollback
+
+`lpic3ctl upgrade --source DIR` sichert zuerst (Archiv in `backups/`), stoppt den Dienst, verschiebt die alte Version nach `/opt/lpic3-trainer/app.previous`, kopiert die neue, erneuert das venv, migriert die Datenbank, importiert die mitgelieferten Inhalte, aktualisiert die Unit und startet. Scheitert ein Schritt (zum Beispiel pip), wird die vorherige Version automatisch zurückgespielt und der Dienst wieder gestartet.
+
+`lpic3ctl rollback` tauscht die Programmdateien zurück. Vorher prüft der Befehl, ob die vorherige Version das aktuelle Datenbankschema kennt (Vergleich der Alembic-Revision mit den Migrationsdateien in `app.previous`). Kennt sie es nicht, verweigert er die Ausführung und nennt das Archiv von vor dem Upgrade. `lpic3ctl rollback --restore ARCHIV` setzt dann Programmdateien und Datenbank gemeinsam zurück: Dienst stoppen, Programmdateien tauschen, venv neu bauen, Datenbank mit Sicherheitskopie ersetzen, `PRAGMA integrity_check`, Revision der Sicherung gegen die alte Version prüfen, Dienst starten, Health abwarten. Es laufen dabei keine Migrationen; die alte Version findet beim Start ihr eigenes Schema vor.
 
 ## Betrieb und Diagnose
 
@@ -127,4 +133,6 @@ curl http://127.0.0.1:8000/health
 
 `/health` liefert JSON mit Status, Version, Schema-Version und Journal-Modus. Bei Datenbankfehlern antwortet es mit HTTP 503.
 
-Protokolle gehen über Uvicorn nach journald. Passwörter und Sitzungs-IDs werden nicht protokolliert.
+Protokolle gehen über Uvicorn nach journald. Passwörter und Sitzungs-IDs werden nicht protokolliert. Alembic-Meldungen erscheinen nur bei `serve`, `migrate`, `install`, `upgrade`, `content-sync` und `import`.
+
+Die Unit ist gehärtet (`UMask=0027`, `PrivateDevices`, `ProtectProc=invisible`, `SystemCallFilter=@system-service`, leere `CapabilityBoundingSet`, `RestrictNamespaces`, dazu die bisherigen Optionen). `systemd-analyze security lpic3-trainer` meldet 1.3 bis 2.0 (OK). Der Dienst kann deshalb keine Ports unter 1024 binden; `LPIC3_PORT` muss 1024 oder höher sein, ein Reverse Proxy übernimmt 80/443.

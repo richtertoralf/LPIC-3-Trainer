@@ -9,7 +9,9 @@ Voraussetzungen:
 - Internetzugang während der Installation (pip lädt die Python-Abhängigkeiten).
 - Für den öffentlichen Betrieb ein Reverse Proxy mit HTTPS.
 
-Prüfstand: Der Ablauf wurde aus einem frischen Klon ohne Root (venv, `lpic3ctl serve`) tatsächlich ausgeführt. Die Schritte mit Root und systemd (`install`, `upgrade`, `rollback`, `uninstall`, `purge`) sind nur in einem automatisierten Test mit Stub-Befehlen geprüft, nicht auf einem echten Server. Siehe `docs/stand.md`.
+Prüfstand: Der komplette Ablauf (Installation, Dienststart durch systemd, Neustart, Upgrade von v0.0.2, Backup, Restore, Rollback, Deinstallation, Reverse Proxy) wurde am 5. November 2026 als Root in LXD-Systemcontainern mit Debian 12, Debian 13, Ubuntu 24.04 und Ubuntu 26.04 ausgeführt; Protokoll und Befunde in `docs/installationstest.md`. Nicht geprüft: blankes Metall oder VM mit eigenem Kernel, ARM64, Docker.
+
+**Hinweis zu v0.0.2:** Der Installer von v0.0.2 bricht auf einem echten System ab (Konfigurationsverzeichnis für den Dienstbenutzer nicht lesbar) und `restore` schlägt unter Debian 12 fehl. Für eine Neuinstallation den aktuellen Stand von `main` oder einen neueren Tag verwenden; Workarounds in `docs/installationstest.md`, Abschnitt 3.
 
 ## Native Installation mit systemd (Standardweg)
 
@@ -19,10 +21,10 @@ Prüfstand: Der Ablauf wurde aus einem frischen Klon ohne Root (venv, `lpic3ctl 
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout v0.0.2
+git checkout main            # oder ein neuerer Tag als v0.0.2, siehe Hinweis oben
 ```
 
-Immer den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
+Für den Betrieb den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
 
 ### 2. Installieren
 
@@ -41,7 +43,9 @@ sudo python3 -m app.cli install
 
 Ist der Port bereits belegt, warnt die Installation. Dann `LPIC3_PORT` in der Konfiguration anpassen und `sudo lpic3ctl restart` ausführen.
 
-Dateirechte nach der Installation: `/opt/lpic3-trainer` gehört root (nur lesbar für den Dienst), `/etc/lpic3-trainer/lpic3-trainer.env` ist `0640 root:lpic3`, `/var/lib/lpic3-trainer` gehört `lpic3` (`0750`). Die systemd-Unit läuft mit `ProtectSystem=strict` und darf nur in das Datenverzeichnis schreiben.
+Dateirechte nach der Installation: `/opt/lpic3-trainer` gehört root (nur lesbar für den Dienst), `/etc/lpic3-trainer` ist `0750 root:lpic3`, die Datei `lpic3-trainer.env` `0640 root:lpic3`, `/var/lib/lpic3-trainer` gehört `lpic3` (`0750`, Datenbank `0640`). Die systemd-Unit läuft mit `ProtectSystem=strict`, ohne Capabilities und mit Systemaufruffilter (`systemd-analyze security`: 1.3 bis 2.0, OK); sie darf nur in das Datenverzeichnis schreiben und kann keine Ports unter 1024 binden, dafür ist der Reverse Proxy zuständig.
+
+Ohne Root liefern `lpic3ctl status` und `check` nur Standardwerte, weil die Konfiguration nicht lesbar ist; beide weisen darauf hin.
 
 ### 3. Status prüfen
 
@@ -136,10 +140,11 @@ Die Konfiguration wird nicht überschrieben. Schlägt ein Schritt fehl, wird die
 Zurück zur vorherigen Programmversion:
 
 ```bash
-sudo lpic3ctl rollback
+sudo lpic3ctl rollback                       # nur Programmdateien, wenn das Schema unverändert ist
+sudo lpic3ctl rollback --restore ARCHIV      # Programmdateien und Datenbank aus der Sicherung von vor dem Upgrade
 ```
 
-Bei Schemaänderungen zusätzlich die Sicherung von vor dem Upgrade mit `lpic3ctl restore` einspielen (siehe `docs/administration.md`).
+Hat das Upgrade das Datenbankschema geändert, verweigert `rollback` ohne `--restore` die Ausführung und nennt das passende Archiv unter `/var/lib/lpic3-trainer/backups/`. Die vorherige Version würde sonst mit einem unbekannten Schema nicht mehr starten. Einzelheiten in `docs/administration.md`.
 
 Version prüfen:
 
