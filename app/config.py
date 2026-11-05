@@ -10,9 +10,24 @@ PREFIX = "LPIC3_"
 PACKAGE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = PACKAGE_DIR.parent
 
+DEFAULT_PASSWORD_MIN = 8
+DEFAULT_PASSWORD_MAX = 128
+PASSWORD_LENGTH_LIMIT = 1024
+
 
 def _env(name: str, default: str) -> str:
     return os.environ.get(PREFIX + name, default)
+
+
+def _env_int(name: str, default: int) -> int:
+    raw = os.environ.get(PREFIX + name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return int(raw.strip())
+    except ValueError:
+        msg = f"{PREFIX}{name} muss eine ganze Zahl sein, nicht {raw.strip()!r}."
+        raise ValueError(msg) from None
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -45,6 +60,27 @@ class Settings:
     entry_test_question_count: int = field(
         default_factory=lambda: int(_env("ENTRY_QUESTIONS", "10"))
     )
+    # Password policy: only length limits, no complexity rules, no expiry. The defaults
+    # keep the behaviour of earlier versions when the variables are not set.
+    password_min_length: int = field(
+        default_factory=lambda: _env_int("PASSWORD_MIN_LENGTH", DEFAULT_PASSWORD_MIN)
+    )
+    password_max_length: int = field(
+        default_factory=lambda: _env_int("PASSWORD_MAX_LENGTH", DEFAULT_PASSWORD_MAX)
+    )
+
+    def __post_init__(self) -> None:
+        lo, hi = self.password_min_length, self.password_max_length
+        if not 1 <= lo <= PASSWORD_LENGTH_LIMIT:
+            raise ValueError(
+                f"LPIC3_PASSWORD_MIN_LENGTH muss zwischen 1 und {PASSWORD_LENGTH_LIMIT} liegen, "
+                f"nicht {lo}."
+            )
+        if not lo <= hi <= PASSWORD_LENGTH_LIMIT:
+            raise ValueError(
+                f"LPIC3_PASSWORD_MAX_LENGTH muss zwischen LPIC3_PASSWORD_MIN_LENGTH ({lo}) und "
+                f"{PASSWORD_LENGTH_LIMIT} liegen, nicht {hi}."
+            )
 
     @property
     def db_path(self) -> Path:

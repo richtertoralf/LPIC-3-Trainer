@@ -19,12 +19,12 @@ from app.deps import (
 )
 from app.models import ROLE_ADMIN, ROLE_LEARNER, STATUS_ACTIVE, STATUS_PENDING, User
 from app.security import (
-    MIN_PASSWORD_LENGTH,
     SESSION_COOKIE,
     create_session,
     delete_session,
     delete_user_sessions,
     hash_password,
+    password_error,
     verify_password,
 )
 from app.web import redirect, render
@@ -139,8 +139,8 @@ def register(
             "Kleinbuchstaben, Ziffern, Punkt, Minus und Unterstrich enthalten."
         )
         return render(request, "auth/register.html", ctx, status_code=400)
-    if len(password) < MIN_PASSWORD_LENGTH:
-        ctx["error"] = f"Das Passwort muss mindestens {MIN_PASSWORD_LENGTH} Zeichen lang sein."
+    if problem := password_error(password):
+        ctx["error"] = problem
         return render(request, "auth/register.html", ctx, status_code=400)
     if password != password2:
         ctx["error"] = "Die Passwörter stimmen nicht überein."
@@ -213,8 +213,8 @@ def account_password(
 ):
     if not verify_password(user.password_hash, current_password):
         return redirect("/account", "Das aktuelle Passwort ist falsch.", "error")
-    if len(password) < MIN_PASSWORD_LENGTH:
-        return redirect("/account", f"Mindestens {MIN_PASSWORD_LENGTH} Zeichen.", "error")
+    if problem := password_error(password):
+        return redirect("/account", problem, "error")
     if password != password2:
         return redirect("/account", "Die neuen Passwörter stimmen nicht überein.", "error")
     user.password_hash = hash_password(password)

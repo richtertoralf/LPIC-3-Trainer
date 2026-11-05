@@ -49,6 +49,15 @@ def _display_choices(question, seed=0):
 templates.env.globals["display_choices"] = _display_choices
 
 
+def _password_policy():
+    from app.security import password_policy
+
+    return password_policy()
+
+
+templates.env.globals["password_policy"] = _password_policy
+
+
 def render(
     request: Request, name: str, context: dict[str, Any] | None = None, status_code: int = 200
 ) -> HTMLResponse:

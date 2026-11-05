@@ -16,7 +16,35 @@ from app.models import STATUS_ACTIVE, User, UserSession, utcnow
 _hasher = PasswordHasher()  # argon2id is the library default
 
 SESSION_COOKIE = "lpic3_session"
-MIN_PASSWORD_LENGTH = 8
+_PASSWORD_ALPHABET = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+
+
+def password_policy() -> tuple[int, int]:
+    """Return (min_length, max_length) from the configuration."""
+    settings = get_settings()
+    return settings.password_min_length, settings.password_max_length
+
+
+def password_error(password: str) -> str | None:
+    """Return a German error message when the password violates the length policy.
+
+    Used by every place that sets a password (registration, password change, user creation
+    in the web interface and on the CLI). Existing hashes are never re-validated, so a
+    stricter policy does not lock out existing accounts.
+    """
+    lo, hi = password_policy()
+    if len(password) < lo:
+        return f"Das Passwort muss mindestens {lo} Zeichen lang sein."
+    if len(password) > hi:
+        return f"Das Passwort darf höchstens {hi} Zeichen lang sein."
+    return None
+
+
+def generate_password() -> str:
+    """Random start password (admin reset) that satisfies the configured policy."""
+    lo, hi = password_policy()
+    length = min(max(12, lo), hi)
+    return "".join(secrets.choice(_PASSWORD_ALPHABET) for _ in range(length))
 
 
 def hash_password(password: str) -> str:
