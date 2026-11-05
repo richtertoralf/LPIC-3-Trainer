@@ -60,6 +60,11 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 - Web App Manifest, Service Worker: statische Dateien und besuchte Seiten bleiben verfügbar, Offline-Seite als Rückfall, Banner ohne Verbindung.
 
+### Netzwerkzugriff und Passwortrichtlinie (nach 0.0.3, 5. November 2026)
+
+- Praxistest von v0.0.3 auf einer Ubuntu-26.04-VM durch den Auftraggeber: Installation, venv, systemd, Migrationen und Health-Check fehlerfrei. Daraus ergänzt: Abschnitt *Zugriff aus dem lokalen Netzwerk* in `docs/installation.md` (`LPIC3_HOST`, Kontrolle mit `ss -ltnp` und Health-Endpunkt, Firewall, libvirt-NAT gegenüber Bridged, HTTP im LAN nur für Tests, HTTPS für den dauerhaften Betrieb).
+- Konfigurierbare Passwortrichtlinie über `LPIC3_PASSWORD_MIN_LENGTH` (Standard 8) und `LPIC3_PASSWORD_MAX_LENGTH` (Standard 128) in `/etc/lpic3-trainer/lpic3-trainer.env`, einheitlich geprüft bei Registrierung, Passwortänderung, Benutzeranlage (Web und CLI), `set-password` und generiertem Startpasswort; nur Längen, keine Komplexitätsregeln, bestehende Passwörter bleiben gültig; ungültige Werte werden mit klarer Meldung abgewiesen (`lpic3ctl check`: *Konfigurationswerte*). Keine Datenbankeinstellung, kein zusätzliches Formular. Tests in `tests/test_password_policy.py`.
+
 ### Pilotbetrieb (Arbeitspaket 4, 5. November 2026)
 
 - Automatisierter Pilotlauf mit drei Rollen und Smartphone-Ansicht (`tests/e2e/test_pilot.py`), auch gegen bestehende Installationen (`LPIC3_E2E_BASE`); gegen die systemd-Installation im Ubuntu-26.04-Container mit 60-Fragen-Simulation bestanden. Keine reale Nutzerabnahme; Plan dafür in `docs/pilotbetrieb.md`.

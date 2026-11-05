@@ -234,7 +234,7 @@ def cmd_user(args) -> int:
     from app.db import session_scope
     from app.migrate import upgrade_database
     from app.models import ROLES, STATUS_ACTIVE, User
-    from app.security import MIN_PASSWORD_LENGTH, delete_user_sessions, hash_password
+    from app.security import delete_user_sessions, hash_password, password_error
 
     upgrade_database()
     with session_scope() as db:
@@ -246,8 +246,8 @@ def cmd_user(args) -> int:
             if db.execute(select(User).where(User.username == args.username)).scalar_one_or_none():
                 raise CliError(f"Benutzer {args.username} existiert bereits.")
             password = args.password or getpass.getpass("Passwort: ")
-            if len(password) < MIN_PASSWORD_LENGTH:
-                raise CliError(f"Das Passwort muss mindestens {MIN_PASSWORD_LENGTH} Zeichen haben.")
+            if problem := password_error(password):
+                raise CliError(problem)
             if args.role not in ROLES:
                 raise CliError(f"Rolle muss eine von {', '.join(ROLES)} sein.", EXIT_USAGE)
             db.add(
@@ -271,8 +271,8 @@ def cmd_user(args) -> int:
             say(f"{user.username} hat jetzt die Rolle {args.role}.")
         elif args.user_command == "set-password":
             password = args.password or getpass.getpass("Neues Passwort: ")
-            if len(password) < MIN_PASSWORD_LENGTH:
-                raise CliError(f"Das Passwort muss mindestens {MIN_PASSWORD_LENGTH} Zeichen haben.")
+            if problem := password_error(password):
+                raise CliError(problem)
             user.password_hash = hash_password(password)
             delete_user_sessions(db, user.id)
             say(f"Passwort von {user.username} geändert.")
@@ -899,7 +899,16 @@ def cmd_check(args) -> int:
         not CONFIG_UNREADABLE and ENV_FILE.is_file(),
         f"{ENV_FILE}" + (" (nicht lesbar, Root-Rechte nötig)" if CONFIG_UNREADABLE else ""),
     )
-    settings = _settings()
+    try:
+        settings = _settings()
+    except ValueError as exc:
+        report("Konfigurationswerte", False, str(exc))
+        return EXIT_ERROR
+    report(
+        "Passwortrichtlinie",
+        True,
+        f"{settings.password_min_length} bis {settings.password_max_length} Zeichen",
+    )
     report("Datenverzeichnis", settings.data_dir.is_dir(), str(settings.data_dir))
     if settings.data_dir.is_dir():
         report("Datenverzeichnis beschreibbar", os.access(settings.data_dir, os.W_OK))
@@ -1126,6 +1135,10 @@ def main(argv: list[str] | None = None) -> int:
     except CliError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)
         return exc.code
+    except ValueError as exc:
+        # invalid LPIC3_* value, e.g. a password length outside the allowed range
+        print(f"Fehler: Ungültige Konfiguration: {exc}", file=sys.stderr)
+        return EXIT_USAGE
     except subprocess.CalledProcessError as exc:
         print(f"Fehler: Befehl fehlgeschlagen: {' '.join(exc.cmd)}", file=sys.stderr)
         if exc.stderr:

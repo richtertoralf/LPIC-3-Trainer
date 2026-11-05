@@ -6,11 +6,12 @@
 {% if user.is_admin %}
 <details class="card narrow">
   <summary><strong>Benutzer anlegen</strong></summary>
+  {% set pmin, pmax = password_policy() %}
   <form method="post" action="/admin/users">
     <label>Benutzername<input name="username" required pattern="[a-z0-9][a-z0-9._\-]{2,31}"><small>3 bis 32 Zeichen, Kleinbuchstaben, Ziffern, Punkt, Minus, Unterstrich.</small></label>
     <label>Anzeigename (optional)<input name="display_name"></label>
     <label>Rolle<select name="role">{% for r in roles %}<option value="{{ r }}">{{ {'admin': 'Administrator', 'supervisor': 'Betreuer', 'learner': 'Lernender'}[r] }}</option>{% endfor %}</select></label>
-    <label>Startpasswort<input type="password" name="password" required minlength="8"><small>Mindestens 8 Zeichen. Bitte der Person mitteilen; sie kann es unter „Konto“ ändern.</small></label>
+    <label>Startpasswort<input type="password" name="password" required minlength="{{ pmin }}" maxlength="{{ pmax }}"><small>Mindestens {{ pmin }} Zeichen{% if pmax < 100 %}, höchstens {{ pmax }}{% endif %}. Bitte der Person mitteilen; sie kann es unter „Konto“ ändern.</small></label>
     <button class="btn btn-primary" type="submit">Anlegen</button>
   </form>
 </details>

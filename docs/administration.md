@@ -52,6 +52,32 @@ sudo lpic3ctl user activate maria
 
 Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit Freigabe` (Konto wartet, bis ein Betreuer oder Administrator es freigibt).
 
+### Passwortrichtlinie
+
+Die Richtlinie besteht nur aus Längenvorgaben und wird in `/etc/lpic3-trainer/lpic3-trainer.env` gesetzt, nicht in der Weboberfläche oder Datenbank:
+
+| Variable | Standard | Zulässig |
+|----------|----------|----------|
+| `LPIC3_PASSWORD_MIN_LENGTH` | `8` | ganze Zahl 1 bis 1024 |
+| `LPIC3_PASSWORD_MAX_LENGTH` | `128` | ganze Zahl von der Mindestlänge bis 1024 |
+
+Beispiel für eine Lerngruppe mit einfachen Startpasswörtern:
+
+```ini
+LPIC3_PASSWORD_MIN_LENGTH=6
+LPIC3_PASSWORD_MAX_LENGTH=24
+```
+
+Nach der Änderung `sudo lpic3ctl restart`; `sudo lpic3ctl check` zeigt die wirksame Richtlinie („Passwortrichtlinie: 6 bis 24 Zeichen“).
+
+Wirkung:
+
+- Dieselbe Prüfung an allen Stellen, die ein Passwort setzen: Registrierung, *Konto › Passwort ändern*, *Verwaltung › Benutzer › Benutzer anlegen*, `lpic3ctl user create` und `lpic3ctl user set-password`. Das vom Administrator erzeugte Startpasswort („Passwort zurücksetzen“) hält die Richtlinie ebenfalls ein (mindestens 12 Zeichen, sofern die Höchstlänge das erlaubt).
+- Meldung bei Verstoß: „Das Passwort muss mindestens N Zeichen lang sein.“ beziehungsweise „Das Passwort darf höchstens N Zeichen lang sein.“ Die Formulare übergeben die Grenzen zusätzlich als `minlength`/`maxlength` an den Browser.
+- Gezählt werden Zeichen, nicht Bytes; Leerzeichen zählen mit. Es gibt keine Komplexitätsregeln (Ziffern, Sonderzeichen) und keinen erzwungenen Passwortwechsel.
+- Bestehende Konten bleiben unverändert gültig: Gespeichert ist nur der Argon2id-Hash, eine strengere Richtlinie greift erst beim nächsten Setzen eines Passworts. Ohne die Variablen gelten die Werte früherer Versionen (mindestens 8 Zeichen), Updates verhalten sich also unverändert.
+- Ungültige Werte verhindern den Start des Dienstes mit einer klaren Meldung im Journal (`sudo lpic3ctl logs`), zum Beispiel „LPIC3_PASSWORD_MAX_LENGTH muss zwischen LPIC3_PASSWORD_MIN_LENGTH (8) und 1024 liegen, nicht 6.“; `lpic3ctl check` meldet dasselbe unter *Konfigurationswerte*.
+
 ## Lerngruppen
 
 *Verwaltung › Gruppen*: Gruppe anlegen mit Beitritt `offen` oder `mit Freigabe`. Wer eine Gruppe anlegt, ist ihr Betreuer. Auf der Gruppenseite: Beitrittsanfragen freigeben, Mitglieder hinzufügen oder entfernen, Lernstand je Mitglied und Modul (geübte Fragen, Trefferquote, Hilfequote, beste Simulation) sowie je Mitglied die Zahl der abgeschlossenen, begonnenen und nicht begonnenen LABs. Lernende treten unter *Gruppen* bei.

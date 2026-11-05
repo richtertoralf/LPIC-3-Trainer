@@ -86,10 +86,57 @@ Datei `/etc/lpic3-trainer/lpic3-trainer.env` (Beispiel in `deploy/lpic3-trainer.
 | `LPIC3_EXAM_MINUTES` | `90` | Zeit je Modulsimulation |
 | `LPIC3_TOPIC_EXAM_QUESTIONS` | `15` | Fragen je Kapiteltest |
 | `LPIC3_ENTRY_QUESTIONS` | `10` | Fragen je Eingangstest |
+| `LPIC3_PASSWORD_MIN_LENGTH` | `8` | Mindestlänge neuer Passwörter in Zeichen (1 bis 1024) |
+| `LPIC3_PASSWORD_MAX_LENGTH` | `128` | Höchstlänge neuer Passwörter in Zeichen (Mindestlänge bis 1024) |
 
 Nach Änderungen: `sudo lpic3ctl restart`.
 
+Passwortrichtlinie: Die beiden Längen gelten einheitlich für Registrierung, Passwortänderung, Benutzeranlage durch Administratoren (Web und `lpic3ctl user create`), `lpic3ctl user set-password` und das vom Administrator zurückgesetzte Startpasswort. Fehlen die Variablen, gelten die bisherigen Werte (mindestens 8 Zeichen, praktisch keine Obergrenze), ein Update ändert also nichts. Bestehende Passwörter bleiben bei einer strengeren Richtlinie gültig; sie gilt erst beim nächsten Setzen eines Passworts. Es gibt keine Komplexitätsregeln und keinen erzwungenen Passwortwechsel. Ungültige Werte (keine ganze Zahl, Mindestlänge unter 1, Höchstlänge kleiner als die Mindestlänge oder über 1024) verhindern den Start des Dienstes mit einer Fehlermeldung im Journal; `sudo lpic3ctl check` meldet sie unter *Konfigurationswerte*. Einzelheiten in `docs/administration.md`.
+
 Für die Entwicklung gibt es `.env.example` im Repository.
+
+## Zugriff aus dem lokalen Netzwerk
+
+Standardmäßig bindet der Dienst mit `LPIC3_HOST=127.0.0.1` nur an die Loopback-Adresse: Die Anwendung ist dann ausschließlich auf dem Server selbst erreichbar (oder über einen Reverse Proxy auf demselben Rechner). Von einem anderen Rechner im LAN kommt ohne weitere Einstellung keine Verbindung zustande, auch wenn Dienst und Health-Check lokal funktionieren.
+
+Sollen Lernende im lokalen Netz direkt zugreifen, die Bindeadresse ausschließlich in `/etc/lpic3-trainer/lpic3-trainer.env` ändern (keine Änderung an der systemd-Unit oder am Programmcode):
+
+```ini
+LPIC3_HOST=0.0.0.0        # alle IPv4-Adressen des Servers
+# oder nur eine Schnittstelle, z. B.
+# LPIC3_HOST=192.168.1.20
+LPIC3_PORT=8000
+```
+
+Dann den Dienst neu starten und die Bindung kontrollieren:
+
+```bash
+sudo lpic3ctl restart
+ss -ltnp | grep 8000            # erwartet: 0.0.0.0:8000 bzw. die gewählte Adresse, Prozess python/uvicorn
+curl http://127.0.0.1:8000/health
+curl http://<Server-IP>:8000/health    # vom Server selbst und von einem anderen Rechner im LAN
+```
+
+Zeigt `ss` weiterhin `127.0.0.1:8000`, wurde die Datei nicht gelesen (Tippfehler, Variable auskommentiert) oder der Dienst nicht neu gestartet; `sudo lpic3ctl status` zeigt die wirksame Adresse. Mit `LPIC3_HOST=::` bindet der Dienst an IPv6 (auf Linux üblicherweise auch IPv4).
+
+**Firewall.** Ist auf dem Server eine Firewall aktiv, muss der Port freigegeben werden, am besten nur für das lokale Netz:
+
+```bash
+sudo ufw allow from 192.168.1.0/24 to any port 8000 proto tcp     # ufw (Ubuntu)
+sudo nft add rule inet filter input ip saddr 192.168.1.0/24 tcp dport 8000 accept   # nftables (Debian), Regelsatz dauerhaft speichern
+```
+
+Die Hardening-Optionen der systemd-Unit erlauben Ports ab 1024; 8000 ist davon nicht betroffen.
+
+**Virtuelle Maschinen (libvirt/KVM).** Läuft der Trainer in einer VM, entscheidet das virtuelle Netz, wer ihn erreicht:
+
+- *NAT* (libvirt-Standardnetz `default`, meist 192.168.122.0/24): Die VM erreicht das LAN, das LAN die VM aber nicht. Vom Virtualisierungshost aus ist `http://192.168.122.x:8000/` erreichbar, von anderen Rechnern nicht. Für den LAN-Zugriff entweder eine Portweiterleitung auf dem Host einrichten (libvirt-Hook oder nftables-DNAT vom Host-Port auf die VM) oder das Netz wechseln.
+- *Bridged* (VM hängt über eine Linux-Bridge wie `br0` oder ein macvtap-Gerät direkt am physischen Netz): Die VM bekommt eine Adresse aus dem LAN und ist für alle Rechner im LAN wie ein eigener Server erreichbar. Das ist für den Unterricht der einfachste Weg.
+- *Isoliert* (ohne Forwarding): nur Host und andere VMs im selben Netz.
+
+In allen Fällen muss `LPIC3_HOST` in der VM auf `0.0.0.0` oder die VM-Adresse stehen, sonst nimmt der Dienst nur Verbindungen aus der VM selbst an. Eine Anleitung zu den libvirt-Netztypen steht in `docs/lab-umgebung.md`.
+
+**Sicherheit.** Ohne Reverse Proxy läuft die Verbindung über unverschlüsseltes HTTP: Anmeldedaten und Sitzungscookies sind im LAN mitlesbar, und `LPIC3_SECURE_COOKIES` muss `false` bleiben, sonst sendet der Browser das Sitzungscookie nicht. Direkter HTTP-Zugriff ist deshalb nur für Tests und kurze Übungen in einem vertrauenswürdigen, abgeschotteten Netz vertretbar. Für den dauerhaften Mehrbenutzerbetrieb, auch im LAN, den Dienst bei `LPIC3_HOST=127.0.0.1` lassen und einen Reverse Proxy mit HTTPS davorschalten (nächster Abschnitt); `lpic3ctl check` weist auf eine öffentliche Bindung ohne `LPIC3_SECURE_COOKIES=true` hin. Nie direkt ins Internet freigeben.
 
 ## Reverse Proxy mit HTTPS
 

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import secrets
-
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
@@ -44,7 +42,7 @@ from app.models import (
     UserModule,
 )
 from app.routers.auth import USERNAME_RE
-from app.security import MIN_PASSWORD_LENGTH, delete_user_sessions, hash_password
+from app.security import delete_user_sessions, generate_password, hash_password, password_error
 from app.services import all_modules, module_progress, set_batch_release
 from app.web import redirect, render
 
@@ -117,12 +115,8 @@ def create_user(
         )
     if role not in ROLES:
         raise HTTPException(400, "Ungültige Rolle")
-    if len(password) < MIN_PASSWORD_LENGTH:
-        return redirect(
-            "/admin/users",
-            f"Das Passwort braucht mindestens {MIN_PASSWORD_LENGTH} Zeichen.",
-            "error",
-        )
+    if problem := password_error(password):
+        return redirect("/admin/users", problem, "error")
     if db.execute(select(User.id).where(User.username == username)).scalar_one_or_none():
         return redirect("/admin/users", "Dieser Benutzername ist bereits vergeben.", "error")
     db.add(
@@ -198,7 +192,7 @@ def reset_password(
     target = db.get(User, user_id)
     if target is None:
         raise HTTPException(404, "Benutzer nicht gefunden")
-    new_password = secrets.token_urlsafe(9)
+    new_password = generate_password()
     target.password_hash = hash_password(new_password)
     delete_user_sessions(db, target.id)
     db.add(target)
