@@ -110,6 +110,19 @@ def test_newest_stable_tag_ignores_prereleases(tmp_path):
     assert cli._parse_version("v0.0.3-4-gabcdef") is None and cli._parse_version("main") is None
 
 
+def test_upgrade_remote_comes_from_the_central_env_file(tmp_path, monkeypatch):
+    """Found in the container test: the remote was read at import time, so a mirror set in
+    /etc/lpic3-trainer/lpic3-trainer.env was ignored."""
+    monkeypatch.delenv("LPIC3_UPGRADE_REMOTE", raising=False)
+    assert cli.remote_url() == cli.DEFAULT_REMOTE_URL
+    env_file = tmp_path / "lpic3-trainer.env"
+    env_file.write_text("LPIC3_UPGRADE_REMOTE=/srv/mirror/lpic3.git\n")
+    cli.load_env_file(env_file)
+    assert cli.remote_url() == "/srv/mirror/lpic3.git"
+    monkeypatch.setenv("LPIC3_UPGRADE_REMOTE", "/other.git")
+    assert cli.remote_url() == "/other.git"
+
+
 def test_access_urls_skip_virtual_interfaces():
     sample = (
         "2: enp1s0    inet 10.77.0.108/24 metric 100 brd 10.77.0.255 scope global dynamic enp1s0\n"

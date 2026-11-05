@@ -39,10 +39,7 @@ BUILD_FILE = APP_DIR / "BUILD"
 SOURCE_DIR = Path(__file__).resolve().parent.parent
 PRODUCT = "LPIC-3 Trainer"
 # Upgrade source: the newest stable tag vX.Y.Z of this repository (RICHTER.PROJECTS ADR-002).
-# Overridable for tests and mirrors.
-REMOTE_URL = os.environ.get(
-    "LPIC3_UPGRADE_REMOTE", "https://github.com/richtertoralf/LPIC-3-Trainer.git"
-)
+DEFAULT_REMOTE_URL = "https://github.com/richtertoralf/LPIC-3-Trainer.git"
 STABLE_TAG_RE = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 
 # Exit codes as in RICHTER.PROJECTS ADR-002: 0 success (also "already up to date" or a
@@ -662,8 +659,16 @@ def _version_line() -> str:
     return f"{PRODUCT} {version} ({', '.join(parts)})"
 
 
-def _latest_stable_tag(remote: str = REMOTE_URL) -> tuple[str, tuple[int, ...]]:
+def remote_url() -> str:
+    """Upgrade remote: LPIC3_UPGRADE_REMOTE (environment or the central env file, for
+    mirrors and tests), otherwise the project repository. Read at call time, after
+    ``load_env_file()``."""
+    return os.environ.get("LPIC3_UPGRADE_REMOTE") or DEFAULT_REMOTE_URL
+
+
+def _latest_stable_tag(remote: str | None = None) -> tuple[str, tuple[int, ...]]:
     """Newest tag ``vX.Y.Z`` of the remote. Pre-releases (``v1.0.0-rc1``) are ignored."""
+    remote = remote or remote_url()
     try:
         result = run(
             ["git", "ls-remote", "--tags", "--refs", remote],
@@ -836,7 +841,7 @@ def cmd_upgrade(args) -> int:
         tmp = tempfile.mkdtemp(prefix="lpic3-upgrade-")
         source = Path(tmp) / "src"
         clone = run(
-            ["git", "clone", "--quiet", "--depth", "1", "--branch", tag, REMOTE_URL, str(source)],
+            ["git", "clone", "--quiet", "--depth", "1", "--branch", tag, remote_url(), str(source)],
             check=False,
             capture=True,
             env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
