@@ -1462,9 +1462,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Fehler: {exc}", file=sys.stderr)
         return exc.code
     except ValueError as exc:
-        # invalid LPIC3_* value, e.g. a password length outside the allowed range
-        print(f"Fehler: Ungültige Konfiguration: {exc}", file=sys.stderr)
-        return EXIT_USAGE
+        # ConfigError: invalid LPIC3_* value (exit 2). Other ValueErrors, e.g. an invalid
+        # content file during content-sync, are ordinary errors (exit 1); seen in the
+        # container test, where they were mislabelled as configuration errors.
+        from app.config import ConfigError
+
+        if isinstance(exc, ConfigError):
+            print(f"Fehler: Ungültige Konfiguration: {exc}", file=sys.stderr)
+            return EXIT_USAGE
+        print(f"Fehler: {exc}", file=sys.stderr)
+        return EXIT_ERROR
     except subprocess.CalledProcessError as exc:
         print(f"Fehler: Befehl fehlgeschlagen: {' '.join(exc.cmd)}", file=sys.stderr)
         if exc.stderr:

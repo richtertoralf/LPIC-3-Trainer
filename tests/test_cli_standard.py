@@ -123,6 +123,21 @@ def test_upgrade_remote_comes_from_the_central_env_file(tmp_path, monkeypatch):
     assert cli.remote_url() == "/other.git"
 
 
+def test_invalid_content_file_is_not_reported_as_configuration_error(tmp_path):
+    """Container test, failed-upgrade case: content-sync on a broken content file said
+    'Ungültige Konfiguration'. Only LPIC3_* values are configuration errors (exit 2)."""
+    content = tmp_path / "content"
+    for sub in ("objectives", "vocabulary", "questions", "labs"):
+        (content / sub).mkdir(parents=True)
+    (content / "objectives" / "300.json").write_text("{ kaputt")
+    env = {"LPIC3_DATA_DIR": str(tmp_path / "data"), "LPIC3_CONTENT_DIR": str(content)}
+    r = run_cli("content-sync", env_extra=env)
+    assert r.returncode == 1, r.stdout + r.stderr
+    assert "300.json" in r.stderr and "Ungültige Konfiguration" not in r.stderr
+    r = run_cli("content-sync", env_extra={**env, "LPIC3_PASSWORD_MIN_LENGTH": "x"})
+    assert r.returncode == 2 and "Ungültige Konfiguration" in r.stderr
+
+
 def test_access_urls_skip_virtual_interfaces():
     sample = (
         "2: enp1s0    inet 10.77.0.108/24 metric 100 brd 10.77.0.255 scope global dynamic enp1s0\n"

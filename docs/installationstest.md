@@ -1,6 +1,6 @@
 # Installationstest der nativen systemd-Installation
 
-Stand: 5. November 2026, Arbeitspaket 1 (Branch `feat/ap1-install`). Dieses Dokument hält fest, was tatsächlich installiert und geprüft wurde, welche Fehler dabei gefunden und behoben wurden und was offen bleibt.
+Stand: 5. November 2026, Arbeitspaket 1 (Branch `feat/ap1-install`), ergänzt um den Integrationstest des CLI-Standards (Abschnitt 6, Branch `fix/cli-upgrade-remote-config`). Dieses Dokument hält fest, was tatsächlich installiert und geprüft wurde, welche Fehler dabei gefunden und behoben wurden und was offen bleibt.
 
 ## 1. Testumgebung
 
@@ -94,6 +94,7 @@ Workaround für v0.0.2 auf Debian 12: Dienst stoppen, Datenbank mit Python `tarf
 - Docker Compose weiterhin ungetestet (kein Docker auf dem Entwicklungsrechner).
 - ARM64 nicht geprüft (nur x86_64-Container).
 - Die Containertests sind manuell protokolliert (Logs im Arbeitsverzeichnis der Sitzung), nicht als wiederholbarer Test im Repository. Der Stub-Test `tests/test_cli_install.py` bleibt der automatisierte Nachweis.
+- `lpic3ctl --upgrade` gegen das echte GitHub-Repository wurde nur im Fall „bereits aktuell“ ausgeführt (Abschnitt 6, Schritt D); ein echtes Release-Upgrade von GitHub gibt es erst, wenn ein Tag neuer als die installierte Version existiert. Der Mechanismus selbst ist mit einer lokalen Remote geprüft.
 
 ## 5. Testplan für einen echten Server oder eine VM
 
@@ -109,3 +110,30 @@ Voraussetzung: frisches Debian 12/13 oder Ubuntu 24.04/26.04, Root per sudo, Int
 8. `sudo lpic3ctl rollback` (erwartet: Verweigerung mit Hinweis auf die Sicherung, falls Schemaänderung), dann `sudo lpic3ctl rollback --restore <Archiv>`; anschließend erneut upgraden.
 9. Reverse Proxy mit HTTPS einrichten, `LPIC3_SECURE_COOKIES=true`, Anmeldung über den Proxy, `Set-Cookie` enthält `Secure`.
 10. `sudo lpic3ctl uninstall` (Daten bleiben), erneut `install` (Konfiguration und Daten wieder nutzbar), zum Schluss optional `sudo lpic3ctl purge`.
+
+## 6. Integrationstest des CLI-Standards (5. November 2026)
+
+Umgebung: LXD-Systemcontainer `lpic3-ubu26` (Ubuntu 26.04 daily 20261016, Python 3.14.4, systemd als PID 1, NAT-Netz mit Internetzugang), Ausführung als Root. Ausgangspunkt: Installation von Tag `v0.0.3` mit `python3 -m app.cli install`. Für die Upgrade-Tests diente ein lokales Bare-Repository `/root/remote.git` (Klon des Projekt-Repositorys) mit Test-Tags `v0.0.4` bis `v0.0.7`, eingestellt über `LPIC3_UPGRADE_REMOTE` in `/etc/lpic3-trainer/lpic3-trainer.env`; die Test-Releases sind Versionssprung-Commits auf dem Branch `fix/cli-upgrade-remote-config`. Im produktiven GitHub-Repository wurden keine Tags angelegt.
+
+| Schritt | Prüfung | Ergebnis |
+|---|---|---|
+| A | v0.0.3 installiert; Benutzer `tester` angelegt, Kommentarzeile und `LPIC3_PASSWORD_MIN_LENGTH=6` in der env-Datei | ok |
+| B | `python3 -m app.cli --upgrade --source /root/work` (Checkout mit CLI-Standard) auf die laufende v0.0.3 | ok, Exit 0; Dienst `active`/`enabled`, neu gestartet; env-Datei mit Marker und Variable erhalten; Benutzer erhalten; `BUILD` mit version, commit, branch, dirty=false, source, installed_at |
+| C | `lpic3ctl --version` | `LPIC-3 Trainer 0.0.3 (commit a61fa5f, branch fix/cli-upgrade-remote-config, installiert 2026-11-05T19:05:01+00:00)`, Exit 0, ohne Netz |
+| C | `lpic3ctl --status` unmittelbar nach dem Neustart | **Befund:** Exit 1 „Dienst aktiv, aber der Health-Endpunkt antwortet nicht“, weil die Anwendung in der ersten Sekunde nach dem Start noch Migrationen und Inhaltsimport ausführt; zwei Sekunden später Exit 0 mit `Health-Check: ok`. Behoben: `--status` wiederholt den Health-Check bei aktivem Dienst bis zu fünfmal im Abstand von zwei Sekunden. |
+| D | `lpic3ctl --upgrade` gegen GitHub (installiert 0.0.3, neuestes Tag v0.0.3) | „Bereits aktuell. Keine Änderung, kein Neustart.“, Exit 0, `ActiveEnterTimestamp` unverändert |
+| E | `LPIC3_UPGRADE_REMOTE=https://github.invalid/nix.git lpic3ctl --upgrade` | Exit 1 „Kein Zugriff auf GitHub; Installation unverändert …“, `BUILD` und Dienst unverändert |
+| F | Remote in der zentralen env-Datei | **Befund:** die Variable wurde beim Import gelesen, also vor dem Laden der env-Datei, und damit ignoriert. Behoben (`remote_url()` zur Laufzeit), Regressionstest. |
+| G | `lpic3ctl --upgrade` bei laufendem Dienst, Remote mit v0.0.4 und Vorabversion v0.0.5-rc1 | v0.0.4 installiert, rc1 ignoriert; Dienst neu gestartet, `/health` meldet 0.0.4; env-Datei und Datenbank (Benutzer) erhalten; Sicherung vor dem Upgrade; `BUILD` mit `release=v0.0.4`; `--version` zeigt `release v0.0.4`; `--status` Exit 0 |
+| H | `lpic3ctl --upgrade` erneut | „Bereits aktuell“, Exit 0, kein Neustart |
+| I | Anmeldung über HTTP mit dem in v0.0.3 angelegten Konto | 303 und `/api/me` liefert das Konto; Passwortrichtlinie aus der env-Datei wirkt |
+| J | Dienst gestoppt, Release v0.0.5 | Upgrade läuft durch, „Der Dienst war gestoppt und bleibt gestoppt.“; `is-active inactive`, `is-enabled enabled`; `--status` Exit 0 mit `Dienst: inactive` |
+| K1 | Port 8000 fremd belegt, Dienst neu gestartet | Unit im Zustand `activating` (Neustartschleife); `--status` Exit 1 mit Fehlerzeile; nach Freigabe des Ports Exit 0 |
+| K2 | `LPIC3_PASSWORD_MAX_LENGTH=1` in der env-Datei, Release v0.0.6 | `--status` Exit 2 mit Variablenname; `--upgrade` Exit 2 „die vorhandene Konfiguration passt nicht zur neuen Version“, Dienst nicht gestoppt, kein Neustart, `BUILD` weiter v0.0.5, kein `app.new` übrig |
+| L | Release v0.0.7 mit defekter Inhaltsdatei (Fehler erst nach dem Tausch, bei content-sync) | Exit 1, „Vorherige Version wird wiederhergestellt“, danach `active`, `/health` 0.0.5, `--version` v0.0.5, Benutzer vorhanden, `app.previous` wieder `app`. **Befund:** die Fehlermeldung des Kindprozesses lautete „Ungültige Konfiguration: 300-mixed-environments.json: invalid JSON“, weil jeder `ValueError` so benannt wurde. Behoben (`ConfigError` nur für `LPIC3_*`-Werte), Regressionstest. |
+| M | defektes Tag aus der Remote entfernt, `--upgrade` | v0.0.6 installiert, Exit 0, `/health` 0.0.6 |
+| N | `lpic3ctl --uninstall` | Dienst und `/opt/lpic3-trainer` entfernt, `/etc/lpic3-trainer/lpic3-trainer.env`, Datenbank und Sicherungen vorhanden. Danach gibt es kein `lpic3ctl` mehr; „nicht installiert“ (Exit 1) meldet nur `python3 -m app.cli --status` aus einem Checkout. |
+
+Kosmetischer Befund: In einer Pipe erschienen die Meldungen von `lpic3ctl` nach denen der Kindprozesse (gepufferte Ausgabe). Behoben durch `flush` in `say`/`warn`. Die pip-Warnung „BuildBackendWarning: Editable installation“ unter Python 3.14 stammt von setuptools und ist unkritisch.
+
+Nicht geprüft: `--upgrade --purge`-Kombinationen, ARM64, blankes Metall, Docker.
