@@ -57,11 +57,13 @@ class CliError(Exception):
 
 
 def say(msg: str) -> None:
-    print(msg)
+    # flush: keep our lines in order with the output of child processes (pip, content-sync)
+    # when stdout is a pipe or a log file
+    print(msg, flush=True)
 
 
 def warn(msg: str) -> None:
-    print(f"Warnung: {msg}", file=sys.stderr)
+    print(f"Warnung: {msg}", file=sys.stderr, flush=True)
 
 
 CONFIG_UNREADABLE = False
