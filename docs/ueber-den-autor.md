@@ -55,3 +55,6 @@ Der Quellcode ist öffentlich zugänglich. Beiträge, praktische Erfahrungen, Ve
 **Toralf Richter**
 
 [GitHub](https://github.com/richtertoralf)
+
+
+[LPIC-2 Certification – verifiziert auf Credly](https://www.credly.com/badges/39a10275-eed9-431f-a6ca-0954b7adb19b)
