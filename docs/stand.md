@@ -1,6 +1,6 @@
 # Entwicklungsstand
 
-Stand: 4. November 2026, Version 0.0.2 (erste Entwicklungsversion, keine stabile Produktionsversion). Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`.
+Stand: 5. November 2026, Entwicklungsstand nach v0.0.2 (keine stabile Produktionsversion). Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`. Installationstest: `docs/installationstest.md`.
 
 ## Zusammenfassung
 
@@ -62,6 +62,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 ### Installation und Betrieb
 
+- Arbeitspaket 1 (5. November 2026): Echte Root-Installation mit systemd in LXD-Containern (Debian 12/13, Ubuntu 24.04/26.04) einschließlich Neustart, Upgrade von v0.0.2, Backup, Restore, Rollback, Deinstallation und Reverse Proxy. Behoben: Konfigurationsverzeichnis für den Dienstbenutzer nicht lesbar (Installation v0.0.2 brach ab), Rollback nach Schemaänderung ließ den Dienst nicht mehr starten (jetzt Prüfung und `rollback --restore`), `restore` unter Debian 12 (Python 3.11.2) abgebrochen, Traceback ohne Root, Dienst in Neustartschleife galt als inaktiv, Eigentümer nach Root-Befehlen, Unit-Härtung (systemd-analyze 1.3 bis 2.0 OK), SPDX-Lizenzangabe, Alembic-Meldungen nur bei Migrationsbefehlen.
 - Nach 0.0.2: Schreibtransaktionen beginnen mit BEGIN IMMEDIATE, Busy-Timeout 15 s, Begriffsmuster werden gecacht (Nebenläufigkeitstest war mit größerem Fragenbestand instabil); Ergänzungspools mit 221 Zusatzfragen, Migration 0005 (Feld `reference`).
 - Version 0.0.2: Restore verweigert die Ausführung bei laufendem, nicht über systemd verwaltetem Server, sichert vorher, prüft danach die Integrität und wartet auf den Health-Check; CLI legt das Datenverzeichnis selbst an; Administratoren legen Benutzer in der Weboberfläche an; Betreuer sehen nur eigene Mitglieder und Importe; Importchargen tragen Prüfungsnummer und Original-URL; Dublettenwarnung beim Import; `active: false` je Frage; SQLite-Fremdschlüssel sind während Migrationen aus (Migration 0004, Upgrade-Test mit Bestandsdaten).
 
@@ -80,7 +81,7 @@ Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet
 
 | Suite | Umfang | Ergebnis |
 |-------|--------|----------|
-| pytest Backend (`tests/`, ohne e2e) | 94 Tests: Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Import- und Freigaberechte (Lernende 403, Pflichtfelder Quelle und Prüfungsgeneration, Import unveröffentlicht, Freigabe durch Betreuer nur für eigene Importe und Gruppen, systemweite Freigabe nur Administrator, Grundbestand freigegeben, externe Quellen nicht), Restore-Regression (laufender Server, Neustart, defektes Archiv), Migrationen mit Bestandsdaten, Benutzeranlage, Betreuer-Sichtbarkeit, Dubletten, Inaktiv-Kennzeichen, Herkunftsfelder | 94 bestanden |
+| pytest Backend (`tests/`, ohne e2e) | 99 Tests (Stand 5. November 2026, Arbeitspaket 1: dazu Eigentümer des Konfigurationsverzeichnisses, tar-Fallback für Python 3.11.2, Dienstzustand `activating`, unlesbare Konfiguration, Revisionsprüfung, Rollback-Verweigerung und `--restore`): Registrierung, Rollen, Sitzungen, Datentrennung, Importvalidierung und Import, Üben, Sprachhilfe, Vokabeln, Labs, Simulation, Eingangstest, Gruppen, Verwaltung, 8 parallele Benutzer, `lpic3ctl` (Migration, Benutzer, Backup, Restore, Check, Install/Upgrade/Rollback/Uninstall/Purge mit Stub-Systembefehlen), Import- und Freigaberechte (Lernende 403, Pflichtfelder Quelle und Prüfungsgeneration, Import unveröffentlicht, Freigabe durch Betreuer nur für eigene Importe und Gruppen, systemweite Freigabe nur Administrator, Grundbestand freigegeben, externe Quellen nicht), Restore-Regression (laufender Server, Neustart, defektes Archiv), Migrationen mit Bestandsdaten, Benutzeranlage, Betreuer-Sichtbarkeit, Dubletten, Inaktiv-Kennzeichen, Herkunftsfelder | 94 bestanden |
 | Playwright (`tests/e2e/`, Chromium) | 12 Tests: Registrierung/Anmeldung/Abmeldung, Üben mit Übersetzung, Begriffsmarkierung, Popover und Merken, Simulation ohne Hilfen mit Timer, Eingangstest und Fortschritt, Labs, Import über Oberfläche mit gültiger und ungültiger Datei, Rollenprüfung (403), Gruppenfreigabe, Handy-Darstellung 390 px ohne horizontales Scrollen, Offline-Verhalten über Service Worker, Import und Freigabe durch Betreuer mit Kennzeichnung beim Lernenden, Lernender ohne Zugriff auf Verwaltungsseiten, Rückfrage bei unbeantworteten Prüfungsfragen, Benutzeranlage durch Administrator | 12 bestanden |
 | ruff check / ruff format | `app`, `tests`, `migrations` | ohne Befunde |
 
@@ -88,7 +89,7 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 
 ## Bekannte Einschränkungen
 
-- **Native systemd-Installation nicht auf einem echten Server geprüft.** Auf dem Entwicklungsrechner gibt es kein Root und kein Docker. `install`, `upgrade`, `rollback`, `uninstall` und `purge` sind nur im automatisierten Test mit Stub-Befehlen für `useradd`, `userdel` und `systemctl` gelaufen. Geprüft sind damit Dateistruktur, venv, Konfigurationserhalt, Dateirechte (`0640` Konfiguration, `0750` Datenverzeichnis), Inhalt der Unit sowie die Befehlsfolge daemon-reload, enable, restart. Nicht geprüft ist der tatsächliche Start durch systemd mit den Härtungsoptionen. Eine simulierte Installation gilt nicht als erfolgreiche Serverinstallation.
+- **Native systemd-Installation nur in Containern geprüft.** Die Installation lief als Root mit echtem systemd in LXD-Systemcontainern (Debian 12/13, Ubuntu 24.04/26.04, x86_64), nicht auf blankem Metall oder in einer VM mit eigenem Kernel und nicht auf ARM64. Testplan für einen echten Server in `docs/installationstest.md`, Abschnitt 5. Der Installer von v0.0.2 ist auf echten Systemen defekt (siehe dort); Neuinstallationen brauchen den aktuellen Stand.
 - **Docker nicht getestet.** Auf dem Entwicklungssystem war kein Docker verfügbar. Dockerfile und Compose-Datei sind ungetestet.
 - **Fragenanzahl.** Mit 60 bis 62 Fragen je Modul zieht eine Modulsimulation nahezu den gesamten Bestand; wiederholte Simulationen enthalten daher weitgehend dieselben Fragen. Kapiteltests mit 15 Fragen sind bei kleinen Themen entsprechend kürzer. Nur 3 von 245 Projektfragen sind Mehrfachauswahl (Abnahmebefund P2-7, offen).
 - **Zwei ExamTopics-Fragen inaktiv.** `300-examtopics-screenshot-08` und `305-examtopics-screenshot-03` sind fachlich unsicher und mit `active: false` ausgeschlossen (P2-8).
@@ -103,7 +104,7 @@ JavaScript-Fehler und fehlgeschlagene Netzwerkanfragen werden in den Browsertest
 
 Didaktische Festlegungen zu den Laboraufgaben und der Abgleich mit dem Stand stehen in `docs/lab-konzept.md` (nächste LAB-Überarbeitung: Einrichtungsanleitung, Erfolgskriterien, Dozentenhinweise, LAB-Status je Gruppe).
 
-1. Installation und Upgrade auf einem frischen Debian 12 oder Ubuntu 24.04 mit systemd durchführen und Ergebnis dokumentieren.
+1. Installation nach dem Testplan in `docs/installationstest.md` auf einem echten Server oder einer VM nachvollziehen (blankes Metall, ARM64).
 2. Docker-Image bauen und Compose-Betrieb prüfen.
 3. Fragenbestand weiter ausbauen (Ziel: mindestens 120 je Modul, damit Simulationen variieren), weitere Labs.
 4. Begriffserkennung um einfache Wortformen erweitern.

@@ -54,12 +54,22 @@ def warn(msg: str) -> None:
     print(f"Warnung: {msg}", file=sys.stderr)
 
 
+CONFIG_UNREADABLE = False
+
+
 def load_env_file(path: Path = ENV_FILE) -> dict[str, str]:
     """Load LPIC3_* variables from the configuration file without overriding the environment."""
+    global CONFIG_UNREADABLE
     values: dict[str, str] = {}
-    if not path.is_file():
+    try:
+        if not path.is_file():
+            return values
+        text = path.read_text(encoding="utf-8")
+    except PermissionError:
+        # The file is 0640 root:lpic3 on purpose; a normal user may still run --help etc.
+        CONFIG_UNREADABLE = True
         return values
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in text.splitlines():
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -93,10 +103,16 @@ def systemctl(*args: str, check: bool = True) -> subprocess.CompletedProcess:
     return run(["systemctl", *args], check=check, capture=True)
 
 
-def service_active() -> bool:
+def service_state() -> str:
     if not has_systemd():
-        return False
-    return systemctl("is-active", SERVICE_NAME, check=False).stdout.strip() == "active"
+        return "unknown"
+    return systemctl("is-active", SERVICE_NAME, check=False).stdout.strip() or "unknown"
+
+
+def service_active() -> bool:
+    # "activating" is a service in a restart loop (e.g. after a failed start); it holds or
+    # will hold the database open, so it must be stopped like an active one.
+    return service_state() in ("active", "activating", "reloading")
 
 
 # ----------------------------------------------------------------- application
@@ -316,21 +332,26 @@ def cmd_backup(args) -> int:
     return EXIT_OK
 
 
-def cmd_restore(args) -> int:
-    archive = Path(args.archive)
-    if not archive.is_file():
-        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_MISSING)
-    settings = _settings()
-    db_path = settings.db_path
-    if not args.yes:
-        answer = input(f"Datenbank {db_path} durch {archive.name} ersetzen? [ja/NEIN] ")
-        if answer.strip().lower() not in ("ja", "j", "yes", "y"):
-            say("Abgebrochen.")
-            return EXIT_USAGE
-    was_active = service_active()
-    if was_active:
+def _tar_extract(tar: tarfile.TarFile, member: str, dest: str) -> None:
+    """Extract one member safely. The ``filter`` argument exists from Python 3.11.4/3.12;
+    Debian 12 ships 3.11.2, where the call used to fail with TypeError."""
+    try:
+        tar.extract(member, dest, filter="data")
+    except TypeError:
+        info = tar.getmember(member)
+        if info.name != Path(info.name).name or not info.isfile():
+            raise CliError(f"Unerwarteter Archivinhalt: {info.name}") from None
+        tar.extract(member, dest)
+
+
+def _ensure_no_foreign_server(settings) -> bool:
+    """Stop the systemd service if it runs; refuse when another server holds the database.
+
+    Returns True when the systemd service was stopped and has to be started again."""
+    if service_active():
         systemctl("stop", SERVICE_NAME)
-    elif _http_health(settings.host, settings.port).startswith("ok"):
+        return True
+    if _http_health(settings.host, settings.port).startswith("ok"):
         # A server not managed by systemd (Docker, foreground) keeps the old database file
         # open and would silently write into the deleted file after the restore.
         raise CliError(
@@ -339,13 +360,20 @@ def cmd_restore(args) -> int:
             "und die Wiederherstellung danach ausführen.",
             EXIT_USAGE,
         )
+    return False
+
+
+def _swap_database(archive: Path, db_path: Path, with_config: bool = False) -> None:
+    """Replace the database file (and optionally the config) with the archive content.
+
+    Keeps a safety copy of the current database next to it. Runs no migration."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(archive, "r:gz") as tar:
         names = tar.getnames()
         if "lpic3-trainer.db" not in names:
             raise CliError("Das Archiv enthält keine Datenbank.")
         with tempfile.TemporaryDirectory() as tmp:
-            tar.extract("lpic3-trainer.db", tmp, filter="data")
+            _tar_extract(tar, "lpic3-trainer.db", tmp)
             if db_path.exists():
                 safety = db_path.with_name(
                     f"lpic3-trainer.before-restore-{datetime.now():%Y%m%d-%H%M%S}.db"
@@ -357,13 +385,55 @@ def cmd_restore(args) -> int:
                 if p.exists():
                     p.unlink()
             shutil.move(str(Path(tmp) / "lpic3-trainer.db"), db_path)
-            if args.with_config and "lpic3-trainer.env" in names:
-                tar.extract("lpic3-trainer.env", tmp, filter="data")
+            if with_config and "lpic3-trainer.env" in names:
+                _tar_extract(tar, "lpic3-trainer.env", tmp)
                 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(Path(tmp) / "lpic3-trainer.env", ENV_FILE)
                 os.chmod(ENV_FILE, 0o640)
                 say(f"Konfiguration wiederhergestellt: {ENV_FILE}")
     _chown_service_files()
+
+
+def _db_revision(db_path: Path) -> str | None:
+    import sqlite3
+
+    if not db_path.is_file():
+        return None
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        row = conn.execute("SELECT version_num FROM alembic_version").fetchone()
+        return row[0] if row else None
+    except sqlite3.Error:
+        return None
+    finally:
+        conn.close()
+
+
+def _code_revisions(app_dir: Path) -> set[str]:
+    """Revision ids known to the code in app_dir (without importing it)."""
+    import re
+
+    found: set[str] = set()
+    for path in (app_dir / "migrations" / "versions").glob("*.py"):
+        m = re.search(r'^revision\s*[:=]\s*["\']([^"\']+)["\']', path.read_text(), re.M)
+        if m:
+            found.add(m.group(1))
+    return found
+
+
+def cmd_restore(args) -> int:
+    archive = Path(args.archive)
+    if not archive.is_file():
+        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_MISSING)
+    settings = _settings()
+    db_path = settings.db_path
+    if not args.yes:
+        answer = input(f"Datenbank {db_path} durch {archive.name} ersetzen? [ja/NEIN] ")
+        if answer.strip().lower() not in ("ja", "j", "yes", "y"):
+            say("Abgebrochen.")
+            return EXIT_USAGE
+    was_active = _ensure_no_foreign_server(settings)
+    _swap_database(archive, db_path, with_config=args.with_config)
     from app.db import reset_engine
     from app.migrate import upgrade_database
 
@@ -455,8 +525,14 @@ def _chown_service_files() -> None:
         if root.exists():
             for p in [root, *root.rglob("*")]:
                 os.chown(p, info.pw_uid, info.pw_gid)
+    # The service user must be able to traverse the config directory, otherwise
+    # ``runuser -u lpic3 lpic3ctl content-sync`` cannot read the environment file.
+    if CONFIG_DIR.exists():
+        os.chown(CONFIG_DIR, 0, info.pw_gid)
+        os.chmod(CONFIG_DIR, 0o750)
     if ENV_FILE.exists():
         os.chown(ENV_FILE, 0, info.pw_gid)
+        os.chmod(ENV_FILE, 0o640)
 
 
 def _copy_source(source: Path, target: Path) -> None:
@@ -653,9 +729,30 @@ def cmd_rollback(args) -> int:
     require_root()
     if not PREVIOUS_DIR.exists():
         raise CliError("Keine vorherige Version vorhanden.", EXIT_MISSING)
-    was_active = service_active()
-    if was_active:
-        systemctl("stop", SERVICE_NAME)
+    load_env_file()
+    settings = _settings()
+    db_path = settings.db_path
+    archive = Path(args.restore).resolve() if args.restore else None
+    if archive and not archive.is_file():
+        raise CliError(f"Archiv {archive} nicht gefunden.", EXIT_MISSING)
+    # The previous code must know the database schema, otherwise the service would
+    # crash at start (Alembic: "Can't locate revision"). Checked before touching anything.
+    db_rev = _db_revision(db_path)
+    known = _code_revisions(PREVIOUS_DIR)
+    if db_rev and known and db_rev not in known and archive is None:
+        backups = sorted((settings.data_dir / "backups").glob("lpic3-trainer-backup-*.tar.gz"))
+        hint = f"z. B. {backups[-1]}" if backups else "Sicherung von vor dem Upgrade"
+        raise CliError(
+            f"Die Datenbank hat Schema {db_rev}, das die vorherige Version nicht kennt. "
+            "Rollback nur zusammen mit der Sicherung von vor dem Upgrade:\n"
+            f"  lpic3ctl rollback --restore <Archiv>   ({hint})",
+            EXIT_USAGE,
+        )
+    if archive is not None:
+        with tarfile.open(archive, "r:gz") as tar:
+            if "lpic3-trainer.db" not in tar.getnames():
+                raise CliError("Das Archiv enthält keine Datenbank.")
+    was_active = _ensure_no_foreign_server(settings)
     current = INSTALL_DIR / "app.failed"
     if current.exists():
         shutil.rmtree(current)
@@ -667,12 +764,27 @@ def cmd_rollback(args) -> int:
         f"Programmdateien zurückgesetzt auf {_installed_version()}. "
         f"Die fehlgeschlagene Version liegt unter {current}."
     )
-    say(
-        "Hinweis: Die Datenbank wurde nicht verändert. Bei Schemaänderungen "
-        "'lpic3ctl restore' mit der Sicherung vor dem Upgrade nutzen."
-    )
+    if archive is not None:
+        _swap_database(archive, db_path)
+        integrity = _integrity_check(db_path)
+        if integrity != "ok":
+            raise CliError(
+                f"Integritätsprüfung der wiederhergestellten Datenbank fehlgeschlagen: {integrity}."
+            )
+        restored_rev = _db_revision(db_path)
+        if known and restored_rev and restored_rev not in known:
+            raise CliError(
+                f"Die Sicherung hat Schema {restored_rev}, das die vorherige Version nicht kennt."
+            )
+        say(f"Datenbank aus {archive.name} wiederhergestellt (Schema {restored_rev}).")
+    else:
+        say("Hinweis: Die Datenbank wurde nicht verändert.")
     if was_active:
         systemctl("start", SERVICE_NAME)
+        health = _wait_for_health(settings.host, settings.port)
+        say(f"Dienst gestartet, Health-Check: {health}")
+        if not health.startswith("ok"):
+            return EXIT_ERROR
     return EXIT_OK
 
 
@@ -701,6 +813,8 @@ def cmd_version(args) -> int:
 def cmd_status(args) -> int:
     load_env_file()
     say(f"Version:       {_installed_version()}")
+    if CONFIG_UNREADABLE:
+        say(f"Konfiguration: {ENV_FILE} nicht lesbar (Root-Rechte nötig, Werte sind Standardwerte)")
     if has_systemd() and UNIT_PATH.exists():
         state = systemctl("is-active", SERVICE_NAME, check=False).stdout.strip()
         enabled = systemctl("is-enabled", SERVICE_NAME, check=False).stdout.strip()
@@ -780,7 +894,11 @@ def cmd_check(args) -> int:
         say(f"[{'OK' if good else '!!'}] {label}{(': ' + detail) if detail else ''}")
 
     report("Python", sys.version_info >= (3, 11), sys.version.split()[0])
-    report("Konfiguration", ENV_FILE.is_file(), str(ENV_FILE))
+    report(
+        "Konfiguration",
+        not CONFIG_UNREADABLE and ENV_FILE.is_file(),
+        f"{ENV_FILE}" + (" (nicht lesbar, Root-Rechte nötig)" if CONFIG_UNREADABLE else ""),
+    )
     settings = _settings()
     report("Datenverzeichnis", settings.data_dir.is_dir(), str(settings.data_dir))
     if settings.data_dir.is_dir():
@@ -889,9 +1007,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-start", action="store_true")
     p.set_defaults(func=cmd_upgrade)
 
-    sub.add_parser(
-        "rollback", help="vorherige Programmversion wiederherstellen (Root)"
-    ).set_defaults(func=cmd_rollback)
+    p = sub.add_parser("rollback", help="vorherige Programmversion wiederherstellen (Root)")
+    p.add_argument(
+        "--restore",
+        metavar="ARCHIV",
+        help="zusätzlich die Datenbank aus dieser Sicherung (von vor dem Upgrade) einspielen",
+    )
+    p.set_defaults(func=cmd_rollback)
     sub.add_parser("version", help="installierte und verfügbare Version anzeigen").set_defaults(
         func=cmd_version
     )
@@ -977,12 +1099,30 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _restore_data_ownership() -> None:
+    """Hand files back to the service user after root ran a command that touched the DB.
+
+    ``lpic3ctl user create`` or ``migrate`` run as root while the service is stopped would
+    otherwise leave root-owned ``-wal``/``-shm`` files and the service could not write.
+    """
+    if os.geteuid() != 0 or os.environ.get("LPIC3_UNPRIVILEGED_TEST") == "1":
+        return
+    try:
+        _chown_service_files()
+    except OSError as exc:  # pragma: no cover - best effort
+        warn(f"Dateirechte konnten nicht gesetzt werden: {exc}")
+
+
 def main(argv: list[str] | None = None) -> int:
     load_env_file()
     parser = build_parser()
     args = parser.parse_args(argv)
+    if args.command not in ("serve", "migrate", "upgrade", "install", "content-sync", "import"):
+        os.environ.setdefault("LPIC3_QUIET_MIGRATIONS", "1")
     try:
-        return args.func(args)
+        result = args.func(args)
+        _restore_data_ownership()
+        return result
     except CliError as exc:
         print(f"Fehler: {exc}", file=sys.stderr)
         return exc.code

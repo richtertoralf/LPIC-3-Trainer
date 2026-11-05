@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -11,7 +12,9 @@ from app.db import build_engine
 from app.models import Base
 
 config = context.config
-if config.config_file_name is not None:
+# LPIC3_QUIET_MIGRATIONS is set by lpic3ctl for administrative commands (user, backup,
+# status ...) so that Alembic's INFO lines do not clutter their output.
+if config.config_file_name is not None and not os.environ.get("LPIC3_QUIET_MIGRATIONS"):
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata

@@ -86,8 +86,11 @@ def test_01_install(env):
     assert "User=lpic3" in unit and "EnvironmentFile=/etc/lpic3-trainer/lpic3-trainer.env" in unit
     assert "ProtectSystem=strict" in unit and "ReadWritePaths=/var/lib/lpic3-trainer" in unit
     assert "WantedBy=multi-user.target" in unit
+    assert "UMask=0027" in unit and "CapabilityBoundingSet=" in unit
+    assert "SystemCallFilter=@system-service" in unit
     # file permissions: configuration not world readable, data directory private
     assert oct((root / "etc" / "lpic3-trainer.env").stat().st_mode)[-3:] == "640"
+    assert oct((root / "etc").stat().st_mode)[-3:] == "750"
     assert oct((root / "var").stat().st_mode)[-3:] == "750"
     assert oct((root / "var" / "backups").stat().st_mode)[-3:] == "750"
     assert (root / "bin" / "lpic3ctl").is_symlink()
@@ -128,12 +131,32 @@ def test_03_upgrade_keeps_config_and_creates_backup(env):
     assert "systemctl restart lpic3-trainer" in stub_log(env)
 
 
-def test_04_rollback(env):
+def test_04_rollback_refuses_unknown_schema_and_restores_backup(env):
+    """Found on a real Debian 12 install: after a rollback the old code crashed on a newer
+    schema. The rollback must refuse without the pre-upgrade backup and succeed with it."""
+    import sqlite3
+
     root = Path(env["_root"])
+    db = root / "var" / "lpic3-trainer.db"
+    backup = sorted((root / "var" / "backups").glob("lpic3-trainer-backup-*.tar.gz"))[-1]
+    conn = sqlite3.connect(db)
+    conn.execute("UPDATE alembic_version SET version_num = '9999'")  # pretend: newer schema
+    conn.commit()
+    conn.close()
     r = cli(env, "rollback")
+    assert r.returncode == 2, r.stdout + r.stderr
+    assert "Schema 9999" in r.stderr and "--restore" in r.stderr and backup.name in r.stderr
+    assert (root / "opt" / "app.previous").is_dir(), "nothing may change when refusing"
+    assert not (root / "opt" / "app.failed").exists()
+
+    r = cli(env, "rollback", "--restore", str(backup))
     assert r.returncode == 0, r.stdout + r.stderr
     assert (root / "opt" / "app.failed").is_dir() and not (root / "opt" / "app.previous").exists()
     assert (root / "opt" / "app" / "pyproject.toml").is_file()
+    conn = sqlite3.connect(db)
+    assert conn.execute("SELECT version_num FROM alembic_version").fetchone()[0] != "9999"
+    conn.close()
+    assert list((root / "var").glob("lpic3-trainer.before-restore-*.db")), "safety copy"
 
 
 def test_05_status_and_version(env):
