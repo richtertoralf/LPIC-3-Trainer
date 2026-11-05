@@ -115,7 +115,3 @@ Lerninhalte und importierte Prüfungsfragen sind davon nicht erfasst. Ihre Nutzu
 - Praxistests: Rückmeldungen aus einer Lerngruppe oder einem Linux-Verein nach dem Ablauf in [docs/pilotbetrieb.md](docs/pilotbetrieb.md)
 - Eigene Prüfungsfragen: Format in [content/README.md](content/README.md); nur selbst erstellte oder zulässig lizenzierte Fragen
 - Dokumentation und Code: [docs/entwicklung.md](docs/entwicklung.md)
-
-## RICHTER.PROJECTS
-
-**Möglichkeiten schaffen.** Der LPIC-3 Trainer gehört zu RICHTER.PROJECTS. Unsere Projekte entstehen aus konkreten Anforderungen, hier aus der Erfahrung, dass gute Linux-Kenntnisse an der englischen Prüfungssprache scheitern können. Wir teilen Werkzeuge und Wissen, setzen auf offene Lösungen und eigene Infrastruktur und arbeiten mit Vereinen, Lerngruppen und Bildungseinrichtungen zusammen. Mitarbeit heißt hier: Fragen und Fachbegriffe prüfen, LABs in der eigenen Testumgebung durchspielen, mit einer Lerngruppe erproben und berichten.
