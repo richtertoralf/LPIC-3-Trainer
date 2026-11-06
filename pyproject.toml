@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lpic3-trainer"
-version = "0.0.4"
+version = "0.0.5"
 description = "Targeted preparation for the English-language LPIC-3 exams: technical English training at the exam questions, with German help"
 readme = "README.md"
 license = "MIT"
