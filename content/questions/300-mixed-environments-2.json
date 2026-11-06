@@ -205,7 +205,7 @@
       "type": "single",
       "difficulty": 3,
       "question": "A domain controller has failed permanently and cannot be demoted. Which command transfers the FSMO roles it held to the local DC?",
-      "question_de": "Ein Domänencontroller ist dauerhaft ausgefallen und kann nicht herabgestuft werden. Welcher Befehl übernimmt die FSMO-Rollen, die er hatte, auf den lokalen DC?",
+      "question_de": "Ein Domänencontroller ist dauerhaft ausgefallen und kann nicht herabgestuft werden. Welcher Befehl überträgt die von ihm gehaltenen FSMO-Rollen auf den lokalen DC?",
       "choices": [
         {
           "text": "samba-tool fsmo seize --role=all",
@@ -588,7 +588,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which command lists all group policy objects of a Samba AD domain?",
-      "question_de": "Welcher Befehl listet alle Gruppenrichtlinienobjekte einer Samba-AD-Domäne?",
+      "question_de": "Welcher Befehl listet alle Gruppenrichtlinienobjekte einer Samba-AD-Domäne auf?",
       "choices": [
         {
           "text": "samba-tool gpo listall",

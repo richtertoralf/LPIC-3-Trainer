@@ -239,7 +239,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "An administrator wants to see which users exist in the local Samba password database. Which command lists them?",
-      "question_de": "Ein Administrator möchte sehen, welche Benutzer in der lokalen Samba-Passwortdatenbank existieren. Welcher Befehl listet sie?",
+      "question_de": "Ein Administrator möchte sehen, welche Benutzer in der lokalen Samba-Passwortdatenbank existieren. Welcher Befehl listet sie auf?",
       "choices": [
         {
           "text": "pdbedit -L",
@@ -268,7 +268,7 @@
       "type": "single",
       "difficulty": 1,
       "question": "Which command provisions a new Samba Active Directory domain on a fresh server?",
-      "question_de": "Welcher Befehl richtet eine neue Samba-Active-Directory-Domäne auf einem frischen Server ein?",
+      "question_de": "Welcher Befehl richtet eine neue Samba-Active-Directory-Domäne auf einem neu installierten Server ein?",
       "choices": [
         {
           "text": "samba-tool domain provision",
@@ -549,7 +549,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "After joining a domain, getent passwd does not show domain users. Which file most likely needs to be changed?",
-      "question_de": "Nach dem Domänenbeitritt zeigt getent passwd keine Domänenbenutzer. Welche Datei muss am wahrscheinlichsten geändert werden?",
+      "question_de": "Nach dem Domänenbeitritt zeigt getent passwd keine Domänenbenutzer. Welche Datei muss höchstwahrscheinlich geändert werden?",
       "choices": [
         {
           "text": "/etc/nsswitch.conf, adding winbind to the passwd and group lines",
@@ -907,7 +907,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which command lists the shares offered by the server fs1 without mounting anything?",
-      "question_de": "Welcher Befehl listet die vom Server fs1 angebotenen Freigaben, ohne etwas einzuhängen?",
+      "question_de": "Welcher Befehl listet die vom Server fs1 angebotenen Freigaben auf, ohne etwas einzuhängen?",
       "choices": [
         {
           "text": "smbclient -L fs1 -U bob",
@@ -1033,7 +1033,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which FreeIPA feature allows presenting different UID, GID, shell or home directory values of a user to a specific set of hosts?",
-      "question_de": "Welche FreeIPA-Funktion erlaubt es, bestimmten Hosts andere UID-, GID-, Shell- oder Home-Verzeichniswerte eines Benutzers zu präsentieren?",
+      "question_de": "Welche FreeIPA-Funktion erlaubt es, bestimmten Hosts für einen Benutzer abweichende Werte für UID, GID, Shell oder Home-Verzeichnis bereitzustellen?",
       "choices": [
         {
           "text": "ID views",

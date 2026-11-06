@@ -66,7 +66,7 @@
       "objective": "351.2",
       "type": "single",
       "question": "In order to use the option dom0_mem to limit the amount of memory assigned to the Xen Domain-0, where must this option be specified?",
-      "question_de": "Wo muss die Option dom0_mem angegeben werden, um den Xen-Domain-0 zugewiesenen Arbeitsspeicher zu begrenzen?",
+      "question_de": "Wo muss die Option dom0_mem angegeben werden, um den der Xen-Domain-0 zugewiesenen Arbeitsspeicher zu begrenzen?",
       "choices": [
         {
           "text": "In the bootloader configuration, when Xen is booted.",
@@ -139,7 +139,7 @@
         },
         {
           "text": "Both can apply changes to a base image.",
-          "text_de": "Beide können Änderungen auf Grundlage eines Basis-Images anwenden.",
+          "text_de": "Beide können ein Basis-Image um Änderungen ergänzen.",
           "correct": true
         },
         {
@@ -253,7 +253,7 @@
         },
         {
           "text": "Each new instance contains a minimal live system running from a virtual CD as the basis from which the administrator deploys the target operating system.",
-          "text_de": "Jede neue Instanz startet ein minimales Live-System von einer virtuellen CD, von dem aus die Administration das Zielsystem installiert.",
+          "text_de": "Jede neue Instanz startet ein minimales Live-System von einer virtuellen CD, von dem aus der Administrator das Zielsystem installiert.",
           "correct": false
         }
       ],
@@ -355,7 +355,7 @@
         },
         {
           "text": "Standardize the configuration of infrastructure services, such as load balancers or virtual firewalls in a cloud.",
-          "text_de": "Die Konfiguration von Infrastrukturdiensten wie Loadbalancern oder virtuellen Firewalls standardisieren.",
+          "text_de": "Die Konfiguration von Infrastrukturdiensten wie Load Balancern oder virtuellen Firewalls standardisieren.",
           "correct": false
         },
         {

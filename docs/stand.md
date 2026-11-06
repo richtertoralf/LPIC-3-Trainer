@@ -10,6 +10,12 @@ Positionierung: gezielte, zügige Vorbereitung auf die englischsprachigen LPIC-3
 
 ## Erledigt
 
+### Deutsche Übersetzungen geprüft (6. November 2026)
+
+- Alle 490 Fragen (1801 deutsche Felder: Fragetext, abweichende Antwortoptionen, Erklärung) und 271 Fachbegriffe gegen das englische Original gelesen. Ziel: natürliches, fachlich korrektes Deutsch, wie es unter Linux-Administratoren üblich ist; etablierte Fachbegriffe (Host, VM, Container, Snapshot, Load Balancer, Health Check, Backing Device, Striped Volume) bleiben englisch.
+- 67 Formulierungen in 56 Fragen und 9 Fachbegriffe direkt in den Inhaltsdateien korrigiert (zum Beispiel „Ein Host mit 32 GB RAM betreibt acht VMs mit je 8 GB“ → „Auf einem Host mit 32 GB RAM laufen acht VMs mit jeweils 8 GB RAM“, ein grammatisch falscher DRBD-Fragesatz, „Hintergrundgerät“ → „darunterliegendes Blockgerät (Backing Device)“, „Elternzone“ → „übergeordnete Zone“, „Gesundheitsprüfung“ → „Health Check“). Englische Fragen, richtige Antworten, Zahlen, Bedingungen und IDs unverändert; Inhaltsdateien weiterhin gültig (`tests/test_content_import.py`).
+- README: Hinweis, dass bessere Übersetzungen und fachsprachliche Fehler über GitHub-Issues gemeldet werden können.
+
 ### lpic3ctl: Status ohne Root, Adressen, Entwicklungsinstallation (Praxistest codex-dev, 6. November 2026)
 
 - `--status` ohne Root: zeigt Version und Dienstzustand und dann nur „Bitte sudo lpic3ctl --status verwenden.“; vorher erschienen aus Standardwerten abgeleitete, irreführende Zeilen (falscher Datenbankpfad, „Schema: nicht lesbar (PermissionError)“). Dateirechte unverändert.

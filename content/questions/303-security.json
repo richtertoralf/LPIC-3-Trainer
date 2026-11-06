@@ -335,7 +335,7 @@
       "type": "single",
       "difficulty": 3,
       "question": "A LUKS volume should be unlocked automatically when the system is in the company network, using a Tang server. Which component implements this on the client?",
-      "question_de": "Ein LUKS-Volume soll automatisch entsperrt werden, wenn sich das System im Firmennetz befindet, über einen Tang-Server. Welche Komponente setzt das auf dem Client um?",
+      "question_de": "Ein LUKS-Volume soll über einen Tang-Server automatisch entsperrt werden, sobald sich das System im Firmennetz befindet. Welche Komponente setzt das auf dem Client um?",
       "choices": [
         {
           "text": "Clevis",
@@ -369,7 +369,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "In DNSSEC, which record in the parent zone establishes the chain of trust to a child zone?",
-      "question_de": "Welcher Eintrag in der Elternzone stellt bei DNSSEC die Vertrauenskette zu einer Kindzone her?",
+      "question_de": "Welcher Eintrag in der übergeordneten Zone stellt bei DNSSEC die Vertrauenskette zu einer untergeordneten Zone her?",
       "choices": [
         {
           "text": "DS",
@@ -389,7 +389,7 @@
           "text_de": "DNSKEY"
         }
       ],
-      "explanation_de": "Der DS-Eintrag (Delegation Signer) in der Elternzone enthält einen Hash des KSK der Kindzone. RRSIG trägt Signaturen, DNSKEY veröffentlicht die Schlüssel in der eigenen Zone, NSEC/NSEC3 beweisen die Nichtexistenz von Namen.",
+      "explanation_de": "Der DS-Eintrag (Delegation Signer) in der übergeordneten Zone enthält einen Hash des KSK der untergeordneten Zone. RRSIG trägt Signaturen, DNSKEY veröffentlicht die Schlüssel in der eigenen Zone, NSEC/NSEC3 beweisen die Nichtexistenz von Namen.",
       "terms": [
         {
           "term": "parent zone",
@@ -416,7 +416,7 @@
         },
         {
           "text": "The ZSK is published in the parent zone, the KSK stays secret on the resolver.",
-          "text_de": "Der ZSK wird in der Elternzone veröffentlicht, der KSK bleibt geheim auf dem Resolver."
+          "text_de": "Der ZSK wird in der übergeordneten Zone veröffentlicht, der KSK bleibt geheim auf dem Resolver."
         },
         {
           "text": "KSK and ZSK must always be the same key.",
@@ -427,7 +427,7 @@
           "text_de": "Der KSK verschlüsselt Zonentransfers, der ZSK verschlüsselt Anfragen."
         }
       ],
-      "explanation_de": "Der Key Signing Key signiert nur den DNSKEY-RRset und wird über den DS-Eintrag der Elternzone verankert; er wird selten gewechselt. Der Zone Signing Key signiert die eigentlichen Zonendaten und kann häufiger rotiert werden, ohne die Elternzone zu ändern. DNSSEC signiert, es verschlüsselt nicht.",
+      "explanation_de": "Der Key Signing Key signiert nur den DNSKEY-RRset und wird über den DS-Eintrag der übergeordneten Zone verankert; er wird selten gewechselt. Der Zone Signing Key signiert die eigentlichen Zonendaten und kann häufiger rotiert werden, ohne die übergeordnete Zone zu ändern. DNSSEC signiert, es verschlüsselt nicht.",
       "terms": []
     },
     {
@@ -537,12 +537,12 @@
       "choices": [
         {
           "text": "Full address space layout randomization including the heap",
-          "text_de": "Vollständige Zufallsanordnung des Adressraums einschließlich des Heaps",
+          "text_de": "Vollständige Randomisierung des Adressraums (ASLR) einschließlich des Heaps",
           "correct": true
         },
         {
           "text": "Mandatory access control for all processes",
-          "text_de": "Regelbasierte Zugriffskontrolle für alle Prozesse"
+          "text_de": "Mandatory Access Control (verbindliche Zugriffskontrolle) für alle Prozesse"
         },
         {
           "text": "Encryption of swap space",
@@ -1162,7 +1162,7 @@
       "type": "single",
       "difficulty": 1,
       "question": "Before starting a penetration test against a customer's systems, what is mandatory from a legal point of view?",
-      "question_de": "Was ist aus rechtlicher Sicht zwingend, bevor ein Penetrationstest gegen Kundensysteme beginnt?",
+      "question_de": "Was ist aus rechtlicher Sicht zwingend erforderlich, bevor ein Penetrationstest gegen Kundensysteme beginnt?",
       "choices": [
         {
           "text": "A written authorization defining scope, targets and time frame",

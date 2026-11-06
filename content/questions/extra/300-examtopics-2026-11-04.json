@@ -188,22 +188,22 @@
         },
         {
           "text": "valid files = read,write",
-          "text_de": "Angebliche Liste gültiger Dateien.",
+          "text_de": "Keine gültige smb.conf-Option.",
           "correct": false
         },
         {
           "text": "browse mask = 000",
-          "text_de": "Angebliche Browse-Maske.",
+          "text_de": "Keine gültige smb.conf-Option.",
           "correct": false
         },
         {
           "text": "browseable = readable",
-          "text_de": "Angeblich nur lesbare Freigaben anzeigen.",
+          "text_de": "Keine gültige smb.conf-Option.",
           "correct": false
         },
         {
           "text": "display mode = 100",
-          "text_de": "Angeblicher Anzeigemodus.",
+          "text_de": "Keine gültige smb.conf-Option.",
           "correct": false
         }
       ],

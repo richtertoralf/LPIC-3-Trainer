@@ -16,7 +16,7 @@
       "objective": "301.1",
       "type": "multiple",
       "question": "A Samba server runs as an Active Directory domain controller. Which services does the samba binary provide itself in this role, so that no separate packages are needed for them? (Choose two.)",
-      "question_de": "Ein Samba-Server läuft als Active-Directory-Domänencontroller. Welche Dienste stellt das samba-Binary in dieser Rolle selbst bereit, so dass dafür keine getrennten Pakete nötig sind? (Zwei Antworten.)",
+      "question_de": "Ein Samba-Server läuft als Active-Directory-Domänencontroller. Welche Dienste stellt das samba-Binary in dieser Rolle selbst bereit, sodass dafür keine separaten Pakete nötig sind? (Zwei Antworten.)",
       "choices": [
         {
           "text": "A Kerberos KDC",
@@ -95,7 +95,7 @@
       "objective": "301.2",
       "type": "single",
       "question": "An administrator wants to split a large smb.conf into several files, one per group of shares, without changing the Samba configuration backend. Which parameter achieves this?",
-      "question_de": "Ein Administrator möchte eine große smb.conf in mehrere Dateien aufteilen, je eine pro Freigabengruppe, ohne das Konfigurations-Backend von Samba zu ändern. Welcher Parameter erreicht das?",
+      "question_de": "Ein Administrator möchte eine große smb.conf in mehrere Dateien aufteilen, jeweils eine pro Gruppe von Freigaben, ohne das Konfigurations-Backend von Samba zu ändern. Welcher Parameter erreicht das?",
       "choices": [
         {
           "text": "include = /etc/samba/shares-%G.conf",
@@ -290,7 +290,7 @@
       "objective": "301.4",
       "type": "single",
       "question": "Clients report intermittent access problems on one share. The administrator wants more detailed logging for the smbd processes only while the problem is reproduced, without restarting Samba. Which command does this?",
-      "question_de": "Clients melden zeitweise Zugriffsprobleme auf einer Freigabe. Der Administrator möchte nur während der Reproduktion des Problems ausführlichere Protokolle der smbd-Prozesse, ohne Samba neu zu starten. Welcher Befehl leistet das?",
+      "question_de": "Clients melden zeitweise Zugriffsprobleme auf einer Freigabe. Der Administrator möchte die smbd-Prozesse nur für die Zeit, in der das Problem nachgestellt wird, ausführlicher protokollieren lassen, ohne Samba neu zu starten. Welcher Befehl leistet das?",
       "choices": [
         {
           "text": "smbcontrol smbd debug 5",
@@ -370,7 +370,7 @@
       "objective": "301.4",
       "type": "single",
       "question": "Which rpcclient command lists the shares of the remote server fs1 using the credentials of the domain user bob?",
-      "question_de": "Welcher rpcclient-Befehl listet die Freigaben des entfernten Servers fs1 mit den Zugangsdaten des Domänenbenutzers bob?",
+      "question_de": "Welcher rpcclient-Befehl listet die Freigaben des entfernten Servers fs1 mit den Zugangsdaten des Domänenbenutzers bob auf?",
       "choices": [
         {
           "text": "rpcclient -U LAB\\\\bob fs1 -c netshareenumall",
@@ -683,7 +683,7 @@
       "objective": "302.3",
       "type": "single",
       "question": "Which samba-tool command lists the members of the AD group linuxadmins?",
-      "question_de": "Welcher samba-tool-Befehl listet die Mitglieder der AD-Gruppe linuxadmins?",
+      "question_de": "Welcher samba-tool-Befehl listet die Mitglieder der AD-Gruppe linuxadmins auf?",
       "choices": [
         {
           "text": "samba-tool group listmembers linuxadmins",
@@ -801,7 +801,7 @@
       "objective": "302.4",
       "type": "single",
       "question": "On a domain member, getent passwd LAB\\\\jdoe works but the user cannot log in via SSH: \"pam_winbind: request failed\". Which smb.conf parameter is most likely missing or wrong?",
-      "question_de": "Auf einem Domänenmitglied funktioniert getent passwd LAB\\\\jdoe, aber die Anmeldung per SSH scheitert mit \"pam_winbind: request failed\". Welcher smb.conf-Parameter fehlt oder ist am wahrscheinlichsten falsch?",
+      "question_de": "Auf einem Domänenmitglied funktioniert getent passwd LAB\\\\jdoe, aber die Anmeldung per SSH scheitert mit \"pam_winbind: request failed\". Welcher smb.conf-Parameter fehlt höchstwahrscheinlich oder ist falsch gesetzt?",
       "choices": [
         {
           "text": "template shell = /bin/bash (otherwise the login shell is /bin/false)",
@@ -1309,7 +1309,7 @@
       "objective": "304.1",
       "type": "single",
       "question": "Which configuration makes the shell line and home directory of all AD users on an SSSD client follow a local template instead of the AD attributes?",
-      "question_de": "Welche Konfiguration lässt Login-Shell und Home-Verzeichnis aller AD-Benutzer auf einem SSSD-Client einer lokalen Vorlage statt den AD-Attributen folgen?",
+      "question_de": "Welche Konfiguration lässt Login-Shell und Home-Verzeichnis aller AD-Benutzer auf einem SSSD-Client einer lokalen Vorlage statt der AD-Attribute folgen?",
       "choices": [
         {
           "text": "[domain/lab.example]\noverride_shell = /bin/bash\noverride_homedir = /home/%d/%u",
@@ -1699,7 +1699,7 @@
       "objective": "305.1",
       "type": "single",
       "question": "A second FreeIPA server should be added for redundancy. Which steps are required on the new server after it was enrolled as an IPA client?",
-      "question_de": "Zur Redundanz soll ein zweiter FreeIPA-Server hinzukommen. Welche Schritte sind auf dem neuen Server nötig, nachdem er als IPA-Client aufgenommen wurde?",
+      "question_de": "Aus Redundanzgründen soll ein zweiter FreeIPA-Server hinzukommen. Welche Schritte sind auf dem neuen Server nötig, nachdem er als IPA-Client aufgenommen wurde?",
       "choices": [
         {
           "text": "Run ipa-replica-install (optionally with --setup-ca --setup-dns) on the client; the replication agreement is created automatically.",

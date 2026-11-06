@@ -79,7 +79,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which metric describes the average time needed to repair a failed component and bring it back into service?",
-      "question_de": "Welche Kennzahl beschreibt die durchschnittliche Zeit, eine ausgefallene Komponente zu reparieren und wieder in Betrieb zu nehmen?",
+      "question_de": "Welche Kennzahl beschreibt die durchschnittliche Zeit, um eine ausgefallene Komponente zu reparieren und wieder in Betrieb zu nehmen?",
       "choices": [
         {
           "text": "MTTR",
@@ -263,7 +263,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which pcs command creates a virtual IP resource named vip with address 10.0.0.50?",
-      "question_de": "Welcher pcs-Befehl legt eine virtuelle-IP-Ressource namens vip mit der Adresse 10.0.0.50 an?",
+      "question_de": "Welcher pcs-Befehl legt eine Ressource namens vip für eine virtuelle IP mit der Adresse 10.0.0.50 an?",
       "choices": [
         {
           "text": "pcs resource create vip ocf:heartbeat:IPaddr2 ip=10.0.0.50 cidr_netmask=24",
@@ -379,7 +379,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which DRBD replication protocol considers a write complete only after it has reached the disk of the remote node?",
-      "question_de": "Welches DRBD-Replikationsprotokoll gilt ein Schreiben erst dann als abgeschlossen, wenn es die Platte des entfernten Knotens erreicht hat?",
+      "question_de": "Bei welchem DRBD-Replikationsprotokoll gilt ein Schreibvorgang erst dann als abgeschlossen, wenn er die Platte des entfernten Knotens erreicht hat?",
       "choices": [
         {
           "text": "Protocol C",
