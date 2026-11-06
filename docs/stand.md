@@ -1,12 +1,20 @@
 # Entwicklungsstand
 
-Stand: 5. November 2026, Version 0.0.4 (Testversion, keine stabile Produktionsversion). Umsetzungsbericht der Arbeitspakete 1 bis 4: `docs/umsetzungsbericht-2026-11.md`. Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`. Installationstest: `docs/installationstest.md`. Pilotbetrieb: `docs/pilotbetrieb.md`.
+Stand: 6. November 2026, Version 0.0.4 (Testversion, keine stabile Produktionsversion). Umsetzungsbericht der Arbeitspakete 1 bis 4: `docs/umsetzungsbericht-2026-11.md`. Behebungsstatus der Abnahmebefunde: `docs/abnahmebericht.md`. Installationstest: `docs/installationstest.md`. Pilotbetrieb: `docs/pilotbetrieb.md`.
 
 ## Zusammenfassung
 
 Die Anwendung ist lauffähig, installierbar und in ihren Kernfunktionen getestet: Mehrbenutzerbetrieb mit Rollen, englische Prüfungsfragen mit deutschen Sprachhilfen, Prüfungssimulation, Eingangstest, Vokabeltraining, Laboraufgaben, Fragenimport, Lernfortschritt, Offline-Nutzung, `lpic3ctl` für Installation und Betrieb.
 
+Positionierung: gezielte, zügige Vorbereitung auf die englischsprachigen LPIC-3-Prüfungen mit dem Fachenglisch-Training an den Prüfungsfragen als Alleinstellungsmerkmal; gelernt wird an Prüfungsfragen, wesentliche Prüfungsinhalte lassen sich über die LAB-Anregungen im eigenen Labor ausprobieren. Kein vollständiger Linux-Lehrgang, vorausgesetzt wird das Wissen einer aktiven LPIC-2. Eigenständige Lernmodule nach didaktischen Regeln sind eine denkbare spätere Ergänzung, nicht Teil des aktuellen Stands.
+
 ## Erledigt
+
+### Produktpositionierung und Alleinstellungsmerkmal (Issues #13 und #14, 6. November 2026)
+
+- Beschreibende Texte präzisiert, keine Programmänderung: README (Kernaussage „Linux verstehen – LPIC-3-Prüfungsenglisch sicher beherrschen“, Fachenglisch-Training als Alleinstellungsmerkmal in der Einleitung, Zusammenspiel von Eingangstest, Sprachhilfen, Vokabelliste, Hilfequote, Simulation und Betreuer-Auswertung, Zielgruppe mit den LPI-Voraussetzungen aktive LPIC-2 und LPIC-1, Gültigkeit fünf Jahre, Prüfungssprachen Englisch und Japanisch, erweiterte Abgrenzung), Startseite und LAB-Übersicht der Oberfläche, Einleitung von `docs/bedienung.md`, Paketbeschreibung in `pyproject.toml`, Kurzbeschreibung des GitHub-Repositorys.
+- Quelle der LPI-Angaben: lpi.org, Seiten zu LPIC-3 303 und LPIC-2, abgerufen am 6. November 2026 („The candidate must have an active LPIC-2 certification to receive the LPIC-3 certification“, „Validity period: 5 years“, Prüfungssprachen „English, Japanese“).
+- LABs, Lernfunktionen, Fragen, Datenbank und Abläufe unverändert.
 
 ### Grundstruktur
 
