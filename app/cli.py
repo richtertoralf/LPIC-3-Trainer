@@ -604,6 +604,17 @@ def _version_in(app_dir: Path) -> str:
     return "unbekannt"
 
 
+def _release_tag(source: Path) -> str:
+    """Release tag of the checked-out commit: the highest stable ``vX.Y.Z`` tag pointing at HEAD
+    (the one ``--upgrade`` selects), otherwise whatever ``git describe`` reports. ``describe``
+    alone prefers annotated tags, so a commit carrying several tags could be recorded under a
+    tag other than the installed release."""
+    tags = [t for t in _git(source, "tag", "--points-at", "HEAD").split() if STABLE_TAG_RE.match(t)]
+    if tags:
+        return max(tags, key=_parse_version)
+    return _git(source, "describe", "--tags", "--exact-match")
+
+
 def _write_build_info(source: Path, target: Path) -> None:
     """Write ``BUILD`` (version, commit, branch, release, dirty, source, time) into ``target``.
 
@@ -615,7 +626,7 @@ def _write_build_info(source: Path, target: Path) -> None:
         "version": _version_in(target),
         "commit": _git(source, "rev-parse", "HEAD") or "unbekannt",
         "branch": branch if branch and branch != "HEAD" else "",
-        "release": _git(source, "describe", "--tags", "--exact-match"),
+        "release": _release_tag(source),
         "dirty": "true" if _git(source, "status", "--porcelain") else "false",
         "source": str(source),
         "installed_at": datetime.now().astimezone().isoformat(timespec="seconds"),
