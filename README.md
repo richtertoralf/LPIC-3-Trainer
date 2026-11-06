@@ -3,15 +3,19 @@
 [![Version 0.0.4](https://img.shields.io/badge/version-0.0.4-blue)](app/__init__.py)
 [![Lizenz MIT](https://img.shields.io/badge/Lizenz-MIT-blue)](LICENSE)
 
-**Vorbereitung auf die LPIC-3-Prüfungen für Linux-Kenner, deren Englisch für die Prüfung noch nicht ausreicht.**
+**Linux verstehen – LPIC-3-Prüfungsenglisch sicher beherrschen.** Fachenglisch-Training für die LPIC-3-Prüfungen: gezielte Vorbereitung für erfahrene Linux-Administratoren, deren Englisch für die Prüfung noch nicht ausreicht.
 
 **Status:** In Entwicklung – installierbar und in den Kernfunktionen getestet, Installation auf Debian 12/13 und Ubuntu 24.04/26.04 geprüft, noch keine betreute Nutzung mit einer realen Lerngruppe ([Entwicklungsstand](docs/stand.md), [Pilotbetrieb](docs/pilotbetrieb.md)).
 
 Die App verbindet gezielte LPIC-3-Prüfungsvorbereitung mit individuellem technischem Englischtraining. Sie läuft im Browser auf eigener Infrastruktur und benötigt keine Cloud, keine externen Dienste und keine KI.
 
+**Kernaussage:** Der LPIC-3 Trainer unterstützt Linux-Anwender bei der gezielten Vorbereitung auf die englischsprachigen LPIC-3-Zertifizierungsprüfungen. Das Alleinstellungsmerkmal ist das technische Englischtraining direkt an den Prüfungsfragen. Gelernt wird vor allem an Prüfungsfragen, ergänzt um Prüfungssimulationen und praktische LAB-Anregungen, mit denen wesentliche Prüfungsinhalte im eigenen Labor ausprobiert werden. So lässt sich vorhandenes Wissen überprüfen und vertiefen, und Wissenslücken werden sichtbar. Die App kann auch zum selbstständigen Lernen genutzt werden, ersetzt aber keinen vollständigen Linux-Lehrgang.
+
 ## Zielgruppe
 
-Die App richtet sich an deutschsprachige Linux-Anwender mit vorhandenen Linux-Kenntnissen, deren Englisch für die LPIC-3-Prüfungen nicht ausreicht.
+Die App richtet sich an deutschsprachige Linux-Administratoren mit umfangreichen Linux-Kenntnissen, deren Englisch für die LPIC-3-Prüfungen nicht ausreicht.
+
+LPIC-3 ist die höchste Stufe der distributionsunabhängigen LPI-Zertifizierung und richtet sich an Linux-Profis im Unternehmensumfeld. Das Linux Professional Institute setzt für jede LPIC-3-Zertifizierung eine aktive LPIC-2-Zertifizierung voraus, die ihrerseits eine aktive LPIC-1 verlangt; Zertifizierungen gelten fünf Jahre. Die LPIC-3-Prüfungen werden nur auf Englisch und Japanisch angeboten, nicht auf Deutsch (Stand November 2026, lpi.org). Genau hier setzt die App an: Das Linux-Wissen ist vorhanden, die Prüfungssprache ist die Hürde.
 
 Sie kann allein oder gemeinsam genutzt werden. Linux-Vereine, Lerngruppen, Privatpersonen und Bildungseinrichtungen können sie auf einem eigenen Server betreiben und ihren Mitgliedern und Teilnehmern bereitstellen.
 
@@ -19,7 +23,7 @@ Sie kann allein oder gemeinsam genutzt werden. Linux-Vereine, Lerngruppen, Priva
 
 Die LPIC-3-Prüfungen werden auf Englisch abgelegt. Englischsprachige Lernmaterialien gibt es viele. Diese App ist keine weitere Fragensammlung und kein Englischkurs.
 
-Ein Lernender kann den technischen Zusammenhang verstehen und trotzdem an der englischen Frage scheitern. Die App erkennt diesen Unterschied und reagiert gezielt darauf.
+Ein Lernender kann den technischen Zusammenhang verstehen und trotzdem an der englischen Frage scheitern: an einem unbekannten Fachbegriff, an einer Formulierung oder am feinen Unterschied zwischen zwei Antwortmöglichkeiten. Die App macht diesen Unterschied zwischen fehlendem Fachwissen und fehlendem Sprachverständnis sichtbar, statt beides zu vermischen.
 
 Das Lernprinzip:
 
@@ -29,6 +33,14 @@ Das Lernprinzip:
 - Vorhandenes Linux-Wissen wird berücksichtigt.
 
 Ziel ist das sichere, selbstständige Verstehen und Beantworten englischer LPIC-3-Prüfungsfragen.
+
+So greifen die vorhandenen Funktionen dafür ineinander:
+
+- Der **Eingangstest** je Modul läuft ohne Sprachhilfen und ordnet vorhandenes Linux-Wissen den Themen zu; Themen mit „sicher“ lassen sich überspringen.
+- Beim **Üben** bleibt die Frage englisch. Übersetzung und markierte Fachbegriffe sind zuschaltbar, die Antwort wird unabhängig davon gewertet. Mit *Begriff merken* wandern unbekannte Fachbegriffe in die persönliche Vokabelliste und werden dort wiederholt; das Glossar erklärt die Begriffe im Prüfungskontext.
+- Die **Hilfequote** je Modul und Thema zeigt, wie oft noch deutsche Hilfe nötig war. Sie soll mit der Zeit sinken, denn in der Prüfung gibt es keine Hilfe.
+- Die **Prüfungssimulation** stellt die Prüfungssituation nach: englische Fragen, ohne Sprachhilfen, mit Zeitlimit und den Fragetypen der echten Prüfung.
+- Betreuer sehen in der **Auswertung je Prüfungsziel** ihrer Gruppe, ob ein Thema fachlich zu vertiefen ist (niedrige Trefferquote) oder ob vor allem das Fachenglisch zu üben ist (richtige Antworten, aber hoher Hilfebedarf).
 
 Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
@@ -43,7 +55,7 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 - Technisches Englischtraining anhand der Prüfungsfragen
 - Kurze Eingangstests zur Berücksichtigung vorhandener Linux-Kenntnisse
 - Prüfungssimulationen ohne Sprachhilfen für einzelne Kapitel und ganze Module
-- Praktische Übungen für das eigene Linux-Lab (Anleitungen und Selbstkontrolle, keine Ausführung durch die App)
+- Praktische LAB-Anregungen zu prüfungsrelevanten Themen für das eigene Linux-Lab (Anleitungen und Selbstkontrolle, keine Ausführung durch die App)
 - Import eigener Prüfungsfragen
 - Persönlicher Lernfortschritt je Nutzer
 - Lernende wählen ihre LPIC-3-Module selbst
@@ -53,6 +65,8 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 
 ## Abgrenzung
 
+- Kein vollständiger Linux-Lehrgang und keine systematische Fachausbildung: Die App setzt das Fachwissen voraus, das LPI für LPIC-3 erwartet, und hilft, es zu überprüfen, zu festigen und auf Englisch sicher abzurufen.
+- Kein interaktiver Kurs mit Lektionen: Gelernt wird an Prüfungsfragen, Erklärungen und LAB-Anregungen, die Reihenfolge wählt jeder selbst. Eigenständige Lernmodule nach didaktischen Regeln sind als spätere Ergänzung denkbar, aber nicht Bestandteil der Anwendung.
 - Kein allgemeiner Englischkurs.
 - Keine vollständige Übersetzung der LPIC-3-Prüfung ins Deutsche.
 - Keine KI-Abhängigkeit.

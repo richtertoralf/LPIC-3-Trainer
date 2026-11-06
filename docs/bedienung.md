@@ -2,6 +2,8 @@
 
 Anleitung für Lernende und Betreuer. Die Oberfläche ist deutsch, die Prüfungsfragen sind englisch.
 
+Der Trainer dient der gezielten Vorbereitung auf die englischsprachigen LPIC-3-Prüfungen. Im Mittelpunkt steht das Fachenglisch-Training direkt an den Prüfungsfragen, ergänzt um Prüfungssimulationen und LAB-Anregungen für die eigene Testumgebung. Er setzt Linux-Kenntnisse auf dem Niveau einer aktiven LPIC-2 voraus (Voraussetzung des LPI für jede LPIC-3-Zertifizierung) und ist kein vollständiger Linux-Lehrgang; zum selbstständigen Lernen lässt er sich trotzdem nutzen.
+
 ## Konto und Module
 
 1. Unter *Registrieren* ein Konto anlegen. Je nach Einstellung ist es sofort aktiv oder wartet auf Freigabe.
