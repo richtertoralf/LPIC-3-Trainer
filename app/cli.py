@@ -116,7 +116,10 @@ def systemctl(*args: str, check: bool = True) -> subprocess.CompletedProcess:
 
 
 def service_state() -> str:
-    if not has_systemd():
+    # Without our unit file (Docker, foreground server, test tree) systemd has nothing to
+    # report about the trainer, so do not ask about a unit that may belong to another
+    # installation on the same host.
+    if not has_systemd() or not UNIT_PATH.exists():
         return "unknown"
     return systemctl("is-active", SERVICE_NAME, check=False).stdout.strip() or "unknown"
 
@@ -329,7 +332,12 @@ def cmd_backup(args) -> int:
         _backup_db_copy(db_path, tmp_db)
         with tarfile.open(archive, "w:gz") as tar:
             tar.add(tmp_db, arcname="lpic3-trainer.db")
-            if ENV_FILE.is_file():
+            try:
+                has_env = ENV_FILE.is_file()
+            except PermissionError:
+                has_env = False
+                warn(f"{ENV_FILE} nicht lesbar; Sicherung ohne Konfiguration (sudo verwenden).")
+            if has_env:
                 tar.add(ENV_FILE, arcname="lpic3-trainer.env")
             meta = Path(tmp) / "VERSION"
             meta.write_text(f"{__version__}\n")
@@ -532,6 +540,15 @@ def _chown_service_files() -> None:
         info = pwd.getpwnam(SERVICE_USER)
     except KeyError:
         return
+    try:
+        _chown_service_files_as(info)
+    except PermissionError:
+        # Only root may hand files to the service user. Happens in the unprivileged test run
+        # on a host that has a real lpic3 account; a real installation always runs as root.
+        warn("Eigentümer nicht gesetzt (keine Root-Rechte).")
+
+
+def _chown_service_files_as(info) -> None:
     data_dir = Path(os.environ.get("LPIC3_DATA_DIR", str(DEFAULT_DATA_DIR)))
     for root in (data_dir,):
         if root.exists():
@@ -681,10 +698,17 @@ def remote_url() -> str:
 
 def _latest_stable_tag(remote: str | None = None) -> tuple[str, tuple[int, ...]]:
     """Newest tag ``vX.Y.Z`` of the remote. Pre-releases (``v1.0.0-rc1``) are ignored."""
+    tag, parsed, _ = _latest_stable_release(remote)
+    return tag, parsed
+
+
+def _latest_stable_release(remote: str | None = None) -> tuple[str, tuple[int, ...], str]:
+    """Newest stable tag of the remote with the commit it points to (peeled for annotated tags,
+    empty when the remote does not report it)."""
     remote = remote or remote_url()
     try:
         result = run(
-            ["git", "ls-remote", "--tags", "--refs", remote],
+            ["git", "ls-remote", "--tags", remote],
             check=False,
             capture=True,
             timeout=60,
@@ -702,16 +726,45 @@ def _latest_stable_tag(remote: str | None = None) -> tuple[str, tuple[int, ...]]
             "Kein Zugriff auf GitHub; Installation unverändert. "
             "Netz prüfen oder Upgrade mit --source PFAD."
         )
-    tags = []
+    tags: dict[str, tuple[int, ...]] = {}
+    commits: dict[str, str] = {}
     for line in result.stdout.splitlines():
-        tag = line.split("refs/tags/")[-1].strip()
+        sha, _, ref = line.partition("\t")
+        if "refs/tags/" not in ref:
+            continue
+        tag = ref.split("refs/tags/")[-1].strip()
+        peeled = tag.endswith("^{}")
+        tag = tag.removesuffix("^{}")
         parsed = _parse_version(tag) if STABLE_TAG_RE.match(tag) else None
-        if parsed:
-            tags.append((parsed, tag))
+        if not parsed:
+            continue
+        tags[tag] = parsed
+        # "<sha> refs/tags/vX^{}" is the commit of an annotated tag; a lightweight tag has
+        # only the plain line, whose sha already is the commit.
+        if peeled or tag not in commits:
+            commits[tag] = sha.strip()
     if not tags:
         raise CliError("Kein stabiles Release (Tag vX.Y.Z) gefunden; Installation unverändert.")
-    parsed, tag = max(tags)
-    return tag, parsed
+    tag = max(tags, key=tags.get)
+    return tag, tags[tag], commits.get(tag, "")
+
+
+def _development_state(info: dict[str, str], release_commit: str = "") -> str:
+    """Why an installation is a development state rather than the release with the same
+    version number; empty when it is the release (installed from the tag, or the very commit
+    the tag points to, without local changes)."""
+    reasons = []
+    commit = info.get("commit", "")
+    if info.get("dirty") == "true":
+        reasons.append("lokale Änderungen (dirty)")
+    if not info.get("release"):
+        if info.get("branch"):
+            reasons.append(f"Branch {info['branch']}")
+        if release_commit and commit and commit != release_commit:
+            reasons.append(f"Commit {commit[:7]} statt {release_commit[:7]}")
+        elif not release_commit and not reasons:
+            reasons.append(f"Commit {commit[:7] or 'unbekannt'} ohne Release-Tag")
+    return ", ".join(reasons)
 
 
 def _create_venv() -> None:
@@ -837,12 +890,22 @@ def cmd_upgrade(args) -> int:
             )
     else:
         # Standard way (ADR-002): the newest stable release tag of the repository.
-        tag, latest = _latest_stable_tag()
+        tag, latest, release_commit = _latest_stable_release()
         info = _build_info()
         installed_text = info.get("release") or info.get("version") or _installed_version()
         installed = _parse_version(installed_text)
         say(f"Installiert: {installed_text}, neuestes stabiles Release: {tag}")
         if installed is not None and installed == latest:
+            development = _development_state(info, release_commit)
+            if development:
+                # Same version number, but not the release: say so and leave it alone.
+                say(
+                    f"Hinweis: Die Installation trägt die Versionsnummer von {tag}, ist aber ein "
+                    f"Entwicklungsstand ({development}). Sie wird nicht ungefragt ersetzt.\n"
+                    f"Release installieren: git clone {remote_url()} && cd LPIC-3-Trainer && "
+                    f'git checkout {tag} && sudo lpic3ctl --upgrade --source "$PWD"'
+                )
+                return EXIT_OK
             say("Bereits aktuell. Keine Änderung, kein Neustart.")
             return EXIT_OK
         if installed is not None and installed > latest:
@@ -1040,7 +1103,13 @@ def cmd_version(args) -> int:
 
 
 def _lan_addresses(ip_output: str | None = None) -> list[str]:
-    """Global IPv4 addresses of physical interfaces (virtual bridges and veths left out)."""
+    """Global IPv4 addresses of the host's own interfaces (LAN, VPN), without the virtual
+    bridges, veths and taps of containers and VMs."""
+    return [address for _, address in _host_addresses(ip_output)]
+
+
+def _host_addresses(ip_output: str | None = None) -> list[tuple[str, str]]:
+    """``(interface, IPv4 address)`` pairs from ``ip -o -4 addr show scope global``."""
     if ip_output is None:
         try:
             ip_output = run(
@@ -1048,7 +1117,10 @@ def _lan_addresses(ip_output: str | None = None) -> list[str]:
             ).stdout
         except FileNotFoundError:
             return []
-    skip = ("docker", "br-", "virbr", "lxdbr", "lxcbr", "veth", "vnet", "tap")
+    skip = (
+        "docker", "br-", "virbr", "lxdbr", "lxcbr", "incusbr", "podman", "cni", "flannel",
+        "veth", "vnet", "tap",
+    )  # fmt: skip
     addresses = []
     for line in ip_output.splitlines():
         fields = line.split()
@@ -1057,14 +1129,19 @@ def _lan_addresses(ip_output: str | None = None) -> list[str]:
         iface, address = fields[1], fields[3].split("/")[0]
         if iface.startswith(skip):
             continue
-        addresses.append(address)
+        addresses.append((iface, address))
     return addresses
 
 
 def _access_urls(host: str, port: int) -> list[str]:
-    """Complete URLs for the local address and, when bound to all interfaces, the LAN."""
+    """Configured addresses with port: the loopback address and, when bound to all interfaces,
+    every LAN and VPN address of the host, each labelled with its interface. They are read
+    from the configuration and the interfaces, not probed; reachability depends on firewall
+    and network."""
     if host in ("0.0.0.0", "::", ""):
-        return [f"http://127.0.0.1:{port}/"] + [f"http://{a}:{port}/" for a in _lan_addresses()]
+        return [f"http://127.0.0.1:{port}/ (lo)"] + [
+            f"http://{address}:{port}/ ({iface})" for iface, address in _host_addresses()
+        ]
     shown = f"[{host}]" if ":" in host else host
     return [f"http://{shown}:{port}/"]
 
@@ -1078,15 +1155,6 @@ def cmd_status(args) -> int:
         return EXIT_ERROR
     code = EXIT_OK
     say(f"Version:       {_version_line()}")
-    if CONFIG_UNREADABLE:
-        say(f"Konfiguration: {ENV_FILE} (nicht lesbar, Standardwerte; 'sudo lpic3ctl --status')")
-    else:
-        say(f"Konfiguration: {ENV_FILE}" + ("" if ENV_FILE.is_file() else " (fehlt)"))
-    try:
-        settings = _settings()
-    except ValueError as exc:
-        say(f"Fehler:        ungültige Konfiguration: {exc}")
-        return EXIT_USAGE
     state = "nicht installiert"
     if has_systemd() and UNIT_PATH.exists():
         state = systemctl("is-active", SERVICE_NAME, check=False).stdout.strip() or "unknown"
@@ -1097,6 +1165,18 @@ def cmd_status(args) -> int:
             code = EXIT_ERROR
     else:
         say("Dienst:        nicht installiert")
+    if CONFIG_UNREADABLE:
+        # Without the configuration every further line would rest on defaults (wrong
+        # database path, wrong port) and mislead. Say what is missing and stop here.
+        say(f"Konfiguration: {ENV_FILE} (ohne Root-Rechte nicht lesbar)")
+        say("Hinweis:       Bitte sudo lpic3ctl --status verwenden.")
+        return code
+    say(f"Konfiguration: {ENV_FILE}" + ("" if ENV_FILE.is_file() else " (fehlt)"))
+    try:
+        settings = _settings()
+    except ValueError as exc:
+        say(f"Fehler:        ungültige Konfiguration: {exc}")
+        return EXIT_USAGE
     say(
         f"Datenbank:     {settings.db_path} "
         f"({'vorhanden' if settings.db_path.exists() else 'fehlt'})"
@@ -1106,6 +1186,9 @@ def cmd_status(args) -> int:
 
         info = db_health()
         say(f"Schema:        {info['schema_version']} (journal {info['journal_mode']})")
+    except PermissionError:
+        say("Schema:        ohne Root-Rechte nicht lesbar")
+        say("Hinweis:       Bitte sudo lpic3ctl --status verwenden.")
     except Exception as exc:
         say(f"Schema:        nicht lesbar ({exc.__class__.__name__})")
     health = _http_health(settings.host, settings.port)
@@ -1130,6 +1213,8 @@ def cmd_status(args) -> int:
         say(f"Hinweis:       laufend {running}, installiert {installed}: Neustart nötig.")
     for url in _access_urls(settings.host, settings.port):
         say(f"Adresse:       {url}")
+    if settings.host in ("0.0.0.0", "::", ""):
+        say("               (konfigurierte Adressen; Erreichbarkeit aus dem Netz nicht geprüft)")
     return code
 
 

@@ -6,7 +6,7 @@ Voraussetzungen:
 
 - Python 3.11 oder neuer, `python3-venv`, `git`, systemd.
 - Root-Rechte (sudo) für die Installation; der Dienst selbst läuft ohne Root als Benutzer `lpic3`.
-- Internetzugang während der Installation (pip lädt die Python-Abhängigkeiten).
+- Internetzugang während der Installation (pip lädt die Python-Abhängigkeiten) und für `lpic3ctl --upgrade` von GitHub. Der laufende Betrieb braucht kein Internet (Abschnitt *Betrieb ohne Internet, im LAN und im Internet*).
 - Für den öffentlichen Betrieb ein Reverse Proxy mit HTTPS.
 
 Prüfstand: Der komplette Ablauf (Installation, Dienststart durch systemd, Neustart, Upgrade von v0.0.2, Backup, Restore, Rollback, Deinstallation, Reverse Proxy) wurde am 5. November 2026 als Root in LXD-Systemcontainern mit Debian 12, Debian 13, Ubuntu 24.04 und Ubuntu 26.04 ausgeführt; Protokoll und Befunde in `docs/installationstest.md`. Nicht geprüft: blankes Metall oder VM mit eigenem Kernel, ARM64, Docker.
@@ -47,7 +47,7 @@ Ist der Port bereits belegt, warnt die Installation. Dann `LPIC3_PORT` in der Ko
 
 Dateirechte nach der Installation: `/opt/lpic3-trainer` gehört root (nur lesbar für den Dienst), `/etc/lpic3-trainer` ist `0750 root:lpic3`, die Datei `lpic3-trainer.env` `0640 root:lpic3`, `/var/lib/lpic3-trainer` gehört `lpic3` (`0750`, Datenbank `0640`). Die systemd-Unit läuft mit `ProtectSystem=strict`, ohne Capabilities und mit Systemaufruffilter (`systemd-analyze security`: 1.3 bis 2.0, OK); sie darf nur in das Datenverzeichnis schreiben und kann keine Ports unter 1024 binden, dafür ist der Reverse Proxy zuständig.
 
-Ohne Root liefern `lpic3ctl status` und `check` nur Standardwerte, weil die Konfiguration nicht lesbar ist; beide weisen darauf hin.
+Ohne Root ist die Konfiguration nicht lesbar: `lpic3ctl --status` zeigt dann nur Version und Dienstzustand und bittet um `sudo lpic3ctl --status`; `check` arbeitet mit Standardwerten und weist darauf hin.
 
 ### 3. Status prüfen
 
@@ -59,7 +59,7 @@ sudo lpic3ctl logs -n 50 # Protokolle aus journald
 curl http://127.0.0.1:8000/health
 ```
 
-`--status` endet mit 0, wenn kein technischer Fehler vorliegt, auch bei bewusst gestopptem Dienst; mit 1 bei `failed`, bei aktivem Dienst ohne Antwort am Health-Endpunkt oder ohne Installation; mit 2 bei ungültiger Konfiguration. Ohne Root ist die Konfiguration nicht lesbar, `--status` weist darauf hin und zeigt Standardwerte.
+`--status` endet mit 0, wenn kein technischer Fehler vorliegt, auch bei bewusst gestopptem Dienst; mit 1 bei `failed`, bei aktivem Dienst ohne Antwort am Health-Endpunkt oder ohne Installation; mit 2 bei ungültiger Konfiguration. Ohne Root ist die Konfiguration nicht lesbar; `--status` zeigt dann Version und Dienstzustand und den Hinweis „Bitte sudo lpic3ctl --status verwenden.“ statt irreführender Standardwerte. Bei `LPIC3_HOST=0.0.0.0` listet `--status` jede LAN- und VPN-Adresse des Servers mit Port und Schnittstelle (ohne Container- und VM-Bridges); das sind die konfigurierten Adressen, die Erreichbarkeit aus dem Netz prüft der Befehl nicht.
 
 ### 4. Erster Administrator und Browserzugriff
 
@@ -144,6 +144,47 @@ In allen Fällen muss `LPIC3_HOST` in der VM auf `0.0.0.0` oder die VM-Adresse s
 
 **Sicherheit.** Ohne Reverse Proxy läuft die Verbindung über unverschlüsseltes HTTP: Anmeldedaten und Sitzungscookies sind im LAN mitlesbar, und `LPIC3_SECURE_COOKIES` muss `false` bleiben, sonst sendet der Browser das Sitzungscookie nicht. Direkter HTTP-Zugriff ist deshalb nur für Tests und kurze Übungen in einem vertrauenswürdigen, abgeschotteten Netz vertretbar. Für den dauerhaften Mehrbenutzerbetrieb, auch im LAN, den Dienst bei `LPIC3_HOST=127.0.0.1` lassen und einen Reverse Proxy mit HTTPS davorschalten (nächster Abschnitt); `lpic3ctl check` weist auf eine öffentliche Bindung ohne `LPIC3_SECURE_COOKIES=true` hin. Nie direkt ins Internet freigeben.
 
+## Betrieb ohne Internet, im LAN und im Internet
+
+Der Trainer ist für den Betrieb auf eigener Infrastruktur gebaut. Der laufende Lernbetrieb braucht keine Verbindung nach außen.
+
+**Alles kommt vom eigenen Server.** HTML, CSS, JavaScript, Icons, Web-App-Manifest und Service Worker liefert der Trainer selbst aus (`/static/`). Schriften kommen aus dem System des Clients (`system-ui` und die Monospace-Systemschrift). Es werden keine Webfonts, Skripte oder Stylesheets von CDNs geladen, es gibt kein Analytics und kein Tracking. Übersetzungen, Fachbegriffe und Erklärungen stammen aus den mitgelieferten Inhalten; es gibt keine externen APIs und keine KI-Dienste. Der Service Worker bearbeitet nur Anfragen an den eigenen Ursprung. Das wird automatisiert geprüft: `tests/test_offline_resources.py` kontrolliert die gerenderten Seiten, die statischen Dateien und die Templates auf fremde Adressen; `tests/e2e/test_offline.py` zeichnet im Browser alle Anfragen eines Lerndurchlaufs auf und verlangt, dass keine an einen anderen Host geht.
+
+**Wann Internet nötig ist.** Nur außerhalb des Lernbetriebs:
+
+| Vorgang | Externe Verbindung | Ohne Internet |
+|---|---|---|
+| Installation | Paketquellen der Distribution (`apt`), PyPI für die Python-Abhängigkeiten (`pip`), GitHub für den Quellcode | Quellcode als Checkout mitbringen; `pip` braucht einen lokalen Paketspiegel oder vorab geladene Wheels (nicht Teil des Trainers, nicht geprüft) |
+| `sudo lpic3ctl --upgrade` | GitHub (Tags und Quellcode) | `--upgrade --source PFAD` mit lokalem Checkout oder `LPIC3_UPGRADE_REMOTE` auf einen eigenen Git-Spiegel |
+| `lpic3ctl version --remote` | GitHub (neuestes Release) | `lpic3ctl --version` arbeitet offline |
+| Docker-Build | Docker Hub (Basis-Image) und PyPI | nicht vorgesehen |
+| Links in der Oberfläche | Prüfungsziele beim LPI, Originalquellen von Zusatzfragen, Herstellerdokumentation in LABs | öffnen im Browser des Lernenden, nie vom Server; ohne Internet bleiben sie ohne Ziel, der Lernbetrieb ist nicht betroffen |
+
+Lernende brauchen nur den Server im LAN. Einmal geladene Seiten bleiben über den Service Worker auch ohne Verbindung zum Server lesbar (Abschnitt *Offline-Verhalten* in `docs/architektur.md`). Ein Betrieb in einem vollständig abgeschotteten Netz nach vorheriger Online-Installation wurde nicht gesondert durchgespielt; die Tests belegen, dass die Anwendung keine fremden Adressen anspricht.
+
+**Mindeststandard im LAN.**
+
+- Dienst über `LPIC3_HOST` an die LAN-Adresse oder `0.0.0.0` binden (Abschnitt *Zugriff aus dem lokalen Netzwerk*) oder, empfohlen, bei `127.0.0.1` lassen und einen Reverse Proxy mit HTTPS auf demselben Rechner davorschalten.
+- Ist eine Firewall aktiv, den Port nur für das lokale Netz freigeben.
+- Unverschlüsseltes HTTP nur in einem vertrauenswürdigen, abgeschotteten Netz und nur für Tests oder kurze Übungen. Für den dauerhaften Mehrbenutzerbetrieb HTTPS auch im LAN; ein Zertifikat einer eigenen CA oder ein selbstsigniertes Zertifikat reicht, wenn die Clients es kennen.
+- Regelmäßig `sudo lpic3ctl backup` (Abschnitt *Backup und Restore*).
+
+**Mindeststandard im Internet.**
+
+- Dienst bleibt bei `LPIC3_HOST=127.0.0.1`. Nach außen zeigt nur der Reverse Proxy mit HTTPS (Ports 80 und 443), nie Port 8000.
+- `LPIC3_SECURE_COOKIES=true` in `/etc/lpic3-trainer/lpic3-trainer.env`.
+- Zertifikate nach Wahl des Administrators (Let's Encrypt, eigene CA, gekauftes Zertifikat). Der Trainer verwaltet keine Zertifikate und spricht selbst kein TLS.
+- Firewall: nur 80/443 und der Administrationszugang offen. Betriebssystem aktuell halten, Backups einrichten.
+- Monitoring, Fail2ban oder vergleichbare Schutzmechanismen sind Sache des Administrators und nicht vorgeschrieben. Anschlusspunkte des Trainers: `/health`, `lpic3ctl --status` mit Exit-Codes und die Logs in journald (`lpic3ctl logs`).
+
+**Reverse Proxy frei wählbar.** Der Trainer schreibt keine Proxy-Software vor; nginx ist nur das Beispiel im nächsten Abschnitt. Apache httpd, Caddy, HAProxy, Traefik oder ein anderer HTTP-Reverse-Proxy sind geeignet, wenn er
+
+- Anfragen per HTTP/1.1 an `http://127.0.0.1:8000` weiterreicht,
+- `Host` oder `X-Forwarded-Host` sowie `X-Forwarded-Proto` setzt (sonst lehnt die Origin-Prüfung Formulare ab),
+- Uploads von mindestens 5 MB zulässt (Fragenimport; die Anwendung begrenzt auf 5 MB).
+
+WebSockets oder besondere Timeouts braucht die Anwendung nicht.
+
 ## Reverse Proxy mit HTTPS
 
 Beispiel für nginx:
@@ -176,7 +217,7 @@ Standardweg: auf das neueste stabile Release aktualisieren.
 sudo lpic3ctl --upgrade
 ```
 
-`--upgrade` fragt die Tags des Repositorys ab und nimmt das höchste `vX.Y.Z`. Vorabversionen (`v1.0.0-rc1`) und der Branch `main` werden nie automatisch installiert. Ist das Release bereits installiert, meldet der Befehl „Bereits aktuell“ und ändert nichts, insbesondere kein Neustart (Exit 0). Ist der installierte Stand neuer (Entwicklungsinstallation aus einem Checkout), gibt es kein Downgrade. Ohne Netz oder ohne Zugriff auf GitHub bricht der Befehl vor jeder Änderung mit Exit 1 ab.
+`--upgrade` fragt die Tags des Repositorys ab und nimmt das höchste `vX.Y.Z`. Vorabversionen (`v1.0.0-rc1`) und der Branch `main` werden nie automatisch installiert. Ist das Release bereits installiert, meldet der Befehl „Bereits aktuell“ und ändert nichts, insbesondere kein Neustart (Exit 0). Ist der installierte Stand neuer (Entwicklungsinstallation aus einem Checkout), gibt es kein Downgrade. Trägt eine Entwicklungsinstallation dieselbe Versionsnummer wie das Release, aber einen anderen Commit, einen Branch oder lokale Änderungen, meldet der Befehl das als Entwicklungsstand und ersetzt nichts; das Release lässt sich dann bewusst mit `--upgrade --source` aus einem Checkout des Tags installieren. Ohne Netz oder ohne Zugriff auf GitHub bricht der Befehl vor jeder Änderung mit Exit 1 ab.
 
 Manueller Weg für Entwicklungsstände, Offline-Server oder eine ältere Version: aus einem lokalen Checkout upgraden.
 

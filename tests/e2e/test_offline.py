@@ -31,3 +31,41 @@ def test_offline_pages_from_service_worker(page: Page, server, username, admin_c
         page.context.set_offline(False)
     page.goto(base + "/exams")
     expect(page.locator("h1")).to_have_text(re.compile("Simulationen"))
+
+
+def test_learning_flow_sends_no_request_to_other_hosts(
+    page: Page, server, username, browser_errors, admin_credentials
+):
+    """Self-hosted operation (issue #12): a complete learner flow in the browser talks only to
+    the own server. Any request to another host (fonts, CDNs, analytics) fails the test."""
+    base = server["base"]
+    foreign: list[str] = []
+    page.on(
+        "request",
+        lambda r: (
+            foreign.append(r.url)
+            if r.url.startswith("http") and not r.url.startswith(base + "/")
+            else None
+        ),
+    )
+    register(page, base, username)
+    select_module(page, base, "305")
+    for path in (
+        "/",
+        "/module/305",
+        "/learn/305",
+        "/labs",
+        "/labs/umgebung",
+        "/vocab",
+        "/glossary",
+        "/progress",
+        "/exams",
+    ):
+        page.goto(base + path)
+        page.wait_for_load_state("networkidle")
+    page.goto(base + "/learn/305")
+    page.click("[data-toggle-translation]")
+    page.locator(".choice input").first.check()
+    page.click("button[type=submit]")
+    page.wait_for_load_state("networkidle")
+    assert not foreign, foreign
