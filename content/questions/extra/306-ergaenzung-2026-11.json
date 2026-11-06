@@ -55,7 +55,7 @@
       "objective": "361.1",
       "type": "single",
       "question": "Which cluster type stores no shared data between nodes and therefore relies on replication or independent data sets, scaling out by adding nodes?",
-      "question_de": "Welcher Clustertyp hält keine gemeinsamen Daten zwischen den Knoten und setzt deshalb auf Replikation oder unabhängige Datenbestände, skalierbar durch weitere Knoten?",
+      "question_de": "Welcher Clustertyp hält keine gemeinsamen Daten zwischen den Knoten und setzt deshalb auf Replikation oder unabhängige Datenbestände und skaliert horizontal durch weitere Knoten?",
       "choices": [
         {
           "text": "Shared-nothing cluster",
@@ -98,7 +98,7 @@
       "choices": [
         {
           "text": "State handling: session state must be shared (external session store) or requests must be kept on one server (session persistence).",
-          "text_de": "Zustandsbehandlung: Sitzungszustand muss geteilt werden (externer Sitzungsspeicher) oder Anfragen müssen auf einem Server bleiben (Session-Persistenz).",
+          "text_de": "Umgang mit Zustand (State Handling): Sitzungszustand muss geteilt werden (externer Sitzungsspeicher) oder Anfragen müssen auf einem Server bleiben (Session-Persistenz).",
           "correct": true
         },
         {
@@ -176,7 +176,7 @@
       "choices": [
         {
           "text": "Node-level fencing powers off or resets the whole node (e.g. IPMI, PDU); resource-level fencing only blocks the node's access to a specific resource, e.g. a SAN LUN via SCSI reservations or a switch port.",
-          "text_de": "Knoten-Fencing schaltet den ganzen Knoten ab oder setzt ihn zurück (z. B. IPMI, Steckdosenleiste); Ressourcen-Fencing sperrt nur den Zugriff des Knotens auf eine bestimmte Ressource, z. B. eine SAN-LUN per SCSI-Reservierung oder einen Switch-Port.",
+          "text_de": "Knoten-Fencing schaltet den ganzen Knoten ab oder setzt ihn zurück (z. B. IPMI, schaltbare Steckdosenleiste/PDU); Ressourcen-Fencing sperrt nur den Zugriff des Knotens auf eine bestimmte Ressource, z. B. eine SAN-LUN per SCSI-Reservierung oder einen Switch-Port.",
           "correct": true
         },
         {
@@ -328,7 +328,7 @@
       "objective": "361.2",
       "type": "single",
       "question": "Which keepalived configuration block defines a health check that removes a real server from the pool when its web page no longer contains the expected content?",
-      "question_de": "Welcher keepalived-Konfigurationsblock definiert eine Gesundheitsprüfung, die einen Real-Server aus dem Pool nimmt, wenn seine Webseite nicht mehr den erwarteten Inhalt liefert?",
+      "question_de": "Welcher keepalived-Konfigurationsblock definiert einen Health Check, der einen Real-Server aus dem Pool nimmt, wenn seine Webseite nicht mehr den erwarteten Inhalt liefert?",
       "choices": [
         {
           "text": "real_server 10.0.0.11 80 {\n  HTTP_GET {\n    url { path /health digest <md5 from genhash> }\n    connect_timeout 3\n  }\n}",
@@ -976,7 +976,7 @@
           "text_de": "drbdadm invalidate r0"
         }
       ],
-      "explanation_de": "drbdadm resize meldet die neue Größe des Hintergrundgeräts und verschiebt interne Metadaten; danach wird das Dateisystem vergrößert (resize2fs oder xfs_growfs auf dem Primary). create-md würde die Metadaten überschreiben, invalidate erzwingt eine Vollsynchronisation.",
+      "explanation_de": "drbdadm resize meldet die neue Größe des darunterliegenden Geräts und verschiebt interne Metadaten; danach wird das Dateisystem vergrößert (resize2fs oder xfs_growfs auf dem Primary). create-md würde die Metadaten überschreiben, invalidate erzwingt eine Vollsynchronisation.",
       "reference": "DRBD 9 User's Guide, Growing resources online",
       "terms": [
         {
@@ -1093,7 +1093,7 @@
           "text_de": "drbdadm outdate r0"
         }
       ],
-      "explanation_de": "invalidate verwirft die lokalen Daten und synchronisiert vom Peer; invalidate-remote wirkt umgekehrt. verify vergleicht beide Seiten blockweise (Ergebnis im Log, danach disconnect/connect zur Korrektur), outdate markiert nur als veraltet, detach trennt das Hintergerät.",
+      "explanation_de": "invalidate verwirft die lokalen Daten und synchronisiert vom Peer; invalidate-remote wirkt umgekehrt. verify vergleicht beide Seiten blockweise (Ergebnis im Log, danach disconnect/connect zur Korrektur), outdate markiert nur als veraltet, detach trennt das darunterliegende Gerät (Backing Device).",
       "reference": "drbdadm(8), invalidate",
       "terms": [
         {
@@ -1420,7 +1420,7 @@
       "objective": "363.1",
       "type": "single",
       "question": "After a brick was offline for an hour, some files on a replicated GlusterFS volume are reported as needing heal. Which command shows these files and which triggers the heal?",
-      "question_de": "Nachdem ein Brick eine Stunde offline war, werden einige Dateien eines replizierten GlusterFS-Volumes als heilungsbedürftig gemeldet. Welcher Befehl zeigt diese Dateien, und welcher stößt die Heilung an?",
+      "question_de": "Nachdem ein Brick eine Stunde offline war, werden einige Dateien eines replizierten GlusterFS-Volumes als reparaturbedürftig (needing heal) gemeldet. Welcher Befehl zeigt diese Dateien, und welcher stößt den Self-Heal an?",
       "choices": [
         {
           "text": "gluster volume heal gv0 info; gluster volume heal gv0",
@@ -2122,7 +2122,7 @@
       "objective": "364.3",
       "type": "single",
       "question": "A classic (thick) LVM snapshot of a 50 GB volume was created with 2 GB of snapshot space. After a large data load, lvs shows the snapshot as invalid. Why, and how can this be avoided?",
-      "question_de": "Ein klassischer (Thick-)LVM-Snapshot eines 50-GB-Volumes wurde mit 2 GB Snapshot-Platz angelegt. Nach einer großen Datenladung zeigt lvs den Snapshot als ungültig. Warum, und wie lässt sich das vermeiden?",
+      "question_de": "Ein klassischer (Thick-)LVM-Snapshot eines 50-GB-Volumes wurde mit 2 GB Snapshot-Platz angelegt. Nach dem Laden einer großen Datenmenge zeigt lvs den Snapshot als ungültig. Warum, und wie lässt sich das vermeiden?",
       "choices": [
         {
           "text": "The copy-on-write area filled up because more than 2 GB of the origin changed; allocate more space, enable snapshot_autoextend in lvm.conf, or use thin snapshots.",

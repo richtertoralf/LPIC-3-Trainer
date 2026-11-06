@@ -273,7 +273,7 @@
     },
     {
       "term": "load balancer",
-      "de": "Lastverteiler"
+      "de": "Load Balancer, Lastverteiler"
     },
     {
       "term": "backend",
@@ -294,7 +294,7 @@
     },
     {
       "term": "snapshot",
-      "de": "Schnappschuss, Momentaufnahme"
+      "de": "Snapshot, Momentaufnahme (eingefrorener Zustand)"
     },
     {
       "term": "guest",
@@ -428,7 +428,7 @@
     },
     {
       "term": "intrusion detection",
-      "de": "Einbruchserkennung"
+      "de": "Intrusion Detection, Angriffserkennung"
     },
     {
       "term": "audit",
@@ -576,7 +576,7 @@
     },
     {
       "term": "quota",
-      "de": "Kontingent, Speicherbegrenzung"
+      "de": "Quota, Speicherkontingent"
     },
     {
       "term": "brick",
@@ -604,7 +604,7 @@
     },
     {
       "term": "hot spare",
-      "de": "Reserveplatte, die automatisch einspringt"
+      "de": "Hot Spare, Reserveplatte, die automatisch einspringt"
     },
     {
       "term": "rebuild",
@@ -612,7 +612,7 @@
     },
     {
       "term": "bonding",
-      "de": "Bündelung von Netzwerkschnittstellen"
+      "de": "Bonding, Bündelung von Netzwerkschnittstellen"
     },
     {
       "term": "link aggregation",
@@ -624,7 +624,7 @@
     },
     {
       "term": "daemon",
-      "de": "Hintergrunddienst"
+      "de": "Daemon, Hintergrunddienst"
     },
     {
       "term": "configuration file",
@@ -680,7 +680,7 @@
     },
     {
       "term": "image",
-      "de": "Abbild (Festplatten- oder Container-Image)"
+      "de": "Image, Abbild (Festplatten- oder Container-Image)"
     },
     {
       "term": "registry",
@@ -749,7 +749,7 @@
     },
     {
       "term": "health check",
-      "de": "Gesundheitsprüfung, Dienstprüfung"
+      "de": "Health Check, Verfügbarkeitsprüfung eines Dienstes"
     },
     {
       "term": "heartbeat",

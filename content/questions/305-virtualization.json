@@ -58,7 +58,7 @@
         },
         {
           "text": "HVM guests share the host kernel, paravirtualized guests have their own.",
-          "text_de": "HVM-Gäste teilen den Host-Kernel, paravirtualisierte Gäste haben einen eigenen."
+          "text_de": "HVM-Gäste nutzen den Kernel des Hosts mit, paravirtualisierte Gäste haben einen eigenen."
         },
         {
           "text": "There is no difference, the terms are synonyms.",
@@ -602,7 +602,7 @@
       "type": "single",
       "difficulty": 1,
       "question": "Which command starts a container from the image nginx in the background and maps host port 8080 to container port 80?",
-      "question_de": "Welcher Befehl startet einen Container aus dem Image nginx im Hintergrund und leitet Host-Port 8080 auf Container-Port 80?",
+      "question_de": "Welcher Befehl startet einen Container aus dem Image nginx im Hintergrund und leitet den Host-Port 8080 auf den Container-Port 80 weiter?",
       "choices": [
         {
           "text": "docker run -d -p 8080:80 nginx",
@@ -761,7 +761,7 @@
       "choices": [
         {
           "text": "The smallest deployable unit: one or more containers sharing network and storage",
-          "text_de": "Die kleinste ausrollbare Einheit: ein oder mehrere Container mit gemeinsamem Netz und Speicher",
+          "text_de": "Die kleinste bereitstellbare Einheit: ein oder mehrere Container, die sich Netzwerk und Speicher teilen",
           "correct": true
         },
         {

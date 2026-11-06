@@ -694,7 +694,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which attack is prevented by salting password hashes?",
-      "question_de": "Welcher Angriff wird durch das Salzen von Passwort-Hashes verhindert?",
+      "question_de": "Welcher Angriff wird durch Salting von Passwort-Hashes verhindert?",
       "choices": [
         {
           "text": "Rainbow table attacks using precomputed hash tables",

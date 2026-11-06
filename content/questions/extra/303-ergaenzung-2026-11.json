@@ -137,7 +137,7 @@
       "choices": [
         {
           "text": "Public, append-only logs of issued certificates so that mis-issued certificates for a domain can be detected by its owner.",
-          "text_de": "Öffentliche, nur anfügbare Protokolle ausgestellter Zertifikate, so dass fehlerhaft ausgestellte Zertifikate für eine Domain vom Inhaber erkannt werden können.",
+          "text_de": "Öffentliche, nur erweiterbare (append-only) Protokolle ausgestellter Zertifikate, so dass fehlerhaft ausgestellte Zertifikate für eine Domain vom Inhaber erkannt werden können.",
           "correct": true
         },
         {
@@ -575,7 +575,7 @@
         },
         {
           "text": "Remove the DS record from the parent zone.",
-          "text_de": "Den DS-Eintrag aus der Elternzone entfernen."
+          "text_de": "Den DS-Eintrag aus der übergeordneten Zone entfernen."
         },
         {
           "text": "Shorten the TTL of the NSEC records.",
@@ -657,7 +657,7 @@
         },
         {
           "text": "The TLSA record must be published in the parent zone org.",
-          "text_de": "Der TLSA-Eintrag muss in der Elternzone org veröffentlicht sein."
+          "text_de": "Der TLSA-Eintrag muss in der übergeordneten Zone org veröffentlicht sein."
         },
         {
           "text": "OCSP stapling must be enabled on the mail server.",
@@ -1260,7 +1260,7 @@
       "objective": "333.1",
       "type": "single",
       "question": "A log file must be appendable by the logging daemon but must not be truncated, deleted or renamed, not even by root, until an administrator removes the protection. Which command sets this?",
-      "question_de": "Eine Protokolldatei muss vom Logdienst erweiterbar sein, darf aber weder gekürzt, gelöscht noch umbenannt werden, auch nicht von root, bis ein Administrator den Schutz aufhebt. Welcher Befehl setzt das?",
+      "question_de": "Der Logdienst muss an eine Protokolldatei anhängen können, sie darf aber weder gekürzt, gelöscht noch umbenannt werden, auch nicht von root, bis ein Administrator den Schutz aufhebt. Welcher Befehl setzt das?",
       "choices": [
         {
           "text": "chattr +a /var/log/secure.log",
@@ -1299,7 +1299,7 @@
       "objective": "333.2",
       "type": "single",
       "question": "An SSH daemon should listen on port 2222 on a SELinux enforcing system. Starting it fails with a permission denial on bind. Which command fixes this correctly?",
-      "question_de": "Ein SSH-Dienst soll auf einem SELinux-System im Enforcing-Modus auf Port 2222 lauschen. Der Start scheitert mit einer Verweigerung beim bind. Welcher Befehl behebt das korrekt?",
+      "question_de": "Ein SSH-Dienst soll auf einem SELinux-System im Enforcing-Modus auf Port 2222 lauschen. Der Start scheitert, weil bind() mit „Permission denied“ abgewiesen wird. Welcher Befehl behebt das korrekt?",
       "choices": [
         {
           "text": "semanage port -a -t ssh_port_t -p tcp 2222",
@@ -1572,7 +1572,7 @@
       "objective": "334.1",
       "type": "single",
       "question": "In Wireshark, an analyst wants to see the complete HTTP conversation between a client and a server reassembled in one window. Which function does this?",
-      "question_de": "In Wireshark möchte ein Analyst die vollständige HTTP-Unterhaltung zwischen Client und Server zusammengesetzt in einem Fenster sehen. Welche Funktion leistet das?",
+      "question_de": "In Wireshark möchte ein Analyst die vollständige HTTP-Kommunikation zwischen Client und Server zusammengesetzt in einem Fenster sehen. Welche Funktion leistet das?",
       "choices": [
         {
           "text": "Analyze › Follow › TCP Stream",
@@ -1728,7 +1728,7 @@
       "objective": "334.2",
       "type": "single",
       "question": "An OpenVAS scan of a web server reports no vulnerabilities although the server runs a very old Apache version. Which maintenance step was most likely skipped?",
-      "question_de": "Ein OpenVAS-Scan eines Webservers meldet keine Schwachstellen, obwohl der Server ein sehr altes Apache läuft. Welcher Wartungsschritt wurde am wahrscheinlichsten ausgelassen?",
+      "question_de": "Ein OpenVAS-Scan eines Webservers meldet keine Schwachstellen, obwohl auf dem Server eine sehr alte Apache-Version läuft. Welcher Wartungsschritt wurde am wahrscheinlichsten ausgelassen?",
       "choices": [
         {
           "text": "Updating the vulnerability test feed (greenbone-feed-sync / openvas-nvt-sync) before scanning",

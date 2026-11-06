@@ -138,4 +138,5 @@ Lerninhalte und importierte Prüfungsfragen sind davon nicht erfasst. Ihre Nutzu
 - Fehler und Ideen: [Issues](https://github.com/richtertoralf/LPIC-3-Trainer/issues)
 - Praxistests: Rückmeldungen aus einer Lerngruppe oder einem Linux-Verein nach dem Ablauf in [docs/pilotbetrieb.md](docs/pilotbetrieb.md)
 - Eigene Prüfungsfragen: Format in [content/README.md](content/README.md); nur selbst erstellte oder zulässig lizenzierte Fragen
+- Übersetzungen: Die deutschen Übersetzungen der Fragen, Antworten, Erklärungen und Fachbegriffe sollen natürliches, fachlich korrektes Administratoren-Deutsch sein. Bessere Formulierungen oder fachsprachliche Fehler bitte als [Issue](https://github.com/richtertoralf/LPIC-3-Trainer/issues) melden, mit Fragen-ID (steht in der Inhaltsdatei) und Vorschlag
 - Dokumentation und Code: [docs/entwicklung.md](docs/entwicklung.md)

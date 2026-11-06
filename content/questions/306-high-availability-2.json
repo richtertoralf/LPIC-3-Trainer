@@ -360,7 +360,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which DRBD command creates the metadata of the resource r0 on a new backing device before the resource is brought up for the first time?",
-      "question_de": "Welcher DRBD-Befehl erzeugt die Metadaten der Ressource r0 auf einem neuen Hintergrundgerät, bevor die Ressource erstmals aktiviert wird?",
+      "question_de": "Welcher DRBD-Befehl erzeugt die Metadaten der Ressource r0 auf einem neuen darunterliegenden Blockgerät (Backing Device), bevor die Ressource erstmals aktiviert wird?",
       "choices": [
         {
           "text": "drbdadm create-md r0",
@@ -615,11 +615,11 @@
         },
         {
           "text": "Striped volume",
-          "text_de": "Gestreiftes Volume"
+          "text_de": "Striped Volume"
         },
         {
           "text": "Arbiter-only volume",
-          "text_de": "Nur-Arbiter-Volume"
+          "text_de": "Reines Arbiter-Volume"
         }
       ],
       "explanation_de": "Replica-Volumes spiegeln Dateien; distributed-replicated kombiniert Verteilung und Spiegelung. Ein verteiltes Volume ohne Replikation verliert bei Brick-Ausfall die darauf liegenden Dateien. Ein Arbiter ist ein dritter Metadaten-Brick gegen Split Brain, kein eigener Volume-Typ.",
@@ -810,7 +810,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which bonding mode provides fault tolerance without any switch support by keeping only one slave active at a time?",
-      "question_de": "Welcher Bonding-Modus bietet Ausfallsicherheit ohne Switch-Unterstützung, indem nur eine Leitung gleichzeitig aktiv ist?",
+      "question_de": "Welcher Bonding-Modus bietet Ausfallsicherheit ohne Switch-Unterstützung, indem jeweils nur eine Schnittstelle (Slave) aktiv ist?",
       "choices": [
         {
           "text": "active-backup (mode 1)",

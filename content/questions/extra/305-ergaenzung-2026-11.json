@@ -55,11 +55,11 @@
       "objective": "351.1",
       "type": "single",
       "question": "A host with 32 GB RAM runs eight VMs with 8 GB each. Which mechanism allows this memory overcommitment to work in practice with KVM?",
-      "question_de": "Ein Host mit 32 GB RAM betreibt acht VMs mit je 8 GB. Welcher Mechanismus lässt diese Speicherüberbuchung mit KVM in der Praxis funktionieren?",
+      "question_de": "Auf einem Host mit 32 GB RAM laufen acht VMs mit jeweils 8 GB RAM. Welcher Mechanismus lässt diese Überbuchung des Arbeitsspeichers mit KVM in der Praxis funktionieren?",
       "choices": [
         {
           "text": "Memory ballooning (virtio-balloon) and kernel same-page merging (KSM) reclaim and share memory the guests do not actively use.",
-          "text_de": "Memory Ballooning (virtio-balloon) und Kernel Same-page Merging (KSM) gewinnen Speicher zurück und teilen Seiten, die Gäste nicht aktiv nutzen.",
+          "text_de": "Memory Ballooning (virtio-balloon) und Kernel Same-page Merging (KSM) geben ungenutzten Gastspeicher an den Host zurück und führen identische Speicherseiten zusammen.",
           "correct": true
         },
         {
@@ -76,7 +76,7 @@
         },
         {
           "text": "It cannot work; libvirt refuses to start the ninth VM.",
-          "text_de": "Es kann nicht funktionieren; libvirt verweigert den Start."
+          "text_de": "Das kann nicht funktionieren; libvirt verweigert den Start der neunten VM."
         }
       ],
       "explanation_de": "Der Balloon-Treiber gibt Speicher des Gastes an den Host zurück (virsh setmem), KSM führt identische Seiten zusammen. Überbuchung birgt Risiken: bei echter Vollauslastung lagert der Host aus oder der OOM-Killer greift.",
@@ -172,11 +172,11 @@
       "objective": "351.1",
       "type": "single",
       "question": "Which type of snapshot can be taken from a running VM so that the exact state including memory can be resumed later?",
-      "question_de": "Welche Art von Snapshot kann von einer laufenden VM erstellt werden, so dass der exakte Zustand einschließlich Speicher später fortgesetzt werden kann?",
+      "question_de": "Welche Art von Snapshot kann von einer laufenden VM erstellt werden, sodass die VM später exakt an diesem Zustand einschließlich Arbeitsspeicher fortgesetzt werden kann?",
       "choices": [
         {
           "text": "A system checkpoint (internal snapshot with memory state), e.g. virsh snapshot-create-as without --disk-only",
-          "text_de": "Ein Systemprüfpunkt (interner Snapshot mit Speicherzustand), z. B. virsh snapshot-create-as ohne --disk-only",
+          "text_de": "Ein System-Checkpoint (interner Snapshot mit Speicherzustand), z. B. virsh snapshot-create-as ohne --disk-only",
           "correct": true
         },
         {
@@ -406,7 +406,7 @@
       "objective": "351.3",
       "type": "single",
       "question": "A running QEMU instance was started with -monitor unix:/tmp/vm1.mon,server,nowait. Which command adds a second virtual disk /srv/data.qcow2 without stopping the guest?",
-      "question_de": "Eine laufende QEMU-Instanz wurde mit -monitor unix:/tmp/vm1.mon,server,nowait gestartet. Welcher Befehl fügt ohne Stopp des Gastes eine zweite virtuelle Platte /srv/data.qcow2 hinzu?",
+      "question_de": "Eine laufende QEMU-Instanz wurde mit -monitor unix:/tmp/vm1.mon,server,nowait gestartet. Welcher Befehl fügt im laufenden Betrieb eine zweite virtuelle Platte /srv/data.qcow2 hinzu?",
       "choices": [
         {
           "text": "Connect with socat - UNIX-CONNECT:/tmp/vm1.mon and issue drive_add 0 file=/srv/data.qcow2,if=none,id=d1 followed by device_add virtio-blk-pci,drive=d1",
@@ -1108,7 +1108,7 @@
       "objective": "352.2",
       "type": "single",
       "question": "A freshly installed LXD must be initialized with a storage pool on the directory backend and a NAT bridge, non-interactively. Which command does this?",
-      "question_de": "Ein frisch installiertes LXD soll nicht interaktiv mit einem Speicherpool auf dem Verzeichnis-Backend und einer NAT-Brücke initialisiert werden. Welcher Befehl leistet das?",
+      "question_de": "Ein neu installiertes LXD soll ohne interaktive Rückfragen mit einem Speicherpool auf dem Verzeichnis-Backend und einer NAT-Brücke initialisiert werden. Welcher Befehl leistet das?",
       "choices": [
         {
           "text": "lxd init --auto --storage-backend dir",
@@ -1576,7 +1576,7 @@
       "objective": "352.4",
       "type": "single",
       "question": "In a docker-compose.yml, the web service must start only after the database container is healthy, not merely started. Which configuration expresses this?",
-      "question_de": "In einer docker-compose.yml soll der Dienst web erst starten, wenn der Datenbankcontainer gesund ist, nicht nur gestartet. Welche Konfiguration drückt das aus?",
+      "question_de": "In einer docker-compose.yml soll der Dienst web erst starten, wenn der Datenbankcontainer als healthy gemeldet wird, nicht nur gestartet ist. Welche Konfiguration drückt das aus?",
       "choices": [
         {
           "text": "A healthcheck on db and depends_on with condition: service_healthy on web",

@@ -713,7 +713,7 @@
       "type": "single",
       "difficulty": 2,
       "question": "Which Dockerfile practice reduces the image size and the number of layers for a package installation?",
-      "question_de": "Welche Dockerfile-Praxis verringert bei einer Paketinstallation die Imagegröße und die Zahl der Schichten?",
+      "question_de": "Welche Vorgehensweise im Dockerfile verringert bei einer Paketinstallation die Imagegröße und die Zahl der Layer?",
       "choices": [
         {
           "text": "Combine update, install and cache cleanup in one RUN instruction with &&",
