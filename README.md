@@ -108,6 +108,16 @@ Funktionstest: `lpic3ctl --status` zeigt Dienst, Datenbank und die Adresse `http
 
 Die Befehle folgen dem einheitlichen Verwaltungsstandard der RICHTER.PROJECTS-Anwendungen. Die bisherigen Unterbefehle (`lpic3ctl status`, `upgrade`, `backup`, `restore`, `rollback`, `user`, …) bleiben gültig; vollständige Liste in [docs/administration.md](docs/administration.md).
 
+**Konfiguration nach einem Upgrade vergleichen.** Die zentrale Konfiguration bleibt `/etc/lpic3-trainer/lpic3-trainer.env`. Ein Upgrade verändert diese Datei nicht und ergänzt keine neuen Variablen; das ist so gewollt. Fehlende Variablen laufen mit den Standardwerten der Anwendung. Vergleiche deshalb nach jedem Upgrade die Beispielkonfiguration der installierten Version mit deiner Datei und übernimm neue Einstellungen bei Bedarf von Hand:
+
+```sh
+sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /opt/lpic3-trainer/app/deploy/lpic3-trainer.env.example
+sudo lpic3ctl --restart    # nach Änderungen
+sudo lpic3ctl --check
+```
+
+Die Beispieldatei wird mit jeder Installation kopiert; alternativ die Fassung des installierten Release-Tags von GitHub nehmen, nicht `main`. Die vorhandene Konfiguration wird nie automatisch überschrieben. Einzelheiten in [docs/installation.md](docs/installation.md#konfiguration-nach-dem-upgrade-vergleichen).
+
 ## Installation und Dokumentation
 
 - [Installation](docs/installation.md): native Installation mit systemd (Standardweg), Konfiguration, Update, Docker Compose (optional); [Installationstest](docs/installationstest.md) mit Ergebnissen und Testplan
