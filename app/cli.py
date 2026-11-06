@@ -182,8 +182,14 @@ def cmd_migrate(args) -> int:
 
 
 def cmd_content_sync(args) -> int:
+    # Alembic's INFO lines belong to the service journal, not to this command's output; the
+    # resulting schema revision is reported in one line instead.
+    os.environ.setdefault("LPIC3_QUIET_MIGRATIONS", "1")
     say("Mitgelieferte Inhalte werden importiert ...")
     _migrate_and_sync(quiet=False)
+    from app.migrate import current_revision
+
+    say(f"Datenbankschema: {current_revision()}")
     return EXIT_OK
 
 
@@ -933,7 +939,8 @@ def cmd_upgrade(args) -> int:
             shutil.rmtree(tmp, ignore_errors=True)
         raise CliError(f"{source} enthält keinen LPIC-3-Trainer-Quellcode.", EXIT_USAGE)
     try:
-        return _perform_upgrade(source, args)
+        # The release path already printed "Installiert: …, neuestes stabiles Release: …".
+        return _perform_upgrade(source, args, announce=bool(args.source))
     finally:
         if tmp:
             shutil.rmtree(tmp, ignore_errors=True)
@@ -977,8 +984,23 @@ def _probe_new_version(stage: Path) -> None:
         )
 
 
-def _perform_upgrade(source: Path, args) -> int:
-    say(f"Installierte Version: {_installed_version()}")
+def _stamp_installed_at(target: Path) -> None:
+    """Set ``installed_at`` in ``BUILD`` to now: the moment the files went live, not the moment
+    they were copied into the staging directory (observed on codex-dev: 16 s difference)."""
+    build = target / "BUILD"
+    if not build.is_file():
+        return
+    now = datetime.now().astimezone().isoformat(timespec="seconds")
+    lines = [
+        f"installed_at={now}" if line.startswith("installed_at=") else line
+        for line in build.read_text().splitlines()
+    ]
+    build.write_text("".join(f"{line}\n" for line in lines))
+
+
+def _perform_upgrade(source: Path, args, announce: bool = True) -> int:
+    if announce:
+        say(f"Installiert: {_version_line()}")
     # 1. Stage and check the new version while the service keeps running.
     if STAGING_DIR.exists():
         shutil.rmtree(STAGING_DIR)
@@ -1003,6 +1025,7 @@ def _perform_upgrade(source: Path, args) -> int:
             shutil.rmtree(PREVIOUS_DIR)
         shutil.move(str(APP_DIR), str(PREVIOUS_DIR))
         shutil.move(str(STAGING_DIR), str(APP_DIR))
+        _stamp_installed_at(APP_DIR)
         _create_venv()
         _write_env_file()
         _chown_service_files()
@@ -1023,7 +1046,7 @@ def _perform_upgrade(source: Path, args) -> int:
         systemctl("restart", SERVICE_NAME)
     elif not was_active:
         say("Der Dienst war gestoppt und bleibt gestoppt.")
-    say(f"Upgrade abgeschlossen. Neue Version: {_installed_version()}")
+    say(f"Upgrade abgeschlossen. Neue Version: {_version_line()}")
     say(f"Vorherige Programmdateien liegen unter {PREVIOUS_DIR} ('lpic3ctl rollback').")
     return EXIT_OK
 

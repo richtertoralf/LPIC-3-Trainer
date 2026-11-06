@@ -11,6 +11,8 @@ import re
 import stat
 import subprocess
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -76,6 +78,10 @@ def test_01_install(env):
     root = Path(env["_root"])
     r = cli(env, "install", "--source", str(PROJECT_DIR))
     assert r.returncode == 0, r.stdout + r.stderr
+    # codex-dev findings: no setuptools banner from the editable install, no Alembic INFO
+    # lines in the administrator's output; the schema is reported in one line instead
+    assert "BuildBackendWarning" not in r.stdout + r.stderr
+    assert "[alembic" not in r.stdout + r.stderr and "Datenbankschema: " in r.stdout
     assert (root / "opt" / "app" / "pyproject.toml").is_file()
     assert (root / "opt" / "app" / "content" / "objectives" / "303.json").is_file()
     assert not (root / "opt" / "app" / ".git").exists()
@@ -155,11 +161,18 @@ def test_03b_upgrade_installs_newest_stable_release_tag(env, tmp_path_factory):
     subprocess.run(["git", "-C", str(remote), "tag", "v99.0.0"], check=True)
     subprocess.run(["git", "-C", str(remote), "tag", "v99.1.0-rc1"], check=True)
     env2 = {**env, "LPIC3_UPGRADE_REMOTE": str(remote)}
+    staged = time.time()
     r = cli(env2, "--upgrade")
     assert r.returncode == 0, r.stdout + r.stderr
     assert "v99.0.0" in r.stdout and "rc1" not in r.stdout
+    # the installed version is announced once (codex-dev finding: two lines in two formats)
+    assert r.stdout.count("Installiert") == 1 and "Installierte Version:" not in r.stdout
+    assert "Neue Version: LPIC-3 Trainer " in r.stdout
     build = (root / "opt" / "app" / "BUILD").read_text()
     assert "release=v99.0.0" in build and "dirty=false" in build
+    # installed_at is the moment the files went live, after staging, backup and venv build
+    installed_at = re.search(r"^installed_at=(.+)$", build, re.M).group(1)
+    assert datetime.fromisoformat(installed_at).timestamp() > staged + 1
     r = cli(env2, "--version")
     assert r.returncode == 0 and r.stdout.startswith("LPIC-3 Trainer ")
     assert "release v99.0.0" in r.stdout and "commit " in r.stdout and "installiert " in r.stdout

@@ -141,6 +141,19 @@ def test_build_release_is_the_highest_stable_tag_on_the_commit(tmp_path):
     assert "release=v1.1.0-rc1\n" in (repo / "BUILD").read_text(), "fallback: git describe"
 
 
+def test_stamp_installed_at_rewrites_only_the_timestamp(tmp_path):
+    build = tmp_path / "BUILD"
+    build.write_text(
+        "version=0.0.5\ncommit=abc\ninstalled_at=2026-11-06T15:10:38+01:00\nsource=/x\n"
+    )
+    cli._stamp_installed_at(tmp_path)
+    text = build.read_text()
+    assert "installed_at=2026-11-06T15:10:38+01:00" not in text
+    assert text.startswith("version=0.0.5\ncommit=abc\ninstalled_at=")
+    assert text.endswith("source=/x\n")
+    cli._stamp_installed_at(tmp_path / "missing")  # no BUILD: nothing to do, no error
+
+
 def test_upgrade_remote_comes_from_the_central_env_file(tmp_path, monkeypatch):
     """Found in the container test: the remote was read at import time, so a mirror set in
     /etc/lpic3-trainer/lpic3-trainer.env was ignored."""
