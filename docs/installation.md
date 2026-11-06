@@ -47,7 +47,7 @@ Ist der Port bereits belegt, warnt die Installation. Dann `LPIC3_PORT` in der Ko
 
 Dateirechte nach der Installation: `/opt/lpic3-trainer` gehört root (nur lesbar für den Dienst), `/etc/lpic3-trainer` ist `0750 root:lpic3`, die Datei `lpic3-trainer.env` `0640 root:lpic3`, `/var/lib/lpic3-trainer` gehört `lpic3` (`0750`, Datenbank `0640`). Die systemd-Unit läuft mit `ProtectSystem=strict`, ohne Capabilities und mit Systemaufruffilter (`systemd-analyze security`: 1.3 bis 2.0, OK); sie darf nur in das Datenverzeichnis schreiben und kann keine Ports unter 1024 binden, dafür ist der Reverse Proxy zuständig.
 
-Ohne Root liefern `lpic3ctl status` und `check` nur Standardwerte, weil die Konfiguration nicht lesbar ist; beide weisen darauf hin.
+Ohne Root ist die Konfiguration nicht lesbar: `lpic3ctl --status` zeigt dann nur Version und Dienstzustand und bittet um `sudo lpic3ctl --status`; `check` arbeitet mit Standardwerten und weist darauf hin.
 
 ### 3. Status prüfen
 
@@ -59,7 +59,7 @@ sudo lpic3ctl logs -n 50 # Protokolle aus journald
 curl http://127.0.0.1:8000/health
 ```
 
-`--status` endet mit 0, wenn kein technischer Fehler vorliegt, auch bei bewusst gestopptem Dienst; mit 1 bei `failed`, bei aktivem Dienst ohne Antwort am Health-Endpunkt oder ohne Installation; mit 2 bei ungültiger Konfiguration. Ohne Root ist die Konfiguration nicht lesbar, `--status` weist darauf hin und zeigt Standardwerte.
+`--status` endet mit 0, wenn kein technischer Fehler vorliegt, auch bei bewusst gestopptem Dienst; mit 1 bei `failed`, bei aktivem Dienst ohne Antwort am Health-Endpunkt oder ohne Installation; mit 2 bei ungültiger Konfiguration. Ohne Root ist die Konfiguration nicht lesbar; `--status` zeigt dann Version und Dienstzustand und den Hinweis „Bitte sudo lpic3ctl --status verwenden.“ statt irreführender Standardwerte. Bei `LPIC3_HOST=0.0.0.0` listet `--status` jede LAN- und VPN-Adresse des Servers mit Port und Schnittstelle (ohne Container- und VM-Bridges); das sind die konfigurierten Adressen, die Erreichbarkeit aus dem Netz prüft der Befehl nicht.
 
 ### 4. Erster Administrator und Browserzugriff
 
@@ -217,7 +217,7 @@ Standardweg: auf das neueste stabile Release aktualisieren.
 sudo lpic3ctl --upgrade
 ```
 
-`--upgrade` fragt die Tags des Repositorys ab und nimmt das höchste `vX.Y.Z`. Vorabversionen (`v1.0.0-rc1`) und der Branch `main` werden nie automatisch installiert. Ist das Release bereits installiert, meldet der Befehl „Bereits aktuell“ und ändert nichts, insbesondere kein Neustart (Exit 0). Ist der installierte Stand neuer (Entwicklungsinstallation aus einem Checkout), gibt es kein Downgrade. Ohne Netz oder ohne Zugriff auf GitHub bricht der Befehl vor jeder Änderung mit Exit 1 ab.
+`--upgrade` fragt die Tags des Repositorys ab und nimmt das höchste `vX.Y.Z`. Vorabversionen (`v1.0.0-rc1`) und der Branch `main` werden nie automatisch installiert. Ist das Release bereits installiert, meldet der Befehl „Bereits aktuell“ und ändert nichts, insbesondere kein Neustart (Exit 0). Ist der installierte Stand neuer (Entwicklungsinstallation aus einem Checkout), gibt es kein Downgrade. Trägt eine Entwicklungsinstallation dieselbe Versionsnummer wie das Release, aber einen anderen Commit, einen Branch oder lokale Änderungen, meldet der Befehl das als Entwicklungsstand und ersetzt nichts; das Release lässt sich dann bewusst mit `--upgrade --source` aus einem Checkout des Tags installieren. Ohne Netz oder ohne Zugriff auf GitHub bricht der Befehl vor jeder Änderung mit Exit 1 ab.
 
 Manueller Weg für Entwicklungsstände, Offline-Server oder eine ältere Version: aus einem lokalen Checkout upgraden.
 

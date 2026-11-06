@@ -6,6 +6,8 @@ userdel and systemctl, so every file system step and the command sequence are ve
 """
 
 import os
+import pwd
+import re
 import stat
 import subprocess
 import sys
@@ -97,7 +99,12 @@ def test_01_install(env):
     build = (root / "opt" / "app" / "BUILD").read_text()
     assert "version=0." in build and "commit=" in build and "installed_at=" in build
     log = stub_log(env)
-    assert "useradd --system --home-dir" in log and "--shell /usr/sbin/nologin" in log
+    try:
+        pwd.getpwnam("lpic3")
+    except KeyError:
+        assert "useradd --system --home-dir" in log and "--shell /usr/sbin/nologin" in log
+    else:  # the host already has the service account (real installation); useradd is skipped
+        assert "useradd" not in log
     assert "systemctl daemon-reload" in log
     assert "systemctl enable lpic3-trainer" in log
     assert "systemctl restart lpic3-trainer" in log
@@ -161,6 +168,21 @@ def test_03b_upgrade_installs_newest_stable_release_tag(env, tmp_path_factory):
     r = cli(env2, "--upgrade")
     assert r.returncode == 0 and "Bereits aktuell" in r.stdout, r.stdout + r.stderr
     assert stub_log(env) == before
+    # development installation with the release's version number: hint, no replacement
+    build_file = root / "opt" / "app" / "BUILD"
+    original = build_file.read_text()
+    build_file.write_text(
+        re.sub(r"^version=.*$", "version=99.0.0", original, flags=re.M)
+        .replace("release=v99.0.0", "release=")
+        .replace("dirty=false", "dirty=true")
+        + "branch=feat/x\n"
+    )
+    before = stub_log(env)
+    r = cli(env2, "--upgrade")
+    assert r.returncode == 0 and "Entwicklungsstand" in r.stdout, r.stdout + r.stderr
+    assert "Bereits aktuell" not in r.stdout and "--source" in r.stdout
+    assert stub_log(env) == before and build_file.read_text() != original
+    build_file.write_text(original)
     # unreachable remote: exit 1, installation untouched
     r = cli({**env, "LPIC3_UPGRADE_REMOTE": str(remote) + "-missing"}, "--upgrade")
     assert r.returncode == 1 and "unverändert" in r.stderr and "--source" in r.stderr

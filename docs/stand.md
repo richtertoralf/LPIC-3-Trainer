@@ -10,6 +10,14 @@ Positionierung: gezielte, zügige Vorbereitung auf die englischsprachigen LPIC-3
 
 ## Erledigt
 
+### lpic3ctl: Status ohne Root, Adressen, Entwicklungsinstallation (Praxistest codex-dev, 6. November 2026)
+
+- `--status` ohne Root: zeigt Version und Dienstzustand und dann nur „Bitte sudo lpic3ctl --status verwenden.“; vorher erschienen aus Standardwerten abgeleitete, irreführende Zeilen (falscher Datenbankpfad, „Schema: nicht lesbar (PermissionError)“). Dateirechte unverändert.
+- `--status` bei `LPIC3_HOST=0.0.0.0`: alle IPv4-Adressen des Servers mit Port und Schnittstelle (Loopback, LAN, VPN wie `wg0`/`tun0`), Bridges und veths von Docker, libvirt, LXD, Incus, Podman und CNI gefiltert; Zusatzzeile „konfigurierte Adressen; Erreichbarkeit aus dem Netz nicht geprüft“. Nur `ip` aus iproute2, keine Python-Abhängigkeit.
+- `--upgrade` unterscheidet Release und Entwicklungsstand: `git ls-remote` liefert jetzt auch den Commit des Tags (annotierte Tags über die `^{}`-Zeile). Gleich ist nur eine Installation aus dem Tag oder von genau diesem Commit ohne lokale Änderungen; sonst Hinweis mit Grund (dirty, Branch, Commit X statt Y) und dem Weg über `--upgrade --source`, keine Ersetzung, Exit 0. Upgrade- und Rollback-Mechanismus unverändert.
+- Regressionstests in `tests/test_cli_standard.py` (Hinweis ohne Rechte, Adressen mit Schnittstelle, Release-Commit, Entwicklungsstand) und `tests/test_cli_install.py` (Entwicklungsinstallation mit Release-Versionsnummer wird nicht ersetzt).
+- Nebenbefund: Die unprivilegierten Installationstests scheiterten, sobald auf dem Host ein echter `lpic3`-Benutzer existiert (`chown` ohne Root); `_chown_service_files` arbeitet jetzt nur als Root.
+
 ### Offlinefähigkeit und Betriebsanforderungen (Issue #12, 6. November 2026)
 
 - Prüfung: Alle Webressourcen (HTML, CSS, JavaScript, Icons, Manifest, Service Worker) kommen vom eigenen Server, Schriften aus dem System, keine CDNs, keine Webfonts, kein Analytics oder Tracking, keine externen APIs; der Service Worker bearbeitet nur den eigenen Ursprung. Vom Server gehen Verbindungen nach außen nur bei Installation (apt, PyPI, GitHub), `--upgrade` von GitHub und `version --remote`; Links zu LPI und Quellen öffnet der Browser des Lernenden. Keine Änderung am Programm nötig, vorhandene Lösungen beibehalten.

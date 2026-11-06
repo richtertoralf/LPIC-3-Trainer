@@ -31,6 +31,9 @@ def env(tmp_path):
         "PATH": os.environ.get("PATH", ""),
         "LANG": "C.UTF-8",
         "LPIC3_DATA_DIR": str(tmp_path / "data"),
+        # keep the test away from a real installation on the host (/etc, systemd unit)
+        "LPIC3_CONFIG_DIR": str(tmp_path / "etc"),
+        "LPIC3_SYSTEMD_DIR": str(tmp_path / "systemd"),
         "LPIC3_PORT": str(port),
         "LPIC3_HOST": "127.0.0.1",
         "LPIC3_LOG_LEVEL": "warning",
