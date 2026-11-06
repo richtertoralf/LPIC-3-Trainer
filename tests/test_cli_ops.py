@@ -11,7 +11,15 @@ from tests.conftest import PROJECT_DIR
 
 
 def run_cli(data_dir, *args, input_text=None):
-    env = {"LPIC3_DATA_DIR": str(data_dir), "PATH": os.environ.get("PATH", ""), "LANG": "C.UTF-8"}
+    env = {
+        "LPIC3_DATA_DIR": str(data_dir),
+        # keep the test away from a real installation on the host (/etc, systemd unit)
+        "LPIC3_CONFIG_DIR": os.path.join(str(data_dir), "etc"),
+        "LPIC3_SYSTEMD_DIR": os.path.join(str(data_dir), "systemd"),
+        "LPIC3_PORT": "18764",  # not the port of a real installation on the host
+        "PATH": os.environ.get("PATH", ""),
+        "LANG": "C.UTF-8",
+    }
     return subprocess.run(
         [sys.executable, "-m", "app.cli", *args],
         capture_output=True,

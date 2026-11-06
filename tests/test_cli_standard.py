@@ -106,6 +106,14 @@ def test_newest_stable_tag_ignores_prereleases(tmp_path):
     assert cli._latest_stable_tag(str(repo)) == ("v0.10.0", (0, 10, 0))
     with pytest.raises(cli.CliError, match="unverändert"):
         cli._latest_stable_tag(str(tmp_path / "missing"))
+    # the commit a release points to, also for annotated tags (peeled "^{}" line of ls-remote)
+    head = subprocess.run([*git, "rev-parse", "HEAD"], capture_output=True, text=True).stdout
+    assert cli._latest_stable_release(str(repo)) == ("v0.10.0", (0, 10, 0), head.strip())
+    subprocess.run(
+        [*git, "-c", "user.name=t", "-c", "user.email=t@x", "tag", "-a", "v0.11.0", "-m", "r"],
+        check=True,
+    )
+    assert cli._latest_stable_release(str(repo)) == ("v0.11.0", (0, 11, 0), head.strip())
     assert cli._parse_version("v0.0.3") == (0, 0, 3) and cli._parse_version("0.0.3") == (0, 0, 3)
     assert cli._parse_version("v0.0.3-4-gabcdef") is None and cli._parse_version("main") is None
 
@@ -170,9 +178,43 @@ def test_access_urls_skip_virtual_interfaces():
         "7: virbr0    inet 192.168.122.1/24 scope global virbr0\n"
     )
     assert cli._lan_addresses(sample) == ["10.77.0.108", "172.16.90.123"]
+    # LAN and VPN addresses stay, each labelled with its interface
+    assert cli._host_addresses(sample) == [("enp1s0", "10.77.0.108"), ("wg0", "172.16.90.123")]
+    assert cli._host_addresses("8: incusbr0    inet 10.1.1.1/24 scope global incusbr0\n") == []
+    assert cli._host_addresses("9: podman0    inet 10.88.0.1/16 scope global podman0\n") == []
+    assert cli._host_addresses("3: tun0    inet 10.8.0.2/24 scope global tun0\n") == [
+        ("tun0", "10.8.0.2")
+    ]
     assert cli._access_urls("127.0.0.1", 8000) == ["http://127.0.0.1:8000/"]
     assert cli._access_urls("192.168.1.20", 8080) == ["http://192.168.1.20:8080/"]
-    assert cli._access_urls("0.0.0.0", 8000)[0] == "http://127.0.0.1:8000/"
+    assert cli._access_urls("0.0.0.0", 8000)[0] == "http://127.0.0.1:8000/ (lo)"
+    assert all(url.endswith(")") for url in cli._access_urls("0.0.0.0", 8000))
+
+
+def test_development_state_distinguishes_release_from_working_tree():
+    """codex-dev finding: an installation from a dirty branch with the release's version number
+    was reported as 'Bereits aktuell'. Release installs (from the tag or its exact commit)
+    are current; everything else is named with its reason."""
+    release_commit = "97bc3a98c12061e2ab7f8666cd6cc0ceb140d950"
+    assert cli._development_state({"release": "v0.0.4", "commit": "x", "dirty": "false"}) == ""
+    assert (
+        cli._development_state(
+            {"release": "", "branch": "", "commit": release_commit, "dirty": "false"},
+            release_commit,
+        )
+        == ""
+    )
+    dev = {"release": "", "branch": "docs/x", "commit": "07af36dc75", "dirty": "true"}
+    assert cli._development_state(dev, release_commit) == (
+        "lokale Änderungen (dirty), Branch docs/x, Commit 07af36d statt 97bc3a9"
+    )
+    main = {"release": "", "branch": "main", "commit": "07af36dc75", "dirty": "false"}
+    assert cli._development_state(main, release_commit) == (
+        "Branch main, Commit 07af36d statt 97bc3a9"
+    )
+    assert cli._development_state({"release": "", "commit": "07af36dc75"}) == (
+        "Commit 07af36d ohne Release-Tag"
+    )
 
 
 @pytest.fixture
@@ -233,5 +275,27 @@ def test_status_shows_lan_urls_when_bound_to_all_interfaces(fake_install):
         "LPIC3_PORT=18999\nLPIC3_HOST=0.0.0.0\n"
     )
     r = status(fake_install, "inactive")
-    assert "Adresse:       http://127.0.0.1:18999/" in r.stdout
+    assert "Adresse:       http://127.0.0.1:18999/ (lo)" in r.stdout
     assert r.stdout.count("Adresse:") == 1 + len(cli._lan_addresses())
+    for iface, address in cli._host_addresses():
+        assert f"http://{address}:18999/ ({iface})" in r.stdout
+    assert "Erreichbarkeit aus dem Netz nicht geprüft" in r.stdout
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can read everything")
+def test_status_without_privileges_gives_one_clear_hint(fake_install):
+    """codex-dev finding: without sudo, --status printed a wrong database path and a schema
+    error derived from defaults. Now: version and service state, then the hint, nothing else."""
+    env_file = Path(fake_install["LPIC3_CONFIG_DIR"], "lpic3-trainer.env")
+    env_file.chmod(0)
+    try:
+        r = status(fake_install, "inactive")
+    finally:
+        env_file.chmod(0o644)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "Bitte sudo lpic3ctl --status verwenden." in r.stdout
+    assert "Dienst:        inactive" in r.stdout
+    assert "Datenbank:" not in r.stdout and "Schema:" not in r.stdout
+    assert "Adresse:" not in r.stdout and "Health-Check:" not in r.stdout
+    r = status(fake_install, "failed")
+    assert r.returncode == 1  # the unit state is still judged
