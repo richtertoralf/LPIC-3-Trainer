@@ -110,6 +110,29 @@ def test_newest_stable_tag_ignores_prereleases(tmp_path):
     assert cli._parse_version("v0.0.3-4-gabcdef") is None and cli._parse_version("main") is None
 
 
+def test_build_release_is_the_highest_stable_tag_on_the_commit(tmp_path):
+    """A commit may carry several tags (e.g. the real release tag and a later re-tag). BUILD
+    records the highest stable one, which is the tag ``--upgrade`` installs; ``git describe``
+    alone would prefer an annotated tag regardless of its version."""
+    repo = tmp_path / "repo"
+    (repo / "app").mkdir(parents=True)
+    (repo / "app" / "__init__.py").write_text('__version__ = "1.0.0"\n')
+    git = ["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@example.org"]
+    subprocess.run(["git", "init", "--quiet", str(repo)], check=True)
+    subprocess.run([*git, "add", "."], check=True)
+    subprocess.run([*git, "commit", "--quiet", "-m", "init"], check=True)
+    subprocess.run([*git, "tag", "-a", "v0.0.4", "-m", "annotated older release"], check=True)
+    subprocess.run([*git, "tag", "v1.0.0"], check=True)
+    subprocess.run([*git, "tag", "v1.1.0-rc1"], check=True)
+    cli._write_build_info(repo, repo)
+    build = (repo / "BUILD").read_text()
+    assert "release=v1.0.0\n" in build and "version=1.0.0\n" in build, build
+
+    subprocess.run([*git, "tag", "-d", "v0.0.4", "v1.0.0"], check=True, capture_output=True)
+    cli._write_build_info(repo, repo)
+    assert "release=v1.1.0-rc1\n" in (repo / "BUILD").read_text(), "fallback: git describe"
+
+
 def test_upgrade_remote_comes_from_the_central_env_file(tmp_path, monkeypatch):
     """Found in the container test: the remote was read at import time, so a mirror set in
     /etc/lpic3-trainer/lpic3-trainer.env was ignored."""
