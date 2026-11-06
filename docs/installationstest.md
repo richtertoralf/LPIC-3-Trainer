@@ -140,3 +140,19 @@ Umgebung: LXD-Systemcontainer `lpic3-ubu26` (Ubuntu 26.04 daily 20261016, Python
 Kosmetischer Befund: In einer Pipe erschienen die Meldungen von `lpic3ctl` nach denen der Kindprozesse (gepufferte Ausgabe). Behoben durch `flush` in `say`/`warn`. Die pip-Warnung „BuildBackendWarning: Editable installation“ unter Python 3.14 stammt von setuptools und ist unkritisch.
 
 Nicht geprüft: `--upgrade --purge`-Kombinationen, ARM64, blankes Metall, Docker.
+
+## 7. Erstes reales Upgrade von GitHub (6. November 2026)
+
+Umgebung: Entwicklungsrechner `codex-dev` (Ubuntu 26.04, systemd), echte Installation aus dem Arbeitsverzeichnis (Version 0.0.4, Branch `docs/offline-requirements-issue-12`, dirty), `LPIC3_HOST=0.0.0.0`, `LPIC3_PASSWORD_MIN_LENGTH=5`. Ausgeführt vom Auftraggeber, Protokoll geprüft.
+
+| Schritt | Ergebnis |
+|---|---|
+| `sudo lpic3ctl --upgrade` vor der Veröffentlichung von v0.0.5 | „Installiert: 0.0.4, neuestes stabiles Release: v0.0.4. Bereits aktuell.“ Das war noch das `lpic3ctl` aus 0.0.4; die Unterscheidung von Entwicklungsstand und Release (Abschnitt *CLI-Standard* in `docs/stand.md`) greift ab 0.0.5. |
+| `sudo lpic3ctl --upgrade` nach der Veröffentlichung | Tag v0.0.5 erkannt, neue Version neben der laufenden aufgebaut und geprüft, Sicherung `lpic3-trainer-backup-20261106-151054.tar.gz`, Tausch, venv erneuert, Konfiguration erhalten, Inhaltsimport (490 Fragen und 271 Begriffe aktualisiert, LABs unverändert), Neustart, „Upgrade abgeschlossen. Neue Version: v0.0.5“, `app.previous` für `rollback` vorhanden. Exit 0. |
+| `lpic3ctl --version` | `LPIC-3 Trainer 0.0.5 (commit 9577995, release v0.0.5, installiert 2026-11-06T15:10:38+01:00)`, Commit ist der Merge-Commit des Release-Tags |
+| `sudo lpic3ctl --status` | Dienst `active`, Autostart `enabled`, Schema 0007 (WAL), Health ok (Version 0.0.5); Adressen `lo`, `enp1s0` (LAN) und `wg0` (VPN) mit Port, LXD-Bridge gefiltert, Zusatzzeile zur ungeprüften Erreichbarkeit |
+| `diff` env-Datei gegen mitinstallierte Beispieldatei | nur die bewusst gesetzten Werte (`LPIC3_HOST`, `LPIC3_PASSWORD_MIN_LENGTH`) unterscheiden sich, keine fehlenden Variablen |
+
+Erwartetes Verhalten: Die Entwicklungsinstallation wurde durch das Release ersetzt, weil 0.0.4 kleiner als 0.0.5 ist; der Schutz vor ungefragter Ersetzung gilt nur bei gleicher Versionsnummer.
+
+Kosmetische Befunde, behoben: (1) setuptools-Warnung „BuildBackendWarning: Editable installation“ erschien zweimal (Prüf-venv und venv), jetzt in `deploy/create-venv.sh` unterdrückt; (2) „Installiert: 0.0.4, …“ und „Installierte Version: v0.0.4-8-g07af36d-dirty“ sagten dasselbe in zwei Formaten, jetzt eine Zeile, und „Neue Version“ nennt die vollständige Versionszeile; (3) Alembic-INFO-Zeilen im Inhaltsimport, ersetzt durch „Datenbankschema: 0007“; (4) `installed_at` in `BUILD` war der Zeitpunkt der Kopie in den Staging-Bereich (15:10:38) statt des Tauschs (nach 15:10:54), jetzt wird der Zeitstempel beim Tausch gesetzt. Ohne Handlungsbedarf: Der Ähnlichkeitsvergleich des Imports meldet die WireGuard-Frage 303-334.4-01 und die eCryptfs-Frage 303-erg-331.3-02 wegen des gleichen Satzbaus „Which statement about … is correct?“ als ähnlich; inhaltlich ein Fehlalarm.

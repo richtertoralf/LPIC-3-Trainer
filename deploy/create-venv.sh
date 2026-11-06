@@ -9,4 +9,6 @@ if [ ! -x "$VENV/bin/python" ]; then
 fi
 "$VENV/bin/python" -m pip install --quiet --upgrade pip
 # Editable install: the package stays in $APP so that content/, migrations/ and alembic.ini are found.
-"$VENV/bin/python" -m pip install --quiet --editable "$APP"
+# setuptools prints a "BuildBackendWarning: Editable installation" banner for every editable
+# install; it is advice for developers, not for administrators, so it is silenced here.
+PYTHONWARNINGS="ignore::UserWarning" "$VENV/bin/python" -m pip install --quiet --editable "$APP"
