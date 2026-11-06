@@ -196,7 +196,7 @@ Ablauf in beiden Fällen:
 5. führt Datenbankmigrationen aus und importiert die mitgelieferten Inhalte,
 6. aktualisiert die systemd-Unit und stellt den vorherigen Dienstzustand wieder her: ein laufender Dienst wird neu gestartet, ein gestoppter bleibt gestoppt, Autostart bleibt unverändert.
 
-Die Konfiguration wird nicht überschrieben. Schlägt ein Schritt nach dem Tausch fehl, wird die vorherige Version automatisch zurückgespielt. Jede Installation schreibt `/opt/lpic3-trainer/app/BUILD` mit Version, Commit, Branch oder Release, `dirty`, Quelle und Zeitpunkt; `lpic3ctl --version` liest nur diese Datei.
+Die Konfiguration wird nicht überschrieben (siehe *Konfiguration nach dem Upgrade vergleichen*). Schlägt ein Schritt nach dem Tausch fehl, wird die vorherige Version automatisch zurückgespielt. Jede Installation schreibt `/opt/lpic3-trainer/app/BUILD` mit Version, Commit, Branch oder Release, `dirty`, Quelle und Zeitpunkt; `lpic3ctl --version` liest nur diese Datei.
 
 Zurück zur vorherigen Programmversion:
 
@@ -206,6 +206,32 @@ sudo lpic3ctl rollback --restore ARCHIV      # Programmdateien und Datenbank aus
 ```
 
 Hat das Upgrade das Datenbankschema geändert, verweigert `rollback` ohne `--restore` die Ausführung und nennt das passende Archiv unter `/var/lib/lpic3-trainer/backups/`. Die vorherige Version würde sonst mit einem unbekannten Schema nicht mehr starten. Einzelheiten in `docs/administration.md`.
+
+### Konfiguration nach dem Upgrade vergleichen
+
+Die zentrale Konfiguration bleibt `/etc/lpic3-trainer/lpic3-trainer.env`. Ein Upgrade verändert diese Datei nicht. Das ist beabsichtigt: Keine lokale Einstellung wird ungeprüft überschrieben, und die Datei bleibt vollständig unter Kontrolle des Administrators. Neue Konfigurationsvariablen einer Version, zum Beispiel `LPIC3_PASSWORD_MIN_LENGTH` und `LPIC3_PASSWORD_MAX_LENGTH` seit 0.0.4, erscheinen deshalb nicht automatisch in einer bestehenden Datei. Fehlt eine Variable, verwendet die Anwendung ihren eingebauten Standardwert; mit einer älteren Datei läuft sie also weiter.
+
+Vergleiche nach jedem Upgrade die Beispielkonfiguration der installierten Version mit deiner Datei. Die Beispieldatei wird bei jeder Installation mit dem Programm nach `/opt/lpic3-trainer/app/deploy/` kopiert und passt damit immer zur installierten Version:
+
+```bash
+sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /opt/lpic3-trainer/app/deploy/lpic3-trainer.env.example
+```
+
+Alternativ die Fassung des installierten Release-Tags von GitHub laden; `lpic3ctl --version` zeigt den Tag. Nimm den Tag, nicht `main`: Dort können bereits Optionen eines noch nicht veröffentlichten Stands stehen, die die installierte Version nicht kennt. Beispiel für v0.0.4:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/richtertoralf/LPIC-3-Trainer/v0.0.4/deploy/lpic3-trainer.env.example -o /tmp/lpic3-trainer.env.example
+sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /tmp/lpic3-trainer.env.example
+```
+
+Unterschiede bei Werten, die du bewusst gesetzt hast (`LPIC3_HOST`, Port, Datenverzeichnis), sind normal. Achte auf Variablen, die nur in der Beispieldatei vorkommen: Diese Einstellungen trägst du bei Bedarf von Hand mit dem gewünschten Wert in deine Datei ein. Es gibt keine automatische Übernahme und keine Konfigurationsmigration. Danach den Dienst neu starten und die Konfiguration prüfen:
+
+```bash
+sudo lpic3ctl --restart
+sudo lpic3ctl --check
+```
+
+`--check` meldet ungültige Werte, zum Beispiel eine Passwortlänge außerhalb des erlaubten Bereichs, als Konfigurationsfehler.
 
 Version prüfen:
 

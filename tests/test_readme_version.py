@@ -29,6 +29,10 @@ def test_current_checkout_hints_name_the_current_version():
         text = (PROJECT_DIR / name).read_text()
         tags = set(re.findall(r"git checkout (v\d+\.\d+\.\d+)", text))
         assert tags == {f"v{__version__}"}, (name, tags)
+        # raw.githubusercontent.com/<owner>/<repo>/<tag>/... examples (configuration comparison)
+        raw_url = r"raw\.githubusercontent\.com/[^/]+/[^/]+/(v\d+\.\d+\.\d+)/"
+        raw_tags = set(re.findall(raw_url, text))
+        assert raw_tags <= {f"v{__version__}"}, (name, raw_tags)
 
 
 def test_readme_names_only_existing_management_commands():
