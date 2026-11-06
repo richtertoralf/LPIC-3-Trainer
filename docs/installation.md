@@ -21,7 +21,7 @@ Prüfstand: Der komplette Ablauf (Installation, Dienststart durch systemd, Neust
 sudo apt install git python3 python3-venv
 git clone https://github.com/richtertoralf/LPIC-3-Trainer.git
 cd LPIC-3-Trainer
-git checkout v0.0.4          # oder ein neuerer Tag; nicht v0.0.2, siehe Hinweis oben
+git checkout v0.0.5          # oder ein neuerer Tag; nicht v0.0.2, siehe Hinweis oben
 ```
 
 Für den Betrieb den Tag der gewünschten Version auschecken (`git tag` zeigt alle). `main` enthält den aktuellen Entwicklungsstand.
@@ -224,7 +224,7 @@ Manueller Weg für Entwicklungsstände, Offline-Server oder eine ältere Version
 ```bash
 cd ~/LPIC-3-Trainer
 git fetch --tags
-git checkout v0.0.4        # gewünschter Stand, siehe git tag
+git checkout v0.0.5        # gewünschter Stand, siehe git tag
 sudo lpic3ctl --upgrade --source "$PWD"
 ```
 
@@ -258,10 +258,10 @@ Vergleiche nach jedem Upgrade die Beispielkonfiguration der installierten Versio
 sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /opt/lpic3-trainer/app/deploy/lpic3-trainer.env.example
 ```
 
-Alternativ die Fassung des installierten Release-Tags von GitHub laden; `lpic3ctl --version` zeigt den Tag. Nimm den Tag, nicht `main`: Dort können bereits Optionen eines noch nicht veröffentlichten Stands stehen, die die installierte Version nicht kennt. Beispiel für v0.0.4:
+Alternativ die Fassung des installierten Release-Tags von GitHub laden; `lpic3ctl --version` zeigt den Tag. Nimm den Tag, nicht `main`: Dort können bereits Optionen eines noch nicht veröffentlichten Stands stehen, die die installierte Version nicht kennt. Beispiel für v0.0.5:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/richtertoralf/LPIC-3-Trainer/v0.0.4/deploy/lpic3-trainer.env.example -o /tmp/lpic3-trainer.env.example
+curl -fsSL https://raw.githubusercontent.com/richtertoralf/LPIC-3-Trainer/v0.0.5/deploy/lpic3-trainer.env.example -o /tmp/lpic3-trainer.env.example
 sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /tmp/lpic3-trainer.env.example
 ```
 
@@ -277,7 +277,7 @@ sudo lpic3ctl --check
 Version prüfen:
 
 ```bash
-lpic3ctl --version            # z. B. LPIC-3 Trainer 0.0.4 (commit 1a2b3c4, release v0.0.4, installiert 2026-11-05T21:30:00+01:00)
+lpic3ctl --version            # z. B. LPIC-3 Trainer 0.0.5 (commit 1a2b3c4, release v0.0.5, installiert 2026-11-06T16:00:00+01:00)
 lpic3ctl version --remote     # zusätzlich das neueste stabile Release auf GitHub
 ```
 
