@@ -62,6 +62,7 @@ Abgedeckt werden alle LPIC-3-Prüfungen mit derselben Lernmethode:
 - Betreuer stellen Fragen bereit und begleiten Lerngruppen
 - Anmeldung offen oder mit Freigabe durch einen Betreuer oder Administrator
 - Nutzung auch offline: einmal geladene Lerninhalte bleiben im Browser verfügbar
+- Keine externen Laufzeitabhängigkeiten: alle Webressourcen kommen vom eigenen Server, keine Webfonts, CDNs oder Tracking; Internet nur für Installation und Upgrade ([Betriebsanforderungen](docs/installation.md#betrieb-ohne-internet-im-lan-und-im-internet))
 
 ## Abgrenzung
 
@@ -82,7 +83,7 @@ Die technischen Vorgaben stehen in [AGENTS.md](AGENTS.md).
 
 ## Erste Schritte
 
-Voraussetzungen: Debian 12/13 oder Ubuntu 24.04/26.04 mit systemd, Python 3.11 oder neuer, Root-Rechte für die Installation.
+Voraussetzungen: Debian 12/13 oder Ubuntu 24.04/26.04 mit systemd, Python 3.11 oder neuer, Root-Rechte für die Installation, Internet nur während der Installation.
 
 ```sh
 sudo apt install git python3 python3-venv
