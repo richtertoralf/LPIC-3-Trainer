@@ -10,6 +10,13 @@ Positionierung: gezielte, zügige Vorbereitung auf die englischsprachigen LPIC-3
 
 ## Erledigt
 
+### Offlinefähigkeit und Betriebsanforderungen (Issue #12, 6. November 2026)
+
+- Prüfung: Alle Webressourcen (HTML, CSS, JavaScript, Icons, Manifest, Service Worker) kommen vom eigenen Server, Schriften aus dem System, keine CDNs, keine Webfonts, kein Analytics oder Tracking, keine externen APIs; der Service Worker bearbeitet nur den eigenen Ursprung. Vom Server gehen Verbindungen nach außen nur bei Installation (apt, PyPI, GitHub), `--upgrade` von GitHub und `version --remote`; Links zu LPI und Quellen öffnet der Browser des Lernenden. Keine Änderung am Programm nötig, vorhandene Lösungen beibehalten.
+- Neue Regressionstests: `tests/test_offline_resources.py` (gerenderte Seiten für Gast, Lernende und Administrator, statische Dateien, Templates) und `tests/e2e/test_offline.py::test_learning_flow_sends_no_request_to_other_hosts` (alle Browseranfragen eines Lerndurchlaufs bleiben beim eigenen Server).
+- Dokumentiert in `docs/installation.md` (*Betrieb ohne Internet, im LAN und im Internet*): wann Internet nötig ist, Mindeststandard für LAN und Internet, Reverse Proxy frei wählbar mit den drei Anforderungen (Weiterleitung an 127.0.0.1:8000, `Host`/`X-Forwarded-Host` und `X-Forwarded-Proto`, Uploads ab 5 MB); keine eigene TLS-Verwaltung, keine vorgeschriebene Firewall-, Proxy- oder Monitoringsoftware. README und `docs/architektur.md` ergänzt.
+- Nicht geprüft: Installation ohne Internet (pip braucht einen Paketspiegel oder Wheels) und Betrieb in einem vollständig abgeschotteten Netz als eigener Durchlauf.
+
 ### Produktpositionierung und Alleinstellungsmerkmal (Issues #13 und #14, 6. November 2026)
 
 - Beschreibende Texte präzisiert, keine Programmänderung: README (Kernaussage „Linux verstehen – LPIC-3-Prüfungsenglisch sicher beherrschen“, Fachenglisch-Training als Alleinstellungsmerkmal in der Einleitung, Zusammenspiel von Eingangstest, Sprachhilfen, Vokabelliste, Hilfequote, Simulation und Betreuer-Auswertung, Zielgruppe mit den LPI-Voraussetzungen aktive LPIC-2 und LPIC-1, Gültigkeit fünf Jahre, Prüfungssprachen Englisch und Japanisch, erweiterte Abgrenzung), Startseite und LAB-Übersicht der Oberfläche, Einleitung von `docs/bedienung.md`, Paketbeschreibung in `pyproject.toml`, Kurzbeschreibung des GitHub-Repositorys.

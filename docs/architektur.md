@@ -109,3 +109,4 @@ Alle Einstellungen kommen aus Umgebungsvariablen mit Präfix `LPIC3_` (siehe `do
 - **Editierbare Installation** (`pip install -e`): Programmdateien bleiben unter `/opt/lpic3-trainer/app`, dadurch findet die Anwendung `content/`, `migrations/` und `alembic.ini`.
 - **Sprachhilfe im Browser**: Markierung und Übersetzung passieren im Browser aus mitgelieferten Daten. Es gibt keine externe Übersetzung und keine KI.
 - **Keine Lernanalyse**: nur Zähler je Ziel, Hilfequote und Ergebnisse.
+- **Keine externen Webressourcen**: Schriften aus dem System des Clients, alle Skripte, Stylesheets und Icons unter `/static/`, Service Worker nur für den eigenen Ursprung, keine Analytics. Vom Server gehen nur bei Installation und Upgrade Verbindungen nach außen. Geprüft durch `tests/test_offline_resources.py` und `tests/e2e/test_offline.py`; Betriebsanforderungen in `docs/installation.md`.
