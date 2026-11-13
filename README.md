@@ -109,7 +109,19 @@ Funktionstest: `lpic3ctl --status` zeigt Dienst, Datenbank und die Adresse `http
 
 Die Befehle folgen dem einheitlichen Verwaltungsstandard der RICHTER.PROJECTS-Anwendungen. Die bisherigen Unterbefehle (`lpic3ctl status`, `upgrade`, `backup`, `restore`, `rollback`, `user`, …) bleiben gültig; vollständige Liste in [docs/administration.md](docs/administration.md).
 
-**Konfiguration nach einem Upgrade vergleichen.** Die zentrale Konfiguration bleibt `/etc/lpic3-trainer/lpic3-trainer.env`. Ein Upgrade verändert diese Datei nicht und ergänzt keine neuen Variablen; das ist so gewollt. Fehlende Variablen laufen mit den Standardwerten der Anwendung. Vergleiche deshalb nach jedem Upgrade die Beispielkonfiguration der installierten Version mit deiner Datei und übernimm neue Einstellungen bei Bedarf von Hand:
+## Konfiguration
+
+Alle Einstellungen sind Umgebungsvariablen `LPIC3_*` in `/etc/lpic3-trainer/lpic3-trainer.env` (Datei `0640 root:lpic3`, Vorlage `deploy/lpic3-trainer.env.example`): Bindeadresse und Port, Datenverzeichnis, Cookies und Sitzungsdauer, Umfang der Prüfungssimulationen, Passwortlängen. Die Datei enthält keine Geheimwerte. Den Registrierungsmodus (offen oder mit Freigabe) stellt ein Administrator unter *Verwaltung › Einstellungen* ein; er wirkt sofort.
+
+```sh
+sudoedit /etc/lpic3-trainer/lpic3-trainer.env
+sudo lpic3ctl --restart    # Änderungen wirken erst nach dem Neustart
+sudo lpic3ctl --check      # Prüfliste; ungültige Werte unter „Konfigurationswerte“
+```
+
+Alle Variablen mit Standard, zulässigen Werten, Vorrang und Verhalten bei Upgrade und Entfernen: [docs/installation.md](docs/installation.md#konfiguration).
+
+**Konfiguration nach einem Upgrade vergleichen.** Ein Upgrade verändert die Datei nicht und ergänzt keine neuen Variablen; das ist so gewollt. Fehlende Variablen laufen mit den Standardwerten der Anwendung. Vergleiche deshalb nach jedem Upgrade die Beispielkonfiguration der installierten Version mit deiner Datei und übernimm neue Einstellungen bei Bedarf von Hand:
 
 ```sh
 sudo diff -u /etc/lpic3-trainer/lpic3-trainer.env /opt/lpic3-trainer/app/deploy/lpic3-trainer.env.example
