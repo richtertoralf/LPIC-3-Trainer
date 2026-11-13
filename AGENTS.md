@@ -79,6 +79,25 @@
 - Keine Frontend-Frameworks, keine Build-Pipeline für das Frontend.
 - Keine zusätzlichen Datenbanksysteme, keine Cache- oder Message-Server.
 
+## Gemeinsame Regeln
+
+Gemeinsam beschlossene Regeln der Produktfamilie. **Heute** beschreibt den
+vorhandenen Stand, **Ziel** eine beschlossene, noch offene Umsetzung mit
+Issue. Ein Ziel ist kein Auftrag, es nebenbei oder im Vorgriff umzusetzen.
+
+- Der Trainer hat ein eigenes Erscheinungsbild; der UI-Standard der
+  Produktionsanwendungen gilt nicht.
+- Verwaltung heute: Unterbefehle mit den Schreibweisen `--version`,
+  `--status`, `--upgrade`, `--check`, `--uninstall [--purge]`; Rückgabecodes
+  0 in Ordnung, 1 technischer Fehler, 2 ungültige Parameter oder
+  Konfiguration. Ziel: ungültige Konfiguration bei `--check` mit Exit 2
+  (heute 1, #23).
+- Releases: Bei einem beauftragten Release erhält der `main`-Commit einen
+  unveränderlichen Tag `vX.Y.Z` und ein GitHub Release; nicht jeder Commit ist
+  ein Release. Versionsquelle und Badge ändern sich im selben Commit.
+- Zugang heute: Anmeldung mit Benutzername und Passwort. Lesende Endpunkte
+  dürfen keine Geheimnisse preisgeben.
+
 ## Architektur
 
 - Monolithische Webanwendung.
