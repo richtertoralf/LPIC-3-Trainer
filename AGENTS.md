@@ -79,6 +79,19 @@
 - Keine Frontend-Frameworks, keine Build-Pipeline für das Frontend.
 - Keine zusätzlichen Datenbanksysteme, keine Cache- oder Message-Server.
 
+## Gemeinsame Regeln
+
+- Der Trainer hat ein eigenes Erscheinungsbild; der UI-Standard der
+  Produktionsanwendungen gilt nicht.
+- Verwaltung: `lpic3ctl` mit den Schreibweisen `--help`, `--version`,
+  `--status`, `--upgrade`, `--check`, `--uninstall`, `--purge [--yes]`;
+  Rückgabecodes 0 in Ordnung, 1 technischer Fehler, 2 ungültige Parameter
+  oder Konfiguration (#23).
+- Releasebasiert: Tag `vX.Y.Z` mit GitHub Release auf `main`.
+- Zugang: Oberflächen mit Benutzername und Passwort; lesende Endpunkte ohne
+  Geheimnisse.
+- Neue technische Bezeichner englisch.
+
 ## Architektur
 
 - Monolithische Webanwendung.
