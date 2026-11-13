@@ -181,7 +181,7 @@ Den Registrierungsmodus ändert ein Administrator in der Weboberfläche.
 | `--upgrade` | verändert die Datei nicht und ergänzt keine neuen Variablen; prüft vor dem Dienststopp, ob die neue Version die vorhandene Konfiguration annimmt (sonst Abbruch mit Exitcode 2, der Dienst läuft weiter); sichert Datenbank und Datei. Neue Variablen von Hand übernehmen, siehe [Konfiguration nach dem Upgrade vergleichen](#konfiguration-nach-dem-upgrade-vergleichen) |
 | `restore --with-config` | ersetzt die Datei durch die Fassung aus der Sicherung |
 | `--uninstall` | Datei, Daten und Dienstkonto bleiben |
-| `--uninstall --purge` | löscht `/etc/lpic3-trainer` und das in `LPIC3_DATA_DIR` eingetragene Verzeichnis vollständig samt Inhalt sowie das Dienstkonto. Vorher prüfen, dass dieses Verzeichnis nur Daten des Trainers enthält. |
+| `--uninstall --purge` | löscht `/etc/lpic3-trainer` und das in `LPIC3_DATA_DIR` eingetragene Verzeichnis vollständig samt Inhalt sowie das Dienstkonto. Vorher prüfen, dass dieses Verzeichnis nur Daten des Trainers enthält; eine Einschränkung auf eigene Daten ist geplant (#26). |
 
 ### 9. Prüfung und Fehlerdiagnose
 
@@ -191,7 +191,7 @@ Den Registrierungsmodus ändert ein Administrator in der Weboberfläche.
   Schema, Inhaltsdateien, Unit, Dienst und Health-Endpunkt und zeigt die
   wirksame Passwortrichtlinie. Ungültige Werte erscheinen unter
   *Konfigurationswerte*. `--check` endet mit Exitcode 0, wenn alles in Ordnung
-  ist, sonst mit 1 – auch bei ungültigen Werten. Eine andere Datei als die
+  ist, sonst mit 1 – auch bei ungültigen Werten (Exit 2 dafür ist geplant, #23). Eine andere Datei als die
   installierte kann `--check` nicht prüfen.
 - Ungültige Werte verhindern den Start des Dienstes; die Meldung steht im
   Journal (`sudo lpic3ctl logs`). Bei den Passwortlängen nennt sie den
