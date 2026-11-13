@@ -16,7 +16,7 @@ Verwaltung nach dem einheitlichen Standard der RICHTER.PROJECTS-Anwendungen (Lan
 | `sudo lpic3ctl --uninstall` | Dienst, Programmdateien und Kommando entfernen; Konfiguration, Daten und Dienstkonto bleiben | 0 |
 | `sudo lpic3ctl --uninstall --purge [--yes]` | zusätzlich Konfiguration, Daten und Dienstkonto `lpic3` entfernen, mit Rückfrage | 0, 2 bei Abbruch |
 
-Zusätzlich, nicht Teil des Standards: `lpic3ctl --check` (Prüfliste) und `sudo lpic3ctl --restart`.
+Zusätzlich, nicht Teil des Standards: `lpic3ctl --check` (Prüfliste; Exit 0 nur, wenn alle Prüfpunkte in Ordnung sind, sonst 1, auch bei ungültigen Konfigurationswerten) und `sudo lpic3ctl --restart`. Konfiguration und Prüfung im Einzelnen: [Installation, Konfiguration](installation.md#konfiguration).
 
 Vollständige Befehlsliste:
 
@@ -43,7 +43,7 @@ Vollständige Befehlsliste:
 
 \* Benötigt Schreibrechte auf das Datenverzeichnis. Auf einer Standardinstallation als `root` oder `lpic3` ausführen, zum Beispiel `sudo lpic3ctl backup`. Nach einem als Root ausgeführten Befehl setzt `lpic3ctl` die Eigentümer im Daten- und Konfigurationsverzeichnis wieder auf den Dienstbenutzer, damit keine root-eigenen `-wal`/`-shm`-Dateien den Dienst blockieren. Ohne Root ist die Konfiguration (`0640 root:lpic3`) nicht lesbar; `--status` zeigt dann nur Version und Dienstzustand und bittet um `sudo lpic3ctl --status`, `check` meldet es und arbeitet mit Standardwerten.
 
-Exit-Codes nach dem RICHTER.PROJECTS-Standard: `0` Erfolg (auch „bereits aktuell“, „nichts zu entfernen“ oder bewusst gestoppter Dienst), `1` technischer Fehler (auch nicht installiert, Objekt nicht gefunden, kein Netz), `2` ungültige Parameter, ungültige Konfiguration oder Abbruch durch den Benutzer. Der frühere Code `3` wird nicht mehr verwendet.
+Exit-Codes nach dem RICHTER.PROJECTS-Standard: `0` Erfolg (auch „bereits aktuell“, „nichts zu entfernen“ oder bewusst gestoppter Dienst), `1` technischer Fehler (auch nicht installiert, Objekt nicht gefunden, kein Netz), `2` ungültige Parameter, ungültige Konfiguration oder Abbruch durch den Benutzer. Der frühere Code `3` wird nicht mehr verwendet. Abweichungen im heutigen Stand: `check` endet bei ungültigen Werten mit `1`; ein nicht ganzzahliger Wert in `LPIC3_PORT`, `LPIC3_SESSION_HOURS` oder den Prüfungsvariablen ergibt außer bei `--status` ebenfalls `1`, ungültige Passwortlängen ergeben `2`.
 
 ## Benutzerverwaltung
 
@@ -70,12 +70,7 @@ Registrierung: *Verwaltung › Einstellungen*. `offen` (sofort aktiv) oder `mit 
 
 ### Passwortrichtlinie
 
-Die Richtlinie besteht nur aus Längenvorgaben und wird in `/etc/lpic3-trainer/lpic3-trainer.env` gesetzt, nicht in der Weboberfläche oder Datenbank:
-
-| Variable | Standard | Zulässig |
-|----------|----------|----------|
-| `LPIC3_PASSWORD_MIN_LENGTH` | `8` | ganze Zahl 1 bis 1024 |
-| `LPIC3_PASSWORD_MAX_LENGTH` | `128` | ganze Zahl von der Mindestlänge bis 1024 |
+Die Richtlinie besteht nur aus Längenvorgaben und wird in `/etc/lpic3-trainer/lpic3-trainer.env` mit `LPIC3_PASSWORD_MIN_LENGTH` (Standard `8`) und `LPIC3_PASSWORD_MAX_LENGTH` (Standard `128`) gesetzt, nicht in der Weboberfläche oder Datenbank. Zulässige Werte und alle übrigen Variablen: [Installation, Konfiguration](installation.md#3-einstellungen).
 
 Beispiel für eine Lerngruppe mit einfachen Startpasswörtern:
 
