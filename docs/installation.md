@@ -75,31 +75,129 @@ Weitere Benutzer legt der Administrator unter *Verwaltung › Benutzer* an oder 
 
 ## Konfiguration
 
-Datei `/etc/lpic3-trainer/lpic3-trainer.env` (Beispiel in `deploy/lpic3-trainer.env.example`):
+### 1. Überblick
 
-| Variable | Standard | Bedeutung |
-|----------|----------|-----------|
-| `LPIC3_HOST` | `127.0.0.1` | Bindeadresse. Nur hinter einem Reverse Proxy auf andere Adressen setzen. |
-| `LPIC3_PORT` | `8000` | Port |
-| `LPIC3_DATA_DIR` | `/var/lib/lpic3-trainer` | Datenbank und Sicherungen |
-| `LPIC3_DB_PATH` | `<DATA_DIR>/lpic3-trainer.db` | abweichender Datenbankpfad |
-| `LPIC3_CONTENT_DIR` | `<App>/content` | Verzeichnis der mitgelieferten Inhalte |
-| `LPIC3_SECURE_COOKIES` | `false` | `true` hinter HTTPS |
-| `LPIC3_SESSION_HOURS` | `720` | Sitzungsdauer in Stunden |
-| `LPIC3_LOG_LEVEL` | `info` | Uvicorn-Logstufe |
-| `LPIC3_EXAM_QUESTIONS` | `60` | Fragen je Modulsimulation |
-| `LPIC3_EXAM_MINUTES` | `90` | Zeit je Modulsimulation |
-| `LPIC3_TOPIC_EXAM_QUESTIONS` | `15` | Fragen je Kapiteltest |
-| `LPIC3_ENTRY_QUESTIONS` | `10` | Fragen je Eingangstest |
-| `LPIC3_PASSWORD_MIN_LENGTH` | `8` | Mindestlänge neuer Passwörter in Zeichen (1 bis 1024) |
-| `LPIC3_PASSWORD_MAX_LENGTH` | `128` | Höchstlänge neuer Passwörter in Zeichen (Mindestlänge bis 1024) |
-| `LPIC3_UPGRADE_REMOTE` | GitHub-Repository des Projekts | Git-Remote (URL oder Pfad) für `lpic3ctl --upgrade`, z. B. ein lokaler Spiegel; gilt nur für Upgrade und `version --remote` |
+Der Trainer wird über Umgebungsvariablen mit dem Präfix `LPIC3_` eingestellt.
+Bei der nativen Installation stehen sie in einer Datei, die systemd beim Start
+einliest. Dazu kommt eine Einstellung in der Weboberfläche: der
+Registrierungsmodus. Alle Einstellungen gelten dauerhaft für die Installation;
+es gibt keine Einstellungen je Kurs oder Lerngruppe.
 
-Nach Änderungen: `sudo lpic3ctl restart`.
+### 2. Speicherorte
 
-Passwortrichtlinie: Die beiden Längen gelten einheitlich für Registrierung, Passwortänderung, Benutzeranlage durch Administratoren (Web und `lpic3ctl user create`), `lpic3ctl user set-password` und das vom Administrator zurückgesetzte Startpasswort. Fehlen die Variablen, gelten die bisherigen Werte (mindestens 8 Zeichen, praktisch keine Obergrenze), ein Update ändert also nichts. Bestehende Passwörter bleiben bei einer strengeren Richtlinie gültig; sie gilt erst beim nächsten Setzen eines Passworts. Es gibt keine Komplexitätsregeln und keinen erzwungenen Passwortwechsel. Ungültige Werte (keine ganze Zahl, Mindestlänge unter 1, Höchstlänge kleiner als die Mindestlänge oder über 1024) verhindern den Start des Dienstes mit einer Fehlermeldung im Journal; `sudo lpic3ctl check` meldet sie unter *Konfigurationswerte*. Einzelheiten in `docs/administration.md`.
+| Betrieb | Ort |
+|---|---|
+| Native Installation | `/etc/lpic3-trainer/lpic3-trainer.env` (Vorlage: `deploy/lpic3-trainer.env.example`, nach der Installation auch unter `/opt/lpic3-trainer/app/deploy/`) |
+| Docker Compose | `environment` in `deploy/docker-compose.yml` und `ENV` in `deploy/Dockerfile`; keine Konfigurationsdatei |
+| Entwicklung | `.env.example` im Repository, in die Shell übernehmen |
+| Registrierungsmodus | Datenbank, gesetzt unter *Verwaltung › Einstellungen* |
 
-Für die Entwicklung gibt es `.env.example` im Repository.
+### 3. Einstellungen
+
+| Variable | Standard | Zulässige Werte | Bedeutung |
+|----------|----------|-----------------|-----------|
+| `LPIC3_HOST` | `127.0.0.1` (Docker: `0.0.0.0`) | IP-Adresse oder Hostname | Bindeadresse. Nur hinter einem Reverse Proxy oder für Tests im LAN ändern, siehe [Zugriff aus dem lokalen Netzwerk](#zugriff-aus-dem-lokalen-netzwerk). |
+| `LPIC3_PORT` | `8000` | ganze Zahl | Port |
+| `LPIC3_DATA_DIR` | `/var/lib/lpic3-trainer` (Vorlage) | Pfad | Datenbank und Sicherungen; ohne Variable im Checkout `./data` |
+| `LPIC3_DB_PATH` | `<DATA_DIR>/lpic3-trainer.db` | Pfad | abweichender Datenbankpfad |
+| `LPIC3_CONTENT_DIR` | `<App>/content` | Pfad | Verzeichnis der mitgelieferten Inhalte |
+| `LPIC3_SECURE_COOKIES` | `false` | `true`, `1`, `yes`, `on` = an; jeder andere Wert = aus | `true` hinter HTTPS |
+| `LPIC3_SESSION_HOURS` | `720` | ganze Zahl (Stunden) | Sitzungsdauer |
+| `LPIC3_LOG_LEVEL` | `info` | Uvicorn-Logstufen, z. B. `warning`, `info`, `debug` | Uvicorn-Logstufe |
+| `LPIC3_EXAM_QUESTIONS` | `60` | ganze Zahl | Fragen je Modulsimulation |
+| `LPIC3_EXAM_MINUTES` | `90` | ganze Zahl | Zeit je Modulsimulation |
+| `LPIC3_TOPIC_EXAM_QUESTIONS` | `15` | ganze Zahl | Fragen je Kapiteltest |
+| `LPIC3_ENTRY_QUESTIONS` | `10` | ganze Zahl | Fragen je Eingangstest |
+| `LPIC3_PASSWORD_MIN_LENGTH` | `8` | ganze Zahl 1 bis 1024 | Mindestlänge neuer Passwörter in Zeichen |
+| `LPIC3_PASSWORD_MAX_LENGTH` | `128` | ganze Zahl von der Mindestlänge bis 1024 | Höchstlänge neuer Passwörter in Zeichen |
+| `LPIC3_UPGRADE_REMOTE` | GitHub-Repository des Projekts | Git-URL oder Pfad | Git-Remote für `lpic3ctl --upgrade` und `version --remote`, z. B. ein lokaler Spiegel |
+
+Registrierungsmodus (*Verwaltung › Einstellungen*): `open` (Standard, neue
+Konten sind sofort aktiv) oder `approval` (neue Konten warten auf Freigabe durch
+Betreuer oder Administrator). Das erste registrierte Konto erhält unabhängig
+davon Administratorrechte.
+
+Passwortrichtlinie: Die beiden Längen gelten einheitlich für alle Stellen, die
+ein Passwort setzen; ohne die Variablen gelten 8 und 128 Zeichen. Wirkung und
+Beispiele: [Administration, Passwortrichtlinie](administration.md#passwortrichtlinie).
+
+Nur für `lpic3ctl` und Tests: `LPIC3_CONFIG_DIR`, `LPIC3_INSTALL_DIR`,
+`LPIC3_SYSTEMD_DIR` und `LPIC3_BIN_DIR` verschieben die Pfade, die `lpic3ctl`
+verwendet; die systemd-Unit nutzt fest `/etc/lpic3-trainer` und
+`/opt/lpic3-trainer`. `LPIC3_UNPRIVILEGED_TEST` ist ausschließlich für die
+automatischen Tests. Im Betrieb keine dieser Variablen setzen.
+
+### 4. Prioritäten
+
+- Für den Dienst gilt nur die Datei, die systemd über `EnvironmentFile` einliest;
+  fehlt eine Variable, gilt der eingebaute Standard.
+- Für `lpic3ctl` gilt: bereits in der Shell gesetzte `LPIC3_*`-Variablen haben
+  Vorrang vor der Datei. Für Prüfungen deshalb keine `LPIC3_*`-Variablen in der
+  eigenen Shell setzen, sonst zeigt `lpic3ctl` andere Werte als der Dienst
+  verwendet.
+- `LPIC3_DB_PATH` hat Vorrang vor `LPIC3_DATA_DIR`.
+- Docker: `environment` in der Compose-Datei vor `ENV` im Dockerfile.
+
+### 5. Einrichtung und Änderung
+
+Datei mit Root-Rechten bearbeiten, danach neu starten und prüfen:
+
+```bash
+sudoedit /etc/lpic3-trainer/lpic3-trainer.env
+sudo lpic3ctl restart
+sudo lpic3ctl check
+```
+
+Den Registrierungsmodus ändert ein Administrator in der Weboberfläche.
+
+### 6. Wirksamkeit
+
+| Änderung | Wirksam |
+|---|---|
+| `LPIC3_*` in der Datei | nach `sudo lpic3ctl restart` |
+| `LPIC3_UPGRADE_REMOTE` | beim nächsten Aufruf von `lpic3ctl` |
+| Registrierungsmodus | sofort |
+| Passwortlängen | ab dem nächsten Setzen eines Passworts; bestehende Passwörter bleiben gültig |
+
+### 7. Geheimnisse und Berechtigungen
+
+- Die Konfiguration enthält keine Geheimwerte. Passwörter liegen nur als
+  Argon2id-Hash in der Datenbank; Sitzungen werden serverseitig verwaltet.
+- `/etc/lpic3-trainer` ist `0750 root:lpic3`, die Datei `0640 root:lpic3`.
+  Ohne Root ist sie nicht lesbar; `lpic3ctl` meldet das.
+- Sicherungen (`lpic3ctl backup`) haben den Modus `0600` und enthalten die
+  Datenbank mit Passworthashes sowie die Konfigurationsdatei.
+- Bekannte Grenze: Die Anwendung übernimmt Proxy-Header wie
+  `X-Forwarded-For` unabhängig vom Absender. Bei direkter Bindung an eine
+  Netzwerkadresse ohne Reverse Proxy sind diese Angaben nicht verlässlich; für
+  den Dauerbetrieb deshalb wie unter [Sicherheit](#zugriff-aus-dem-lokalen-netzwerk)
+  beschrieben hinter einem Reverse Proxy betreiben.
+
+### 8. Installation, Aktualisierung, Entfernen
+
+| Vorgang | Wirkung auf die Konfiguration |
+|---|---|
+| `install` | legt die Datei aus der Vorlage an, wenn sie fehlt; eine vorhandene Datei bleibt |
+| `--upgrade` | verändert die Datei nicht und ergänzt keine neuen Variablen; prüft vor dem Dienststopp, ob die neue Version die vorhandene Konfiguration annimmt (sonst Abbruch mit Exitcode 2, der Dienst läuft weiter); sichert Datenbank und Datei. Neue Variablen von Hand übernehmen, siehe [Konfiguration nach dem Upgrade vergleichen](#konfiguration-nach-dem-upgrade-vergleichen) |
+| `restore --with-config` | ersetzt die Datei durch die Fassung aus der Sicherung |
+| `--uninstall` | Datei, Daten und Dienstkonto bleiben |
+| `--uninstall --purge` | löscht `/etc/lpic3-trainer` und das in `LPIC3_DATA_DIR` eingetragene Verzeichnis vollständig samt Inhalt sowie das Dienstkonto. Vorher prüfen, dass dieses Verzeichnis nur Daten des Trainers enthält. |
+
+### 9. Prüfung und Fehlerdiagnose
+
+- `sudo lpic3ctl --status` zeigt Konfigurationsdatei, Datenbank, Schema,
+  Health-Check und Adressen; eine ungültige Konfiguration ergibt Exitcode 2.
+- `sudo lpic3ctl --check` prüft Datei, Werte, Datenverzeichnis, Datenbank,
+  Schema, Inhaltsdateien, Unit, Dienst und Health-Endpunkt und zeigt die
+  wirksame Passwortrichtlinie. Ungültige Werte erscheinen unter
+  *Konfigurationswerte*. `--check` endet mit Exitcode 0, wenn alles in Ordnung
+  ist, sonst mit 1 – auch bei ungültigen Werten. Eine andere Datei als die
+  installierte kann `--check` nicht prüfen.
+- Ungültige Werte verhindern den Start des Dienstes; die Meldung steht im
+  Journal (`sudo lpic3ctl logs`). Bei den Passwortlängen nennt sie den
+  zulässigen Bereich.
+- `lpic3ctl check` ohne Root kann die Datei nicht lesen und prüft dann mit den
+  Standardwerten.
 
 ## Zugriff aus dem lokalen Netzwerk
 
@@ -272,7 +370,7 @@ sudo lpic3ctl --restart
 sudo lpic3ctl --check
 ```
 
-`--check` meldet ungültige Werte, zum Beispiel eine Passwortlänge außerhalb des erlaubten Bereichs, als Konfigurationsfehler.
+`--check` meldet ungültige Werte, zum Beispiel eine Passwortlänge außerhalb des erlaubten Bereichs, unter *Konfigurationswerte* und endet dann mit Exitcode 1 (siehe [Prüfung und Fehlerdiagnose](#9-prüfung-und-fehlerdiagnose)).
 
 Version prüfen:
 
@@ -302,6 +400,8 @@ docker compose -f deploy/docker-compose.yml up -d --build
 ```
 
 Die Anwendung ist dann unter `http://127.0.0.1:8000/` erreichbar. Daten liegen im Volume `lpic3-data` unter `/var/lib/lpic3-trainer`, also in derselben Struktur wie bei der nativen Installation.
+
+Konfiguration: Es gibt keine Konfigurationsdatei. `deploy/Dockerfile` setzt `LPIC3_HOST=0.0.0.0`, `LPIC3_PORT=8000` und `LPIC3_DATA_DIR`; `deploy/docker-compose.yml` setzt `LPIC3_SECURE_COOKIES` und `LPIC3_SESSION_HOURS`. Weitere Variablen aus [Einstellungen](#3-einstellungen) unter `environment` ergänzen und den Container neu erstellen (`docker compose -f deploy/docker-compose.yml up -d`).
 
 Backup im laufenden Container: `docker compose -f deploy/docker-compose.yml exec lpic3-trainer lpic3ctl backup --to /var/lib/lpic3-trainer/backups`.
 
