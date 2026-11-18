@@ -305,3 +305,9 @@ CLAUDE.md
 - Änderungen und Testergebnisse dokumentieren.
 - Offene Punkte und Einschränkungen benennen.
 - Keine ungetesteten Funktionen als fertig melden.
+- Relevante technische Entscheidungen im bestehenden Abschlussbericht in
+  insgesamt 2–6 Sätzen erläutern. Die gewählte Lösung begründen und nur
+  tatsächlich geprüfte Alternativen samt Verwerfungsgrund erwähnen. Einen
+  konkreten Zielkonflikt, ein technisches Konzept oder eine wesentliche
+  Unsicherheit bei Bedarf kurz benennen. Bei Routineänderungen entfällt der
+  Zusatz.
