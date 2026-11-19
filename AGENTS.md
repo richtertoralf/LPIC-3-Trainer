@@ -97,6 +97,24 @@ Issue. Ein Ziel ist kein Auftrag, es nebenbei oder im Vorgriff umzusetzen.
   ein Release. Versionsquelle und Badge ändern sich im selben Commit.
 - Zugang heute: Anmeldung mit Benutzername und Passwort. Lesende Endpunkte
   dürfen keine Geheimnisse preisgeben.
+- Python: Unterstützt werden Ubuntu 24.04 LTS mit Python 3.12 und Ubuntu 26.04
+  LTS mit Python 3.14; andere Versionen werden nicht eigens unterstützt oder
+  getestet. Nichts verwenden, was erst nach 3.12 eingeführt wurde, außer
+  ausdrücklich begründet. Bewährte, einfache Lösungen, möglichst wenige
+  Abhängigkeiten, keine experimentellen Frameworks. Die Funktion wird für
+  beide Zielplattformen nachgewiesen, vorzugsweise auf eigener Infrastruktur;
+  GitHub Actions ist keine Pflicht, keine weiteren Versionsmatrizen, keine
+  Mehrfachläufe nur wegen verschiedener GitHub-Ereignisse. Installer und
+  Upgrader prüfen die Python-Kompatibilität und verwalten die venv; die
+  System-Python-Version ersetzen sie nicht. Gilt für jede Änderung;
+  Bestehendes wird nicht allein deswegen umgebaut. Heute abweichend: README,
+  `docs/installation.md` und diese Datei nennen zusätzlich Debian 12/13 mit
+  Python ab 3.11; Debian 12 liegt unter der Mindestversion. Nachweis für
+  Ubuntu 26.04 mit Python 3.14 steht aus.
+- Tests heute: `.venv/bin/pytest tests --ignore=tests/e2e` und die
+  Playwright-Tests unter `tests/e2e`. Der Prüfbefehl läuft vor dem Merge
+  vollständig lokal; das Ergebnis steht im PR. Ein Nachweis für Ubuntu 26.04
+  mit Python 3.14 erfolgt vor Release und Feldeinsatz.
 
 ## Architektur
 
