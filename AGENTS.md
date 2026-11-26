@@ -97,6 +97,12 @@ Issue. Ein Ziel ist kein Auftrag, es nebenbei oder im Vorgriff umzusetzen.
   ein Release. Versionsquelle und Badge ändern sich im selben Commit.
 - Zugang heute: Anmeldung mit Benutzername und Passwort. Lesende Endpunkte
   dürfen keine Geheimnisse preisgeben.
+- Einfachheit: die kleinste robuste Lösung, nichts auf Vorrat. Keine zweite
+  Implementierung derselben Funktion und kein Sonderweg je Sportart, Marke
+  oder Quelle, wo ein allgemeiner Mechanismus reicht. Vor einer größeren
+  Erweiterung früh und produktübergreifend klären: fachliches Ziel,
+  wiederverwendbare Mechanismen, einfachere Lösung, unvermeidbare
+  Komplexität, was dadurch entfallen kann.
 - Python: Unterstützt werden Ubuntu 24.04 LTS mit Python 3.12 und Ubuntu 26.04
   LTS mit Python 3.14; andere Versionen werden nicht eigens unterstützt oder
   getestet. Nichts verwenden, was erst nach 3.12 eingeführt wurde, außer
@@ -310,11 +316,15 @@ CLAUDE.md
 
 ## Dokumentation
 
+Dokumentation ist Teil jeder Änderung und beschreibt den Stand des Branches, auf dem sie liegt.
+
 - README als verständlicher Einstieg: Nutzen vor technischen Details.
 - Nur tatsächlich vorhandene Funktionen und Befehle als verfügbar beschreiben; Status und bekannte Grenzen korrekt halten.
-- Bei Änderungen an Funktionen, Installation, Bedienung, Verwaltungsbefehlen oder Entwicklungsstand README und `docs/` auf nötige Anpassungen prüfen.
+- Jede verbindliche Aussage hat einen Ort; andere Stellen verweisen darauf. Einen Inhalt erst durch einen Verweis ersetzen, wenn er am Zielort vollständig dokumentiert ist. Überholte Aussagen ersetzen oder entfernen; gültige Informationen nicht ohne fachlichen Grund entfernen.
+- **Vor jedem Commit:** betroffene Dokumentation im selben Commit nachführen. Ist keine betroffen, entsteht keine künstliche Änderung.
+- **Vor jedem Merge:** Umsetzung gegen die betroffene Dokumentation und die geltenden Regeln prüfen; Folgen für andere Repositories und gemeinsame Schnittstellen nennen; Roadmap (`docs/stand.md`) und Aufgabenstatus auf den tatsächlichen Stand bringen.
+- **Vor jedem Release:** Installation, Konfiguration, Schnittstellen, Bedienung und bekannte Einschränkungen gegen den Release-Stand abgleichen. Nichts Erledigtes steht als offen, nichts Ungeprüftes als abgenommen. Der Release-PR nennt, was fachlich hinzukam, und den Umfang seit dem letzten Release (`git diff --shortstat <letzter Tag>..HEAD`).
 - Technische Details in `docs/` dieses Repositorys pflegen; keine notwendigen Informationen nur in anderen Repositories.
-- Bestehende Informationen nicht ohne fachlichen Grund entfernen.
 - Die vorhandene Dokumentationsstruktur dieses Projekts respektieren.
 - Versionsquelle ist `__version__` in `app/__init__.py`; `pyproject.toml`, das Versions-Badge in `README.md` und aktuelle Versionsangaben in `docs/` ändern sich im selben Commit (geprüft durch `tests/test_readme_version.py`).
 
